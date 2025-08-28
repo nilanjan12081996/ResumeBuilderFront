@@ -54,64 +54,6 @@ const inter = Inter({
 })
 
 const Page = () => {
-  const { coins, avilableData } = useSelector((state) => state?.coinData)
-  const { historyData } = useSelector((state) => state?.his)
-  const dispatch = useDispatch()
-  const [isclick, setIsclick] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [selectedCoin, setSelectedCoin] = useState('');
-  const [selectedCoinSymbol, setSelectedCoinSymbol] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-  const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(1);
-  const limit = 10;
-  useEffect(() => {
-    dispatch(getSearchHistory({ page: currentPage, limit }));
-  }, [dispatch, currentPage]);
-  const list = historyData?.data?.list || [];
-  const totalPage = historyData?.data?.pagination?.pages || 1;
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-  };
-  console.log("historyData", historyData);
-
-  useEffect(() => {
-    dispatch(getCoins())
-  }, [])
-  // console.log("coinsd", coins)
-
-
-  const coinItems = Array.isArray(coins)
-    ? coins?.map((coin) => coin).filter(Boolean)
-    : [];
-
-  // Filter coins based on search term
-  const filteredCoins = coinItems.filter((coin) =>
-    coin?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    coin?.symbol?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-
-  const handleCoinSelect = (coin) => {
-    console.log(coin, "coin");
-
-    setSelectedCoin(coin.name);
-    setSelectedCoinSymbol(coin.symbol.toLowerCase());
-    // setSearchTerm(''); // Clear search after selection
-    setSearchTerm(coin.name);
-    setShowDropdown(false);
-
-  };
-  useEffect(() => {
-    dispatch(checkAvilableSearch())
-  }, [])
-  console.log("Avil", avilableData);
-
-  const handlePredictClick = () => {
-    // Set isclick to true in Redux before navigation
-    dispatch(setIsClick(true));
-  };
 
   return (
     <div className={`${inter.className} antialiased`}>

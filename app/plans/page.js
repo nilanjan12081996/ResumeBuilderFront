@@ -2,266 +2,480 @@
 import { useEffect, useState } from "react"
 import { IoIosCheckmarkCircle } from "react-icons/io"
 import { useDispatch, useSelector } from "react-redux"
-import { createSubscriptions, getPlans } from "../reducers/PlanSlice"
+import { createSubscriptions, getIpData, getPlans } from "../reducers/PlanSlice"
 import PaymentModal from "../modal/PaymentModal";
 import { checkSubscription } from "../reducers/ProfileSlice";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Image from "next/image";
+import sub01 from "../../app/assets/imagesource/sub01.png"
+import sub02 from "../../app/assets/imagesource/sub02.png";
+import Check from "../../app/assets/imagesource/Check.png";
+
 
 const page = () => {
-    const { plans } = useSelector((state) => state?.planst)
-    const { subscriptionData } = useSelector((state) => state?.profile)
-    const disptach = useDispatch()
-    const [cSecrateKey, setCsecrateKey] = useState()
-    const [sPublishKey, setSPublishKey] = useState()
-    const [openPaymentModal, setOpenPaymentModal] = useState()
-    const [subsId, setSubsId] = useState()
-    const [customerId, setCustomerid] = useState()
-    const [planId, setPlanId] = useState()
-    useEffect(() => {
-        disptach(getPlans())
-    }, [])
-    useEffect(() => {
-        disptach(checkSubscription())
-    }, [])
-    console.log("subscriptionData", subscriptionData);
-
-    const handleCreateSubscription = (id) => {
-        setPlanId(id)
-        disptach(createSubscriptions({ plan_id: id })).then((res) => {
-            console.log("resStripe", res)
-            if (res?.payload?.status_code === 201) {
-                setCsecrateKey(res?.payload?.clientSecret)
-                setSPublishKey(res?.payload?.stripe_publish)
-                setSubsId(res?.payload?.subscriptionId)
-                setCustomerid(res?.payload?.customer_id)
-                setOpenPaymentModal(true)
-            }
-        })
+    const { plans,ipData } = useSelector((state) => state?.planst)
+const usertypeId = sessionStorage.getItem('signup_type_id');
+const parsed = usertypeId ? JSON.parse(usertypeId) : null;
+console.log("userPlanId", parsed?.signup_type_id); // 2
+const dispatch=useDispatch()
+useEffect(()=>{
+dispatch(getIpData()).then((res)=>{
+    console.log("Ipres:",res);
+    if(res?.payload?.ip){
+        dispatch(getPlans({plan_type:parsed?.signup_type_id,ip_address:res?.payload?.ip}))
     }
+})
+},[])
+console.log("plans",plans);
+
+   
     return (
         <>
             <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
-                <div className=''>
-                    {
-                        (subscriptionData?.data && new Date(subscriptionData.data.stripe_subscription_end_date) > new Date()) && (
-                            <div className="bg-[#222222] rounded-4xl p-5 mb-4">
-                                <p className="text-2xl text-white mb-2">Your Active Plan</p>
-                                <div>
-                                    <p className="text-[#42C4AD] text-[15px] mb-1"><span className="text-[#6d6d6d]">Plan Name:</span> {subscriptionData?.data?.Plan?.plan_name}</p>
-                                    <p className="text-[#42C4AD] text-[15px] mb-1"><span className="text-[#6d6d6d]">Price:</span> ${subscriptionData?.data?.Plan?.price}/{subscriptionData?.data?.Plan?.billing_cycle}</p>
-                                    <p className="text-[#42C4AD] text-[15px] mb-1"><span className="text-[#6d6d6d]">Start Date:</span> {new Date(subscriptionData?.data?.stripe_subscription_start_date).toISOString().split('T')[0]}</p>
-                                    <p className="text-[#42C4AD] text-[15px] mb-1"><span className="text-[#6d6d6d]">End Date:</span> {new Date(subscriptionData?.data?.stripe_subscription_end_date).toISOString().split('T')[0]}</p>
-                                </div>
-
-                            </div>
-                        )
-                    }
-
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-[#222222] rounded-4xl p-5">
-                        {
-                            plans?.data?.map((plansDatas, index) => {
-                                return (
-                                    <div key={index}>
+                <div className="purchase_section py-8 lg:py-20">
+                           <div className='max-w-6xl mx-auto'>
+                              {/* <div className="text-center mb-10 lg:mb-10">
+                                 <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
+                                 <p className="text-[#4C4B4B] text-base lg:text-[18px] leading-[30px] lg:px-32">Discover the ideal plan to fuel your business growth. Our pricing options are carefully crafted to cater to businesses.</p>
+                              </div> */}
+                              <div className="subscription_tab_section">
+                                 <Tabs>
+                                    <TabList>
+                                     {parsed?.signup_type_id==1&&(
+                                        <Tab>One Time</Tab>
+                                     )}  
+                                       <Tab>Quarterly </Tab>
+                                      {
+                                        parsed?.signup_type_id==2&&(
+                                        <Tab>Annual </Tab>
+                                        )
+                                      } 
+                                    </TabList>
+                                      
+                                      {
+                                        parsed?.signup_type_id==1&&(
+                                            <>
+                                             <TabPanel>
+                                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
+                                        
                                         {
-                                            index % 2 == 0 ? (
-                                                <div key={index}>
-                                                    <div className="pt-5" >
-                                                        <div className="py-8 px-6">
-                                                            <h3 className="text-[19px] text-[#ffffff] pb-6 font-medium">{plansDatas?.plan_name}</h3>
-                                                            <div className="flex items-center gap-2 mb-8">
-                                                                <p className="text-[#ffffff] text-[36px] leading-[36px] font-extrabold">{plansDatas?.currency} {plansDatas?.price}</p>
-                                                                <div>
-                                                                    <p className="text-[#cbced1] text-[12px] leading-[16px]">/month</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="mb-10">
-                                                                <div>
-                                                                    {
-                                                                        plansDatas?.plan_features?.map((fets, index) => {
-                                                                            return (
-                                                                                <div key={index}>
-                                                                                    <div className="flex gap-1 text-[#6d6d6d] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" />{fets}</div>
-                                                                                </div>
-                                                                            )
-                                                                        })
-                                                                    }
-
-                                                                    {/* <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> real-time analysis</div> */}
-                                                                </div>
-                                                            </div>
-                                                            {
-                                                                (subscriptionData?.data && new Date(subscriptionData?.data?.stripe_subscription_end_date) > new Date()) || subscriptionData?.data?.subscription_status === "active" ? (
-                                                                    <>
-
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        {
-                                                                            plansDatas?.price !== 0 && (
-                                                                                <div className="mt-[50px]">
-                                                                                    <button onClick={() => handleCreateSubscription(plansDatas?.id)} className="bg-[#EBFFFC] hover:bg-[#055346] text-[#055346] hover:text-[#EBFFFC] text-[16px] leading-[40px] rounded-md w-full block cursor-pointer">Choose Plan</button>
-                                                                                </div>
-                                                                            )
-                                                                        }
-                                                                    </>
-
-                                                                )
-                                                            }
-
-                                                        </div>
-                                                    </div>
-
+                                            plans?.data?.map((pln,index)=>{
+                                                return(
+                                                    <>
+                                                     <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                              {
+                                                pln?.plan_name==="Gold"?(
+                                                    <Image src={sub02} alt='sub01' className='mb-6' />
+                                                ):(
+                                                     <Image src={sub01} alt='sub01' className='mb-6' />
+                                                )
+                                              }  
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{pln?.plan_name}</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium"><span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">{pln?.planPrice?.currency}</span> {pln?.planPrice?.price}</p>
                                                 </div>
-                                            ) : (
-                                                <>
-                                                    <div className="most_popular_bg border-[10px] border-[#8ac6b1] rounded-4xl p-4" >
-                                                        <div className="">
-                                                            <div className="pt-2 px-1">
-                                                                <div className="flex justify-between items-center pb-6">
-                                                                    <h3 className="text-[15px] text-[#F3F3F3] font-medium">{plansDatas?.plan_name}</h3>
-                                                                    <div className="text-[12px] font-medium rounded-md leading-[30px] text-[#023F9B] px-4 bg-white">
-                                                                        Most Popular
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 mb-8">
-                                                                    <p className="text-[#ffffff] text-[36px] leading-[36px] font-extrabold">{plansDatas?.currency} {plansDatas?.price}</p>
-                                                                    <div>
-                                                                        <p className="text-[#F3F3F3] text-[12px] leading-[16px]">/month</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="mb-16">
-                                                                    <div>
-                                                                        {
-                                                                            plansDatas?.plan_features?.map((ft, index) => {
-                                                                                return (
-                                                                                    <div key={index}>
-                                                                                        <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" />{ft}</div>
-                                                                                    </div>
-                                                                                )
-                                                                            })
-                                                                        }
-
-                                                                        {/* <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> real-time analysis</div>
-                                                                 <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> priority analysis</div>
-                                                                 <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> 10 searches</div> */}
-                                                                    </div>
-                                                                </div>
-                                                                {(subscriptionData?.data && new Date(subscriptionData?.data?.stripe_subscription_end_date) > new Date()) || subscriptionData?.data?.subscription_status === "active" ? (
-                                                                    <></>
-                                                                ) : (
-                                                                    <div>
-                                                                        <button onClick={() => handleCreateSubscription(plansDatas?.id)} className="bg-[#013859] hover:bg-[#52A8CD] text-[#F3F3F3] hover:text-[#EBFFFC] text-[16px] leading-[40px] rounded-md w-full block cursor-pointer">Choose Plan</button>
-                                                                    </div>
-                                                                )}
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                    {pln?.PlanAccess?.map((pAccess)=>{
+                                                        return(
+                                                            <>
+                                                        <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> {pAccess?.plan_access_description}
+                                                      </div>
+                                                            </>
+                                                        )
+                                                    })}
+                                                    
+                                                
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                                    </>
+                                                )
+                                            })
                                         }
-                                    </div>
-                                )
-                            })
-                        }
-                        {/* <div className="pt-5">
-                                <div className="py-8 px-6">
-                                   <h3 className="text-[19px] text-[#1D2127] pb-6 font-medium">Free</h3>
-                                   <div className="flex items-center gap-2 mb-8">
-                                      <p className="text-[#1D2127] text-[36px] leading-[36px] font-extrabold">$0</p>
-                                      <div>
-                                         <p className="text-[#cbced1] text-[12px] leading-[16px]">/month</p>
-                                      </div>
-                                   </div>
-                                   <div className="mb-16">
-                                      <div>
-                                         <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> 2 searches/day</div>
-                                         <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> real-time analysis</div>
-                                      </div>
-                                   </div>
-                                   <div className="mt-[120px]">
-                                      <button className="bg-[#EBFFFC] hover:bg-[#055346] text-[#055346] hover:text-[#EBFFFC] text-[16px] leading-[40px] rounded-md w-full block cursor-pointer">Choose Plan</button>
-                                   </div>
-                                </div>
-                             </div>
-                             <div className="most_popular_bg border-[10px] border-[#8ac6b1] rounded-4xl p-4">
-                                <div className="">
-                                   <div className="pt-2 px-6">
-                                      <div className="flex justify-between items-center pb-6">
-                                         <h3 className="text-[19px] text-[#F3F3F3] font-medium">Pro</h3>
-                                         <div className="text-[12px] font-medium rounded-md leading-[30px] text-[#023F9B] px-4 bg-white">
-                                            Most Popular
-                                         </div>
-                                      </div>
-                                      <div className="flex items-center gap-2 mb-8">
-                                         <p className="text-[#ffffff] text-[36px] leading-[36px] font-extrabold">$10</p>
-                                         <div>
-                                            <p className="text-[#F3F3F3] text-[12px] leading-[16px]">/month</p>
-                                         </div>
-                                      </div>
-                                      <div className="mb-16">
-                                         <div>
-                                            <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> Unlimited searches</div>
-                                            <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> real-time analysis</div>
-                                            <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> priority analysis</div>
-                                            <div className="flex gap-1 text-[#F3F3F3] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#52A8CD] text-xl" /> 10 searches</div>
-                                         </div>
-                                      </div>
-                                      <div>
-                                         <button className="bg-[#013859] hover:bg-[#52A8CD] text-[#F3F3F3] hover:text-[#EBFFFC] text-[16px] leading-[40px] rounded-md w-full block cursor-pointer">Choose Plan</button>
-                                      </div>
-                                   </div>
-                                </div>
-                             </div>
-                             <div className="pt-5">
-                                <div className="py-8 px-6">
-                                   <h3 className="text-[19px] text-[#1D2127] pb-6 font-medium">Premium</h3>
-                                   <div className="flex items-center gap-2 mb-8">
-                                      <p className="text-[#1D2127] text-[36px] leading-[36px] font-extrabold">$100</p>
-                                      <div>
-                                         <p className="text-[#cbced1] text-[12px] leading-[16px]">/month</p>
-                                      </div>
-                                   </div>
-                                   <div className="mb-16">
-                                      <div>
-                                         <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> Unlimited searches</div>
-                                         <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> real-time analysis</div>
-                                         <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> priority analysis</div>
-                                         <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> 120 searches</div>
-                                      </div>
-                                   </div>
-                                   <div>
-                                      <button className="bg-[#EBFFFC] hover:bg-[#055346] text-[#055346] hover:text-[#EBFFFC] text-[16px] leading-[40px] rounded-md w-full block cursor-pointer">Choose Plan</button>
-                                   </div>
-                                </div>
-                             </div> */}
-                        {/* <div className="pt-5">
-                            <div className="py-8 px-6">
-                                <h3 className="text-[19px] text-[#1D2127] pb-6 font-medium">Enterprise</h3>
-                                <div className="mb-16">
-                                         <div>
-                                            <div className="flex gap-1 text-[#393d42] text-[14px] mb-2"><IoIosCheckmarkCircle className="text-[#bfc4c7] text-xl" /> </div>
-                                         </div>
-                                      </div>
-                                <div className="mt-[240px]">
-                                    <button className="bg-[#EBFFFC] hover:bg-[#055346] text-[#055346] hover:text-[#EBFFFC] text-[16px] leading-[40px] rounded-md w-full block cursor-pointer">Discuss with us</button>
-                                </div>
-                            </div>
-                        </div> */}
-                    </div>
-                </div>
-                {
-                    openPaymentModal && (
-                        <PaymentModal
-                            openPaymentModal={openPaymentModal}
-                            setOpenPaymentModal={setOpenPaymentModal}
-                            cSecrateKey={cSecrateKey}
-                            sPublishKey={sPublishKey}
-                            subsId={subsId}
-                            customerId={customerId}
-                            planId={planId}
-                        />
-                    )
-                }
+                                         
+                                          {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹199</p>
+                                                    <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume (Premium ATS score + better rating) +1 JD match resume
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub02} alt='sub02' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹499</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹699</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 LinkedIn rewrite
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Platinum</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹649</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹949</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume  +1 LinkedIn rewrite
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div> */}
+                                          
+                                       </div>
+                                            </TabPanel>
+                                            </>
+                                        )
+                                      }
+                                   
+                                    <TabPanel>
+                                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Free</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹0</p>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 3 resumes (with watermark)
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹799</p>
+                                                    <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹999</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 8 resumes (premium ATS score) + 8 JD specific resume
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub02} alt='sub02' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1299</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹1599</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 8 resumes + 2 LinkedIn rewrites
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[0] w-full px-6">
+                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </TabPanel>
+                                    {/* <TabPanel>
+                                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Basic</h3>
+                                                <div className="gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹60,000</p>
+                                                   <div className="pt-0">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹90,000</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 500 resumes
+                                                      </div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹120/resume
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[10px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Pro</h3>
+                                                <div className="gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1,00,000</p>
+                                                    <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹1,50,000</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1,000 resumes
+                                                      </div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹100/resume
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub02} alt='sub02' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Plus</h3>
+                                                <div className="gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1,20,000</p>
+                                                   <div className="pt-0">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹1,70,000</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 500 resumes
+                                                      </div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 500 LinkedIn rewrites
+                                                      </div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹80/resume + LinkedIn
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Elite</h3>
+                                                <div className="gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1,70,000</p>
+                                                   <div className="pt-0">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹2,00,000</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1,000 resumes
+                                                      </div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1,000 LinkedIn rewrites
+                                                      </div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹85/resume + LinkedIn
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          
+                                       </div>
+                                    </TabPanel> */}
+                                     {
+                                        parsed?.signup_type_id==2&&(
+                                            <>
+                                             <TabPanel>
+                                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
+                                        
+                                        {
+                                            plans?.data?.map((pln,index)=>{
+                                                return(
+                                                    <>
+                                                     <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                              {
+                                                pln?.plan_name==="Campus Plus"?(
+                                                    <Image src={sub02} alt='sub01' className='mb-6' />
+                                                ):(
+                                                     <Image src={sub01} alt='sub01' className='mb-6' />
+                                                )
+                                              }  
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{pln?.plan_name}</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium"><span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">{pln?.planPrice?.currency}</span> {pln?.planPrice?.price}</p>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                    {pln?.PlanAccess?.map((pAccess)=>{
+                                                        return(
+                                                            <>
+                                                        <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> {pAccess?.plan_access_description}
+                                                      </div>
+                                                            </>
+                                                        )
+                                                    })}
+                                                    
+                                                
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                                    </>
+                                                )
+                                            })
+                                        }
+                                         
+                                          {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹199</p>
+                                                    <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume (Premium ATS score + better rating) +1 JD match resume
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub02} alt='sub02' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹499</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹699</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 LinkedIn rewrite
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative">
+                                                <Image src={sub01} alt='sub01' className='mb-6' />
+                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Platinum</h3>
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹649</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹949</p>
+                                                   </div>
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume  +1 LinkedIn rewrite
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div> */}
+                                          
+                                       </div>
+                                            </TabPanel>
+                                            </>
+                                        )
+                                      }
+                                 </Tabs>
+                              </div>
+                           </div>
+                        </div>
+        
             </div>
         </>
     )

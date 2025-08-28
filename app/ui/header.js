@@ -15,11 +15,15 @@ import RegistrationModal from '../modal/RegistrationModal';
 import PriceListModal from '../modal/PriceListModal';
 
 import { FaArrowRight } from "react-icons/fa6";
+import { AiOutlineLogin } from 'react-icons/ai';
+import ChoiceModal from '../modal/ChoiceModal';
 
 
 const Header = () => {
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [openRegisterModal, setOpenRegisterModal] = useState(false);
+  const [openChoiceModal,setOpenChoiceModal]=useState(false)
+  const [chooseResumeType,setChooseResumeType]=useState()
   const [openVerifyOtpModal, setOpenVerifyOtpModal] = useState(false);
   const [openPricModal, setOpenPriceModal] = useState(false)
 
@@ -104,7 +108,11 @@ const Header = () => {
                   {/* <button onClick={() => setOpenLoginModal(true)} className="text-[#046D78] bg-white cursor-pointer font-medium text-xs lg:text-sm rounded-[5px] px-2 py-1 lg:px-6 lg:py-2 border-2 border-[#046D78] hover:bg-[#046D78] hover:text-[#ffffff]">
                     Login
                   </button> */}
-                  <button onClick={() => setOpenRegisterModal(true)} className="text-white bg-[#800080] flex items-center cursor-pointer font-medium text-xs lg:text-[16px] rounded-[5px] px-2 py-1 lg:px-6 lg:py-3 border-2 border-[#800080] hover:bg-white hover:text-[#800080]">
+                    <button onClick={() => setOpenLoginModal(true)} className="text-white bg-[#800080] flex items-center cursor-pointer font-medium text-xs lg:text-[16px] rounded-[5px] px-2 py-1 lg:px-6 lg:py-3 border-2 border-[#800080] hover:bg-white hover:text-[#800080]">
+                    Log in
+                    <AiOutlineLogin className='ml-2' />
+                  </button>
+                  <button onClick={() => setOpenChoiceModal(true)} className="text-white bg-[#800080] flex items-center cursor-pointer font-medium text-xs lg:text-[16px] rounded-[5px] px-2 py-1 lg:px-6 lg:py-3 border-2 border-[#800080] hover:bg-white hover:text-[#800080]">
                     Get Started
                     <FaArrowRight className='ml-2' />
                   </button>
@@ -121,6 +129,7 @@ const Header = () => {
                 openLoginModal={openLoginModal}
                 setOpenLoginModal={setOpenLoginModal}
                 setOpenRegisterModal={setOpenRegisterModal}
+                setOpenChoiceModal={setOpenChoiceModal}
               />
             }
           </>
@@ -138,8 +147,10 @@ const Header = () => {
                 setOpenLoginModal={setOpenLoginModal}
                 openPricModal={openPricModal}
                 setOpenPriceModal={setOpenPriceModal}
+                chooseResumeType={chooseResumeType}
               />
             }
+
           </>
           {/* register popup ends here */}
           {
@@ -147,6 +158,16 @@ const Header = () => {
               <PriceListModal
                 openPricModal={openPricModal}
                 setOpenPriceModal={setOpenPriceModal}
+              />
+            )
+          }
+          {
+            openChoiceModal&&(
+              <ChoiceModal
+              openChoiceModal={openChoiceModal}
+              setOpenChoiceModal={setOpenChoiceModal}
+              setChooseResumeType={setChooseResumeType}
+              setOpenRegisterModal={setOpenRegisterModal}
               />
             )
           }

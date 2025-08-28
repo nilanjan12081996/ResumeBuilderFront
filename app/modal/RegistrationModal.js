@@ -6,7 +6,7 @@ import registerStepone from "../assets/imagesource/register_stepone.png";
 import { useForm } from "react-hook-form";
 import VerifyOtpModal from "./verifyOtpModal";
 import { useDispatch, useSelector } from "react-redux";
-import { registerCustomer } from "../reducers/AuthSlice";
+import { registerCustomer, registerCustomerOrg } from "../reducers/AuthSlice";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { checkSubscription } from "../reducers/ProfileSlice";
@@ -16,7 +16,7 @@ import { getSearchHistory } from "../reducers/SearchHistroySlice";
 import { RiGoogleFill } from "react-icons/ri";
 import Link from 'next/link';
 
-const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVerifyOtpModal, setOpenLoginModal, openPricModal, setOpenPriceModal }) => {
+const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVerifyOtpModal, setOpenLoginModal, openPricModal, setOpenPriceModal,chooseResumeType }) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading } = useSelector((state) => state?.auth);
@@ -29,44 +29,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
         formState: { errors },
     } = useForm();
     const password = watch("password");
-    const onSubmit = (data) => {
-        console.log("registration data", data)
-        dispatch(registerCustomer(data)).then((res) => {
-            console.log("registration res", res)
-            if (res?.payload?.status_code === 201) {
-                toast.success(res?.payload?.message, {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    progress: undefined,
-                    theme: "light",
-                });
-                //setOpenRegisterModal(false);
-                //setOpenLoginModal(true);
-                // setOpenPriceModal(true)
-                dispatch(checkSubscription()).then((res) => {
-                    console.log("res", res);
-                    if (res?.payload?.data) {
-
-                        setOpenRegisterModal(false);
-                        router.push('/dashboard');
-                        dispatch(getSearchHistory({ week: 0 }));
-                    } else {
-
-                        setOpenRegisterModal(false);
-                        router.push('/plans');
-                        dispatch(getSearchHistory({ week: 0 }));
-                    }
-                })
-            } else if (res?.payload?.response?.data?.status_code === 422) {
-                const validationErrors = res?.payload?.response?.data?.data || []
-                console.log("validationErrors", validationErrors);
-                const combinedMessages = validationErrors.map((e) => e.message).join(' | ');
-                setError(combinedMessages);
-            }
-        })
-    };
+  
 
     const openLoginModal = () => {
         setOpenLoginModal(true);
@@ -76,6 +39,57 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     const handlePriceModal = () => {
         setOpenPriceModal(true)
         setOpenRegisterModal(false);
+    }
+    const onSubmit=(data)=>{
+        const payload1={
+            signup_type_id:1,
+            fullname:data?.first_name+" "+data?.last_name,
+            username:data?.username,
+            email:data?.email,
+            password:data?.password,
+            confirm_password:data?.confirm_password
+        }
+        const payload2={
+            signup_type_id:2,
+            fullname:data?.first_name+" "+data?.last_name,
+            username:data?.username,
+            organization_name:data?.organization_name,
+            email:data?.email,
+            password:data?.password,
+            confirm_password:data?.confirm_password
+        }
+        if(chooseResumeType==='organization'){
+            dispatch(registerCustomerOrg(payload2)).then((res)=>{
+                console.log("resRegOrg",res);
+                if(res?.payload?.status_code===201){
+                    setOpenRegisterModal(false);
+                        router.push('/dashboard');
+                }
+                else if(res?.payload?.response?.data?.status_code === 400){
+                    const validationErrors = res?.payload?.response?.data?.data || []
+                console.log("validationErrors", validationErrors);
+                const combinedMessages = validationErrors.map((e) => e.message).join(' | ');
+                setError(combinedMessages);
+                }
+            })
+        }else{
+ dispatch(registerCustomer(payload1)).then((res)=>{
+    console.log("resRegind",res);
+      if(res?.payload?.status_code===201){
+                    setOpenRegisterModal(false);
+                        router.push('/dashboard');
+                }
+              else if (res?.payload?.response?.data?.status_code === 400) {
+                    const validationErrors = res?.payload?.response?.data?.errors || [];
+                    console.log("validationErrors", validationErrors);
+                    // Extract "msg" from each error
+                    const combinedMessages = validationErrors.map((e) => e.msg).join(" | ");
+
+  setError(combinedMessages);
+}
+ })
+        }
+       
     }
 
     return (
@@ -154,6 +168,26 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                                 </span>
                                             )}
                                         </div>
+                                        {
+                                            chooseResumeType==='organization'&&(
+                                               <div className='mb-2'>
+                                            <div className="mb-0 block">
+                                                <Label>Organization Name</Label>
+                                            </div>
+                                            <TextInput type="text" placeholder="Enter your Organization Name"
+                                                {...register("organization_name", {
+                                                    required: "Organization Name is required",
+                                                })}
+                                            />
+                                            {errors?.organization_name && (
+                                                <span className="text-red-500">
+                                                    {errors?.organization_name?.message}
+                                                </span>
+                                            )}
+                                        </div>
+                                            )
+                                        }
+                                          
                                         <div className='mb-2'>
                                             <div className="mb-0 block">
                                                 <Label>Enter your Password</Label>
@@ -198,7 +232,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                                 </span>
                                             )}
                                         </div>
-                                        <Button  type="button" onClick={handlePriceModal} className='mt-2'>{loading ? "Wait..." : "Sign Up"}</Button>
+                                        <Button  type="submit"  className='mt-2'>{loading ? "Wait..." : "Sign Up"}</Button>
                                         {
                                             error && (
                                                 <div className="text-center text-sm text-red-600 mt-3">{error}</div>

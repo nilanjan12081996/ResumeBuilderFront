@@ -64,7 +64,6 @@ const poppins = Poppins({
    display: 'swap',
 });
 
-
 export default function Home() {
    const { plans } = useSelector((state) => state?.planst)
    const { coins } = useSelector((state) => state?.coinData)
@@ -76,68 +75,6 @@ export default function Home() {
    const [showDropdown, setShowDropdown] = useState(false);
    const router = useRouter();
    const [openLoginModal, setOpenLoginModal] = useState(false);
-
-   const hanleloginModal = () => {
-      setOpenLoginModal(true)
-   }
-
-
-   useEffect(() => {
-      dispatch(getPlans())
-   }, [])
-   console.log("plan", plans);
-   useEffect(() => {
-      dispatch(getCoins())
-   }, [])
-   console.log("coinsd", coins)
-   // const coinItems = coins?.coins?.map((coin) => coin.item) || [];
-
-   // // Your filtering logic looks correct
-   // const filteredCoins = coinItems.filter((coin) =>
-   //    coin.name.toLowerCase().includes(searchTerm.toLowerCase())
-   // );
-
-   const coinItems = Array.isArray(coins?.coins)
-      ? coins.coins.map((coin) => coin.item).filter(Boolean)
-      : [];
-
-   // Filter coins based on search term
-   const filteredCoins = coinItems.filter((coin) =>
-      coin?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coin?.symbol?.toLowerCase().includes(searchTerm.toLowerCase())
-   );
-
-
-   const handleCoinSelect = (coin) => {
-      console.log(coin, "coin");
-
-      setSelectedCoin(coin.name);
-      setSelectedCoinSymbol(coin.symbol.toLowerCase());
-      // setSearchTerm(''); // Clear search after selection
-      setSearchTerm(coin.name);
-      setShowDropdown(false);
-
-   };
-   // const handleTryForFree = async () => {
-   //    console.log("select currency", selectedCoinSymbol);
-   //    console.log("select coin symbol", selectedCoinSymbol);
-   //    // router.push("/details")
-
-   //    router.push({
-   //       pathname: '/details',
-   //       query: {
-   //          coin: selectedCoinSymbol,
-   //          currency: selectedCurrency
-   //       }
-   //    });
-
-
-
-   // };
-   useEffect(() => {
-      console.log("currency", selectedCurrency);
-   }, [selectedCurrency])
-
 
    return (
       <div className={`${poppins.variable} antialiased home_wrapper_arera`}>

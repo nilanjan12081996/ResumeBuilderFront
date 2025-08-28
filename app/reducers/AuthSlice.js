@@ -6,7 +6,27 @@ export const registerCustomer = createAsyncThunk(
     'registerCustomer',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/user/user-auth/sign-up', userInput);
+            const response = await api.post('/api/auth/signup/individual', userInput);
+            if (response?.data?.status_code === 201) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+export const registerCustomerOrg = createAsyncThunk(
+    'registerCustomerOrg',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/auth/signup/organisation', userInput);
             if (response?.data?.status_code === 201) {
                 return response.data;
             } else {
@@ -63,7 +83,7 @@ export const loginCustomer = createAsyncThunk(
     'loginCustomer',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/user/user-auth/sign-in', userInput);
+            const response = await api.post('/api/auth/signin', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -114,8 +134,10 @@ const authSlice = createSlice({
         },
         logout: (state) => {
             state.isLoggedIn = false;
-            sessionStorage.removeItem('cryptoToken');
+            sessionStorage.removeItem('resumeToken');
             sessionStorage.removeItem('user_id');
+            sessionStorage.removeItem('fullname')
+            sessionStorage.removeItem('signup_type_id')
         },
     },
     extraReducers: (builder) => {
@@ -132,7 +154,7 @@ const authSlice = createSlice({
                 state.isLoggedIn = true;
                 state.message = payload;
                 sessionStorage.setItem(
-                    'cryptoToken',
+                    'resumeToken',
                     JSON.stringify({ token: access_token })
                 );
             })
@@ -187,8 +209,16 @@ const authSlice = createSlice({
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
+                 sessionStorage.setItem(
+                    'fullname',
+                    JSON.stringify({ fullname: data?.fullname })
+                );
+                      sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: data?.signup_type_id })
+                );
                 sessionStorage.setItem(
-                    'cryptoToken',
+                    'resumeToken',
                     JSON.stringify({ token: access_token })
                 );
             })
@@ -218,6 +248,29 @@ const authSlice = createSlice({
                         ? payload.message
                         : 'Something went wrong. Try again later.';
             })
+              .addCase(registerCustomerOrg.pending, (state) => {
+                state.message = null;
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerCustomerOrg.fulfilled, (state, { payload }) => {
+                const { access_token, data, refresh_token } = payload;
+                console.log("payload",payload);
+                
+                state.loading = false;
+                state.isLoggedIn = true;
+                state.message = payload;
+                sessionStorage.setItem(
+                    'resumeToken',
+                    JSON.stringify({ token: access_token })
+                );
+            })
+            .addCase(registerCustomerOrg.rejected, (state, { payload }) => {
+
+                state.loading = false;
+                state.error = payload;
+            })
+
 
     },
 });

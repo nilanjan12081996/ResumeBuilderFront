@@ -16,7 +16,7 @@ import { getSearchHistory } from "../reducers/SearchHistroySlice";
 import { RiGoogleFill } from "react-icons/ri";
 
 
-const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal }) => {
+const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,setOpenChoiceModal }) => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading } = useSelector((state) => state?.auth);
@@ -32,22 +32,23 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal })
         dispatch(loginCustomer(data)).then((res) => {
             console.log("login res", res)
             if (res?.payload?.status_code === 200) {
-                dispatch(checkSubscription()).then((res) => {
-                    console.log("res", res);
-                    if (res?.payload?.data) {
+                // dispatch(checkSubscription()).then((res) => {
+                    // console.log("res", res);
+                    // if (res?.payload?.data) {
 
                         setOpenLoginModal(false);
                         router.push('/dashboard');
-                        dispatch(getSearchHistory({ week: 0 }));
-                        dispatch(getProfile())
-                    } else {
+                        // dispatch(getSearchHistory({ week: 0 }));
+                        // dispatch(getProfile())
+                   //  } 
+                    //else {
 
-                        setOpenLoginModal(false);
-                        router.push('/plans');
-                        dispatch(getSearchHistory({ week: 0 }));
-                        dispatch(getProfile())
-                    }
-                })
+                    //     setOpenLoginModal(false);
+                    //     router.push('/plans');
+                    //     dispatch(getSearchHistory({ week: 0 }));
+                    //     dispatch(getProfile())
+                    // }
+                // })
 
             } else if (res?.payload?.response?.data?.status_code === 401) {
                 setError(res?.payload?.response?.data?.message)
@@ -60,10 +61,13 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal })
                 //     theme: "dark",
                 // });
             }
+            else if(res?.payload?.response?.data?.status_code===400){
+                setError(res?.payload?.response?.data?.message)
+            }
         })
     };
     const handleSignup = () => {
-        setOpenRegisterModal(true)
+        setOpenChoiceModal(true)
         setOpenLoginModal(false)
     }
 

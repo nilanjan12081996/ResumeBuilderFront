@@ -25,6 +25,7 @@ import { logout } from '../reducers/AuthSlice';
 
 import { HiDocumentText } from "react-icons/hi2";
 import { HiHome } from "react-icons/hi";
+import { CiLogout } from "react-icons/ci";
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -83,35 +84,12 @@ const Sidebar = () => {
     setSidebarOpen(false);
   };
   // For mobile menu ends here
-  useEffect(() => {
-    dispatch(getSearchHistory({ week: 0 }));
-  }, [dispatch]);
+  
 
-  // const handleObserver = useCallback(
-  //   (entries) => {
-  //     const target = entries[0];
-  //     if (target.isIntersecting && pagination.has_next && !loading) {
-  //       dispatch(getSearchHistory({ week: pagination.previous_week }));
-  //     }
-  //   },
-  //   [dispatch, pagination, loading]
-  // );
-
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver(handleObserver, {
-  //     root: null,
-  //     rootMargin: '20px',
-  //     threshold: 1.0
-  //   });
-  //   if (loaderRef.current) observer.observe(loaderRef.current);
-  //   return () => {
-  //     if (loaderRef.current) observer.unobserve(loaderRef.current);
-  //   };
-  // }, [handleObserver]);
+  
 
 
-
-  { console.log("searchHistory", historyData) }
+  
 
   return (
     <aside
@@ -188,6 +166,29 @@ const Sidebar = () => {
                   <BiSolidDashboard className='text-2xl' />
                   Resume Templates
                 </Link>
+              </li>
+
+                    <li onClick={closeNavbar}>
+                <Link href="/plans"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
+                    'bg-graydark dark:bg-meta-4'
+                    }`}
+                  passHref>
+                  <BiSolidDashboard className='text-2xl' />
+                  Plans
+                </Link>
+              </li>
+
+                <li onClick={closeNavbar}>
+                <button
+                onClick={handleLogout}
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
+                    'bg-graydark dark:bg-meta-4 cursor-pointer'
+                    }`}
+                  passHref>
+                  <CiLogout className='text-2xl' />
+                  Logout
+                </button>
               </li>
             </ul>
 

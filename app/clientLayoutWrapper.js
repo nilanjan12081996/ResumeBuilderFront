@@ -14,13 +14,13 @@ export default function ClientLayoutWrapper({ children }) {
     const router = useRouter();
 
     // Define public routes that don't require authentication
-    const publicRoutes = ['/', '/about-us', '/contact', '/pricing', '/how-it-works', '/features', '/privacy', '/dashboard', '/faqs', '/resume-templates', '/resume-history'];
+    const publicRoutes = ['/', '/about-us', '/contact', '/pricing', '/how-it-works', '/features', '/privacy', '/faqs'];
     const isPublicRoute = publicRoutes.includes(pathname);
 
     // Function to check token validity
     const checkTokenValidity = () => {
         try {
-            const storedToken = sessionStorage.getItem("cryptoToken");
+            const storedToken = sessionStorage.getItem("resumeToken");
             if (!storedToken) return false;
 
             const parsedToken = JSON.parse(storedToken);
@@ -32,7 +32,7 @@ export default function ClientLayoutWrapper({ children }) {
         } catch (error) {
             console.error("Error parsing token:", error);
             // Clear invalid token
-            sessionStorage.removeItem("cryptoToken");
+            sessionStorage.removeItem("resumeToken");
             return false;
         }
     };
@@ -53,7 +53,7 @@ export default function ClientLayoutWrapper({ children }) {
 
         // Listen for storage changes (for logout in other tabs)
         const handleStorageChange = (e) => {
-            if (e.key === "cryptoToken") {
+            if (e.key === "resumeToken") {
                 validateToken();
             }
         };
@@ -90,7 +90,7 @@ export default function ClientLayoutWrapper({ children }) {
     }
 
     // Authenticated layout
-    if (!hasToken) {
+    if (hasToken) {
         return (
             <main>
                 <div className="dashboard_wrapper lg:flex bg-[#f3f4f6] p-0">
