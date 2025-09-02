@@ -15,6 +15,10 @@ import { BiDownload } from "react-icons/bi";
 import { RiDraftLine } from "react-icons/ri";
 import { BsSave } from "react-icons/bs";
 
+import { BiEdit } from "react-icons/bi";
+import { MdOutlinePreview } from "react-icons/md";
+
+
 const inter = Inter({
   subsets: ['latin'], // or ['latin-ext'] etc.
   weight: ['400', '500', '600', '700'], // specify desired weights
@@ -23,7 +27,7 @@ const inter = Inter({
 
 const page = () => {
   return (
-    <div className={`${inter.className} antialiased`}>
+    <div className={`${inter.className} antialiased pb-8`}>
       <div className='mb-10'>
         <h2 className='text-[30px] leading-[30px] text-[#151515] font-semibold mb-4'>Resume History</h2>
         <p className='text-[16px] leading-[23px] text-[#575757] font-normal mb-0'>Manage and organize all your resumes in one place</p>
@@ -101,10 +105,143 @@ const page = () => {
         <div className='px-8 py-8'>
            <p className='text-[#151515] text-[20px] leading-[20px] mb-4'>Your Resumes (6)</p>
         </div>
-        <div>
-            <div className='border-b border-[#E5E5E5]'>
-                dssds
-            </div>
+        <div className='px-8 py-0'>
+          <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+              <div className='flex gap-3 items-center'>
+                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                  <CgFileDocument className='text-[#ffffff] text-2xl' />
+                </div>
+                <div>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
+                  <div className='flex items-center'>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8'>After analysis ATS Score: 80/100</p>
+                  </div>
+                </div>
+              </div>
+              <div className='flex items-center gap-8'>
+                <button className='text-[15px] text-[#AE7100] hover:text-[#ffffff] bg-[#F7FFD5] hover:bg-[#AE7100] rounded-3xl px-5 py-2 cursor-pointer'>Draft</button>
+                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+              </div>
+          </div>
+
+           <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+              <div className='flex gap-3 items-center'>
+                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                  <CgFileDocument className='text-[#ffffff] text-2xl' />
+                </div>
+                <div>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
+                  <div className='flex items-center'>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
+                  </div>
+                </div>
+              </div>
+              <div className='flex items-center gap-8'>
+                <button className='text-[15px] text-[#186603] hover:text-[#ffffff] bg-[#DEFFD5] hover:bg-[#186603] rounded-3xl px-5 py-2 cursor-pointer'>Downloaded</button>
+                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+              </div>
+          </div>
+
+           <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+              <div className='flex gap-3 items-center'>
+                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                  <CgFileDocument className='text-[#ffffff] text-2xl' />
+                </div>
+                <div>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
+                  <div className='flex items-center'>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
+                  </div>
+                </div>
+              </div>
+              <div className='flex items-center gap-8'>
+                <button className='text-[15px] text-[#92278F] hover:text-[#ffffff] bg-[#EFE3FF] hover:bg-[#92278F] rounded-3xl px-5 py-2 cursor-pointer'>Saved</button>
+                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+              </div>
+          </div>
+
+           <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+              <div className='flex gap-3 items-center'>
+                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                  <CgFileDocument className='text-[#ffffff] text-2xl' />
+                </div>
+                <div>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
+                  <div className='flex items-center'>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
+                  </div>
+                </div>
+              </div>
+              <div className='flex items-center gap-8'>
+                <button className='text-[15px] text-[#186603] hover:text-[#ffffff] bg-[#DEFFD5] hover:bg-[#186603] rounded-3xl px-5 py-2 cursor-pointer'>Downloaded</button>
+                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+              </div>
+          </div>
+
+           <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+              <div className='flex gap-3 items-center'>
+                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                  <CgFileDocument className='text-[#ffffff] text-2xl' />
+                </div>
+                <div>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
+                  <div className='flex items-center'>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
+                  </div>
+                </div>
+              </div>
+              <div className='flex items-center gap-8'>
+                <button className='text-[15px] text-[#186603] hover:text-[#ffffff] bg-[#DEFFD5] hover:bg-[#186603] rounded-3xl px-5 py-2 cursor-pointer'>Downloaded</button>
+                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+              </div>
+          </div>
+
+           <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+              <div className='flex gap-3 items-center'>
+                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                  <CgFileDocument className='text-[#ffffff] text-2xl' />
+                </div>
+                <div>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
+                  <div className='flex items-center'>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
+                  </div>
+                </div>
+              </div>
+              <div className='flex items-center gap-8'>
+                <button className='text-[15px] text-[#92278F] hover:text-[#ffffff] bg-[#EFE3FF] hover:bg-[#92278F] rounded-3xl px-5 py-2 cursor-pointer'>Saved</button>
+                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+              </div>
+          </div>
         </div>
       </div>
     </div>

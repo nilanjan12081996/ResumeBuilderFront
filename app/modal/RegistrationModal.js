@@ -63,7 +63,8 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                 console.log("resRegOrg",res);
                 if(res?.payload?.status_code===201){
                     setOpenRegisterModal(false);
-                        router.push('/dashboard');
+                        router.push('/plans');
+                        // handlePriceModal()
                 }
                 else if(res?.payload?.response?.data?.status_code === 400){
                     const validationErrors = res?.payload?.response?.data?.data || []
@@ -77,7 +78,8 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     console.log("resRegind",res);
       if(res?.payload?.status_code===201){
                     setOpenRegisterModal(false);
-                        router.push('/dashboard');
+                        router.push('/plans');
+                    //    handlePriceModal()
                 }
               else if (res?.payload?.response?.data?.status_code === 400) {
                     const validationErrors = res?.payload?.response?.data?.errors || [];

@@ -20,7 +20,7 @@ import Create_Resume_plus from "../assets/imagesource/Create_Resume_plus.png";
 import Improve_existing_resume_icon from "../assets/imagesource/Improve_existing_resume_icon.png";
 import jd_based_resume from "../assets/imagesource/jd_based_resume.png";
 
-import { BiEdit } from "react-icons/bi"
+import { BiEdit } from "react-icons/bi";
 import { CgFileDocument } from "react-icons/cg";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";

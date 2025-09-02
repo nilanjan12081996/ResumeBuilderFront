@@ -27,6 +27,9 @@ import { HiDocumentText } from "react-icons/hi2";
 import { HiHome } from "react-icons/hi";
 import { CiLogout } from "react-icons/ci";
 
+import { BiSolidBriefcase } from "react-icons/bi";
+import { VscChecklist } from "react-icons/vsc";
+
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'], // specify desired weights
@@ -168,18 +171,31 @@ const Sidebar = () => {
                 </Link>
               </li>
 
-                    <li onClick={closeNavbar}>
+              <li onClick={closeNavbar}>
                 <Link href="/plans"
                   className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>
-                  <BiSolidDashboard className='text-2xl' />
+                  <VscChecklist className='text-2xl' />
                   Plans
                 </Link>
               </li>
 
-                <li onClick={closeNavbar}>
+              <li onClick={closeNavbar}>
+                <Link href="/featured-jobs"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('featured-jobs') &&
+                    'bg-graydark dark:bg-meta-4'
+                    }`}
+                  passHref>
+                  <BiSolidBriefcase className='text-2xl' />
+                  Featured Jobs
+                </Link>
+              </li>
+
+              
+
+              <li onClick={closeNavbar}>
                 <button
                 onClick={handleLogout}
                   className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
