@@ -8,7 +8,7 @@ import { Inter } from 'next/font/google';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoSearchOutline } from 'react-icons/io5';
-import { Select, Table, TextInput, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Pagination } from 'flowbite-react';
+import { Select, Table, TextInput, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Pagination, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'flowbite-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { checkAvilableSearch, getCoins, setIsClick } from '../reducers/CoinSlice';
@@ -19,6 +19,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import Create_Resume_plus from "../assets/imagesource/Create_Resume_plus.png";
 import Improve_existing_resume_icon from "../assets/imagesource/Improve_existing_resume_icon.png";
 import jd_based_resume from "../assets/imagesource/jd_based_resume.png";
+
+import resume01 from "../assets/imagesource/resume01.png";
+import view_full_resume from "../assets/imagesource/view_full_resume.png";
 
 import { BiEdit } from "react-icons/bi";
 import { CgFileDocument } from "react-icons/cg";
@@ -54,7 +57,11 @@ const inter = Inter({
 })
 
 const Page = () => {
-
+  const router = useRouter();
+  const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
+  const resumeBuilderHandler = () => {
+    router.push("/resume-builder");
+  };
   return (
     <div className={`${inter.className} antialiased`}>
       <ToastContainer />
@@ -67,11 +74,11 @@ const Page = () => {
           <h3 className='text-[20px] leading-[20px] text-[#151515] font-medium mb-6'>Quick Actions</h3>
           <div className='flex gap-4'>
             <div className='w-full grid grid-cols-4 gap-4'>
-              <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-5 py-7'>
-                <Image src={Create_Resume_plus} alt="Create_Resume_plus" className='mb-5' />
-                <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Create Resume From Scratch</h3>
-                <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Start fresh with a new resume using our professional templates</p>
-              </div>
+              <div onClick={() => setOpenModalCreateResume(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
+                  <Image src={Create_Resume_plus} alt="Create_Resume_plus" className='mb-5' />
+                  <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Create Resume From Scratch</h3>
+                  <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Start fresh with a new resume using our professional templates</p>
+              </div>  
               <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7'>
                 <Image src={Improve_existing_resume_icon} alt="Improve_existing_resume_icon" className='mb-5' />
                 <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Improve existing resume</h3>
@@ -136,6 +143,56 @@ const Page = () => {
           </div>
         </div>
       </div>
+      {/* add modal for apply job start here */}
+        <Modal size="7xl" className="apply_modal_area" show={openModalCreateResume} onClose={() => setOpenModalCreateResume(false)}>
+              <ModalHeader className='bg-white text-black modal_header'>
+                Upload Resume or Select Resume
+              </ModalHeader>
+              <ModalBody className='bg-white p-0 rounded-b-[4px]'>
+                  <div className="lg:flex justify-center items-center gap-5 p-5">
+                      <div className='lg:w-6/12 border border-[#DADADA] rounded-[7px] p-4 pr-0'>
+                          <h3 className="text-[#151515] text-base font-medium pb-4">Select resume from the list</h3>
+                          <ul className='grid grid-cols-2 gap-5 resume_list_area'>
+                              <li>
+                                <input type="radio" name="test" id="cb1" />
+                                <label for="cb1" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
+                                    <Image src={resume01} alt="resume01" className='' />
+                                </label>
+                                <p className='text-[#000000] text-base font-semibold text-center pt-1'>Modern Template</p>
+                              </li>
+                              <li>
+                                <input type="radio" name="test" id="cb2" />
+                                <label for="cb2" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
+                                    <Image src={resume01} alt="resume01" className='' />
+                                </label>
+                                  <p className='text-[#000000] text-base font-semibold text-center'>Professional Template</p>
+                              </li>
+                              <li>
+                                <input type="radio" name="test" id="cb3" />
+                                <label for="cb3" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
+                                    <Image src={resume01} alt="resume01" className='' />
+                                </label>
+                                  <p className='text-[#000000] text-base font-semibold text-center'>Technical Template</p>
+                              </li>
+                              <li>
+                                <input type="radio" name="test" id="cb4" />
+                                <label for="cb4" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
+                                    <Image src={resume01} alt="resume01" className='' />
+                                </label>
+                                <p className='text-[#000000] text-base font-semibold text-center'>Modern Template</p>
+                              </li>
+                          </ul>
+                      </div>
+                      <div className='lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden'>
+                          <Image src={view_full_resume} alt="view_full_resume" className='' />
+                      </div>
+                  </div>
+                  <div className="p-5 inset-shadow-xs">
+                      <button onClick={resumeBuilderHandler} className='bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]'>Continue</button>
+                  </div>
+              </ModalBody>
+          </Modal>
+      {/* add modal for apply job ends here */}
     </div>
   )
 }

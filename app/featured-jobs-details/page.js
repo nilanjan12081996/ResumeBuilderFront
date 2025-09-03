@@ -14,7 +14,7 @@ import Image from 'next/image';
 
 
 const page = () => {
-  const [openJobApplyModal, setOpenJobApplyModal] = useState(true);
+  const [openJobApplyModal, setOpenJobApplyModal] = useState(false);
   return (
     <div className='bg-[#ffffff] rounded-[10px] p-10'>
         <div className='flex gap-2 items-center mb-8'>
@@ -159,7 +159,7 @@ const page = () => {
                     </div>
                 </ModalBody>
             </Modal>
-      {/* add modal for apply job ends here */}
+        {/* add modal for apply job ends here */}
     </div>
   )
 }
