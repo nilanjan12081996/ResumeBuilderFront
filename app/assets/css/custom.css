@@ -987,6 +987,92 @@ body {
   display: block;
 }
 
+.apply_modal_area h3 {
+  color: #000000;
+}
+.modal_header {
+  border-bottom: #e5e5e5 1px solid;
+}
+
+.resume_list_area {
+  height: 450px;
+  overflow-y: scroll;
+  padding-right: 20px;
+}
+
+.resume_list_area ul {
+  list-style-type: none;
+}
+
+.resume_list_area li {
+  display: inline-block;
+}
+
+.resume_list_area input[type="radio"][id^="cb"] {
+  display: none;
+}
+
+.resume_list_area label {
+  border: 1px solid #fff;
+  padding: 0;
+  display: block;
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+  border: #a1a1a1 2px solid;
+  border-radius: 4px;
+}
+
+.resume_list_area label:before {
+  background-color: white;
+  color: white;
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  border: 1px solid #92278f;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  line-height: 28px;
+  transition-duration: 0.4s;
+  transform: scale(0);
+}
+
+/* .resume_list_area label img {
+  height: 100px;
+  width: 100px;
+  transition-duration: 0.2s;
+  transform-origin: 50% 50%;
+} */
+
+.resume_list_area :checked + label {
+  border-color: #92278f;
+}
+
+.resume_list_area :checked + label:before {
+  content: "✓";
+  background-color: #92278f;
+  transform: scale(1);
+}
+
+/* .resume_list_area :checked + label img {
+  transform: scale(0.9);
+  box-shadow: 0 0 5px #333;
+  z-index: -1;
+} */
+
+.resume_upload_box {
+  background-color: #ffffff;
+  border-color: #92278f;
+  padding: 170px 0;
+}
+.resume_upload_box:hover {
+  background-color: #f3f1f1;
+}
+
 @media only screen and (max-width: 767px) {
   .menu_btn {
     display: inline-flex;
