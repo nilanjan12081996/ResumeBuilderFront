@@ -1073,6 +1073,120 @@ body {
   background-color: #f3f1f1;
 }
 
+.resume_form_box label {
+  color: #000000;
+  font-size: 12px;
+}
+.resume_form_box label span {
+  color: #ff0004;
+}
+.field_box {
+  border: #e2e2e2 1px solid;
+  border-radius: 4px;
+  height: 45px;
+  background: #f6f6f6;
+}
+.field_box input[type="text"],
+.field_box input[type="email"] {
+  background: none;
+  border: none;
+  color: #000000;
+  font-size: 12px;
+  line-height: 45px;
+  padding: 0;
+  width: 100%;
+}
+.field_box_date input[type="text"] {
+  background: #f6f6f6;
+  border: #e2e2e2 1px solid;
+  border-radius: 4px;
+  color: #000000;
+  font-size: 12px;
+  line-height: 25px;
+  width: 100%;
+}
+.field_box input[type="text"]:focus,
+.field_box input[type="email"]:focus,
+.field_box_date input[type="text"]:focus,
+.resume_form_box select:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+.field_box input[type="text"]::placeholder {
+  color: #868686;
+}
+
+.resume_form_box textarea {
+  border: #e2e2e2 1px solid;
+  border-radius: 4px;
+  background: #f6f6f6;
+  color: #000000;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.resume_form_box select {
+  /* background: none; */
+  background-color: #f6f6f6;
+  border: none;
+  color: #000000;
+  font-size: 12px;
+  line-height: 45px;
+  padding: 0 0 0 15px;
+  width: 100%;
+}
+
+.tab_point ul {
+  border: none;
+  margin-bottom: 0;
+}
+.tab_point ul li.react-tabs__tab {
+  border: #d5d5d5 1px solid;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 42px;
+  color: #828282;
+  font-weight: 500;
+  padding: 0 15px;
+  margin-right: 10px;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.tab_point ul li.react-tabs__tab span {
+  background: #eae9ea;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 8px;
+}
+.tab_point ul li.react-tabs__tab:hover span {
+  background: #ffffff;
+}
+.tab_point ul li.react-tabs__tab:hover {
+  border: #f6efff 1px solid;
+  background: #f6efff;
+  color: #92278f;
+}
+.tab_point ul li.react-tabs__tab.react-tabs__tab--selected {
+  border: #f6efff 1px solid;
+  background: #f6efff;
+  color: #92278f;
+}
+.tab_point ul li.react-tabs__tab.react-tabs__tab--selected span {
+  background: #ffffff;
+}
+
+.tab_wrap {
+  height: 475px;
+  overflow-y: scroll;
+  padding-right: 15px;
+}
+
 @media only screen and (max-width: 767px) {
   .menu_btn {
     display: inline-flex;
