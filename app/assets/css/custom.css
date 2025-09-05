@@ -1073,6 +1073,15 @@ body {
   background-color: #f3f1f1;
 }
 
+.resume_upload_box_small {
+  background-color: #ffffff;
+  border-color: #92278f;
+  padding: 155px 0;
+}
+.resume_upload_box_small:hover {
+  background-color: #f3f1f1;
+}
+
 .resume_form_box label {
   color: #000000;
   font-size: 12px;
