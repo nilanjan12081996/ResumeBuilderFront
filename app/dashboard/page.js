@@ -38,6 +38,11 @@ import { FaGlobe } from "react-icons/fa";
 import { BiLogoLinkedinSquare } from "react-icons/bi";
 import { BiLink } from "react-icons/bi";
 
+import { BiPlus } from "react-icons/bi";
+import { RiExchange2Line } from "react-icons/ri";
+import { BiBriefcaseAlt } from "react-icons/bi";
+import { BiLogoLinkedin } from "react-icons/bi";
+
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
 // import QuerySim from "../assets/imagesource/Query Sim.png";
@@ -84,6 +89,10 @@ const Page = () => {
   const resumeBuilderHandler = () => {
     router.push("/resume-builder");
   };
+
+  const HandlerLinkedInRewrite = () => {
+    router.push("/linkedIn-rewrite");
+  };
   return (
     <div className={`${inter.className} antialiased`}>
       <ToastContainer />
@@ -97,24 +106,32 @@ const Page = () => {
           <div className='flex gap-4'>
             <div className='w-full grid grid-cols-4 gap-4'>
               <div onClick={() => setOpenModalCreateResume(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
-                  <Image src={Create_Resume_plus} alt="Create_Resume_plus" className='mb-5' />
+                  <div className='bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center'>
+                     <BiPlus className='text-[#00A63E] text-[30px]' />
+                  </div>
                   <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Create Resume From Scratch</h3>
                   <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Start fresh with a new resume using our professional templates</p>
               </div>  
               <div onClick={() => setOpenModalImproveExistingResumeTwo(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
-                <Image src={Improve_existing_resume_icon} alt="Improve_existing_resume_icon" className='mb-5' />
+                 <div className='bg-[#DBEAFE] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center'>
+                     <RiExchange2Line className='text-[#2B7FFF] text-[30px]' />
+                  </div>
                 <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Improve existing resume</h3>
                 <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Upload and enhance your current resume with AI-powered suggestions</p>
               </div>
               <div onClick={() => setOpenModalImproveexistingResume(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
-                <Image src={jd_based_resume} alt="jd_based_resume" className='mb-5' />
+                  <div className='bg-[#FFEDD4] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center'>
+                     <BiBriefcaseAlt className='text-[#FF886D] text-[30px]' />
+                  </div>
                 <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>JD based resume</h3>
                 <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Upload and enhance your current resume with AI-powered suggestions</p>
               </div>
-              <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7'>
-                <Image src={jd_based_resume} alt="jd_based_resume" className='mb-5' />
-                <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Create Resume From Scratch</h3>
-                <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Start fresh with a new resume using our professional templates</p>
+              <div onClick={() => HandlerLinkedInRewrite(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
+                  <div className='bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center'>
+                     <BiLogoLinkedin className='text-[#9747FF] text-[30px]' />
+                  </div>
+                <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>LinkedIn Rewrite</h3>
+                <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Get AI-powered suggestions to enhance and optimize your LinkedIn profile.</p>
               </div>
             </div>
           </div>

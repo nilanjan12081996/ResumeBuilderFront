@@ -1138,11 +1138,12 @@ body {
 .resume_form_box select {
   /* background: none; */
   background-color: #f6f6f6;
-  border: none;
+  border: none !important;
   color: #000000;
   font-size: 12px;
-  line-height: 45px;
-  padding: 0 0 0 15px;
+  line-height: 43px;
+  height: 43px;
+  padding: 0 0 0 0;
   width: 100%;
 }
 

@@ -501,7 +501,7 @@ const page = () => {
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Proficiency</Label>
                                       </div>
-                                      <div className='field_box'>
+                                      <div className='field_box pl-3'>
                                         <Select required>
                                           <option>Intermediate</option>
                                           <option>English</option>
@@ -558,7 +558,7 @@ const page = () => {
                                         <div className='p-3'>
                                           <BiCodeAlt className='text-[#928F8F]' />
                                         </div>
-                                        <TextInput id="base" type="email" sizing="md" placeholder='Separate multiple skills with commas for better formatting' />
+                                        <TextInput id="base" type="email" sizing="md" className='w-full' placeholder='Separate multiple skills with commas for better formatting' />
                                       </div>
                                     </div>
                                 </div>
