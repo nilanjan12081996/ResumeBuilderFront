@@ -30,6 +30,8 @@ import { CiLogout } from "react-icons/ci";
 import { BiSolidBriefcase } from "react-icons/bi";
 import { VscChecklist } from "react-icons/vsc";
 
+import { HiUserAdd } from "react-icons/hi";
+
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'], // specify desired weights
@@ -190,6 +192,17 @@ const Sidebar = () => {
                   passHref>
                   <BiSolidBriefcase className='text-2xl' />
                   Featured Jobs
+                </Link>
+              </li>
+
+              <li onClick={closeNavbar}>
+                <Link href="/invite-students"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
+                    'bg-graydark dark:bg-meta-4'
+                    }`}
+                  passHref>
+                  <HiUserAdd className='text-2xl' />
+                  Invite Students
                 </Link>
               </li>
 

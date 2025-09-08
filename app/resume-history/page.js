@@ -17,6 +17,7 @@ import { BsSave } from "react-icons/bs";
 
 import { BiEdit } from "react-icons/bi";
 import { MdOutlinePreview } from "react-icons/md";
+import { MdDataUsage } from "react-icons/md";
 
 
 const inter = Inter({
@@ -66,6 +67,17 @@ const page = () => {
                     </div>
                 </div>
             </div>
+            {/* <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-4 py-4'>
+                <div className='flex gap-3 items-center'>
+                    <div className='bg-[#FFE0D9] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
+                        <MdDataUsage className='text-[#F24822] text-3xl' />
+                    </div>
+                    <div>
+                        <p className='text-[#7D7D7D] text-[15px]'>Total Resume Usage</p>
+                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>200/500</h3>
+                    </div>
+                </div>
+            </div> */}
             <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-4 py-4'>
                 <div className='flex gap-3 items-center'>
                     <div className='bg-[#DEFFD5] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>

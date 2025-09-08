@@ -416,7 +416,7 @@ const page = () => {
                                             <div className='p-3'>
                                               <FaLanguage className='text-[#928F8F]' />
                                             </div>
-                                            <TextInput id="base" type="text" sizing="md" placeholder='E.g English, Hindi, German, etc.' />
+                                            <TextInput id="base" type="text" sizing="md" className='w-full' placeholder='E.g English, Hindi, German, etc.' />
                                           </div>
                                         </div>
                                     </div>

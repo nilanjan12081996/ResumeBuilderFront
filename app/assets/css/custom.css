@@ -1082,6 +1082,15 @@ body {
   background-color: #f3f1f1;
 }
 
+.resume_upload_box_small2 {
+  background-color: #ffffff;
+  border-color: #92278f;
+  padding: 30px 0;
+}
+.resume_upload_box_small2:hover {
+  background-color: #f3f1f1;
+}
+
 .resume_form_box label {
   color: #000000;
   font-size: 12px;
@@ -1195,6 +1204,46 @@ body {
   height: 475px;
   overflow-y: scroll;
   padding-right: 15px;
+}
+
+.invited_students_table_wrap table tr th {
+  background-color: #f0f0f0 !important;
+}
+.invited_students_table_wrap table tr td:first-child,
+.invited_students_table_wrap table tr td:last-child {
+  border-radius: 0;
+}
+
+.invited_students_table_wrap table tr {
+  border-bottom: 0;
+}
+.invited_students_table_wrap table tr td {
+  background-color: #fff;
+  border-bottom: #f0f0f0 1px solid;
+}
+
+.invited_students_table_wrap input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #a1a8b3;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  background: #ffffff;
+}
+
+.invited_students_table_wrap input[type="checkbox"]:checked {
+  background-color: purple; /* Box background */
+  border-color: purple;
+}
+
+.invited_students_table_wrap input[type="checkbox"]:checked::after {
+  content: "✔";
+  position: absolute;
+  left: 2px;
+  top: 0px;
+  font-size: 11px;
+  color: white; /* Tick color */
 }
 
 @media only screen and (max-width: 767px) {
