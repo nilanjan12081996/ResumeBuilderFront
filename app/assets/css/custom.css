@@ -1247,6 +1247,10 @@ body {
   color: white; /* Tick color */
 }
 
+.resume_templates_section {
+  padding: 70px 0;
+}
+
 @media only screen and (max-width: 767px) {
   .invited_students_table_wrap table tr td:first-child,
   .invited_students_table_wrap table tr td:last-child {

@@ -112,7 +112,7 @@ export default function Home() {
                      <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">How It <span className="text-[#a536a2]">Works</span></h2>
                      <p className="text-[#2A2A2A] text-sm lg:text-[20px] leading-[30px]">Quickly upload, customize, and download your resume tailored to any <br></br> job description in no time</p>
                   </div>
-                  <div className="lg:flex gap-20 mb-20">
+                  <div className="lg:flex gap-20 mb-10 lg:mb-20">
                      <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center mb-4 lg:mb-0">
                         <div>
                            <div className="mb-4">
@@ -120,14 +120,14 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <Link className="text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE MY REUSME</Link>
+                           <Link className="text-xs lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE MY REUSME</Link>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
                         <Image src={hw01} alt='hw01' className='' />
                      </div>
                   </div>
-                  <div className="lg:flex gap-20 mb-20">
+                  <div className="lg:flex gap-20 mb-10 lg:mb-20">
                      <div className="lg:w-6/12 mb-4 lg:mb-0">
                         <Image src={hw02} alt='hw02' className='' />
                      </div>
@@ -138,7 +138,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <Link className="text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE ATS FRIENDLY REUSME</Link>
+                           <Link className="text-xs lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE ATS FRIENDLY REUSME</Link>
                         </div>
                      </div>
                   </div>
@@ -150,7 +150,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
-                           <Link className="text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CUSTOMIZE MY REUSME</Link>
+                           <Link className="text-xs lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CUSTOMIZE MY REUSME</Link>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
