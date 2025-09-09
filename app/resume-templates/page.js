@@ -16,43 +16,43 @@ const inter = Inter({
 const page = () => {
   return (
     <div className={`${inter.className} antialiased`}>
-      <div className='mb-10'>
-        <h2 className='text-[30px] leading-[30px] text-[#151515] font-semibold mb-4'>Resume Templates</h2>
-        <p className='text-[16px] leading-[23px] text-[#575757] font-normal mb-0'>Select a professionally designed template to showcase your career</p>
+      <div className='mb-5 lg:mb-10 pt-6'>
+        <h2 className='text-xl lg:text-[30px] leading-[30px] text-[#151515] font-semibold mb-1s lg:mb-4'>Resume Templates</h2>
+        <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Select a professionally designed template to showcase your career</p>
       </div>
-      <div className='grid grid-cols-3 gap-8'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 pb-8'>
         <div>
-          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-6'>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Modern Template</p>
         </div>
         <div>
-          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-6'>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Professional Template</p>
         </div>
         <div>
-          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-6'>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Technical Template</p>
         </div>
                 <div>
-          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-6'>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Modern Template</p>
         </div>
         <div>
-          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-6'>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Professional Template</p>
         </div>
         <div>
-          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-6'>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Technical Template</p>

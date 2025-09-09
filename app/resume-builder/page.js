@@ -56,14 +56,14 @@ const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   return (
-    <div className='flex gap-5 pb-5'>
-        <div className='w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px]'>
+    <div className='lg:flex gap-5 pb-5'>
+        <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
            <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
-              <div className='flex items-center gap-1'>
+              <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
                 <HiClipboardList className='text-[#800080] text-2xl' />
                 <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
               </div>
-              <button className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
+              <button className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
            </div>
            <div className='resume_tab_section'>
               <Tabs>
@@ -92,8 +92,8 @@ const page = () => {
                                 <p className='text-[14px] text-[#939393] font-normal'>Add your personal details that will appear at the top of your resume. * Required fields</p>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Full Name <span>*</span></Label>
                                       </div>
@@ -104,7 +104,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='Kabilan S' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Email Address <span>*</span></Label>
                                       </div>
@@ -116,8 +116,8 @@ const page = () => {
                                       </div>
                                     </div>
                                 </div>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Phone Number <span>*</span></Label>
                                       </div>
@@ -128,7 +128,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='+91-5362563762' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Location <span>*</span></Label>
                                       </div>
@@ -148,8 +148,8 @@ const page = () => {
                                 <p className='text-[14px] text-[#939393] font-normal'>Add your web presence to make it easy for employers to learn more about you.</p>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Personal Website</Label>
                                       </div>
@@ -160,7 +160,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='https://yourname.design' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">LinkedIn Profile </Label>
                                       </div>
@@ -172,8 +172,8 @@ const page = () => {
                                       </div>
                                     </div>
                                 </div>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">GitHub Profile</Label>
                                       </div>
@@ -193,8 +193,8 @@ const page = () => {
                                 <p className='text-[14px] text-[#939393] font-normal'>Add information about your professional identity and career summary.</p>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Career Title</Label>
                                       </div>
@@ -205,7 +205,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='UI Designer' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Career Goals</Label>
                                       </div>
@@ -225,8 +225,8 @@ const page = () => {
                         <TabPanel>
                           <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Education 1</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Add your educational background and qualifications</p>
                                  </div>
@@ -236,8 +236,8 @@ const page = () => {
                                 </div>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Institution/School</Label>
                                       </div>
@@ -248,7 +248,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='Saranathan College of Engineering' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Location</Label>
                                       </div>
@@ -260,8 +260,8 @@ const page = () => {
                                       </div>
                                     </div>
                                 </div>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Degree</Label>
                                       </div>
@@ -272,7 +272,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='B.Tech' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Field of study</Label>
                                       </div>
@@ -326,8 +326,8 @@ const page = () => {
                         <TabPanel>
                            <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Experience 1</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Add your work experience and internships</p>
                                  </div>
@@ -337,8 +337,8 @@ const page = () => {
                                 </div>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Company</Label>
                                       </div>
@@ -349,7 +349,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='Company or Organization Name' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Position</Label>
                                       </div>
@@ -387,8 +387,8 @@ const page = () => {
                                       </div>
                                     </div>
                                 </div>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Start Date <span>*</span></Label>
                                       </div>
@@ -396,7 +396,7 @@ const page = () => {
                                         <Datepicker /> 
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">End Date <span>*</span></Label>
                                       </div>
@@ -418,8 +418,8 @@ const page = () => {
                                       <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Project 1</h4>
                                     </div>
 
-                                    <div className='flex gap-4 mb-3'>
-                                        <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:flex gap-4 mb-3'>
+                                        <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                           <div className="mb-1 block">
                                             <Label htmlFor="base">Project Title</Label>
                                           </div>
@@ -430,7 +430,7 @@ const page = () => {
                                             <TextInput id="base" type="text" sizing="md" placeholder='Name of the project' />
                                           </div>
                                         </div>
-                                        <div className='w-6/12 resume_form_box'>
+                                        <div className='lg:w-6/12 resume_form_box'>
                                           <div className="mb-1 block">
                                             <Label htmlFor="base">Your Role</Label>
                                           </div>
@@ -475,8 +475,8 @@ const page = () => {
                         <TabPanel>
                           <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Languages</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Add languages you know and proficiency levels</p>
                                  </div>
@@ -485,8 +485,8 @@ const page = () => {
                                 </div>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Language Name </Label>
                                       </div>
@@ -497,7 +497,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='E.g English, Hindi, German, etc.' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Proficiency</Label>
                                       </div>
@@ -527,8 +527,8 @@ const page = () => {
                         <TabPanel>
                           <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Skill Category #1</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Add your key skills and competencies</p>
                                  </div>
@@ -570,8 +570,8 @@ const page = () => {
                         <TabPanel>
                           <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Projects</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Add notable projects you&lsquo;ve worked on</p>
                                  </div>
@@ -582,8 +582,8 @@ const page = () => {
                               </div>
                               <div className='resume_form_area'>
 
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Project Title</Label>
                                       </div>
@@ -594,7 +594,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='Name of the project' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Your Role</Label>
                                       </div>
@@ -607,8 +607,8 @@ const page = () => {
                                     </div>
                                 </div>
                                 
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Start Date <span>*</span></Label>
                                       </div>
@@ -616,7 +616,7 @@ const page = () => {
                                         <Datepicker /> 
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='g:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">End Date <span>*</span></Label>
                                       </div>
@@ -673,8 +673,8 @@ const page = () => {
                         <TabPanel>
                           <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Certifications</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Fill in the details for this section</p>
                                  </div>
@@ -684,8 +684,8 @@ const page = () => {
                                 </div>
                               </div>
                               <div className='resume_form_area'>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Certification Name</Label>
                                       </div>
@@ -696,7 +696,7 @@ const page = () => {
                                         <TextInput id="base" type="text" sizing="md" placeholder='Name of th certification' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base"> Issuing Organization</Label>
                                       </div>
@@ -708,8 +708,8 @@ const page = () => {
                                       </div>
                                     </div>
                                 </div>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Date Obtained</Label>
                                       </div>
@@ -717,7 +717,7 @@ const page = () => {
                                         <Datepicker /> 
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Certification ID</Label>
                                       </div>
@@ -737,8 +737,8 @@ const page = () => {
                         <TabPanel>  
                           <div className='tab_wrap'>
                             <div className='mb-4'>
-                              <div className='mb-4 flex items-center justify-between'>
-                                 <div>
+                              <div className='mb-4 lg:flex items-center justify-between'>
+                                 <div className='mb-2 lg:mb-0'>
                                     <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Achievement #1</h4>
                                     <p className='text-[14px] text-[#939393] font-normal'>Fill in the details for this section</p>
                                  </div>
@@ -761,8 +761,8 @@ const page = () => {
                                       </div>
                                     </div>
                                 </div>
-                                <div className='flex gap-4 mb-3'>
-                                    <div className='w-6/12 resume_form_box'>
+                                <div className='lg:flex gap-4 mb-3'>
+                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base"> Issuing Organization</Label>
                                       </div>
@@ -773,7 +773,7 @@ const page = () => {
                                         <TextInput id="base" type="email" sizing="md" placeholder='Company or Organization Name' />
                                       </div>
                                     </div>
-                                    <div className='w-6/12 resume_form_box'>
+                                    <div className='lg:w-6/12 resume_form_box'>
                                       <div className="mb-1 block">
                                         <Label htmlFor="base">Date Recieved</Label>
                                       </div>
@@ -803,15 +803,15 @@ const page = () => {
               </Tabs>
            </div>
         </div>
-        <div className='w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
+        <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
           <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center gap-1'>
+            <div className='flex items-center gap-1 mb-2 lg:mb-0'>
               <MdPreview className='text-[#800080] text-2xl' />
               <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
             </div>
-            <div className='flex items-center gap-3'>
-              <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoStatsChart className='text-base' /> Analyze Resume</button>
-              <button onClick={() => setOpenModalAnalyzeResumeBig(true)} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
+            <div className='lg:flex items-center gap-3'>
+              <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
+              <button onClick={() => setOpenModalAnalyzeResumeBig(true)} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
               <button className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
             </div>
           </div>
@@ -837,7 +837,7 @@ const page = () => {
                     <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
                       <Image src={resume_sections_view} alt="resume_sections_view" className='' />
                     </div>
-                    <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] bottom-[-130px] p-5'>
+                    <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
                       <Image src={resume_score} alt="resume_score" className='mb-0' />
                     </div>
                   </div>

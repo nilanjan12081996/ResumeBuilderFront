@@ -16,17 +16,17 @@ import Image from 'next/image';
 const page = () => {
   const [openJobApplyModal, setOpenJobApplyModal] = useState(false);
   return (
-    <div className='bg-[#ffffff] rounded-[10px] p-10'>
-        <div className='flex gap-2 items-center mb-8'>
+    <div className='bg-[#ffffff] rounded-[10px] p-6 lg:p-10'>
+        <div className='flex gap-2 items-center mb-8 mt-3 lg:mt-0'>
             <Link className='bg-[#92278F] hover:bg-[#151515] rounded-[7px] w-[32px] h-[32px] flex justify-center items-center' href="/featured-jobs" passHref>
                <CgArrowLeft className='text-white text-[18px]' />
             </Link>
             <p className='text-[16px] text-[#151515] font-medium'>Go Back</p>
         </div>
-        <div className='flex gap-6'>
-            <div className='w-8/12 border border-[#C8C8C8] rounded-[10px] px-8 py-10'>
-                <div className='mb-16 flex items-center'>
-                    <div className='w-6/12 flex gap-4 items-center'>
+        <div className='lg:flex gap-6'>
+            <div className='lg:w-8/12 border border-[#C8C8C8] rounded-[10px] px-4 lg:px-8 py-5 lg:py-10 mb-8 lg:mb-0'>
+                <div className='mb-8 lg:mb-16 lg:flex items-center'>
+                    <div className='lg:w-6/12 flex gap-4 items-center mb-4 lg:mb-0'>
                       <div className='border border-[#C2C2C2] rounded-[6px] w-[135px] h-[135px] flex justify-center items-center'>
                         <Image src={small_inner_logo} alt="small_inner_logo" className='mb-0' />
                       </div>
@@ -39,7 +39,7 @@ const page = () => {
                         </div> */}
                       </div>
                     </div>
-                    <div className='w-6/12 flex gap-6 justify-end'>
+                    <div className='lg:w-6/12 flex gap-6 justify-end'>
                        <div>
                           <p className='text-[16px] leading-[24px] font-semibold text-[#6C6C6C] pb-1'>Type</p>
                           <p className='text-[15px] leading-[24px] font-normal text-[#6C6C6C]'>Full time</p>
@@ -50,15 +50,15 @@ const page = () => {
                        </div>
                     </div>
                 </div>
-               <div className='mb-8 flex items-center'>
-                  <div className='w-6/12'>
+               <div className='mb-8 lg:flex items-center'>
+                  <div className='lg:w-6/12 mb-4 lg:mb-0'>
                     <h3 className='text-black text-[22px] leading-[24px] font-semibold pb-4'>Sales Manager</h3>
                     <p className='text-[17px] leading-[20px] font-semibold text-black pb-1'>Hiring Eye: <span className='text-[#6C6C6C] font-medium text-[15px] leading-[24px]'>Downtown District, USA</span></p>
                     <p className='text-[17px] leading-[20px] font-semibold text-black pb-1'>Job Type: <span className='text-[#6C6C6C] font-medium text-[15px] leading-[24px]'>Full Time</span></p>
                   </div>
-                  <div className='w-6/12 flex justify-end'>
+                  <div className='lg:w-6/12 flex lg:justify-end justify-start'>
                      <div>
-                        <p className='text-[#626262] text-[14px] leading-[20px] pb-3 text-right'>Posted 3 days ago</p>
+                        <p className='text-[#626262] text-[14px] leading-[20px] pb-3 lg:text-right'>Posted 3 days ago</p>
                         <button onClick={() => setOpenJobApplyModal(true)} className='bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold block text-center rounded-[7px]'>Apply Job</button>
                      </div>
                   </div>
@@ -81,7 +81,7 @@ const page = () => {
                         fast-paced environment.</p>
                </div>
             </div>
-            <div className='w-4/12 border border-[#C8C8C8] rounded-[10px] px-6 py-10'>
+            <div className='lg:w-4/12 border border-[#C8C8C8] rounded-[10px] px-4 lg:px-6 py-5 lg:py-10'>
                <h3 className='text-black text-[22px] leading-[24px] font-semibold pb-4'>Responsibilities</h3>
                <p className='text-[#6C6C6C] font-medium text-[15px] leading-[24px] pb-4'>As a Sales Manager, you will oversee the sales team, develop strategies to achieve revenue goals, and build strong client relationships. 
                 You will be responsible for driving business growth while ensuring customer satisfaction and team performance.</p>
@@ -98,13 +98,13 @@ const page = () => {
             </div>
         </div>
         {/* add modal for apply job start here */}
-          <Modal size="7xl" className="apply_modal_area" show={openJobApplyModal} onClose={() => setOpenJobApplyModal(false)}>
+          <Modal size="7xl" className="apply_modal_area" show={openJobApplyModal} onClose={() => setOpenJobApplyModal(false)}>   
                 <ModalHeader className='bg-white text-black modal_header'>
                   Upload Resume or Select Resume
                 </ModalHeader>
                 <ModalBody className='bg-white p-0 rounded-b-[4px]'>
                     <div className="lg:flex gap-5 p-5">
-                        <div className='lg:w-6/12 border border-[#DADADA] rounded-[7px] p-4 pr-0'>
+                        <div className='lg:w-6/12 border border-[#DADADA] rounded-[7px] p-4 pr-0 mb-4 lg:mb-0'>
                             <h3 className="text-[#151515] text-base font-medium pb-4">Select resume from the list</h3>
                               <ul className='grid grid-cols-2 gap-5 resume_list_area'>
                                  <li>
@@ -144,8 +144,8 @@ const page = () => {
                               className="resume_upload_box flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                               >
                               <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                                 <BiImport className="text-[100px] text-[#92278F]" />
-                                 <p className="mb-2 text-xl text-[#92278F]">
+                                 <BiImport className="text-[40px] lg:text-[100px] text-[#92278F]" />
+                                 <p className="mb-2 text-base lg:text-xl text-[#92278F]">
                                     Upload your resume
                                  </p>
                               </div>

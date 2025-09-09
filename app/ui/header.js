@@ -48,7 +48,7 @@ const Header = () => {
     <div>
       <ToastContainer />
       <div className="header_section w-full lg:pb-0 absolute left-0 lg:top-4">
-        <div className="max-w-6xl mx-auto pt-2 lg:pt-0 lg:py-5 px-4 lg:px-5 rounded-b-2xl relative z-10">
+        <div className="max-w-6xl mx-auto pt-4.5 lg:pt-0 lg:py-5 px-4 lg:px-5 rounded-b-2xl relative z-10">
           <div className="w-full">
             <div className="header_top flex justify-between items-center">
               <div className="flex items-center justify-between">

@@ -108,17 +108,17 @@ export default function Home() {
         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
             <div className='max-w-6xl mx-auto h-full'>
                <div>
-                  <div className="text-center mb-28">
+                  <div className="text-center mb-10 lg:mb-28">
                      <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">How It <span className="text-[#a536a2]">Works</span></h2>
                      <p className="text-[#2A2A2A] text-sm lg:text-[20px] leading-[30px]">Quickly upload, customize, and download your resume tailored to any <br></br> job description in no time</p>
                   </div>
                   <div className="lg:flex gap-20 mb-20">
-                     <div className="lg:w-6/12 pr-20 flex justify-center items-center">
+                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center mb-4 lg:mb-0">
                         <div>
                            <div className="mb-4">
                               <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><SlCloudUpload className="text-[#1570EF] text-xl mr-2" /> CREATE RESUME</p>
                            </div>
-                           <h2 className="text-[#1D2939] text-[42px] leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
+                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
                            <Link className="text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE MY REUSME</Link>
                         </div>
@@ -128,27 +128,27 @@ export default function Home() {
                      </div>
                   </div>
                   <div className="lg:flex gap-20 mb-20">
-                     <div className="lg:w-6/12">
+                     <div className="lg:w-6/12 mb-4 lg:mb-0">
                         <Image src={hw02} alt='hw02' className='' />
                      </div>
-                     <div className="lg:w-6/12 pr-20 flex justify-center items-center">
+                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center">
                         <div>
                            <div className="mb-4">
                               <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><TiDocumentText className="text-[#039855] text-2xl mr-1.5 rotate-10" /> ATS RESUME GENERATOR</p>
                            </div>
-                           <h2 className="text-[#1D2939] text-[42px] leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
+                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
                            <Link className="text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE ATS FRIENDLY REUSME</Link>
                         </div>
                      </div>
                   </div>
                   <div className="lg:flex gap-20 mb-4">
-                     <div className="lg:w-6/12 pr-20 flex justify-center items-center">
+                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center mb-4 lg:mb-0">
                         <div>
                            <div className="mb-4">
                               <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><GrSettingsOption className="text-[#9747FF] text-xl mr-2" /> CUTOMIZATION</p>
                            </div>
-                           <h2 className="text-[#1D2939] text-[42px] leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
+                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
                            <Link className="text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CUSTOMIZE MY REUSME</Link>
                         </div>
@@ -165,9 +165,9 @@ export default function Home() {
          {/* Resume Templates section start here */}
          <div className="resume_templates_section px-4 pt-10 lg:pt-20 lg:pb-20">
             <div className='max-w-6xl mx-auto'>
-               <div className="mb-10">
+               <div className="mb-10 px-2 lg:px-0">
                   <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6 text-center">Access Free <span className="text-[#A536A2]">Resume Templates</span></h2>
-                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] px-40 text-center">All the templates are ATS compliant and can be customized according to your style using our AI Resume Builder.</p>
+                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] lg:px-40 px-10 text-center">All the templates are ATS compliant and can be customized according to your style using our AI Resume Builder.</p>
                </div>
                <FreeResumeTemplates />
             </div>
@@ -179,7 +179,7 @@ export default function Home() {
             <div className='max-w-6xl mx-auto'>
                <div className="mb-10">
                   <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6 text-center">Explore <span className="text-[#A536A2]">AI Resume Builder Features</span></h2>
-                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] px-40 text-center">Dive into a powerful suite of career development tools and features designed to advance careers at all levels.</p>
+                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] lg:px-40 px-10 text-center">Dive into a powerful suite of career development tools and features designed to advance careers at all levels.</p>
                </div>
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
@@ -211,11 +211,11 @@ export default function Home() {
 
 
          {/* Key benefits section start here */}
-         <div className="key_benefits_section px-4 pt-10 lg:pt-20 lg:pb-20 bg-[#fbfbfb]">
+         <div className="key_benefits_section px-4 pt-10 pb-10 lg:pt-20 lg:pb-20 bg-[#fbfbfb]">
             <div className='max-w-6xl mx-auto'>
                <div className="mb-10">
                   <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6 text-center">Featured <span className="text-[#A536A2]">Jobs</span></h2>
-                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] px-40 text-center">Discover roles that match your skills and goals.</p>
+                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] lg:px-40 px-10 text-center">Discover roles that match your skills and goals.</p>
                </div>
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
@@ -256,16 +256,16 @@ export default function Home() {
 
 
          {/* Testimonials section start here */}
-         <div className="testimonials_section lg:pt-20 lg:pb-20 pt-10 pb-5 px-4 lg:px-0">
+         <div className="testimonials_section lg:pt-20 lg:pb-20 pt-10 pb-10 pb-5 px-4 lg:px-0">
             <div className='max-w-6xl mx-auto'>
-               <div className="flex gap-12">
-                  <div className="w-4/12">
+               <div className="lg:flex gap-12">
+                  <div className="lg:w-4/12 mb-4 lg:mb-0">
                     <p className="text-base leading-[27px] text-white uppercase mb-1">testimonials</p>
                     <h2 className="text-2xl lg:text-[40px] lg:leading-[40px] text-white font-bold mb-2 lg:mb-4 pr-20">What people say</h2>
                     <p className="text-sm leading-[24px] text-white">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. 
                      Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non</p>
                   </div>
-                  <div className="w-8/12">
+                  <div className="lg:w-8/12">
                     <Testimonial />
                   </div>
                </div>
@@ -274,7 +274,7 @@ export default function Home() {
          {/* Testimonials section ends here */}
 
          {/* Purchase section start here */}
-         <div className="purchase_section py-8 lg:py-20">
+         <div className="purchase_section py-8 lg:py-20 px-4 lg:px-0">
             <div className='max-w-6xl mx-auto'>
                <div className="text-center mb-10 lg:mb-10">
                   <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
@@ -304,7 +304,7 @@ export default function Home() {
                                        </div>
                                     </div>
                                  </div>
-                                 <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                 <div className="absolute left-0 lg:bottom-[-20px] bottom-[15px] w-full px-6">
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
@@ -348,7 +348,7 @@ export default function Home() {
                                        </div>
                                     </div>
                                  </div>
-                                 <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                 <div className="absolute left-0 lg:bottom-[-20px] bottom-[20px] w-full px-6">
                                     <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
@@ -370,7 +370,7 @@ export default function Home() {
                                        </div>
                                     </div>
                                  </div>
-                                 <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                 <div className="absolute left-0 lg:bottom-[-20px] bottom-[20px] w-full px-6">
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
@@ -394,7 +394,7 @@ export default function Home() {
                                        </div>
                                     </div>
                                  </div>
-                                 <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                 <div className="absolute left-0 bottom-[20px] w-full px-6">
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
@@ -438,7 +438,7 @@ export default function Home() {
                                        </div>
                                     </div>
                                  </div>
-                                 <div className="absolute left-0 bottom-[0] w-full px-6">
+                                 <div className="absolute left-0 bottom-[20px] w-full px-6">
                                     <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>

@@ -32,7 +32,7 @@ console.log("plans",plans);
     return (
         <>
             <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
-                <div className="purchase_section py-8 lg:py-20">
+                <div className="purchase_section py-8 lg:py-20 px-0 lg:px-0">
                            <div className='max-w-6xl mx-auto'>
                               {/* <div className="text-center mb-10 lg:mb-10">
                                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
@@ -90,7 +90,7 @@ console.log("plans",plans);
                                                 
                                                    </div>
                                                 </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
                                                    <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                                 </div>
                                              </div>
@@ -189,7 +189,7 @@ console.log("plans",plans);
                                                       </div>
                                                    </div>
                                                 </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
                                                    <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                                 </div>
                                              </div>
@@ -233,7 +233,7 @@ console.log("plans",plans);
                                                       </div>
                                                    </div>
                                                 </div>
-                                                <div className="absolute left-0 bottom-[0] w-full px-6">
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
                                                    <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                                 </div>
                                              </div>
@@ -389,7 +389,7 @@ console.log("plans",plans);
                                                 
                                                    </div>
                                                 </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
                                                    <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                                 </div>
                                              </div>

@@ -75,12 +75,12 @@ const inter = Inter({
 const page = () => {
   return (
     <div className={`${inter.className} antialiased pb-8`}>
-        <div className='mb-10'>
-            <h2 className='text-[30px] leading-[30px] text-[#151515] font-semibold mb-4'>Invite Students</h2>
-            <p className='text-[16px] leading-[23px] text-[#575757] font-normal mb-0'>Easily invite and manage student profiles with seamless Excel upload or manual entry.</p>
+        <div className='mb-5 lg:mb-10 pt-6'>
+            <h2 className='text-xl lg:text-[30px] leading-[30px] text-[#151515] font-semibold mb-1 lg:mb-4'>Invite Students</h2>
+            <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Easily invite and manage student profiles with seamless Excel upload or manual entry.</p>
         </div>
-        <div className='bg-white rounded-[10px] p-10 flex gap-6 mb-5'>
-            <div className='w-6/12'>
+        <div className='bg-white rounded-[10px] p-5 lg:p-10 lg:flex gap-6 mb-5'>
+            <div className='lg:w-6/12 mb-4 lg:mb-0'>
                 <div className='mb-0'>
                     <div>
                         <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
@@ -100,21 +100,21 @@ const page = () => {
                             <FileInput id="dropzone-file" className="hidden" />
                         </Label>
                     </div> 
-                    <div className='flex gap-4 mt-3'>
-                        <button class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center"><BiImport className="text-[24px]" /> Download Sample CSV</button>
+                    <div className='lg:flex gap-4 mt-3'>
+                        <button class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
                         <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">Invite Students</button>
                     </div>
                 </div>
             </div>
-            <div className='w-6/12'>
+            <div className='lg:w-6/12'>
                 <div className=''>
                     <div className='mb-0'>
                         <div className='mb-4 flex items-center justify-between'>
-                            <div>
-                              <h4 className='text-[20px] text-[#151515] font-semibold pb-1'>Invite students manually</h4>
+                            <div className='w-6/12'>
+                              <h4 className='text-[16px] lg:text-[20px] text-[#151515] font-semibold pb-1'>Invite students manually</h4>
                             </div>
-                            <div className='flex justify-end items-center gap-2'>
-                                <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Another Student</button>
+                            <div className='flex justify-end items-center gap-2 w-6/12'>
+                                <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[32px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Another Student</button>
                             </div>  
                         </div>
                         <div className='resume_form_area'>
@@ -135,8 +135,8 @@ const page = () => {
                     </div>  
                     <div className='mb-4'>
                         <div className='resume_form_area'>
-                            <div className='flex gap-4 mb-3'>
-                                <div className='w-6/12 resume_form_box'>
+                            <div className='lg:flex gap-4 mb-3'>
+                                <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
                                     <div className="mb-1 block">
                                     <Label htmlFor="base">Student Email Id <span>*</span></Label>
                                     </div>
@@ -147,7 +147,7 @@ const page = () => {
                                     <TextInput id="base" type="email" sizing="md" placeholder='Enter student email address' />
                                     </div>
                                 </div>
-                                <div className='w-6/12 resume_form_box'>
+                                <div className='lg:w-6/12 resume_form_box'>
                                     <div className="mb-1 block">
                                     <Label htmlFor="base">Phone Number <span>*</span></Label>
                                     </div>
@@ -186,10 +186,10 @@ const page = () => {
                 </div>
             </div>
         </div>
-        <div className='bg-white rounded-[10px] p-10'>
-            <div className='flex justify-between items-center mb-4'>
+        <div className='bg-white rounded-[10px] p-5 lg:p-10'>
+            <div className='lg:flex justify-between items-center mb-4'>
                 <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invited Students</h4>
-                <div className='flex items-center gap-2 w-3/12 search_section'>
+                <div className='flex items-center gap-2 lg:w-3/12 search_section'>
                     <div className='w-10/12'>
                         <div className='bg-[#F3F4F6] rounded-[8px] flex gap-2 items-center pl-2'>
                             <button className='w-[42px] h-[42px] flex justify-center items-center cursor-pointer'>

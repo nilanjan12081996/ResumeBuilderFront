@@ -45,7 +45,7 @@ const ChoiceModal = ({
 
               {/* Content */}
               <div className="px-8 pb-8">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Individual Resume Card */}
                   <div
                     className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${

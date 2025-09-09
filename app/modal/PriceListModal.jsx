@@ -99,7 +99,7 @@ const PriceListModal = ({ openPricModal, setOpenPriceModal }) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                            <div className="absolute left-0 bottom-[20px] w-full px-6">
                               <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">
                                 Get Started
                               </button>
@@ -170,7 +170,7 @@ const PriceListModal = ({ openPricModal, setOpenPriceModal }) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                            <div className="absolute left-0 bottom-[20px] w-full px-6">
                               <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">
                                 Get Started
                               </button>
@@ -205,7 +205,7 @@ const PriceListModal = ({ openPricModal, setOpenPriceModal }) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                            <div className="absolute left-0 bottom-[20px] w-full px-6">
                               <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">
                                 Get Started
                               </button>
@@ -239,7 +239,7 @@ const PriceListModal = ({ openPricModal, setOpenPriceModal }) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="absolute left-0 bottom-[-20px] w-full px-6">
+                            <div className="absolute left-0 bottom-[20px] w-full px-6">
                               <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">
                                 Get Started
                               </button>
@@ -310,7 +310,7 @@ const PriceListModal = ({ openPricModal, setOpenPriceModal }) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="absolute left-0 bottom-[0] w-full px-6">
+                            <div className="absolute left-0 bottom-[20px] w-full px-6">
                               <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">
                                 Get Started
                               </button>

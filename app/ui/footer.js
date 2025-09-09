@@ -43,7 +43,7 @@ const Footer = () => {
           <div className='footer_top_container'>
             <div className='lg:w-full mb-6 lg:mb-0 text-center'>
               <Image src={footerLogo} alt='footerLogo' className='inline-block mb-8' />
-              <div className='flex justify-center items-center'>
+              <div className='flex lg:justify-center lg:items-center items-start'>
                 <ImLocation className='text-[#92278F] text-xl mr-1' />
                 <p className='text-black text-sm leading-[24px]'>1234 Main Street, Suite 500, Downtown District, Anytown, State, 12345, USA</p>
               </div>

@@ -5,6 +5,8 @@ import React, { useEffect } from 'react'
 
 import userFace from "../assets/imagesource/user_face.png";
 
+import logoAdmin from "../assets/imagesource/logo_admin.png";
+
 import { Poppins } from 'next/font/google';
 
 import { useState } from "react";
@@ -60,9 +62,11 @@ const Insideheader = () => {
 
   return (
     <div className='bg-[#ffffff] rounded-[0px] py-4 px-6 mb-6 border-l border-[#f3f4f6]'>
-      <div className='lg:flex justify-between items-center'>
-        <div className='pl-[50px] lg:pl-0'>
-          &nbsp;
+      <div className='flex justify-between items-center'>
+        <div className='w-3/12'>
+          <Link className='block lg:hidden' href="/dashboard" passHref>
+            <Image src={logoAdmin} alt="logoAdmin" className='w-full' />
+          </Link>
         </div>
         <div>
           <div className='flex justify-end items-center gap-3'>

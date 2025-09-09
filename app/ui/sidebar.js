@@ -140,10 +140,10 @@ const Sidebar = () => {
           {/* <!-- Menu Group --> */}
           <div>
 
-            <ul className="mb-6 flex flex-col gap-1.5 mx-4">
+            <ul className="mb-6 flex flex-col gap-1.5 lg:mx-4">
               <li onClick={closeNavbar}>
                 <Link href="/dashboard"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('dashboard') &&
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('dashboard') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>
@@ -154,7 +154,7 @@ const Sidebar = () => {
 
               <li onClick={closeNavbar}>
                 <Link href="/resume-history"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-history') &&
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-history') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>
@@ -164,7 +164,7 @@ const Sidebar = () => {
               </li>
               <li onClick={closeNavbar}>
                 <Link href="/resume-templates"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>
@@ -175,7 +175,7 @@ const Sidebar = () => {
 
               <li onClick={closeNavbar}>
                 <Link href="/plans"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>
@@ -186,7 +186,7 @@ const Sidebar = () => {
 
               <li onClick={closeNavbar}>
                 <Link href="/featured-jobs"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('featured-jobs') &&
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('featured-jobs') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>
@@ -197,7 +197,7 @@ const Sidebar = () => {
 
               <li onClick={closeNavbar}>
                 <Link href="/invite-students"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
                     'bg-graydark dark:bg-meta-4'
                     }`}
                   passHref>

@@ -82,7 +82,7 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
                         </div>
                         <div className='lg:w-6/12 py-20 px-10 lg:py-32 lg:px-20'>
                             <div className='py-0 px-0'>
-                                <h2 className='text-[#000000] text-[30px] leading-[35px] font-semibold pb-4'>Log In</h2>
+                                <h2 className='text-[#000000] text-2xl lg:text-[30px] lg:leading-[35px] font-semibold pb-4'>Log In</h2>
                                 <div className='form_area'>
                                     <form onSubmit={handleSubmit(onSubmit)} className="flex max-w-md flex-col gap-0">
                                         <div className='mb-2'>

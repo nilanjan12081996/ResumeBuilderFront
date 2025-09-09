@@ -98,13 +98,13 @@ const Page = () => {
       <ToastContainer />
       <div className='mb-0'>
         <div className='welcome_area py-8 px-9 rounded-[10px] mb-10'>
-          <h3 className='text-[22px] leading-[22px] text-white font-semibold mb-4'>Welcome to Resume Builder, Soumyajit Chandra!</h3>
-          <p className='text-[18px] leading-[25px] text-white font-normal mb-0 pr-20'>Create a professional resume in minutes with our easy-to-use builder. Choose from our collection of templates and get hired faster.</p>
+          <h3 className='text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4'>Welcome to Resume Builder, Soumyajit Chandra!</h3>
+          <p className='text-[18px] leading-[25px] text-white font-normal mb-0 lg:pr-20'>Create a professional resume in minutes with our easy-to-use builder. Choose from our collection of templates and get hired faster.</p>
         </div>
         <div className='mb-10'>
           <h3 className='text-[20px] leading-[20px] text-[#151515] font-medium mb-6'>Quick Actions</h3>
           <div className='flex gap-4'>
-            <div className='w-full grid grid-cols-4 gap-4'>
+            <div className='w-full grid grid-cols-1 lg:grid-cols-4 gap-4'>
               <div onClick={() => setOpenModalCreateResume(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
                   <div className='bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center'>
                      <BiPlus className='text-[#00A63E] text-[30px]' />
@@ -138,16 +138,16 @@ const Page = () => {
         </div>
         <div className='mb-14'>
           <h3 className='text-[20px] leading-[20px] text-[#151515] font-medium mb-6'>Recent Resumes</h3>
-          <div className='flex gap-4'>
-            <div className='w-8/12'>
+          <div className='lg:flex gap-4 pb-8 lg:pb-0'>
+            <div className='lg:w-8/12'>
               <div className='flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4'>
                   <div className='flex gap-3 items-center'>
                     <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
                       <CgFileDocument className='text-[#ffffff] text-2xl' />
                     </div>
                     <div>
-                      <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                      <p className='text-[#7D7D7D] text-sm'>Created on 7 July, 2025</p>
+                      <h3 className='text-[#151515] text-sm lg:text-base font-medium mb-1'>Software Developer Resume</h3>
+                      <p className='text-[#7D7D7D] text-xs lg:text-sm'>Created on 7 July, 2025</p>
                     </div>
                   </div>
                   <div>
@@ -160,8 +160,8 @@ const Page = () => {
                       <CgFileDocument className='text-[#ffffff] text-2xl' />
                     </div>
                     <div>
-                      <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                      <p className='text-[#7D7D7D] text-sm'>Created on 7 July, 2025</p>
+                      <h3 className='text-[#151515] text-sm lg:text-base font-medium mb-1'>Software Developer Resume</h3>
+                      <p className='text-[#7D7D7D] text-xs lg:text-sm'>Created on 7 July, 2025</p>
                     </div>
                   </div>
                   <div>
@@ -169,7 +169,7 @@ const Page = () => {
                   </div>
               </div>
             </div>
-            <div className='w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7'>
+            <div className='lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7'>
               <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>Resume Writing Tips</h3>
               <ul className='pl-4.5'>
                   <li className='text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc'>Keep your resume to 1-2 pages maximum</li>
@@ -189,36 +189,36 @@ const Page = () => {
               </ModalHeader>
               <ModalBody className='bg-white p-0 rounded-b-[4px]'>
                   <div className="lg:flex justify-center items-center gap-5 p-5">
-                      <div className='lg:w-6/12 border border-[#DADADA] rounded-[7px] p-4 pr-0'>
+                      <div className='lg:w-6/12 border border-[#DADADA] rounded-[7px] p-4 pr-0 mb-4 lg:mb-0'>
                           <h3 className="text-[#151515] text-base font-medium pb-4">Select resume from the list</h3>
-                          <ul className='grid grid-cols-2 gap-5 resume_list_area'>
+                          <ul className='grid grid-cols-2 gap-2 lg:gap-5 resume_list_area'>
                               <li>
                                 <input type="radio" name="test" id="cb1" />
                                 <label for="cb1" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
                                     <Image src={resume01} alt="resume01" className='' />
                                 </label>
-                                <p className='text-[#000000] text-base font-semibold text-center pt-1'>Modern Template</p>
+                                <p className='text-[#000000] text-sm lg:text-base font-semibold text-center pt-1'>Modern Template</p>
                               </li>
                               <li>
                                 <input type="radio" name="test" id="cb2" />
                                 <label for="cb2" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
                                     <Image src={resume01} alt="resume01" className='' />
                                 </label>
-                                  <p className='text-[#000000] text-base font-semibold text-center'>Professional Template</p>
+                                  <p className='text-[#000000] text-sm lg:text-base font-semibold text-center'>Professional Template</p>
                               </li>
                               <li>
                                 <input type="radio" name="test" id="cb3" />
                                 <label for="cb3" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
                                     <Image src={resume01} alt="resume01" className='' />
                                 </label>
-                                  <p className='text-[#000000] text-base font-semibold text-center'>Technical Template</p>
+                                  <p className='text-[#000000] text-sm lg:text-base font-semibold text-center'>Technical Template</p>
                               </li>
                               <li>
                                 <input type="radio" name="test" id="cb4" />
                                 <label for="cb4" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
                                     <Image src={resume01} alt="resume01" className='' />
                                 </label>
-                                <p className='text-[#000000] text-base font-semibold text-center'>Modern Template</p>
+                                <p className='text-[#000000] text-sm lg:text-base font-semibold text-center'>Modern Template</p>
                               </li>
                           </ul>
                       </div>
@@ -414,8 +414,8 @@ const Page = () => {
                             className="resume_upload_box_small flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                             >
                             <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                                <BiImport className="text-[70px] text-[#92278F]" />
-                                <p className="mb-2 text-xl text-[#92278F]">
+                                <BiImport className="text-[50px] lg:text-[70px] text-[#92278F]" />
+                                <p className="mb-2 text-base lg:text-xl text-[#92278F]">
                                   Import your Resume
                                 </p>
                             </div>

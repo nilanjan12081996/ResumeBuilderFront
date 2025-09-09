@@ -18,11 +18,11 @@ const inter = Inter({
 const page = () => {
   return (
      <div className={`${inter.className} antialiased`}>
-      <div className='mb-10'>
-        <h2 className='text-[30px] leading-[30px] text-[#151515] font-semibold mb-4'>Featured Jobs</h2>
-        <p className='text-[16px] leading-[23px] text-[#575757] font-normal mb-0'>Discover roles that match your skills and goals.</p>
+      <div className='mb-5 lg:mb-10 pt-6'>
+        <h2 className='text-xl lg:text-[30px] leading-[30px] text-[#151515] font-semibold mb-1 lg:mb-4'>Featured Jobs</h2>
+        <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Discover roles that match your skills and goals.</p>
       </div>
-      <div className='grid grid-cols-3 gap-6'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 pb-8'>
         <div className='bg-[#FFFFFF] rounded-[10px] px-8 py-8 shadow-lg'>
           <Image src={hiring_icon} alt="hiring_icon" className='mb-4' />
           <h3 className='text-[#560654] text-[20px] font-semibold pb-2'>Sales Manager</h3>
