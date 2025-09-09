@@ -84,7 +84,7 @@ export default function Home() {
             <Image src={bannerImg} alt='bannerImg' className='w-full hidden lg:block' />
             <div className="banner_content_area lg:absolute w-full h-full left-0 top-0">
                <div className='max-w-6xl mx-auto lg:flex justify-center items-center h-full'>
-                  <div className="lg:w-6/12 px-4 pt-24">
+                  <div className="lg:w-6/12 px-4 pt-20 lg:pt-24">
                      <p className="text-[18px] leading-[18px] text-[#800080] uppercase font-semibold mb-2"> AI RESUME BUILDER</p>
                      <h1 className="text-2xl leading-[30px] lg:text-[60px] lg:leading-[60px] text-black font-bold mb-2 lg:mb-4">Build an ATS-Ready Resume <span>Instantly with AI</span>.</h1>
                      <p className="text-[#2A2A2A] text-sm lg:text-[18px] leading-[28px] mb-5 lg:mb-6">
