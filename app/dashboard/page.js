@@ -81,6 +81,10 @@ const Page = () => {
 
   const [openModalImproveExistingResumeTwo, setOpenModalImproveExistingResumeTwo] = useState(false);
 
+  const [openModalLinkedInRewrite, setOpenModalLinkedInRewrite] = useState(false);
+
+  
+
   const alertContinueHandler = () => {
     setOpenModalImproveexistingResume(false);
     setOpenModalAlertModal(true);
@@ -126,7 +130,7 @@ const Page = () => {
                 <h3 className='text-[#151515] text-[18px] leading-[22px] font-medium pb-3'>JD based resume</h3>
                 <p className='text-[#575757] text-[15px] leading-[23px] pb-0'>Upload and enhance your current resume with AI-powered suggestions</p>
               </div>
-              <div onClick={() => HandlerLinkedInRewrite(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
+              <div onClick={() => setOpenModalLinkedInRewrite(true)} className='border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer'>
                   <div className='bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center'>
                      <BiLogoLinkedin className='text-[#9747FF] text-[30px]' />
                   </div>
@@ -426,6 +430,58 @@ const Page = () => {
                   </div>
                   <div className="p-5 inset-shadow-xs">
                       <button onClick={() => setOpenModalCreateResume(true)} className='bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]'>Choose Template</button>
+                  </div>
+              </ModalBody>
+          </Modal>
+      {/* add modal for apply job ends here */}
+
+
+      {/* add modal for apply job start here */}
+          <Modal size="4xl" className="apply_modal_area" show={openModalLinkedInRewrite} onClose={() => setOpenModalLinkedInRewrite(false)}>
+              <ModalHeader className='bg-white text-black modal_header'>
+                <div className='flex items-center gap-1'>
+                  <HiClipboardList className='text-[#800080] text-3xl' />
+                  LinkedIn Rewrite
+                </div>
+              </ModalHeader>
+              <ModalBody className='bg-white p-0 rounded-b-[4px]'>
+                  <div className="lg:flex gap-5 p-5">
+                      <div className='lg:w-6/12 p-0 pr-0'>
+                        <div className='resume_form_area'>
+                          <div className=''>
+                              <div className='w-full resume_form_box mb-3'>
+                                <div className="mb-1 block">
+                                  <Label htmlFor="base">LinkedIn Profile Link <span>*</span></Label>
+                                </div>
+                                <div className='field_box flex items-center'>
+                                  <div className='p-3'>
+                                    <BiLogoLinkedinSquare className='text-[#928F8F]' />
+                                  </div>
+                                  <TextInput id="base" type="text" sizing="md" placeholder='https://www.linkedin.com/in/johndoe' />
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className='lg:w-6/12'>
+                          <div className="flex w-full items-center justify-center">
+                            <Label
+                            htmlFor="dropzone-file"
+                            className="resume_upload_box_small flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                            >
+                            <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                                <BiImport className="text-[70px] text-[#92278F]" />
+                                <p className="mb-2 text-xl text-[#92278F]">
+                                  Import your Resume
+                                </p>
+                            </div>
+                            <FileInput id="dropzone-file" className="hidden" />
+                            </Label>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="p-5 inset-shadow-xs">
+                      <button onClick={() => HandlerLinkedInRewrite(true)} className='bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]'>Continue</button>
                   </div>
               </ModalBody>
           </Modal>
