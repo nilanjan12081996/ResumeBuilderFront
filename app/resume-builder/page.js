@@ -60,26 +60,91 @@ import PersonalProject from './PersonalProject';
 import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { saveLanguageInfo, savePersonalInfo, saveWorkExp } from '../reducers/ResumeSlice';
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
+  const user_id=sessionStorage.getItem('user_id')
+  const parseUserId=JSON.parse(user_id)
+
+const dispatch=useDispatch()
+ const [experiences, setExperiences] = useState([
+    {
+      id: Date.now(),
+      company_name: "",
+      position: "",
+      location: "",
+      skill: "",
+      start_date: "",
+      end_date: "",
+      current_work: false,
+      projects: [{ id: Date.now() + 1, title: "", role: "", technology: "", description: "" }]
+    }
+  ]);
+
+    const [languages, setLanguages] = useState([
+    { id: Date.now(), language_name: "", proficiency: "" },
+  ]);
 
    const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const onSubmit=(data)=>{
+    console.log("data",data);
+dispatch(savePersonalInfo(data)).then((res)=>{
+  console.log("res",res);
+  if(res?.payload?.status_code===201){
+    const payload = {
+      resume_id: res?.payload?.id,
+      data: experiences.map(exp => ({
+        company_name: exp.company_name,
+        position: exp.position,
+        location: exp.location,
+        skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
+        start_date: exp.start_date,
+        end_date: exp.end_date,
+        current_work: exp.current_work ? 1 : 0,
+        projects: exp.projects.map(proj => ({
+          title: proj.title,
+          role: proj.role,
+          technology: proj.technology.split(",").map(t => t.trim()),
+          description: proj.description
+        }))
+      }))
+    };
+    dispatch(saveWorkExp(payload))
+
+     const payloadLang = {
+          user_id: parseUserId,
+          resume_id: res?.payload?.id,
+          data: languages.map((lang) => ({
+            language_name: lang.language_name,
+            proficiency: lang.proficiency,
+          })),
+        };
+        dispatch(saveLanguageInfo(payloadLang))
+
+    
+  }
+  
+})
+  }
   return (
     <div className='lg:flex gap-5 pb-5'>
-      <form>
+      
+      
         <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
+        <form onSubmit={handleSubmit(onSubmit)}>
            <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
               <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
                 <HiClipboardList className='text-[#800080] text-2xl' />
                 <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
               </div>
-              <button className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
+              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
            </div>
            <div className='resume_tab_section'>
               <Tabs>
@@ -101,36 +166,39 @@ const page = () => {
                   <div className='mb-4'>
                       <div>
                         <TabPanel>
-                        <PersonalInfo register={register}/>
+                        <PersonalInfo register={register} errors={errors}/>
                         </TabPanel>
                         
                       <TabPanel>
-                      <Education register={register}/>
+                      <Education register={register} errors={errors}/>
                       </TabPanel>
                         
 
                         <TabPanel>
-                          <WorkExp register={register}/>
+                          <WorkExp experiences={experiences} setExperiences={setExperiences} register={register} errors={errors}/>
                         </TabPanel>
 
                         <TabPanel>
-                         <Language register={register}/>
+                         <Language 
+                         languages={languages}
+                          setLanguages={setLanguages}
+                          />
                         </TabPanel>
 
                         <TabPanel>
-                          <Skills register={register}/>
+                          <Skills register={register} errors={errors}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <PersonalProject register={register}/>
+                          <PersonalProject register={register} errors={errors}/>
                         </TabPanel>
 
                         <TabPanel>
-                         <Certificates register={register}/>
+                         <Certificates register={register} errors={errors}/>
                         </TabPanel>
 
                         <TabPanel>  
-                         <Achivments register={register}/>
+                         <Achivments register={register} errors={errors}/>
                         </TabPanel>
 
                       </div>
@@ -138,8 +206,9 @@ const page = () => {
                 </div>
               </Tabs>
            </div>
+           </form>
         </div>
-        </form>
+       
 
 
 

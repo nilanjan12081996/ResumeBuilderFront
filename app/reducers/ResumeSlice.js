@@ -8,7 +8,7 @@ export const savePersonalInfo=createAsyncThunk(
       async (userInput, { rejectWithValue }) => {
         try {
             const response = await api.post('/api/resume/personal-info/create', userInput);
-            if (response?.data?.status_code === 200) {
+            if (response?.data?.status_code === 201) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {

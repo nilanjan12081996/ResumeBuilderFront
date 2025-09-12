@@ -6,7 +6,7 @@ import { FaLocationDot } from "react-icons/fa6"
 import { MdEmail } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const PersonalInfo=({register})=>{
+const PersonalInfo=({register,errors})=>{
     return(
         <>
    
@@ -26,8 +26,14 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <BiSolidUser className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='Kabilan S' />
+                      <TextInput {...register("full_name",{required:"Full Name is required"})} id="base" type="text" sizing="md" placeholder='Kabilan S' />
+                    
                     </div>
+                        {errors?.full_name && (
+                    <span className="text-red-500">
+                    {errors?.full_name?.message}
+                    </span>
+                  )}
                   </div>
                   <div className='lg:w-6/12 resume_form_box'>
                     <div className="mb-1 block">
@@ -37,8 +43,13 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <MdEmail className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="email" sizing="md" placeholder='Kabilan S' />
+                      <TextInput {...register("email",{required:"Email is required"})} id="base" type="email" sizing="md" placeholder='Kabilan S' />
                     </div>
+                      {errors?.email && (
+                    <span className="text-red-500">
+                    {errors?.email?.message}
+                    </span>
+                  )}
                   </div>
               </div>
               <div className='lg:flex gap-4 mb-3'>
@@ -50,8 +61,13 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <BiSolidPhone className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='+91-5362563762' />
+                      <TextInput {...register("phone",{required:"Ph no required"})}  id="base" type="text" sizing="md" placeholder='+91-5362563762' />
                     </div>
+                       {errors?.email && (
+                    <span className="text-red-500">
+                    {errors?.email?.message}
+                    </span>
+                  )}
                   </div>
                   <div className='lg:w-6/12 resume_form_box'>
                     <div className="mb-1 block">
@@ -61,8 +77,13 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <FaLocationDot className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='Trichy, TN' />
+                      <TextInput {...register("location",{required:"Location is required"})} id="base" type="text" sizing="md" placeholder='Trichy, TN' />
                     </div>
+                     {errors?.location && (
+                    <span className="text-red-500">
+                    {errors?.location?.message}
+                    </span>
+                  )}
                   </div>
               </div>
             </div>
@@ -82,7 +103,7 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <FaGlobe className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='https://yourname.design' />
+                      <TextInput {...register("personal_web")} id="base" type="text" sizing="md" placeholder='https://yourname.design' />
                     </div>
                   </div>
                   <div className='lg:w-6/12 resume_form_box'>
@@ -93,7 +114,7 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <BiLogoLinkedinSquare className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='https://www.linkedin.com/in/johndoe' />
+                      <TextInput {...register("linkdin_profile")} id="base" type="text" sizing="md" placeholder='https://www.linkedin.com/in/johndoe' />
                     </div>
                   </div>
               </div>
@@ -106,7 +127,7 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <BsGithub className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='https://github.com/johndoe' />
+                      <TextInput {...register("github_profile")} id="base" type="text" sizing="md" placeholder='https://github.com/johndoe' />
                     </div>
                   </div>
               </div>
@@ -127,8 +148,13 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <BiSolidBriefcase className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='UI Designer' />
+                      <TextInput {...register("title",{required:"Career Title is required"})} id="base" type="text" sizing="md" placeholder='UI Designer' />
                     </div>
+                         {errors?.title && (
+                    <span className="text-red-500">
+                    {errors?.title?.message}
+                    </span>
+                  )}
                   </div>
                   <div className='lg:w-6/12 resume_form_box'>
                     <div className="mb-1 block">
@@ -138,8 +164,13 @@ const PersonalInfo=({register})=>{
                       <div className='p-3'>
                         <BiSolidBriefcase className='text-[#928F8F]' />
                       </div>
-                      <TextInput id="base" type="text" sizing="md" placeholder='Briefly Describe your career goals' />
+                      <TextInput {...register("goal",{required:"Career Goal is Required"})} id="base" type="text" sizing="md" placeholder='Briefly Describe your career goals' />
                     </div>
+                      {errors?.goal && (
+                    <span className="text-red-500">
+                    {errors?.goal?.message}
+                    </span>
+                  )}
                   </div>
               </div>
             </div>
