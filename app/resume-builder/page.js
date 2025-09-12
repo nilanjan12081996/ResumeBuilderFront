@@ -51,12 +51,28 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select } from "flowbite-react";
+import PersonalInfo from './PersonalInfo';
+import Education from './Education';
+import WorkExp from './WorkExp';
+import Language from './Language';
+import Skills from './Skills';
+import PersonalProject from './PersonalProject';
+import Certificates from './Certificates';
+import Achivments from './Achivments';
+import { useForm } from 'react-hook-form';
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
+
+   const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   return (
     <div className='lg:flex gap-5 pb-5'>
+      <form>
         <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
            <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
               <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
@@ -85,716 +101,36 @@ const page = () => {
                   <div className='mb-4'>
                       <div>
                         <TabPanel>
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4'>
-                                <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Basic Info</h4>
-                                <p className='text-[14px] text-[#939393] font-normal'>Add your personal details that will appear at the top of your resume. * Required fields</p>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Full Name <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidUser className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Kabilan S' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Email Address <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <MdEmail className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="email" sizing="md" placeholder='Kabilan S' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Phone Number <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidPhone className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='+91-5362563762' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Location <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaLocationDot className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Trichy, TN' />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className='mb-4'>
-                              <div className='mb-4'>
-                                <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Web & Social</h4>
-                                <p className='text-[14px] text-[#939393] font-normal'>Add your web presence to make it easy for employers to learn more about you.</p>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Personal Website</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaGlobe className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='https://yourname.design' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">LinkedIn Profile </Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiLogoLinkedinSquare className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='https://www.linkedin.com/in/johndoe' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">GitHub Profile</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BsGithub className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='https://github.com/johndoe' />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className='mb-4'>
-                              <div className='mb-4'>
-                                <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Professional Details</h4>
-                                <p className='text-[14px] text-[#939393] font-normal'>Add information about your professional identity and career summary.</p>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Career Title</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBriefcase className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='UI Designer' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Career Goals</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBriefcase className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Briefly Describe your career goals' />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                        <PersonalInfo register={register}/>
+                        </TabPanel>
+                        
+                      <TabPanel>
+                      <Education register={register}/>
+                      </TabPanel>
+                        
+
+                        <TabPanel>
+                          <WorkExp register={register}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Education 1</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Add your educational background and qualifications</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Education</button>
-                                  <button className='bg-[#ffffff] hover:bg-[#0000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Institution/School</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBank className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Saranathan College of Engineering' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Location</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaLocationDot className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Trichy, TN' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Degree</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <HiAcademicCap className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='B.Tech' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Field of study</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <HiAcademicCap className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Computer Science' />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 resume_form_box mb-4 ml-1">
-                              <Checkbox id="age" />
-                              <Label htmlFor="age">Currently studying here</Label>
-                            </div>
-                            <div className='mb-4'>
-                              <div className='resume_form_area'>
-                                <div className=''>
-                                    <div className='w-full resume_form_box mb-3'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Date</Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                    <div className='w-full resume_form_box mb-3'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">GPA or Grade</Label>
-                                      </div>
-                                      <div className='field_box flex items-center pl-3'>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='e.g. 3.8/4.0 or 85%' />
-                                      </div>
-                                    </div>
-                                    <div className='w-full resume_form_box mb-3'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Additional Information</Label>
-                                      </div>
-                                      <div className='flex items-center'>
-                                        <Textarea id="comment" placeholder="Honors, activities, relevant coursework..." required rows={3} />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                         <Language register={register}/>
                         </TabPanel>
 
                         <TabPanel>
-                           <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Experience 1</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Add your work experience and internships</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Education</button>
-                                  <button className='bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Company</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBuilding className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Company or Organization Name' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Position</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBriefcase className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Job Title or Role' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='mb-3'>
-                                    <div className='w-full resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Location</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaLocationDot className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='City, Country' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='mb-3'>
-                                    <div className='w-full resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Skill Set</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaTags className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Add your Skills ' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Start Date <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">End Date <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 resume_form_box mb-4 ml-1">
-                              <Checkbox id="age" />
-                              <Label htmlFor="age">Currently studying here</Label>
-                            </div>
-                            <div className='mb-4'>
-                              <div className='resume_form_area'>
-                                <div className=''>
-                                    <div>
-                                      <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Project 1</h4>
-                                    </div>
-
-                                    <div className='lg:flex gap-4 mb-3'>
-                                        <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                          <div className="mb-1 block">
-                                            <Label htmlFor="base">Project Title</Label>
-                                          </div>
-                                          <div className='field_box flex items-center'>
-                                            <div className='p-3'>
-                                              <FaDiagramProject className='text-[#928F8F]' />
-                                            </div>
-                                            <TextInput id="base" type="text" sizing="md" placeholder='Name of the project' />
-                                          </div>
-                                        </div>
-                                        <div className='lg:w-6/12 resume_form_box'>
-                                          <div className="mb-1 block">
-                                            <Label htmlFor="base">Your Role</Label>
-                                          </div>
-                                          <div className='field_box flex items-center'>
-                                            <div className='p-3'>
-                                              <BiSolidBriefcase className='text-[#928F8F]' />
-                                            </div>
-                                            <TextInput id="base" type="text" sizing="md" placeholder='E.g Developer, Designer, etc.' />
-                                          </div>
-                                        </div>
-                                    </div>
-
-                                    <div className='mb-3'>
-                                        <div className='w-full resume_form_box'>
-                                          <div className="mb-1 block">
-                                            <Label htmlFor="base">Technologies Used</Label>
-                                          </div>
-                                          <div className='field_box flex items-center'>
-                                            <div className='p-3'>
-                                              <BiCodeAlt className='text-[#928F8F]' />
-                                            </div>
-                                            <TextInput id="base" type="text" sizing="md" placeholder='Enter the technologies used in this project' />
-                                          </div>
-                                        </div>
-                                    </div>
-
-                                    <div className='w-full resume_form_box mb-3'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Description</Label>
-                                      </div>
-                                      <div className='flex items-center'>
-                                        <Textarea id="comment" placeholder="Write a description about the project" required rows={3} />
-                                      </div>
-                                    </div>
-
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                          <Skills register={register}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Languages</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Add languages you know and proficiency levels</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add New Language</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Language Name </Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaLanguage className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='E.g English, Hindi, German, etc.' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Proficiency</Label>
-                                      </div>
-                                      <div className='field_box pl-3'>
-                                        <Select required>
-                                          <option>Intermediate</option>
-                                          <option>English</option>
-                                          <option>Hindi</option>
-                                          <option>bengali</option>
-                                        </Select>
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='border border-[#E2E2E2] bg-white rounded-[4px] p-4 flex items-center justify-between'>
-                                  <div className='flex items-center gap-2'>
-                                    <span className='bg-[#F6EFFF] w-[26px] h-[26px] rounded-full flex items-center justify-center text-[#000000] text-[13px] font-medium'><BiWorld className='text-[#92278F]' /></span> English
-                                  </div>
-                                  <div className='flex justify-end items-center'>
-                                    <button className='bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                          <PersonalProject register={register}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Skill Category #1</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Add your key skills and competencies</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Skill</button>
-                                  <button className='bg-[#ffffff] hover:bg-[#0000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className=''>
-                                    <div className='w-full resume_form_box mb-3'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Skill Category</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaTags className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Tools' className='w-full' />
-                                      </div>
-                                    </div>
-                                    <div className='w-full resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base"> Skills</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiCodeAlt className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="email" sizing="md" className='w-full' placeholder='Separate multiple skills with commas for better formatting' />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </TabPanel>
-
-                        <TabPanel>
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Projects</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Add notable projects you&lsquo;ve worked on</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Project</button>
-                                  <button className='bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Project Title</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaDiagramProject className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Name of the project' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Your Role</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBriefcase className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='E.g Developer, Designer, etc.' />
-                                      </div>
-                                    </div>
-                                </div>
-                                
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Start Date <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                    <div className='g:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">End Date <span>*</span></Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                </div>
-
-                                <div className='mb-3'>
-                                    <div className='w-full resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Project URL</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiLink className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='E.g. https://yourname.design' />
-                                      </div>
-                                    </div>
-                                </div>
-
-                                <div className='mb-3'>
-                                    <div className='w-full resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Technologies Used</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiCodeAlt className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Enter the technologies used in this project' />
-                                      </div>
-                                    </div>
-                                </div>
-
-                                <div className='w-full resume_form_box mb-3'>
-                                  <div className="mb-1 block">
-                                    <Label htmlFor="base">Description</Label>
-                                  </div>
-                                  <div className='flex items-center'>
-                                    <Textarea id="comment" placeholder="Write a description about the project" required rows={3} />
-                                  </div>
-                                </div>
-
-
-                              </div>
-                            </div>
-
-                          </div>
-                        </TabPanel>
-
-                        <TabPanel>
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Certifications</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Fill in the details for this section</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Certification</button>
-                                  <button className='bg-[#ffffff] hover:bg-[#0000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Certification Name</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaCertificate className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Name of th certification' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base"> Issuing Organization</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBuilding className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="email" sizing="md" placeholder='E.g. Coursera, Udemy, etc.' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Date Obtained</Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Certification ID</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BsFillPersonVcardFill className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Enter certification ID' />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                         <Certificates register={register}/>
                         </TabPanel>
 
                         <TabPanel>  
-                          <div className='tab_wrap'>
-                            <div className='mb-4'>
-                              <div className='mb-4 lg:flex items-center justify-between'>
-                                 <div className='mb-2 lg:mb-0'>
-                                    <h4 className='text-[16px] text-[#151515] font-semibold pb-1'>Achievement #1</h4>
-                                    <p className='text-[14px] text-[#939393] font-normal'>Fill in the details for this section</p>
-                                 </div>
-                                 <div className='flex justify-end items-center gap-2'>
-                                  <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Achievement</button>
-                                  <button className='bg-[#ffffff] hover:bg-[#0000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1'><MdDelete className='text-sm text-[#FF0000]' /> Delete</button>
-                                </div>
-                              </div>
-                              <div className='resume_form_area'>
-                                <div className='mb-3'>
-                                    <div className='w-full resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Achievement Title</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <FaTrophy className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="text" sizing="md" placeholder='Employee of the Month, Excellence Award' />
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='lg:flex gap-4 mb-3'>
-                                    <div className='lg:w-6/12 resume_form_box mb-2 lg:mb-0'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base"> Issuing Organization</Label>
-                                      </div>
-                                      <div className='field_box flex items-center'>
-                                        <div className='p-3'>
-                                          <BiSolidBuilding className='text-[#928F8F]' />
-                                        </div>
-                                        <TextInput id="base" type="email" sizing="md" placeholder='Company or Organization Name' />
-                                      </div>
-                                    </div>
-                                    <div className='lg:w-6/12 resume_form_box'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Date Recieved</Label>
-                                      </div>
-                                      <div className='field_box_date'>
-                                        <Datepicker /> 
-                                      </div>
-                                    </div>
-                                </div>
-                                <div className='mb-3'>
-                                    <div className='w-full resume_form_box mb-3'>
-                                      <div className="mb-1 block">
-                                        <Label htmlFor="base">Description</Label>
-                                      </div>
-                                      <div className='flex items-center'>
-                                        <Textarea id="comment" placeholder="Solved 100+ DSA problems on LeetCode." required rows={3} />
-                                      </div>
-                                    </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                         <Achivments register={register}/>
                         </TabPanel>
 
                       </div>
@@ -803,6 +139,11 @@ const page = () => {
               </Tabs>
            </div>
         </div>
+        </form>
+
+
+
+
         <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
           <div className='flex items-center justify-between mb-4'>
             <div className='flex items-center gap-1 mb-2 lg:mb-0'>

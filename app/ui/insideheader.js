@@ -54,10 +54,10 @@ const Insideheader = () => {
     }
 
   };
-  useEffect(() => {
-    dispatch(getProfile())
-  }, [])
-  console.log("headrr", profileData);
+  // useEffect(() => {
+  //   dispatch(getProfile())
+  // }, [])
+  // console.log("headrr", profileData);
 
 
   return (
