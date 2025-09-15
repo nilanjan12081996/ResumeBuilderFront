@@ -27,7 +27,7 @@ export const saveEducationInfo=createAsyncThunk(
     'saveEducationInfo',
       async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/resume/education/create', userInput);
+            const response = await api.post('/api/resume/education/create-update', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -47,7 +47,7 @@ export const saveWorkExp=createAsyncThunk(
     'saveWorkExp',
         async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/resume/experience/create', userInput);
+            const response = await api.post('/api/resume/experience/create-update', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -88,7 +88,7 @@ export const saveSkillInfo=createAsyncThunk(
         async (userInput, { rejectWithValue }) => {
         try {
             const response = await api.post('/api/resume/skills/add', userInput);
-            if (response?.data?.status_code === 200) {
+            if (response?.data?.status_code === 201) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {

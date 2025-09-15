@@ -271,12 +271,14 @@ const WorkExp = ({experiences, setExperiences}) => {
               </div>
               <div className="flex justify-end items-center gap-2">
                 <button
+                type="button"
                   onClick={addExperience}
                   className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
                 >
                   <BsFillPlusCircleFill className="text-sm" /> Add Experience
                 </button>
                 <button
+                type="button"
                   onClick={() => deleteExperience(exp.id)}
                   className="bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1"
                 >
@@ -431,12 +433,14 @@ const WorkExp = ({experiences, setExperiences}) => {
 
                     <div className="flex justify-end items-center gap-2">
                       <button
+                      type="button"
                         onClick={() => addProject(exp.id)}
                         className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
                       >
                         <BsFillPlusCircleFill className="text-sm" /> Add Project
                       </button>
                       <button
+                      type="button"
                         onClick={() => deleteProject(exp.id, proj.id)}
                         className="bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1"
                       >
@@ -519,7 +523,7 @@ const WorkExp = ({experiences, setExperiences}) => {
                       <Textarea
                          id={`proj-desc-${proj.id}`}
                         placeholder="Write a description about the project"
-                        required
+                       
                         rows={3}
                         value={proj.description}
             onChange={(e) =>

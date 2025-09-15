@@ -125,50 +125,21 @@ import { HiAcademicCap } from "react-icons/hi2"
 import { MdDelete } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const Education = () => {
-  // State to manage multiple education entries
-  const [educationEntries, setEducationEntries] = useState([
-    {
-      id: 1,
-      institution: '',
-      location: '',
-      degree: '',
-      fieldOfStudy: '',
-      currentlyStudying: false,
-      date: '',
-      gpa: '',
-      additionalInfo: ''
-    }
-  ]);
-
-  // Function to add new education entry
-  const addEducation = () => {
-    const newEntry = {
-      id: Date.now(), // Simple ID generation
-      institution: '',
-      location: '',
-      degree: '',
-      fieldOfStudy: '',
-      currentlyStudying: false,
-      date: '',
-      gpa: '',
-      additionalInfo: ''
-    };
-    setEducationEntries([...educationEntries, newEntry]);
+const Education = ({educationEntries,setEducationEntries}) => {
+        const addEducation = () => {
+    setEducationEntries([...educationEntries,  {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}]);
   };
 
-  // Function to delete specific education entry
   const deleteEducation = (id) => {
-    if (educationEntries.length > 1) { // Prevent deleting the last entry
-      setEducationEntries(educationEntries.filter(entry => entry.id !== id));
-    }
+    setEducationEntries(educationEntries.filter((cer) => cer.id !== id));
   };
 
-  // Function to update specific field of an education entry
   const updateEducationField = (id, field, value) => {
-    setEducationEntries(educationEntries.map(entry => 
-      entry.id === id ? { ...entry, [field]: value } : entry
-    ));
+    setEducationEntries(
+      educationEntries.map((cer) =>
+        cer.id === id ? { ...cer, [field]: value } : cer
+      )
+    );
   };
 
   return (
@@ -187,12 +158,14 @@ const Education = () => {
               </div>
               <div className='flex justify-end items-center gap-2'>
                 <button 
+                type="button"
                   onClick={addEducation}
                   className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'
                 >
                   <BsFillPlusCircleFill className='text-sm' /> Add Education
                 </button>
                 <button 
+                type="button"
                   onClick={() => deleteEducation(entry.id)}
                   disabled={educationEntries.length === 1}
                   className={`bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] font-medium cursor-pointer px-2 flex items-center gap-1 ${
@@ -274,12 +247,12 @@ const Education = () => {
                       <HiAcademicCap className='text-[#928F8F]' />
                     </div>
                     <TextInput 
-                      id={`fieldOfStudy-${entry.id}`}
+                      id={`field_study-${entry.id}`}
                       type="text" 
                       sizing="md" 
                       placeholder='Computer Science'
-                      value={entry.fieldOfStudy}
-                      onChange={(e) => updateEducationField(entry.id, 'fieldOfStudy', e.target.value)}
+                      value={entry.field_study}
+                      onChange={(e) => updateEducationField(entry.id, 'field_study', e.target.value)}
                     />
                   </div>
                 </div>
@@ -305,8 +278,21 @@ const Education = () => {
                     <div className='field_box_date'>
                       <Datepicker 
                         id={`date-${entry.id}`}
-                        value={entry.date}
-                        onChange={(date) => updateEducationField(entry.id, 'date', date)}
+                        value={entry.start_time}
+                        onChange={(date) => updateEducationField(entry.id, 'start_time', date)}
+                      />
+                    </div>
+                  </div>
+
+                        <div className='w-full resume_form_box mb-3'>
+                    <div className="mb-1 block">
+                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                    </div>
+                    <div className='field_box_date'>
+                      <Datepicker 
+                        id={`date-${entry.id}`}
+                        value={entry.end_time}
+                        onChange={(date) => updateEducationField(entry.id, 'end_time', date)}
                       />
                     </div>
                   </div>

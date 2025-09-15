@@ -63,9 +63,9 @@ const PersonalInfo=({register,errors})=>{
                       </div>
                       <TextInput {...register("phone",{required:"Ph no required"})}  id="base" type="text" sizing="md" placeholder='+91-5362563762' />
                     </div>
-                       {errors?.email && (
+                       {errors?.phone && (
                     <span className="text-red-500">
-                    {errors?.email?.message}
+                    {errors?.phone?.message}
                     </span>
                   )}
                   </div>

@@ -61,7 +61,8 @@ import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { saveLanguageInfo, savePersonalInfo, saveWorkExp } from '../reducers/ResumeSlice';
+import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
+import Template from '../temp/Template';
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
@@ -88,16 +89,59 @@ const dispatch=useDispatch()
     { id: Date.now(), language_name: "", proficiency: "" },
   ]);
 
+  const[skills,setSkills]=useState([
+    {id:Date.now(),skill_category:"",skill:""}
+  ])
+
+  const[personalPro,setPersonalPro]=useState([
+    {id:Date.now(),project_title:"",role:"",start_time:null,end_time:null,project_url:"",skill:"",description:""}
+  ])
+
+  const[certificates,setCertificates]=useState([
+    {id:Date.now(),certification_name:"",issuing_organization:"",obtained_date:null,certification_id:""}
+  ])
+
+  const[achivments,setAchivments]=useState([
+    {id:Date.now(),achievement_title:"",organization:"",receive_date:null,description:""}
+  ])
+
+  const[educationEntries,setEducationEntries]=useState([
+    {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}
+  ])
+
    const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm();
+
+  const formValues = watch();
   const onSubmit=(data)=>{
     console.log("data",data);
 dispatch(savePersonalInfo(data)).then((res)=>{
   console.log("res",res);
   if(res?.payload?.status_code===201){
+     
+    const eduPayload={
+       resume_id: res?.payload?.id,
+       education_arr:educationEntries.map((edu)=>(
+        {
+          institution:edu?.institution,
+          location:edu?.location,
+          field_study:edu?.field_study,
+          degree:edu?.degree,
+          start_time:edu?.start_time,
+          end_time:edu?.end_time,
+          cgpa:edu?.gpa,
+          information:edu?.additionalInfo
+        }
+       ))
+    }
+    dispatch(saveEducationInfo(eduPayload))
+
+
+
     const payload = {
       resume_id: res?.payload?.id,
       data: experiences.map(exp => ({
@@ -119,7 +163,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
     dispatch(saveWorkExp(payload))
 
      const payloadLang = {
-          user_id: parseUserId,
+          user_id: parseUserId?.user_id,
           resume_id: res?.payload?.id,
           data: languages.map((lang) => ({
             language_name: lang.language_name,
@@ -127,6 +171,69 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           })),
         };
         dispatch(saveLanguageInfo(payloadLang))
+
+  
+      const payloadSkills={
+        user_id: parseUserId?.user_id,
+        
+        data:skills.map((sk)=>(
+          {
+            resume_id:res?.payload?.id,
+            skill_category:sk.skill_category,
+            position:"test",
+            skill:sk.skill.split(',').map(t=>t.trim())
+          }
+          
+        ))
+      }
+      dispatch(saveSkillInfo(payloadSkills))
+
+      const payloadProject={
+         user_id: parseUserId?.user_id,
+         resume_id: res?.payload?.id,
+         data:personalPro.map((pPro)=>(
+          {
+            project_title:pPro?.project_title,
+            role:pPro?.role,
+            start_time:pPro?.start_time,
+            end_time:pPro?.end_time,
+            project_url:pPro?.project_url,
+            skill:pPro.skill.split(',').map(t=>t.trim())
+          }
+         ))
+      }
+      dispatch(saveProjectInfo(payloadProject))
+
+
+      const payloadCerticate={
+         user_id: parseUserId?.user_id,
+         resume_id: res?.payload?.id,
+         data:certificates.map((cer)=>(
+          {
+            certification_name:cer?.certification_name,
+            issuing_organization:cer?.issuing_organization,
+            obtained_date:cer?.obtained_date,
+            certification_id:cer?.certification_id
+          }
+         ))
+      }
+      dispatch(saveCertificatesInfo(payloadCerticate))
+
+      const payloadAchive={
+         user_id: parseUserId?.user_id,
+         resume_id: res?.payload?.id,
+         data:achivments.map((achiv)=>(
+          {
+
+            achievement_title:achiv?.achievement_title,
+            organization:achiv?.organization,
+            receive_date:achiv?.receive_date,
+            description:achiv?.description
+          }
+         ))
+      }
+      dispatch(saveAchivmentInfo(payloadAchive))
+      
 
     
   }
@@ -170,7 +277,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                         </TabPanel>
                         
                       <TabPanel>
-                      <Education register={register} errors={errors}/>
+                      <Education register={register} errors={errors} educationEntries={educationEntries}setEducationEntries={setEducationEntries}/>
                       </TabPanel>
                         
 
@@ -186,19 +293,19 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                         </TabPanel>
 
                         <TabPanel>
-                          <Skills register={register} errors={errors}/>
+                          <Skills register={register} errors={errors} skills={skills}setSkills={setSkills}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <PersonalProject register={register} errors={errors}/>
+                          <PersonalProject register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro}/>
                         </TabPanel>
 
                         <TabPanel>
-                         <Certificates register={register} errors={errors}/>
+                         <Certificates register={register} errors={errors} certificates={certificates} setCertificates={setCertificates}/>
                         </TabPanel>
 
                         <TabPanel>  
-                         <Achivments register={register} errors={errors}/>
+                         <Achivments register={register} errors={errors} achivments={achivments} setAchivments={setAchivments}/>
                         </TabPanel>
 
                       </div>
@@ -226,7 +333,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             </div>
           </div>
           <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-             <Image src={resume_sections_view} alt="resume_sections_view" className='' />
+             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
+             <Template data={formValues} education={educationEntries}/>
           </div>
           <div className='flex items-center justify-between mb-0'>
             <div className='flex items-center gap-1'>
