@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-const Template=({data,education})=> {
+const Template=({data,education,experiences,skills,languages,personalPro})=> {
   return (
     <div className="max-w-4xl mx-auto bg-white text-gray-900 p-8 font-sans">
       {/* Header */}
@@ -88,35 +88,75 @@ const Template=({data,education})=> {
       )}
 
           {/* Experience */}
-          <section className="mb-6">
-            <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">
-              Professional Experience
-            </h2>
-            <div className="space-y-4 text-sm">
-              <div>
-                <p className="font-medium">Software Developer Intern – StartupBricks</p>
-                <p>
-                  Developed responsive React + Tailwind projects. Optimized performance,
-                  improving load times by 30%.
-                </p>
-              </div>
-              <div>
-                <p className="font-medium">Front-End Developer Intern – Utilized</p>
-                <p>
-                  Built modular React + TypeScript UIs. Improved user engagement by 20%.
-                </p>
-              </div>
-              <div>
-                <p className="font-medium">Web Developer Intern – SunriseDesignHive</p>
-                <p>
-                  Created responsive Next.js website, achieving 95+ mobile responsiveness score.
-                </p>
-              </div>
-            </div>
-          </section>
+   {/* ================= Work Experience ================= */}
+{experiences?.length > 0 && (
+  <section className="mb-6">
+    <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">
+      Professional Experience
+    </h2>
+    <div className="space-y-4 text-sm">
+      {experiences.map((exp) => (
+        <div key={exp.id}>
+          {/* Job title, company, location, and dates */}
+          <p className="font-medium">
+            {exp.position || "Job Title"} – {exp.company_name || "Company Name"}
+          </p>
+          <p className="text-gray-600">
+            {exp.location ? `${exp.location} | ` : ""}
+            {exp.startDate
+              ? new Date(exp.startDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })
+              : ""}
+            {" – "}
+            {exp.current_work
+              ? "Present"
+              : exp.endDate
+              ? new Date(exp.endDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })
+              : ""}
+          </p>
+
+          {/* Projects */}
+          {exp.projects && exp.projects.length > 0 && (
+            <ul className="list-disc ml-5 mt-2 space-y-1">
+              {exp.projects.map((proj) => (
+                <li key={proj.id}>
+                  <span className="font-medium">
+                    {proj.title || "Project Title"}
+                  </span>
+                  {proj.role && <span> – {proj.role}</span>}
+                  {proj.technology && (
+                    <span className="text-gray-600"> [{proj.technology}]</span>
+                  )}
+                  {proj.description && (
+                    <p className="text-gray-700 text-sm ml-1">
+                      {proj.description}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Skills */}
-          <section className="mb-6">
+          {exp.skill && (
+            <p className="mt-1 text-sm text-gray-600">
+              <strong>Skills:</strong> {exp.skill}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+
+          {/* Skills */}
+          {/* <section className="mb-6">
             <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">Skills</h2>
             <ul className="text-sm space-y-1">
               <li>
@@ -129,38 +169,107 @@ const Template=({data,education})=> {
                 <span className="font-medium">Concepts:</span> REST APIs, CRUD, Responsive Design, State Management
               </li>
             </ul>
-          </section>
+          </section> */}
+
+          {/* ================= Skills ================= */}
+{/* ================= Skills ================= */}
+{skills?.length > 0 && (
+  <section className="mb-6">
+    <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">
+      Skills
+    </h2>
+    <div className="text-sm">
+      {skills.map((sk) => (
+        <div key={sk.id} className="mb-2">
+          <p className="font-medium">{sk.skill_category||"Language & Frameworks"}:</p>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {sk.skill
+              ?.split(",")
+              .map((s, i) => (
+                <span
+                  key={i}
+                  className={`${s?"px-2 py-1 bg-gray-100 border rounded-md text-xs":""}`}
+                >
+                  {s.trim()}
+                </span>
+              ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+
 
           {/* Languages */}
-          <section>
-            <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">Languages</h2>
-            <ul className="text-sm space-y-1">
-              <li>English — Native</li>
-              <li>Spanish — Intermediate</li>
-            </ul>
-          </section>
+          {/* ================= Languages ================= */}
+{languages?.length > 0 && (
+  <section className="mb-6">
+    <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">
+      Languages
+    </h2>
+    <ul className="text-sm space-y-1">
+      {languages.map((lang) => (
+        <li key={lang.id}>
+          <span className="font-medium">{lang.language_name || "Known Language"} — </span>
+          {lang.proficiency || "Not specified"}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
         </div>
 
         {/* Right Column */}
         <div>
           {/* Projects */}
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">Projects</h2>
-            <ul className="text-sm space-y-3 list-disc pl-5">
-              <li>
-                <span className="font-medium">Resume Builder App:</span> Form-based PDF resume generator (React, Node, MongoDB)
-              </li>
-              <li>
-                <span className="font-medium">Expense Tracker:</span> Real-time budget + expenses tracker (React, Tailwind, Node, MongoDB)
-              </li>
-              <li>
-                <span className="font-medium">CRUD Task Manager:</span> MERN CRUD task app with APIs
-              </li>
-              <li>
-                <span className="font-medium">SunriseDesignHive Landing Page:</span> Responsive business website (Next.js, Tailwind)
-              </li>
-            </ul>
-          </section>
+  <h2 className="text-lg font-semibold text-blue-700 border-b mb-2">
+    Projects
+  </h2>
+  <ul className="text-sm space-y-3 list-disc pl-5">
+    {personalPro.map((project) => (
+      <li key={project.id}>
+        <span className="font-medium">{project.project_title}:</span>{" "}
+        {project.description && (
+          <span>{project.description}</span>
+        )}
+        <br />
+        {project.role && (
+          <span className="text-gray-600">Role: {project.role}</span>
+        )}
+        {project.skill && (
+          <span className="ml-2 text-gray-600">
+            | Tech: {project.skill}
+          </span>
+        )}
+        {project.project_url && (
+          <span className="ml-2">
+            | <a
+              href={project.project_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              {project.project_url}
+            </a>
+          </span>
+        )}
+        {(project.start_time || project.end_time) && (
+          <div className="text-xs text-gray-500">
+            {project.start_time
+              ? `(${project.start_time}`
+              : ""}
+            {project.end_time ? ` - ${project.end_time})` : ")"}
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+</section>
+
 
           {/* Certifications */}
           <section>

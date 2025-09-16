@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 
@@ -63,12 +63,20 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
 import Template from '../temp/Template';
+import { useReactToPrint } from 'react-to-print';
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
+
+   const componentRef = useRef();
+
+     const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: "resume", // file name when downloaded
+  });
 
 const dispatch=useDispatch()
  const [experiences, setExperiences] = useState([
@@ -329,12 +337,12 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             <div className='lg:flex items-center gap-3'>
               <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
               <button onClick={() => setOpenModalAnalyzeResumeBig(true)} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
-              <button className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
+              <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
             </div>
           </div>
-          <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+          <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
              {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-             <Template data={formValues} education={educationEntries}/>
+             <Template ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro}/>
           </div>
           <div className='flex items-center justify-between mb-0'>
             <div className='flex items-center gap-1'>

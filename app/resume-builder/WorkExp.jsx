@@ -174,25 +174,7 @@ import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 
 const WorkExp = ({experiences, setExperiences}) => {
-//   const [experiences, setExperiences] = useState([
-//     {
-//       id: Date.now(),
-//       projects: [
-//         { id: Date.now() + 1 } // start with 1 default project
-//       ]
-//     }
-//   ]);
 
-  // Add new experience
-//   const addExperience = () => {
-//     setExperiences([
-//       ...experiences,
-//       {
-//         id: Date.now(),
-//         projects: [{ id: Date.now() + 1 }]
-//       }
-//     ]);
-//   };
 
   // Delete experience
   const deleteExperience = (expId) => {
