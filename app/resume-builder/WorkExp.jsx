@@ -381,7 +381,7 @@ const WorkExp = ({experiences, setExperiences}) => {
                     <Datepicker 
                      id={`end-date-${exp.id}`}
                     value={exp.endDate} // from your state
-      disabled={exp.endDate}
+      // disabled={exp.endDate}
   onChange={(date) => {
     if (date instanceof Date && !isNaN(date)) {
       updateExperienceField(exp.id, "endDate", date.toISOString().split("T")[0]);

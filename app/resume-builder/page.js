@@ -62,12 +62,19 @@ import Achivments from './Achivments';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
-import Template from '../temp/Template';
+import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
+import { useSearchParams } from 'next/navigation';
+import Template2 from '../temp/Template2';
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
+  const searchParams = useSearchParams();
+  const template = searchParams.get("template");
+
+  console.log(template,"template");
+  
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
 
@@ -342,7 +349,17 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           </div>
           <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
              {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-             <Template ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro}/>
+             {
+              template==="resume1"&&(
+                <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro}/>
+              )
+             }
+             {
+              template==="resume2"&&(
+              <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro}/>
+              )
+             }
+             
           </div>
           <div className='flex items-center justify-between mb-0'>
             <div className='flex items-center gap-1'>

@@ -20,7 +20,8 @@ import Create_Resume_plus from "../assets/imagesource/Create_Resume_plus.png";
 import Improve_existing_resume_icon from "../assets/imagesource/Improve_existing_resume_icon.png";
 import jd_based_resume from "../assets/imagesource/jd_based_resume.png";
 
-import resume01 from "../assets/imagesource/resume01.png";
+import resume1 from "../assets/imagesource/resume1.png";
+import resume2 from "../assets/imagesource/resume2.png";
 import view_full_resume from "../assets/imagesource/view_full_resume.png";
 
 import resume_sections_view from "../assets/imagesource/resume_sections_view.png";
@@ -83,7 +84,7 @@ const Page = () => {
 
   const [openModalLinkedInRewrite, setOpenModalLinkedInRewrite] = useState(false);
 
-  
+   const [selectedResume, setSelectedResume] = useState(null);
 
   const alertContinueHandler = () => {
     setOpenModalImproveexistingResume(false);
@@ -91,11 +92,21 @@ const Page = () => {
   };
 
   const resumeBuilderHandler = () => {
-    router.push("/resume-builder");
+      if (!selectedResume) {
+    toast.error("Please select a resume first!");
+    return;
+  }
+    router.push(`/resume-builder?template=${selectedResume}`);
   };
 
   const HandlerLinkedInRewrite = () => {
     router.push("/linkedIn-rewrite");
+  };
+
+   
+
+  const handleSelect = (id) => {
+    setSelectedResume(id);
   };
   return (
     <div className={`${inter.className} antialiased`}>
@@ -197,37 +208,47 @@ const Page = () => {
                           <h3 className="text-[#151515] text-base font-medium pb-4">Select resume from the list</h3>
                           <ul className='grid grid-cols-2 gap-2 lg:gap-5 resume_list_area'>
                               <li>
-                                <input type="radio" name="test" id="cb1" />
+                                <input type="radio" name="test" id="cb1"  onChange={() => handleSelect("resume1")}/>
                                 <label for="cb1" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
-                                    <Image src={resume01} alt="resume01" className='' />
+                                    <Image src={resume1} alt="resume01" className='h-[400px]' />
                                 </label>
                                 <p className='text-[#000000] text-sm lg:text-base font-semibold text-center pt-1'>Modern Template</p>
                               </li>
                               <li>
-                                <input type="radio" name="test" id="cb2" />
+                                <input type="radio" name="test" id="cb2"  onChange={() => handleSelect("resume2")}/>
                                 <label for="cb2" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
-                                    <Image src={resume01} alt="resume01" className='' />
+                                    <Image src={resume2} alt="resume01" className='h-[400px]' />
                                 </label>
                                   <p className='text-[#000000] text-sm lg:text-base font-semibold text-center'>Professional Template</p>
                               </li>
                               <li>
                                 <input type="radio" name="test" id="cb3" />
                                 <label for="cb3" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
-                                    <Image src={resume01} alt="resume01" className='' />
+                                    <Image src={resume1} alt="resume01" className='' />
                                 </label>
                                   <p className='text-[#000000] text-sm lg:text-base font-semibold text-center'>Technical Template</p>
                               </li>
                               <li>
                                 <input type="radio" name="test" id="cb4" />
                                 <label for="cb4" className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2'>
-                                    <Image src={resume01} alt="resume01" className='' />
+                                    <Image src={resume1} alt="resume01" className='' />
                                 </label>
                                 <p className='text-[#000000] text-sm lg:text-base font-semibold text-center'>Modern Template</p>
                               </li>
                           </ul>
                       </div>
                       <div className='lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden'>
-                          <Image src={view_full_resume} alt="view_full_resume" className='' />
+                      {
+                        selectedResume==="resume1"&&(
+                           <Image src={resume1} alt="resume01" className='h-[600px] w-[500px]' />
+                        )
+                      }
+                      {
+                        selectedResume==="resume2"&&(
+                           <Image src={resume2} alt="resume01" className='h-[600px] w-[500px]' />
+                        )
+                      }
+                          {/* <Image src={view_full_resume} alt="view_full_resume" className='' /> */}
                       </div>
                   </div>
                   <div className="p-5 inset-shadow-xs">
