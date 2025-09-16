@@ -230,8 +230,8 @@ const WorkExp = ({experiences, setExperiences}) => {
         position: "",
         location: "",
         skill: "",
-        start_date: "",
-        end_date: "",
+        start_date:null,
+        end_date: null,
         current_work: false,
         projects: [{ id: Date.now() + 1, title: "", role: "", technology: "", description: "" }]
       }
@@ -362,10 +362,10 @@ const WorkExp = ({experiences, setExperiences}) => {
                   <div className="field_box_date">
                     <Datepicker 
                     id={`start-date-${exp.id}`}
-                    value={exp.startDate} // from your state
+                   value={exp.start_date ? new Date(exp.start_date) : null} // from your state
       onChange={(date) => {
     if (date instanceof Date && !isNaN(date)) {
-      updateExperienceField(exp.id, "startDate", date.toISOString().split("T")[0]);
+      updateExperienceField(exp.id, "start_date", date);
     }
   }}
                     />
@@ -380,11 +380,11 @@ const WorkExp = ({experiences, setExperiences}) => {
                   <div className="field_box_date">
                     <Datepicker 
                      id={`end-date-${exp.id}`}
-                    value={exp.endDate} // from your state
+                   value={exp.end_date ? new Date(exp.end_date) : null}  // from your state
       // disabled={exp.endDate}
   onChange={(date) => {
     if (date instanceof Date && !isNaN(date)) {
-      updateExperienceField(exp.id, "endDate", date.toISOString().split("T")[0]);
+      updateExperienceField(exp.id, "end_date", date);
     }
   }}
                     />

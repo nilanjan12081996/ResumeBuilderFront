@@ -82,7 +82,7 @@ const Certificates=({certificates, setCertificates})=>{
                     <Datepicker 
                          value={cer.obtained_date}
                       onChange={(date) =>
-                        updateCertificates(cer.id, "obtained_date", date.toISOString().split("T")[0])
+                        updateCertificates(cer.id, "obtained_date", date)
                       }
                     /> 
                     </div>

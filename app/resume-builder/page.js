@@ -93,8 +93,8 @@ const dispatch=useDispatch()
       position: "",
       location: "",
       skill: "",
-      start_date: "",
-      end_date: "",
+      start_date: null,
+      end_date: null,
       current_work: false,
       projects: [{ id: Date.now() + 1, title: "", role: "", technology: "", description: "" }]
     }
@@ -146,8 +146,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           location:edu?.location,
           field_study:edu?.field_study,
           degree:edu?.degree,
-          start_time:edu?.start_time,
-          end_time:edu?.end_time,
+          start_time:edu?.start_time.toISOString().split("T")[0],
+          end_time:edu?.end_time.toISOString().split("T")[0],
           cgpa:edu?.gpa,
           information:edu?.additionalInfo
         }
@@ -164,8 +164,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         position: exp.position,
         location: exp.location,
         skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-        start_date: exp.start_date,
-        end_date: exp.end_date,
+        start_date:exp.start_date? exp.start_date.toISOString().split("T")[0]:null,
+        end_date: exp.end_date?exp.end_date.toISOString().split("T")[0]:null,
         current_work: exp.current_work ? 1 : 0,
         projects: exp.projects.map(proj => ({
           title: proj.title,
@@ -227,7 +227,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           {
             certification_name:cer?.certification_name,
             issuing_organization:cer?.issuing_organization,
-            obtained_date:cer?.obtained_date,
+            obtained_date:cer?.obtained_date.toISOString().split("T")[0],
             certification_id:cer?.certification_id
           }
          ))
@@ -242,7 +242,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
 
             achievement_title:achiv?.achievement_title,
             organization:achiv?.organization,
-            receive_date:achiv?.receive_date,
+            receive_date:achiv?.receive_date.toISOString().split("T")[0],
             description:achiv?.description
           }
          ))

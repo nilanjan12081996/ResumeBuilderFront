@@ -80,7 +80,7 @@ const Achivments=({achivments, setAchivments})=>{
                         <Datepicker  
                          value={ach.receive_date}
                       onChange={(date) =>
-                        updateAchivments(ach.id, "receive_date", date.toISOString().split("T")[0])
+                        updateAchivments(ach.id, "receive_date", date)
                       }
                         /> 
                         </div>
