@@ -356,7 +356,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
              }
              {
               template==="resume2"&&(
-              <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro}/>
+              <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates}/>
               )
              }
              
