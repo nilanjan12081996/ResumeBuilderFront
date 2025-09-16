@@ -146,8 +146,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           location:edu?.location,
           field_study:edu?.field_study,
           degree:edu?.degree,
-          start_time:edu?.start_time.toISOString().split("T")[0],
-          end_time:edu?.end_time.toISOString().split("T")[0],
+          start_time:edu?.start_time?edu?.start_time.toISOString().split("T")[0]:null,
+          end_time:edu?.end_time?edu?.end_time.toISOString().split("T")[0]:null,
           cgpa:edu?.gpa,
           information:edu?.additionalInfo
         }
@@ -210,8 +210,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           {
             project_title:pPro?.project_title,
             role:pPro?.role,
-            start_time:pPro?.start_time,
-            end_time:pPro?.end_time,
+            start_time:pPro?.start_time?pPro?.start_time.toISOString().split("T")[0]:null,
+            end_time:pPro?.end_time?pPro?.end_time.toISOString().split("T")[0]:null,
             project_url:pPro?.project_url,
             skill:pPro.skill.split(',').map(t=>t.trim())
           }

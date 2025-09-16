@@ -362,7 +362,7 @@ const WorkExp = ({experiences, setExperiences}) => {
                   <div className="field_box_date">
                     <Datepicker 
                     id={`start-date-${exp.id}`}
-                   value={exp.start_date ? new Date(exp.start_date) : null} // from your state
+                   value={exp.start_date} // from your state
       onChange={(date) => {
     if (date instanceof Date && !isNaN(date)) {
       updateExperienceField(exp.id, "start_date", date);

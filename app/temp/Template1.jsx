@@ -205,13 +205,13 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
       <p className="text-[10px] text-gray-500 mb-1">
         {/* {exp.start_date || "2022"} – {exp.current_work ? "Present" : (exp.end_date || "2023")} */}
           {exp.start_date
-    ? new Date(exp.start_date).toISOString().split("T")[0]
+    ? exp.start_date.toISOString().split("T")[0]
     : "2022"}{" "}
   –{" "}
   {exp.current_work
     ? "Present"
     : exp.end_date
-    ? new Date(exp.end_date).toISOString().split("T")[0]
+    ? exp.end_date.toISOString().split("T")[0]
     : "2023"}
       </p>
 

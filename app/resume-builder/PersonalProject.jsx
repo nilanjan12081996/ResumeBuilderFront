@@ -84,7 +84,7 @@ const PersonalProject=({personalPro, setPersonalPro})=>{
                            value={pPro.start_time} // from your state
                             onChange={(date) => {
                             if (date instanceof Date && !isNaN(date)) {
-                            updateProjects(pPro.id, "start_time", date.toISOString().split("T")[0]);
+                            updateProjects(pPro.id, "start_time", date);
                             }
                         }}
                     /> 
@@ -99,7 +99,7 @@ const PersonalProject=({personalPro, setPersonalPro})=>{
                       value={pPro.end_time} // from your state
                             onChange={(date) => {
                             if (date instanceof Date && !isNaN(date)) {
-                            updateProjects(pPro.id, "end_time", date.toISOString().split("T")[0]);
+                            updateProjects(pPro.id, "end_time", date);
                             }
                         }}
                     

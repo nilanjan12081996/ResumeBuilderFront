@@ -265,10 +265,15 @@ const Template2=({ref, data, education, experiences, skills, languages, personal
             {exp.position || "Job Title"}
           </h3>
           <p className="text-sm text-gray-600 mt-1 sm:mt-0">
-            {exp.startDate || "Start Date"} -{" "}
-            {exp.current_work
-              ? "Present"
-              : exp.endDate || "End Date"}
+             {exp.start_date
+    ? exp.start_date.toISOString().split("T")[0]
+    : "2022"}{" "}
+  –{" "}
+  {exp.current_work
+    ? "Present"
+    : exp.end_date
+    ? exp.end_date.toISOString().split("T")[0]
+    : "2023"}
           </p>
         </div>
 
