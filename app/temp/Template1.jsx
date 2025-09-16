@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-const Template1=({data,education,experiences,skills,languages,personalPro})=> {
+const Template1=({data,education,experiences,skills,languages,personalPro,achivments,certificates})=> {
   return (
       <div className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px]">
@@ -23,7 +23,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro})=> {
           </div>
           
           {/* Skills */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">SKILLS</h3>
             <div className="flex flex-wrap gap-2">
               {[
@@ -35,16 +35,70 @@ const Template1=({data,education,experiences,skills,languages,personalPro})=> {
                 <span key={skill} className="bg-[#dde3fa] text-xs px-2 py-1 rounded">{skill}</span>
               ))}
             </div>
+          </div> */}
+
+          <div className="mb-6">
+  <h3 className="text-sm font-bold text-[#7076b4] mb-3">SKILLS</h3>
+
+  {skills && skills.length > 0 ? (
+    <div className="space-y-3">
+      {skills.map((sk) => (
+        <div key={sk.id}>
+          {/* Skill Category */}
+          <p className="text-xs font-semibold text-[#333] mb-1">
+            {sk.skill_category || "General Skills"}
+          </p>
+
+          {/* Skills List */}
+          <div className="flex flex-wrap gap-2">
+            {sk.skill
+              ? sk.skill.split(",").map((item, i) => (
+                  <span
+                    key={i}
+                    className="bg-[#dde3fa] text-xs px-2 py-1 rounded"
+                  >
+                    {item.trim()}
+                  </span>
+                ))
+              : <span className="text-gray-400 text-xs">No skills added</span>}
           </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-xs text-gray-500">No skills added yet.</p>
+  )}
+</div>
+
 
           {/* Languages */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">LANGUAGES</h3>
             <p className="text-xs">English, Tamil</p>
-          </div>
+          </div> */}
+
+<div className="mb-6">
+  <h3 className="text-sm font-bold text-[#7076b4] mb-3">LANGUAGES</h3>
+  {languages && languages.length > 0 ? (
+    <ul className="text-xs space-y-1">
+      {languages.map((lang) => (
+        <li key={lang.id} className="flex items-center gap-1">
+          <span className="font-medium">{lang.language_name || "Language"}</span>
+          {lang.proficiency && (
+            <span className="text-gray-500 text-xs">({lang.proficiency})</span>
+          )}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-xs text-gray-500">No languages added yet.</p>
+  )}
+</div>
+
+
 
           {/* Achievements */}
-          <div>
+          {/* <div>
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">ACHIEVEMENTS</h3>
             <ul className="list-disc pl-4 text-xs space-y-1">
               <li>100+ DSA problems solved - LeetCode</li>
@@ -54,7 +108,49 @@ const Template1=({data,education,experiences,skills,languages,personalPro})=> {
               <li>1st Place in Project Presentation - 2021</li>
               <li>Published Resume Builder Web-app</li>
             </ul>
-          </div>
+          </div> */}
+
+          <div className="mb-6">
+  <h3 className="text-sm font-bold text-[#7076b4] mb-3">ACHIEVEMENTS</h3>
+
+  {achivments && achivments.length > 0 ? (
+    <ul className="list-disc pl-4 text-xs space-y-3">
+      {achivments.map((ach, i) => (
+        <li key={ach.id || i}>
+          {/* Title */}
+          <span className="font-semibold">
+            {ach.achievement_title || "Achievement Title"}
+          </span>
+
+          {/* Organization */}
+          {ach.organization && (
+            <span className="ml-1 text-[#6471af] text-[11px]">
+              – {ach.organization}
+            </span>
+          )}
+
+          {/* Date */}
+          {ach.receive_date && (
+            <div className="text-[11px] text-gray-500">
+              {new Date(ach.receive_date).toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              })}
+            </div>
+          )}
+
+          {/* Description */}
+          {ach.description && (
+            <p className="text-xs mt-1">{ach.description}</p>
+          )}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-xs text-gray-500">No achievements added yet.</p>
+  )}
+</div>
+
         </div>
 
         {/* Main: Right */}
@@ -63,7 +159,8 @@ const Template1=({data,education,experiences,skills,languages,personalPro})=> {
           <div className="mb-4">
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">PROFESSIONAL SUMMARY</h3>
             <p className="text-xs text-gray-700">
-              Full Stack Developer with hands-on experience in building scalable, responsive web applications using React.js, Next.js, Node.js, Express, and MongoDB. Passionate about creating user-friendly solutions with robust backend integrations and secure RESTful APIs. Successfully delivered multiple client and student projects with a focus on best practices, responsiveness, and code maintainability.
+              {data?.goal||"Full Stack Developer with hands-on experience in building scalable, responsive web applications using React.js, Next.js, Node.js, Express, and MongoDB. Passionate about creating user-friendly solutions with robust backend integrations and secure RESTful APIs. Successfully delivered multiple client and student projects with a focus on best practices, responsiveness, and code maintainability."}
+              
             </p>
           </div>
 
@@ -233,7 +330,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro})=> {
 
 
           {/* Projects */}
-          <div>
+          {/* <div>
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">PROJECTS</h3>
             <ul className="list-disc pl-4 text-xs space-y-2">
               <li>
@@ -249,7 +346,112 @@ const Template1=({data,education,experiences,skills,languages,personalPro})=> {
                 MERN-based task manager with CRUD operations and RESTful APIs.
               </li>
             </ul>
-          </div>
+          </div> */}
+
+          <div className="mb-6">
+  <h3 className="text-sm font-bold text-[#7076b4] mb-3">PROJECTS</h3>
+
+  {personalPro && personalPro.length > 0 ? (
+    <ul className="list-disc pl-4 text-xs space-y-3">
+      {personalPro.map((proj) => (
+        <li key={proj.id}>
+          {/* Project Title */}
+          <span className="font-semibold">{proj.project_title || "Untitled Project"}</span>
+
+          {/* Role */}
+          {proj.role && (
+            <span className="ml-1 text-[#6471af] text-[11px]">
+              ({proj.role})
+            </span>
+          )}
+
+          {/* Date Range */}
+          {(proj.start_time || proj.end_time) && (
+            <div className="text-[11px] text-gray-500">
+              {proj.start_time || "Start"} – {proj.end_time || "Present"}
+            </div>
+          )}
+
+          {/* Description */}
+          {proj.description && (
+            <p className="text-xs mt-1">{proj.description}</p>
+          )}
+
+          {/* Technologies */}
+          {proj.skill && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {proj.skill.split(",").map((tech, i) => (
+                <span
+                  key={i}
+                  className="bg-[#dde3fa] text-[10px] px-2 py-0.5 rounded"
+                >
+                  {tech.trim()}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* URL */}
+          {proj.project_url && (
+            <a
+              href={proj.project_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[11px] text-blue-600 underline mt-1"
+            >
+              {proj.project_url}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-xs text-gray-500">No projects added yet.</p>
+  )}
+</div>
+
+<div className="mb-6">
+  <h3 className="text-sm font-bold text-[#7076b4] mb-3">CERTIFICATES</h3>
+
+  {certificates && certificates.length > 0 ? (
+    <ul className="list-disc pl-4 text-xs space-y-2">
+      {certificates.map((cer, index) => (
+        <li key={cer.id || index}>
+          {/* Certificate Name */}
+          <span className="font-semibold">{cer.certification_name || "Certificate Name"}</span>
+
+          {/* Issuing Organization */}
+          {cer.issuing_organization && (
+            <span className="ml-1 text-gray-600">
+              – {cer.issuing_organization}
+            </span>
+          )}
+
+          {/* Obtained Date */}
+          {cer.obtained_date && (
+            <div className="text-[11px] text-gray-500">
+              {new Date(cer.obtained_date).toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              })}
+            </div>
+          )}
+
+          {/* Certification ID */}
+          {cer.certification_id && (
+            <p className="text-[11px] text-[#7076b4]">
+              ID: {cer.certification_id}
+            </p>
+          )}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-xs text-gray-500">No certificates added yet.</p>
+  )}
+</div>
+
+
         </div>
       </div>
     </div>

@@ -351,7 +351,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
              {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
              {
               template==="resume1"&&(
-                <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro}/>
+                <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates}/>
               )
              }
              {
