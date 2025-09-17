@@ -1,3 +1,5 @@
+import { convertToSubmitFormat } from "../utils/DateSubmitFormatter"
+
 const Template2=({ref, data, education, experiences, skills, languages, personalPro, achivments, certificates})=>{
     return(
         <>
@@ -183,16 +185,19 @@ const Template2=({ref, data, education, experiences, skills, languages, personal
             {(entry.start_time || entry.end_time) && (
               <p className="text-sm text-gray-600">
                 {entry.start_time
-                  ? new Date(entry.start_time).toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "numeric",
-                    })
+                  ? 
+                  // new Date(entry.start_time).toLocaleDateString("en-US", {
+                  //     month: "short",
+                  //     year: "numeric",
+                  //   })
+                  convertToSubmitFormat(entry.start_time)
                   : ""}
                 {entry.end_time
-                  ? ` - ${new Date(entry.end_time).toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "numeric",
-                    })}`
+                  ? ` - 
+                
+                    ${convertToSubmitFormat(entry.end_time)}
+                    
+                    `
                   : entry.currentlyStudying
                   ? " - Present"
                   : ""}
@@ -266,13 +271,13 @@ const Template2=({ref, data, education, experiences, skills, languages, personal
           </h3>
           <p className="text-sm text-gray-600 mt-1 sm:mt-0">
              {exp.start_date
-    ? exp.start_date.toISOString().split("T")[0]
+    ? convertToSubmitFormat(exp.start_date)
     : "2022"}{" "}
   –{" "}
   {exp.current_work
     ? "Present"
     : exp.end_date
-    ? exp.end_date.toISOString().split("T")[0]
+    ?convertToSubmitFormat(exp.end_date)
     : "2023"}
           </p>
         </div>
@@ -410,7 +415,7 @@ const Template2=({ref, data, education, experiences, skills, languages, personal
                             <p className="text-sm text-gray-700 italic mb-1">
                                 {project.role || "Your Role"}{" "}
                                 {project.start_time && project.end_time
-                                ? `(${project.start_time} - ${project.end_time})`
+                                ? `(${convertToSubmitFormat(project.start_time)} - ${convertToSubmitFormat(project.end_time)})`
                                 : ""}
                             </p>
                             {project.project_url && (
@@ -457,7 +462,7 @@ const Template2=({ref, data, education, experiences, skills, languages, personal
                 </p>
                 <p className="text-sm text-gray-600">
                     {cert.obtained_date
-                    ? `Obtained: ${cert.obtained_date}`
+                    ? `Obtained: ${convertToSubmitFormat(cert.obtained_date)}`
                     : "Date not specified"}
                 </p>
                 {cert.certification_id && (
@@ -491,7 +496,7 @@ const Template2=({ref, data, education, experiences, skills, languages, personal
             {ach.organization || "Organization not specified"}
             {ach.receive_date && (
               <span className="ml-2 text-gray-500">
-                ({ach.receive_date})
+                ({convertToSubmitFormat(ach.receive_date)})
               </span>
             )}
           </p>

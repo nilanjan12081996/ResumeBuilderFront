@@ -66,15 +66,13 @@ import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
 import Template2 from '../temp/Template2';
+import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
   const template = searchParams.get("template");
-
-  console.log(template,"template");
-  
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
 
@@ -134,8 +132,10 @@ const dispatch=useDispatch()
   const formValues = watch();
   const onSubmit=(data)=>{
     console.log("data",data);
+      
 dispatch(savePersonalInfo(data)).then((res)=>{
   console.log("res",res);
+ 
   if(res?.payload?.status_code===201){
      
     const eduPayload={
@@ -146,13 +146,15 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           location:edu?.location,
           field_study:edu?.field_study,
           degree:edu?.degree,
-          start_time:edu?.start_time?edu?.start_time.toISOString().split("T")[0]:null,
-          end_time:edu?.end_time?edu?.end_time.toISOString().split("T")[0]:null,
+          start_time:convertToSubmitFormat(edu?.start_time),
+          end_time:convertToSubmitFormat(edu?.end_time),
           cgpa:edu?.gpa,
           information:edu?.additionalInfo
         }
        ))
     }
+  
+    
     dispatch(saveEducationInfo(eduPayload))
 
 
@@ -164,8 +166,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         position: exp.position,
         location: exp.location,
         skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-        start_date:exp.start_date? exp.start_date.toISOString().split("T")[0]:null,
-        end_date: exp.end_date?exp.end_date.toISOString().split("T")[0]:null,
+        start_date:convertToSubmitFormat(exp.start_date),
+        end_date:convertToSubmitFormat(exp.end_date),
         current_work: exp.current_work ? 1 : 0,
         projects: exp.projects.map(proj => ({
           title: proj.title,
@@ -190,7 +192,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
   
       const payloadSkills={
         user_id: parseUserId?.user_id,
-        
         data:skills.map((sk)=>(
           {
             resume_id:res?.payload?.id,
@@ -210,8 +211,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           {
             project_title:pPro?.project_title,
             role:pPro?.role,
-            start_time:pPro?.start_time?pPro?.start_time.toISOString().split("T")[0]:null,
-            end_time:pPro?.end_time?pPro?.end_time.toISOString().split("T")[0]:null,
+            start_time:convertToSubmitFormat(pPro?.start_time),
+            end_time:convertToSubmitFormat(pPro?.end_time),
             project_url:pPro?.project_url,
             skill:pPro.skill.split(',').map(t=>t.trim())
           }
@@ -227,7 +228,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           {
             certification_name:cer?.certification_name,
             issuing_organization:cer?.issuing_organization,
-            obtained_date:cer?.obtained_date.toISOString().split("T")[0],
+            obtained_date:convertToSubmitFormat(cer?.obtained_date),
             certification_id:cer?.certification_id
           }
          ))
@@ -242,7 +243,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
 
             achievement_title:achiv?.achievement_title,
             organization:achiv?.organization,
-            receive_date:achiv?.receive_date.toISOString().split("T")[0],
+            receive_date:convertToSubmitFormat(achiv?.receive_date),
             description:achiv?.description
           }
          ))

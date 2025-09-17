@@ -250,7 +250,6 @@ const Language = ({ languages, setLanguages }) => {
                       <option value="">Select proficiency</option>
                       <option value="Beginner">Beginner</option>
                       <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
                       <option value="Fluent">Fluent</option>
                     </Select>
                   </div>
