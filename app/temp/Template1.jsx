@@ -1,10 +1,42 @@
 "use client";
-import React from "react";
+import React, { forwardRef } from "react";
 import { convertToSubmitFormat } from "../utils/DateSubmitFormatter";
 
-const Template1=({data,education,experiences,skills,languages,personalPro,achivments,certificates})=> {
+const Template1= forwardRef(({data,education,experiences,skills,languages,personalPro,achivments,certificates},ref)=> {
   return (
-      <div className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
+    
+      <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
+        <style jsx>{`
+        @media print {
+          .min-h-screen {
+            min-height: auto !important;
+          }
+          
+          .bg-\\[\\#f6f8fa\\] {
+            background: white !important;
+          }
+          
+          .shadow-lg {
+            box-shadow: none !important;
+          }
+          
+          .rounded-xl {
+            border-radius: 0 !important;
+          }
+          
+          /* Ensure colors print correctly */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          
+          /* Optimize for A4 */
+          .w-\\[800px\\] {
+            width: 100% !important;
+            max-width: none !important;
+          }
+        }
+      `}</style>
       <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px]">
         {/* Sidebar: Left */}
         <div className="w-2/5 bg-[#eff2fc] p-6 rounded-xl flex flex-col justify-start">
@@ -392,5 +424,5 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
       </div>
     </div>
   );
-}
+})
 export default Template1

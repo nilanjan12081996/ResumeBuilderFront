@@ -1,5 +1,7 @@
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getSignupType } from "../reducers/AuthSlice";
 
 const ChoiceModal = ({
   openChoiceModal,
@@ -7,17 +9,24 @@ const ChoiceModal = ({
   setChooseResumeType,
   setOpenRegisterModal,
 }) => {
+  const{signUpTypes}=useSelector((state)=>state?.auth)
   const [selectedType, setSelectedType] = useState(null);
 
-  const handleIndiVidual = () => {
-    setSelectedType("individual");
-    setChooseResumeType("individual");
+  const dispatch=useDispatch()
+  useEffect(()=>{
+dispatch(getSignupType())
+  },[])
+console.log("signUpTypes",signUpTypes);
+
+  const handleIndiVidual = (id) => {
+    setSelectedType(id);
+    setChooseResumeType(id);
     setOpenChoiceModal(false);
     setOpenRegisterModal(true);
   };
-  const handleOrganization = () => {
-    setSelectedType("organization");
-    setChooseResumeType("organization");
+  const handleOrganization = (id) => {
+    setSelectedType(id);
+    setChooseResumeType(id);
     setOpenChoiceModal(false);
     setOpenRegisterModal(true);
   };
@@ -49,11 +58,11 @@ const ChoiceModal = ({
                   {/* Individual Resume Card */}
                   <div
                     className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                      selectedType === "individual"
+                      selectedType == signUpTypes?.data?.[0]?.id
                         ? "border-purple-500"
                         : "border-gray-200 hover:border-purple-500"
                     }`}
-                    onClick={() => handleIndiVidual()}
+                    onClick={() => handleIndiVidual(signUpTypes?.data?.[0]?.id)}
                   >
                     {/* Image */}
                     <div className="aspect-[4/3] bg-gray-100 rounded-t-lg overflow-hidden">
@@ -67,7 +76,7 @@ const ChoiceModal = ({
                     {/* Content */}
                     <div className="p-4 text-center">
                       <h3 className="text-lg font-medium text-gray-900 mb-1">
-                        Individual Resume
+                        {signUpTypes?.data?.[0]?.name}
                       </h3>
                     </div>
                   </div>
@@ -75,11 +84,11 @@ const ChoiceModal = ({
                   {/* Organization Resume Card */}
                   <div
                     className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                      selectedType === "organization"
+                      selectedType ==signUpTypes?.data?.[1]?.id
                         ? "border-purple-500"
                         : "border-gray-200 hover:border-purple-500"
                     }`}
-                    onClick={() => handleOrganization()}
+                    onClick={() => handleOrganization(signUpTypes?.data?.[1]?.id)}
                   >
                     {/* Image */}
                     <div className="aspect-[4/3] bg-gray-100 rounded-t-lg overflow-hidden">
@@ -93,7 +102,7 @@ const ChoiceModal = ({
                     {/* Content */}
                     <div className="p-4 text-center">
                       <h3 className="text-lg font-medium text-gray-900 mb-1">
-                        Organization Resume
+                         {signUpTypes?.data?.[1]?.name}
                       </h3>
                     </div>
                   </div>

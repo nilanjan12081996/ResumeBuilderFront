@@ -42,38 +42,16 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     }
     const onSubmit=(data)=>{
         const payload1={
-            signup_type_id:1,
+            signup_type_id:chooseResumeType,
             fullname:data?.first_name+" "+data?.last_name,
             username:data?.username,
             email:data?.email,
             password:data?.password,
-            confirm_password:data?.confirm_password
+             ...(chooseResumeType == 2 && { organization_name: data?.organization_name }),
+            confirm_password:data?.confirm_password,
+           
         }
-        const payload2={
-            signup_type_id:2,
-            fullname:data?.first_name+" "+data?.last_name,
-            username:data?.username,
-            organization_name:data?.organization_name,
-            email:data?.email,
-            password:data?.password,
-            confirm_password:data?.confirm_password
-        }
-        if(chooseResumeType==='organization'){
-            dispatch(registerCustomerOrg(payload2)).then((res)=>{
-                console.log("resRegOrg",res);
-                if(res?.payload?.status_code===201){
-                    setOpenRegisterModal(false);
-                        router.push('/plans');
-                        // handlePriceModal()
-                }
-                else if(res?.payload?.response?.data?.status_code === 400){
-                    const validationErrors = res?.payload?.response?.data?.data || []
-                console.log("validationErrors", validationErrors);
-                const combinedMessages = validationErrors.map((e) => e.message).join(' | ');
-                setError(combinedMessages);
-                }
-            })
-        }else{
+        
  dispatch(registerCustomer(payload1)).then((res)=>{
     console.log("resRegind",res);
       if(res?.payload?.status_code===201){
@@ -81,18 +59,27 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                         router.push('/plans');
                     //    handlePriceModal()
                 }
-              else if (res?.payload?.response?.data?.status_code === 400) {
-                    const validationErrors = res?.payload?.response?.data?.errors || [];
-                    console.log("validationErrors", validationErrors);
-                    // Extract "msg" from each error
-                    const combinedMessages = validationErrors.map((e) => e.msg).join(" | ");
+//               else if (res?.payload?.response?.data?.status_code === 422) {
+//                     const validationErrors = res?.payload?.response?.data?.errors || [];
+//                     console.log("validationErrors", validationErrors);
+//                     // Extract "msg" from each error
+//                     const combinedMessages = validationErrors.map((e) => e.msg).join(" | ");
 
-  setError(combinedMessages);
-}
+//   setError(combinedMessages);
+// }
+                    else if (res?.payload?.response?.data?.status_code === 422) {
+                    const validationErrors = res?.payload?.response?.data?.data || [];
+                    console.log("validationErrors", validationErrors);
+
+                    // Extract "message" from each error
+                    const combinedMessages = validationErrors.map((e) => e.message).join(" | ");
+
+                    setError(combinedMessages);
+                    }
  })
         }
        
-    }
+    
 
     return (
         <>
@@ -171,7 +158,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                             )}
                                         </div>
                                         {
-                                            chooseResumeType==='organization'&&(
+                                            chooseResumeType==2&&(
                                                <div className='mb-2'>
                                             <div className="mb-0 block">
                                                 <Label>Organization Name</Label>

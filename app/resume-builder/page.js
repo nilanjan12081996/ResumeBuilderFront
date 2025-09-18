@@ -67,6 +67,10 @@ import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
 import Template2 from '../temp/Template2';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
+import { saveAs } from "file-saver";
+// import htmlDocx from "html-docx-js/dist/html-docx";
+// import juice from 'juice';
+// import html2docx from "html2docx";
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
@@ -77,11 +81,7 @@ const page = () => {
   const parseUserId=JSON.parse(user_id)
 
    const componentRef = useRef();
-
-     const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-    documentTitle: "resume", // file name when downloaded
-  });
+ 
 
 const dispatch=useDispatch()
  const [experiences, setExperiences] = useState([
@@ -256,6 +256,77 @@ dispatch(savePersonalInfo(data)).then((res)=>{
   
 })
   }
+
+
+    const handlePrint = useReactToPrint({
+    contentRef: componentRef, // Updated for newer versions of react-to-print
+    documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
+    pageStyle: `
+    @page {
+      size: A4;
+      margin: 0.5in;
+    }
+
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0;
+    }
+
+    /* Disable browser default headers and footers */
+    @page {
+      margin: 0;
+    }
+
+    /* Hide default header/footer added by Chrome/Edge/WPS */
+    @page :header {
+      display: none;
+    }
+    @page :footer {
+      display: none;
+    }
+  `,
+    onBeforeGetContent: () => {
+      // Optional: You can do something before printing starts
+      console.log('Starting PDF generation...');
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 100);
+      });
+    },
+    onAfterPrint: () => {
+      // Optional: You can do something after printing
+      console.log('PDF generated successfully!');
+    },
+  });
+
+// const downloadDocx = async () => {
+//   if (!componentRef.current) return;
+
+//   const content = componentRef.current.innerHTML;
+
+//   const html = `
+//     <!DOCTYPE html>
+//     <html>
+//       <head>
+//         <meta charset="utf-8" />
+//         <style>
+//           ${document.querySelector("style")?.innerHTML || ""}
+//         </style>
+//       </head>
+//       <body>
+//         ${content}
+//       </body>
+//     </html>
+//   `;
+
+//   const blob = await html2docx(html, null, {
+//     margins: { top: 720, right: 720, bottom: 720, left: 720 }, // Word margins
+//   });
+
+//   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
+// };
   return (
     <div className='lg:flex gap-5 pb-5'>
       
@@ -344,7 +415,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             </div>
             <div className='lg:flex items-center gap-3'>
               <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
-              <button onClick={() => setOpenModalAnalyzeResumeBig(true)} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
+              <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
               <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
             </div>
           </div>
