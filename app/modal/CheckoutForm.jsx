@@ -35,6 +35,7 @@ const CheckoutForm = ({
     if (!stripe || !elements) {
       return;
     }
+    
     const result = await stripe
       .confirmPayment({
         elements,

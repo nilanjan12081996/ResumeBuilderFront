@@ -14,6 +14,7 @@ const page = () => {
    const { plans } = useSelector((state) => state?.planst)
    const disptach = useDispatch()
    const [openLoginModal, setOpenLoginModal] = useState(false);
+   
    const hanleloginModal = () => {
       setOpenLoginModal(true)
    }
