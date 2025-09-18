@@ -100,12 +100,15 @@ export const createOrder = createAsyncThunk(
       const response = await api.post("/api/payment/create-order", user_input);
       console.log("createOrder API response:", response);
       console.log("createOrder API response data:", response?.data);
-      
+
       if (response?.data?.status_code === 200) {
         console.log("createOrder API success - returning:", response.data);
         return response.data;
       } else {
-        console.log("createOrder API error - status_code:", response?.data?.status_code);
+        console.log(
+          "createOrder API error - status_code:",
+          response?.data?.status_code
+        );
         if (response?.data?.errors) {
           return rejectWithValue(response.data.errors);
         } else {
@@ -142,9 +145,9 @@ export const verifyOrder = createAsyncThunk(
 );
 
 const initialState = {
-  loading: false,
   plans: [],
   error: false,
+  loading: false,
   subs: [],
   comSubs: [],
   ipData: "",
@@ -169,32 +172,33 @@ const PlanSlice = createSlice({
       .addCase(getPlans.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload;
+       
       })
-      .addCase(createSubscriptions.pending, (state) => {
+       .addCase(createSubscriptions.pending, (state) => {
         state.loading = true;
       })
       .addCase(createSubscriptions.fulfilled, (state, { payload }) => {
-        state.loading = false;
         state.subs = payload;
         state.error = false;
+        state.loading = false;
       })
       .addCase(createSubscriptions.rejected, (state, { payload }) => {
-        state.loading = false;
         state.error = payload;
+        state.loading = false;
       })
-      .addCase(completeSubscriptions.pending, (state) => {
+       .addCase(completeSubscriptions.pending, (state) => {
         state.loading = true;
       })
       .addCase(completeSubscriptions.fulfilled, (state, { payload }) => {
-        state.loading = false;
         state.comSubs = payload;
         state.error = false;
+        state.loading = false;
       })
       .addCase(completeSubscriptions.rejected, (state, { payload }) => {
-        state.loading = false;
         state.error = payload;
+        state.loading = false;
       })
-      .addCase(getIpData.pending, (state) => {
+       .addCase(getIpData.pending, (state) => {
         state.loading = true;
       })
       .addCase(getIpData.fulfilled, (state, { payload }) => {
@@ -206,7 +210,7 @@ const PlanSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
-      .addCase(createOrder.pending, (state) => {
+       .addCase(createOrder.pending, (state) => {
         state.loading = true;
       })
       .addCase(createOrder.fulfilled, (state, { payload }) => {
@@ -218,7 +222,7 @@ const PlanSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
-      .addCase(verifyOrder.pending, (state) => {
+       .addCase(verifyOrder.pending, (state) => {
         state.loading = true;
       })
       .addCase(verifyOrder.fulfilled, (state, { payload }) => {

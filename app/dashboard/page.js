@@ -65,7 +65,7 @@ import { BiPlus } from "react-icons/bi";
 import { RiExchange2Line } from "react-icons/ri";
 import { BiBriefcaseAlt } from "react-icons/bi";
 import { BiLogoLinkedin } from "react-icons/bi";
-import { getRecentResume } from '../reducers/ResumeHistorySlice';
+import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
 import { improveResume } from "../reducers/DashboardSlice";
@@ -100,11 +100,11 @@ const inter = Inter({
 });
 
 const Page = () => {
-  const{recentResume}=useSelector((state)=>state?.resHist)
+  const { recentResume } = useSelector((state) => state?.resHist);
 
   const router = useRouter();
-const dispatch = useDispatch();
-  const { loading, error, improveResumeData } = useSelector(
+  const dispatch = useDispatch();
+  const { error, improveResumeData } = useSelector(
     (state) => state.dash
   );
   const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
@@ -152,7 +152,8 @@ const dispatch = useDispatch();
 
   // Watch the resume_file field to see if it changes
   const resumeFile = watch("resume_file");
-  
+  console.log("improveResumeData", improveResumeData);
+
   useEffect(() => {
     if (resumeFile && resumeFile[0]) {
       console.log("Resume file selected:", resumeFile[0]);
@@ -162,18 +163,18 @@ const dispatch = useDispatch();
   const handleResumeImprove = (data) => {
     console.log("Form data received:", data);
     console.log("Resume file:", data.resume_file);
-    
+
     const formData = new FormData();
-    
+
     // Check if linkedin_profile_file exists and append it
     if (data.linkedin_profile_file && data.linkedin_profile_file[0]) {
       formData.append("linkedin_profile_file", data.linkedin_profile_file[0]);
-    }else {
+    } else {
       console.error("No linkedin file selected");
       alert("Please select a linkedin file to upload");
       return;
     }
-    
+
     // Check if resume_file exists and append it
     if (data.resume_file && data.resume_file[0]) {
       console.log("Appending resume file:", data.resume_file[0]);
@@ -183,45 +184,49 @@ const dispatch = useDispatch();
       alert("Please select a resume file to upload");
       return;
     }
-    
+
     formData.append("portfolio_link", data.portfolio_link);
     formData.append("github_profile", data.github_profile);
     formData.append("other_link", data.other_link);
-    formData.append("job_description", data.job_description);
     
+
     // Log FormData contents for debugging
     console.log("FormData contents:");
     for (let [key, value] of formData.entries()) {
       console.log(key, value);
     }
-    
-    dispatch(improveResume(formData)).then((res) => {
-      console.log(" res ", res);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
+    dispatch(improveResume(formData))
+      .then((res) => {
+        console.log(" res ", res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const onSubmit = (data) => handleResumeImprove(data);
-  useEffect(()=>{
-dispatch(getRecentResume())
-  },[])
+
+  useEffect(() => {
+    dispatch(getRecentResume()).then((res) => {
+      console.log("Recent resume data:", res);
+    });
+  }, []);
 
   const formatDate = (dateString) => {
-  const date = new Date(dateString);
+    const date = new Date(dateString);
 
-  // Day
-  const day = date.getDate();
+    // Day
+    const day = date.getDate();
 
-  // Month (full name)
-  const month = date.toLocaleString("en-US", { month: "long" });
+    // Month (full name)
+    const month = date.toLocaleString("en-US", { month: "long" });
 
-  // Year
-  const year = date.getFullYear();
+    // Year
+    const year = date.getFullYear();
 
-  return `${day} ${month}, ${year}`;
-};
+    return `${day} ${month}, ${year}`;
+  };
 
   return (
     <div className={`${inter.className} antialiased`}>
@@ -311,47 +316,47 @@ dispatch(getRecentResume())
           </h3>
           <div className="lg:flex gap-4 pb-8 lg:pb-0">
             <div className="lg:w-8/12">
-              <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
-                <div className="flex gap-3 items-center">
-                  <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                    <CgFileDocument className="text-[#ffffff] text-2xl" />
+              {recentResume?.map((resume) => (
+                <div key={resume.id} className="flex justify-between ...">
+                  <div className="flex gap-3 items-center">
+                    <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
+                      <CgFileDocument className="text-white text-2xl" />
+                    </div>
+                    <div>
+                      <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
+                        {resume.title}
+                      </h3>
+                      <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                        Created on {formatDate(resume.createdAt)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                      Software Developer Resume
-                    </h3>
-                    <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                      Created on 7 July, 2025
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer">
+                  <button className="text-xl text-[#797979] hover:text-[#A635A2]">
                     <BiEdit />
                   </button>
                 </div>
-              </div>
-              <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
-                <div className="flex gap-3 items-center">
-                  <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                    <CgFileDocument className="text-[#ffffff] text-2xl" />
-                  </div>
-                  <div>
-                    <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                      Software Developer Resume
-                    </h3>
-                    <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                      Created on 7 July, 2025
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer">
-                    <BiEdit />
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
+             {/* <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
+                <div className="flex gap-3 items-center">
+                  <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
+                    <CgFileDocument className="text-[#ffffff] text-2xl" />
+                  </div>
+                  <div>
+                    <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
+                      Software Developer Resume
+                    </h3>
+                    <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                      Created on 7 July, 2025
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <button className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer">
+                    <BiEdit />
+                  </button>
+                </div>
+              </div> */}
             <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
               <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
                 Resume Writing Tips
@@ -703,21 +708,24 @@ dispatch(getRecentResume())
                         <div className="p-3">
                           <FaLinkedin className="text-[#928F8F]" />
                         </div> */}
-                        
-                     <div>
-                       <FileInput id="file-upload"  
-                      {...register("linkedin_profile_file", { required: true })}
+
+                      <div>
+                        <FileInput
+                          id="file-upload"
+                          {...register("linkedin_profile_file", {
+                            required: true,
+                          })}
                           aria-invalid={
                             errors.linkedin_profile_file ? "true" : "false"
                           }
-                          />
-                     </div>
+                        />
+                      </div>
                       {errors.linkedin_profile_file?.type === "required" && (
                         <p className="text-red-700 text-sm" role="alert">
                           linkedin_profile_file is required
                         </p>
                       )}
-                        {/* </div> */}
+                      {/* </div> */}
                     </div>
                     <div className="w-full resume_form_box mb-3">
                       <div className="mb-1 block">
@@ -812,7 +820,9 @@ dispatch(getRecentResume())
                     <div className="flex flex-col items-center justify-center pb-6 pt-5">
                       <BiImport className="text-[50px] lg:text-[70px] text-[#92278F]" />
                       <p className="mb-2 text-base lg:text-xl text-[#92278F]">
-                        {resumeFile && resumeFile[0] ? resumeFile[0].name : "Import your Resume"}
+                        {resumeFile && resumeFile[0]
+                          ? resumeFile[0].name
+                          : "Import your Resume"}
                       </p>
                       {resumeFile && resumeFile[0] && (
                         <p className="text-sm text-green-600">
@@ -828,7 +838,6 @@ dispatch(getRecentResume())
                       aria-invalid={errors.resume_file ? "true" : "false"}
                     />
                   </Label>
-              
                 </div>
                 {errors.resume_file?.type === "required" && (
                   <p className="text-red-700 text-sm" role="alert">

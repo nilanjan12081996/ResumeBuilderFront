@@ -19,7 +19,7 @@ import Check from "../../app/assets/imagesource/Check.png";
 import RazorPaymentModal from "../modal/RazorPaymentModal";
 
 const page = () => {
-  const { plans, ipData, loading, createOrderData, error } = useSelector(
+  const { plans, loading, ipData, createOrderData, error } = useSelector(
     (state) => state.planst
   );
   const { profileData } = useSelector((state) => state.profile);
@@ -32,7 +32,6 @@ const page = () => {
   const [amount, setAmount] = useState();
   const [currency, setCurrency] = useState();
   const [plan_id, sePlanid] = useState();
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const loadRazorpayScript = (() => {
     let loaded;
@@ -55,7 +54,6 @@ const page = () => {
   const handlePaymentModal = async (e, data) => {
     console.log("data", data);
     e.preventDefault();
-    setIsProcessingPayment(true);
     // setAmount(data?.amount);
     // setCurrency(data?.currency);
     // sePlanid(data?.plan_id);
@@ -101,7 +99,6 @@ const page = () => {
             }catch(err){
               console.log(err);
             } finally {
-              setIsProcessingPayment(false);
             }
           },
           prefill: {
@@ -120,12 +117,10 @@ const page = () => {
       } else {
         console.error("Failed to create order:", result.payload);
         alert("Failed to create order. Please try again.");
-        setIsProcessingPayment(false);
       }
     } catch (error) {
       console.error("Error in payment process:", error);
       alert("Something went wrong. Please try again.");
-      setIsProcessingPayment(false);
     }
   };
 
@@ -146,18 +141,6 @@ const page = () => {
 
   return (
     <>
-      {/* Loading Overlay */}
-      {(loading || isProcessingPayment) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-gray-700 text-lg font-medium">
-              {loading ? "Creating order..." : "Processing payment..."}
-            </p>
-            <p className="text-gray-500 text-sm mt-2">Please wait...</p>
-          </div>
-        </div>
-      )}
       
       <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
         <div className="purchase_section py-8 lg:py-20 px-0 lg:px-0">
@@ -237,14 +220,10 @@ const page = () => {
                                           plan_id: pln?.planPrice?.plan_id,
                                         })
                                       }
-                                      disabled={loading || isProcessingPayment}
-                                      className={`bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block ${
-                                        loading || isProcessingPayment 
-                                          ? 'cursor-not-allowed opacity-50' 
-                                          : 'cursor-pointer'
-                                      }`}
+                                      className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
                                     >
-                                      {loading || isProcessingPayment ? 'Processing...' : 'Get Started'}
+                                     {/* {loading? "Processing...": "Get Started"} */}
+                                     Get Started
                                     </button>
                                   </div>
                                 </div>
@@ -351,14 +330,9 @@ const page = () => {
                         </div>
                         <div className="absolute left-0 bottom-[20px] w-full px-6">
                           <button 
-                            disabled={loading || isProcessingPayment}
-                            className={`bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block ${
-                              loading || isProcessingPayment 
-                                ? 'cursor-not-allowed opacity-50' 
-                                : 'cursor-pointer'
-                            }`}
+                            className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
                           >
-                            {loading || isProcessingPayment ? 'Processing...' : 'Get Started'}
+                            Get Started
                           </button>
                         </div>
                       </div>
@@ -394,14 +368,9 @@ const page = () => {
                         </div>
                         <div className="absolute left-0 bottom-[20px] w-full px-6">
                           <button 
-                            disabled={loading || isProcessingPayment}
-                            className={`bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block ${
-                              loading || isProcessingPayment 
-                                ? 'cursor-not-allowed opacity-50' 
-                                : 'cursor-pointer'
-                            }`}
+                            className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
                           >
-                            {loading || isProcessingPayment ? 'Processing...' : 'Get Started'}
+                            Get Started
                           </button>
                         </div>
                       </div>
@@ -436,14 +405,9 @@ const page = () => {
                         </div>
                         <div className="absolute left-0 bottom-[20px] w-full px-6">
                           <button 
-                            disabled={loading || isProcessingPayment}
-                            className={`bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block ${
-                              loading || isProcessingPayment 
-                                ? 'cursor-not-allowed opacity-50' 
-                                : 'cursor-pointer'
-                            }`}
+                            className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
                           >
-                            {loading || isProcessingPayment ? 'Processing...' : 'Get Started'}
+                            Get Started
                           </button>
                         </div>
                       </div>
@@ -615,14 +579,9 @@ const page = () => {
                                   <div className="absolute left-0 bottom-[20px] w-full px-6">
                                     <button
                                       onClick={handlePaymentModal}
-                                      disabled={loading || isProcessingPayment}
-                                      className={`bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block ${
-                                        loading || isProcessingPayment 
-                                          ? 'cursor-not-allowed opacity-50' 
-                                          : 'cursor-pointer'
-                                      }`}
+                                      className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
                                     >
-                                      {loading || isProcessingPayment ? 'Processing...' : 'Get Started'}
+                                      Get Started
                                     </button>
                                   </div>
                                 </div>

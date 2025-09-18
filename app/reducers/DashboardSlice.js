@@ -24,7 +24,6 @@ export const improveResume=createAsyncThunk(
 )
 
 const initialState={
-loading:false,
 error:false,
 improveResumeData:{}
 }
@@ -35,16 +34,11 @@ const DashboardSlice=createSlice(
         initialState,
         reducers:{},
         extraReducers:(builder)=>{
-            builder.addCase(improveResume.pending,(state)=>{
-                state.loading=true
-            })
-            .addCase(improveResume.fulfilled,(state,{payload})=>{
-                state.loading=false
+            builder.addCase(improveResume.fulfilled,(state,{payload})=>{
                 state.error=false
                 state.improveResumeData=payload
             })
             .addCase(improveResume.rejected,(state,{payload})=>{
-                state.loading=false
                 state.error=payload
             })
            

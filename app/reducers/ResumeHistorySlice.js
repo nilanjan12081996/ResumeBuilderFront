@@ -27,8 +27,9 @@ export const getRecentResume=createAsyncThunk(
       async (_, { rejectWithValue }) => {
         try {
             const response = await api.get(`/api/home/recent-resume-list`);
+            console.log("response", response);
             if (response?.data?.status_code === 200) {
-                return response.data;
+                return response.data?.data;
             } else {
                 if (response?.data?.errors) {
                     return rejectWithValue(response.data.errors);
