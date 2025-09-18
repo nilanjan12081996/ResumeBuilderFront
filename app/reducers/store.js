@@ -8,6 +8,7 @@ import PlanSlice from '../reducers/PlanSlice'
 import CoinSlice from '../reducers/CoinSlice'
 import ProfileSlice from '../reducers/ProfileSlice'
 import SearchHistroySlice from '../reducers/SearchHistroySlice'
+import ResumeHistorySlice from '../reducers/ResumeHistorySlice'
 import DashboardSlice from '../reducers/DashboardSlice'
 
 const store = configureStore({
@@ -19,7 +20,8 @@ const store = configureStore({
         coinData: CoinSlice,
         profile: ProfileSlice,
         his: SearchHistroySlice,
-        dash:DashboardSlice
+       dash:DashboardSlice,
+        resHist:ResumeHistorySlice
     },
     devTools: process.env.NODE_ENV,
 });

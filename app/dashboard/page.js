@@ -65,6 +65,7 @@ import { BiPlus } from "react-icons/bi";
 import { RiExchange2Line } from "react-icons/ri";
 import { BiBriefcaseAlt } from "react-icons/bi";
 import { BiLogoLinkedin } from "react-icons/bi";
+import { getRecentResume } from '../reducers/ResumeHistorySlice';
 
 import { useForm } from "react-hook-form";
 import { improveResume } from "../reducers/DashboardSlice";
@@ -99,6 +100,8 @@ const inter = Inter({
 });
 
 const Page = () => {
+  const{recentResume}=useSelector((state)=>state?.resHist)
+
   const router = useRouter();
 const dispatch = useDispatch();
   const { loading, error, improveResumeData } = useSelector(
@@ -201,6 +204,24 @@ const dispatch = useDispatch();
   };
 
   const onSubmit = (data) => handleResumeImprove(data);
+  useEffect(()=>{
+dispatch(getRecentResume())
+  },[])
+
+  const formatDate = (dateString) => {
+  const date = new Date(dateString);
+
+  // Day
+  const day = date.getDate();
+
+  // Month (full name)
+  const month = date.toLocaleString("en-US", { month: "long" });
+
+  // Year
+  const year = date.getFullYear();
+
+  return `${day} ${month}, ${year}`;
+};
 
   return (
     <div className={`${inter.className} antialiased`}>

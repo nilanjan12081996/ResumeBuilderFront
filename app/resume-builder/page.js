@@ -66,24 +66,22 @@ import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
 import Template2 from '../temp/Template2';
+import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
+import { saveAs } from "file-saver";
+// import htmlDocx from "html-docx-js/dist/html-docx";
+// import juice from 'juice';
+// import html2docx from "html2docx";
 
 const page = () => {
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
   const template = searchParams.get("template");
-
-  console.log(template,"template");
-  
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
 
    const componentRef = useRef();
-
-     const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-    documentTitle: "resume", // file name when downloaded
-  });
+ 
 
 const dispatch=useDispatch()
  const [experiences, setExperiences] = useState([
@@ -134,8 +132,10 @@ const dispatch=useDispatch()
   const formValues = watch();
   const onSubmit=(data)=>{
     console.log("data",data);
+      
 dispatch(savePersonalInfo(data)).then((res)=>{
   console.log("res",res);
+ 
   if(res?.payload?.status_code===201){
      
     const eduPayload={
@@ -146,13 +146,15 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           location:edu?.location,
           field_study:edu?.field_study,
           degree:edu?.degree,
-          start_time:edu?.start_time?edu?.start_time.toISOString().split("T")[0]:null,
-          end_time:edu?.end_time?edu?.end_time.toISOString().split("T")[0]:null,
+          start_time:convertToSubmitFormat(edu?.start_time),
+          end_time:convertToSubmitFormat(edu?.end_time),
           cgpa:edu?.gpa,
           information:edu?.additionalInfo
         }
        ))
     }
+  
+    
     dispatch(saveEducationInfo(eduPayload))
 
 
@@ -164,8 +166,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         position: exp.position,
         location: exp.location,
         skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-        start_date:exp.start_date? exp.start_date.toISOString().split("T")[0]:null,
-        end_date: exp.end_date?exp.end_date.toISOString().split("T")[0]:null,
+        start_date:convertToSubmitFormat(exp.start_date),
+        end_date:convertToSubmitFormat(exp.end_date),
         current_work: exp.current_work ? 1 : 0,
         projects: exp.projects.map(proj => ({
           title: proj.title,
@@ -190,7 +192,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
   
       const payloadSkills={
         user_id: parseUserId?.user_id,
-        
         data:skills.map((sk)=>(
           {
             resume_id:res?.payload?.id,
@@ -210,8 +211,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           {
             project_title:pPro?.project_title,
             role:pPro?.role,
-            start_time:pPro?.start_time?pPro?.start_time.toISOString().split("T")[0]:null,
-            end_time:pPro?.end_time?pPro?.end_time.toISOString().split("T")[0]:null,
+            start_time:convertToSubmitFormat(pPro?.start_time),
+            end_time:convertToSubmitFormat(pPro?.end_time),
             project_url:pPro?.project_url,
             skill:pPro.skill.split(',').map(t=>t.trim())
           }
@@ -227,7 +228,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           {
             certification_name:cer?.certification_name,
             issuing_organization:cer?.issuing_organization,
-            obtained_date:cer?.obtained_date.toISOString().split("T")[0],
+            obtained_date:convertToSubmitFormat(cer?.obtained_date),
             certification_id:cer?.certification_id
           }
          ))
@@ -242,7 +243,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
 
             achievement_title:achiv?.achievement_title,
             organization:achiv?.organization,
-            receive_date:achiv?.receive_date.toISOString().split("T")[0],
+            receive_date:convertToSubmitFormat(achiv?.receive_date),
             description:achiv?.description
           }
          ))
@@ -255,6 +256,77 @@ dispatch(savePersonalInfo(data)).then((res)=>{
   
 })
   }
+
+
+    const handlePrint = useReactToPrint({
+    contentRef: componentRef, // Updated for newer versions of react-to-print
+    documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
+    pageStyle: `
+    @page {
+      size: A4;
+      margin: 0.5in;
+    }
+
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0;
+    }
+
+    /* Disable browser default headers and footers */
+    @page {
+      margin: 0;
+    }
+
+    /* Hide default header/footer added by Chrome/Edge/WPS */
+    @page :header {
+      display: none;
+    }
+    @page :footer {
+      display: none;
+    }
+  `,
+    onBeforeGetContent: () => {
+      // Optional: You can do something before printing starts
+      console.log('Starting PDF generation...');
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 100);
+      });
+    },
+    onAfterPrint: () => {
+      // Optional: You can do something after printing
+      console.log('PDF generated successfully!');
+    },
+  });
+
+// const downloadDocx = async () => {
+//   if (!componentRef.current) return;
+
+//   const content = componentRef.current.innerHTML;
+
+//   const html = `
+//     <!DOCTYPE html>
+//     <html>
+//       <head>
+//         <meta charset="utf-8" />
+//         <style>
+//           ${document.querySelector("style")?.innerHTML || ""}
+//         </style>
+//       </head>
+//       <body>
+//         ${content}
+//       </body>
+//     </html>
+//   `;
+
+//   const blob = await html2docx(html, null, {
+//     margins: { top: 720, right: 720, bottom: 720, left: 720 }, // Word margins
+//   });
+
+//   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
+// };
   return (
     <div className='lg:flex gap-5 pb-5'>
       
@@ -343,7 +415,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             </div>
             <div className='lg:flex items-center gap-3'>
               <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
-              <button onClick={() => setOpenModalAnalyzeResumeBig(true)} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
+              <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
               <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
             </div>
           </div>

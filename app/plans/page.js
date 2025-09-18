@@ -53,6 +53,7 @@ const page = () => {
   })();
 
   const handlePaymentModal = async (e, data) => {
+    console.log("data", data);
     e.preventDefault();
     setIsProcessingPayment(true);
     // setAmount(data?.amount);

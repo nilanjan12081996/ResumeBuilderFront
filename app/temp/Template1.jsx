@@ -1,9 +1,42 @@
 "use client";
-import React from "react";
+import React, { forwardRef } from "react";
+import { convertToSubmitFormat } from "../utils/DateSubmitFormatter";
 
-const Template1=({data,education,experiences,skills,languages,personalPro,achivments,certificates})=> {
+const Template1= forwardRef(({data,education,experiences,skills,languages,personalPro,achivments,certificates},ref)=> {
   return (
-      <div className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
+    
+      <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
+        <style jsx>{`
+        @media print {
+          .min-h-screen {
+            min-height: auto !important;
+          }
+          
+          .bg-\\[\\#f6f8fa\\] {
+            background: white !important;
+          }
+          
+          .shadow-lg {
+            box-shadow: none !important;
+          }
+          
+          .rounded-xl {
+            border-radius: 0 !important;
+          }
+          
+          /* Ensure colors print correctly */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          
+          /* Optimize for A4 */
+          .w-\\[800px\\] {
+            width: 100% !important;
+            max-width: none !important;
+          }
+        }
+      `}</style>
       <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px]">
         {/* Sidebar: Left */}
         <div className="w-2/5 bg-[#eff2fc] p-6 rounded-xl flex flex-col justify-start">
@@ -23,19 +56,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
           </div>
           
           {/* Skills */}
-          {/* <div className="mb-6">
-            <h3 className="text-sm font-bold text-[#7076b4] mb-3">SKILLS</h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "React.js / Next.js", "Tailwind CSS",
-                "Node.js / Express", "MongoDB",
-                "JavaScript, TypeScript",
-                "REST API, JWT, Axios"
-              ].map(skill => (
-                <span key={skill} className="bg-[#dde3fa] text-xs px-2 py-1 rounded">{skill}</span>
-              ))}
-            </div>
-          </div> */}
+
 
           <div className="mb-6">
   <h3 className="text-sm font-bold text-[#7076b4] mb-3">SKILLS</h3>
@@ -71,11 +92,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
 </div>
 
 
-          {/* Languages */}
-          {/* <div className="mb-6">
-            <h3 className="text-sm font-bold text-[#7076b4] mb-3">LANGUAGES</h3>
-            <p className="text-xs">English, Tamil</p>
-          </div> */}
+         
 
 <div className="mb-6">
   <h3 className="text-sm font-bold text-[#7076b4] mb-3">LANGUAGES</h3>
@@ -98,17 +115,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
 
 
           {/* Achievements */}
-          {/* <div>
-            <h3 className="text-sm font-bold text-[#7076b4] mb-3">ACHIEVEMENTS</h3>
-            <ul className="list-disc pl-4 text-xs space-y-1">
-              <li>100+ DSA problems solved - LeetCode</li>
-              <li>Smart India Hackathon 2023 Participant</li>
-              <li>2nd Place in Project Contest - 2023</li>
-              <li>Placed in <span className="font-semibold">Xplore</span> Internship</li>
-              <li>1st Place in Project Presentation - 2021</li>
-              <li>Published Resume Builder Web-app</li>
-            </ul>
-          </div> */}
+      
 
           <div className="mb-6">
   <h3 className="text-sm font-bold text-[#7076b4] mb-3">ACHIEVEMENTS</h3>
@@ -132,10 +139,11 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
           {/* Date */}
           {ach.receive_date && (
             <div className="text-[11px] text-gray-500">
-              {new Date(ach.receive_date).toLocaleDateString("en-US", {
+              {/* {new Date(ach.receive_date).toLocaleDateString("en-US", {
                 month: "short",
                 year: "numeric",
-              })}
+              })} */}
+              {convertToSubmitFormat(ach.receive_date)}
             </div>
           )}
 
@@ -165,27 +173,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
           </div>
 
           {/* Experience */}
-          {/* <div className="mb-4">
-            <h3 className="text-sm font-bold text-[#7076b4] mb-3">EXPERIENCE</h3>
-            <div className="mb-2">
-              <p className="font-semibold text-xs">Software Developer Intern</p>
-              <p className="text-xs text-[#6471af]">StartupFlint</p>
-              <p className="text-xs text-gray-700">Developed resume builder web app using React.js and Tailwind CSS. Optimized user experience and code reusability, improving load times by 30%.</p>
-            </div>
-            <div className="mb-2">
-              <p className="font-semibold text-xs">Front-End Developer Intern</p>
-              <p className="text-xs text-[#6471af]">Unaced</p>
-              <p className="text-xs text-gray-700">Integrated micro-animations for enhanced student dashboards (React.js) and improved responsiveness across 70% through UI/UX updates.</p>
-            </div>
-            <div>
-              <p className="font-semibold text-xs">Web Developer Intern</p>
-              <p className="text-xs text-[#6471af]">SunriseDesignTech</p>
-              <p className="text-xs text-gray-700">Built multiple responsive websites using Next.js and Tailwind CSS, achieving 90+ site mobile responsiveness score.</p>
-            </div>
-          </div> */}
-
-
-
+          
 <div className="mb-4">
   <h3 className="text-sm font-bold text-[#7076b4] mb-3">EXPERIENCE</h3>
   {experiences.map((exp) => (
@@ -205,13 +193,13 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
       <p className="text-[10px] text-gray-500 mb-1">
         {/* {exp.start_date || "2022"} – {exp.current_work ? "Present" : (exp.end_date || "2023")} */}
           {exp.start_date
-    ? exp.start_date.toISOString().split("T")[0]
+    ? convertToSubmitFormat(exp.start_date)
     : "2022"}{" "}
   –{" "}
   {exp.current_work
     ? "Present"
     : exp.end_date
-    ? exp.end_date.toISOString().split("T")[0]
+    ? convertToSubmitFormat(exp.end_date)
     : "2023"}
       </p>
 
@@ -269,25 +257,7 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
 
 
           {/* Education */}
-          {/* <div className="mb-4">
-            <h3 className="text-sm font-bold text-[#7076b4] mb-3">EDUCATION</h3>
-            <div className="flex flex-col">
-              <div className="flex justify-between text-xs">
-                <div>B.Tech, Computer Science</div>
-                <div className="text-[#6471af]">2021-2025</div>
-              </div>
-              <span className="text-xs mb-2">Saranathan College of Engineering</span>
-              <div className="flex justify-between text-xs">
-                <div>Higher Secondary School</div>
-                <div className="text-[#6471af]">2021</div>
-              </div>
-              <span className="text-xs mb-2">James Higher Secondary School</span>
-              <div className="flex justify-between text-xs">
-                <div>High School</div>
-              </div>
-              <span className="text-xs">Govt High School</span>
-            </div>
-          </div> */}
+          
 
           <div className="mb-4">
   <h3 className="text-sm font-bold text-[#7076b4] mb-3">EDUCATION</h3>
@@ -299,24 +269,28 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
           <div>
             {entry.degree}{entry.field_study ? `, ${entry.field_study}` : "B.Tech, Computer Science"}
           </div>
-          <div className="text-[#6471af]">
+          <div className="text-[#6471af] text-[10px]">
             {/* {entry.start_time
               ? `${entry.start_time} - ${entry.currentlyStudying ? "Present" : entry.end_time || ""}`
               : "2021-2025"} */}
                   {entry.start_time
-                      ? new Date(entry.start_time).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })
+                      ? 
+                      // new Date(entry.start_time).toLocaleDateString("en-US", {
+                      //     month: "short",
+                      //     year: "numeric",
+                      //   })
+                      convertToSubmitFormat(entry.start_time)
                       : ""}
                     {" – "}
                     {entry.currentlyStudying
                       ? "Present"
                       : entry.end_time
-                      ? new Date(entry.end_time).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })
+                      ? 
+                      // new Date(entry.end_time).toLocaleDateString("en-US", {
+                      //     month: "short",
+                      //     year: "numeric",
+                      //   })
+                      convertToSubmitFormat(entry.end_time)
                       : ""}
           </div>
         </div>
@@ -335,27 +309,11 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
       </div>
     ))}
   </div>
-</div>
+          </div>
 
 
           {/* Projects */}
-          {/* <div>
-            <h3 className="text-sm font-bold text-[#7076b4] mb-3">PROJECTS</h3>
-            <ul className="list-disc pl-4 text-xs space-y-2">
-              <li>
-                <span className="font-semibold">Resume Builder App</span> <br />
-                Create & download resume generator with dynamic PDF export.
-              </li>
-              <li>
-                <span className="font-semibold">Expense Tracker App</span> <br />
-                Manage expenses through budget management, and visualization.
-              </li>
-              <li>
-                <span className="font-semibold">CRUD Task Manager</span> <br />
-                MERN-based task manager with CRUD operations and RESTful APIs.
-              </li>
-            </ul>
-          </div> */}
+         
 
           <div className="mb-6">
   <h3 className="text-sm font-bold text-[#7076b4] mb-3">PROJECTS</h3>
@@ -375,9 +333,9 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
           )}
 
           {/* Date Range */}
-          {(proj.start_time || proj.end_time) && (
+          {(proj?.start_time || proj?.end_time) && (
             <div className="text-[11px] text-gray-500">
-              {proj.start_time || "Start"} – {proj.end_time || "Present"}
+              {convertToSubmitFormat(proj?.start_time) || "Start"} – {convertToSubmitFormat(proj?.end_time) || "Present"}
             </div>
           )}
 
@@ -439,10 +397,11 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
           {/* Obtained Date */}
           {cer.obtained_date && (
             <div className="text-[11px] text-gray-500">
-              {new Date(cer.obtained_date).toLocaleDateString("en-US", {
+              {/* {new Date(cer.obtained_date).toLocaleDateString("en-US", {
                 month: "short",
                 year: "numeric",
-              })}
+              })} */}
+              {convertToSubmitFormat(cer.obtained_date)}
             </div>
           )}
 
@@ -465,5 +424,5 @@ const Template1=({data,education,experiences,skills,languages,personalPro,achivm
       </div>
     </div>
   );
-}
+})
 export default Template1

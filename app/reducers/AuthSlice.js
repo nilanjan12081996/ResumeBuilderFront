@@ -1,12 +1,13 @@
 'use client';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from './api';
+import serverApi from './serverApi';
 
 export const registerCustomer = createAsyncThunk(
     'registerCustomer',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/auth/signup/individual', userInput);
+            const response = await serverApi.post('/api/auth/register', userInput);
             if (response?.data?.status_code === 201) {
                 return response.data;
             } else {
@@ -28,6 +29,26 @@ export const registerCustomerOrg = createAsyncThunk(
         try {
             const response = await api.post('/api/auth/signup/organisation', userInput);
             if (response?.data?.status_code === 201) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+export const getSignupType = createAsyncThunk(
+    'getSignupType',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.get('/api/signup-type/type-list');
+            if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {
@@ -83,7 +104,7 @@ export const loginCustomer = createAsyncThunk(
     'loginCustomer',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/auth/signin', userInput);
+            const response = await serverApi.post('/api/auth/login', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -120,6 +141,7 @@ const initialState = {
     loading: false,
     isLoggedIn: false,
     loadingIccid: false,
+    signUpTypes:[]
 };
 
 const authSlice = createSlice({
@@ -215,7 +237,7 @@ const authSlice = createSlice({
                 );
                       sessionStorage.setItem(
                     'signup_type_id',
-                    JSON.stringify({ signup_type_id: data?.signup_type_id })
+                    JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
                 sessionStorage.setItem(
                     'resumeToken',
@@ -266,6 +288,21 @@ const authSlice = createSlice({
                 );
             })
             .addCase(registerCustomerOrg.rejected, (state, { payload }) => {
+
+                state.loading = false;
+                state.error = payload;
+            })
+                .addCase(getSignupType.pending, (state) => {
+                state.message = null;
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSignupType.fulfilled, (state, { payload }) => {
+              
+                state.loading = false;
+                state.signUpTypes=payload
+            })
+            .addCase(getSignupType.rejected, (state, { payload }) => {
 
                 state.loading = false;
                 state.error = payload;
