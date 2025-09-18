@@ -74,7 +74,7 @@ dispatch(getResumeHistory({page:1,limit:10}))
                     </div>
                     <div>
                         <p className='text-[#7D7D7D] text-[15px]'>Total resumes</p>
-                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.total_resume}</h3>
+                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.statistics?.total_resume}</h3>
                     </div>
                 </div>
             </div>
@@ -96,7 +96,7 @@ dispatch(getResumeHistory({page:1,limit:10}))
                     </div>
                     <div>
                         <p className='text-[#7D7D7D] text-[15px]'>Total Downloads</p>
-                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.total_downloaded_resume}</h3>
+                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.statistics?.total_downloaded_resume}</h3>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@ dispatch(getResumeHistory({page:1,limit:10}))
                     </div>
                     <div>
                         <p className='text-[#7D7D7D] text-[15px]'>Drafts</p>
-                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.total_draft_resume}</h3>
+                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.statistics?.total_draft_resume}</h3>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@ dispatch(getResumeHistory({page:1,limit:10}))
                     </div>
                     <div>
                         <p className='text-[#7D7D7D] text-[15px]'>Saved</p>
-                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.total_saved_resume}</h3>
+                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>{rHistory?.statistics?.total_saved_resume}</h3>
                     </div>
                 </div>
             </div>
@@ -126,7 +126,7 @@ dispatch(getResumeHistory({page:1,limit:10}))
       </div>
       <div className='border bg-white border-[#D5D5D5] rounded-[10px]'>
         <div className='lg:px-8 px-4 py-8'>
-           <p className='text-[#151515] text-[20px] leading-[20px] lg:mb-4'>Your Resumes ({rHistory?.total_resume})</p>
+           <p className='text-[#151515] text-[20px] leading-[20px] lg:mb-4'>Your Resumes ({rHistory?.statistics?.total_resume})</p>
         </div>
         <div className='lg:px-8 px-4 py-0'>
           {
