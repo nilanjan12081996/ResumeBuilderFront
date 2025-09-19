@@ -68,7 +68,7 @@ import { BiLogoLinkedin } from "react-icons/bi";
 import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
-import { improveResume } from "../reducers/DashboardSlice";
+import { checkATS, improveResume } from "../reducers/DashboardSlice";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -104,7 +104,7 @@ const Page = () => {
 
   const router = useRouter();
   const dispatch = useDispatch();
-  const { error, improveResumeData } = useSelector(
+  const { error, improveResumeData, loading } = useSelector(
     (state) => state.dash
   );
   const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
@@ -119,6 +119,8 @@ const Page = () => {
 
   const [openModalLinkedInRewrite, setOpenModalLinkedInRewrite] =
     useState(false);
+  const [openATSmodal, setopenATSmodal] = useState(false);
+  const [ATSscore, setATSscore] = useState(0);
 
   const [selectedResume, setSelectedResume] = useState(null);
 
@@ -141,6 +143,17 @@ const Page = () => {
 
   const handleSelect = (id) => {
     setSelectedResume(id);
+  };
+
+  // clear file input
+  const clearFileInput = () => {
+    const fileInput1 = document.getElementById("dropzone-file");
+
+    if (fileInput1) {
+      fileInput1.value = "";
+    }
+
+    // clear state variables if you are tracking them
   };
 
   const {
@@ -167,13 +180,11 @@ const Page = () => {
     const formData = new FormData();
 
     // Check if linkedin_profile_file exists and append it
-    if (data.linkedin_profile_file && data.linkedin_profile_file[0]) {
-      formData.append("linkedin_profile_file", data.linkedin_profile_file[0]);
-    } else {
-      console.error("No linkedin file selected");
-      alert("Please select a linkedin file to upload");
-      return;
-    }
+    // if (data.linkedin_profile_file && data.linkedin_profile_file[0]) {
+    //   formData.append("linkedin_profile_file", data.linkedin_profile_file[0] || null);
+    // } else{
+    //   formData.append("linkedin_profile_file", null);
+    // }
 
     // Check if resume_file exists and append it
     if (data.resume_file && data.resume_file[0]) {
@@ -184,25 +195,44 @@ const Page = () => {
       alert("Please select a resume file to upload");
       return;
     }
-
-    formData.append("portfolio_link", data.portfolio_link);
-    formData.append("github_profile", data.github_profile);
-    formData.append("other_link", data.other_link);
-    
+    data.linkedin_profile &&
+      formData.append("linkedin_profile", data.linkedin_profile);
+    data.portfolio_link &&
+      formData.append("portfolio_link", data.portfolio_link);
+    data.github_profile &&
+      formData.append("github_profile", data.github_profile);
+    data.other_link && formData.append("other_link", data.other_link);
 
     // Log FormData contents for debugging
     console.log("FormData contents:");
     for (let [key, value] of formData.entries()) {
       console.log(key, value);
     }
-
+    
     dispatch(improveResume(formData))
       .then((res) => {
         console.log(" res ", res);
+        const userData = {
+          imp_resume_id: res?.payload?.data?.id,
+          raw_data: res?.payload?.raw_data,
+        };
+        dispatch(checkATS(userData))
+          .then((res) => {
+            // toast.success(res?.payload?.message || "ATS score");
+            setATSscore(res?.payload?.data?.ats_score);
+            setopenATSmodal(true);
+          })
+          .catch((err) => {
+            console.log("err", err);
+          });
       })
       .catch((err) => {
-        console.log(err);
+        console.log("err", err);
+        toast.error(
+          err?.message || "An error occurred while improving the resume."
+        );
       });
+      clearFileInput();
   };
 
   const onSubmit = (data) => handleResumeImprove(data);
@@ -227,6 +257,25 @@ const Page = () => {
 
     return `${day} ${month}, ${year}`;
   };
+
+  // ATS data modal
+  const max = 100;
+  const size = 124;
+  const strokeWidth = 10;
+  const label = "ATS Score";
+  const className = "";
+  const clamped = Math.max(0, Math.min(ATSscore, max));
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = (clamped / max) * circumference;
+
+  const isGood = clamped >= 70;
+  const ringColor = isGood
+    ? "#16a34a" /* tailwind green-600 */
+    : "#ef4444"; /* red-500 */
+  const badgeBg = isGood
+    ? "bg-green-50 text-green-700"
+    : "bg-red-50 text-red-700";
 
   return (
     <div className={`${inter.className} antialiased`}>
@@ -316,28 +365,32 @@ const Page = () => {
           </h3>
           <div className="lg:flex gap-4 pb-8 lg:pb-0">
             <div className="lg:w-8/12">
-              {recentResume?.map((resume) => (
-                <div key={resume.id} className="flex justify-between ...">
-                  <div className="flex gap-3 items-center">
-                    <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                      <CgFileDocument className="text-white text-2xl" />
-                    </div>
-                    <div>
-                      <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                        {resume.title}
-                      </h3>
-                      <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                        Created on {formatDate(resume.createdAt)}
-                      </p>
+              {recentResume
+                ?.map((resume) => (
+                  <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
+                    <div key={resume.id} className="flex justify-between ...">
+                      <div className="flex gap-3 items-center">
+                        <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
+                          <CgFileDocument className="text-white text-2xl" />
+                        </div>
+                        <div>
+                          <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
+                            {resume.resume_name}
+                          </h3>
+                          <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                            Created on {formatDate(resume.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                      <button className="text-xl text-[#797979] hover:text-[#A635A2]">
+                        <BiEdit />
+                      </button>
                     </div>
                   </div>
-                  <button className="text-xl text-[#797979] hover:text-[#A635A2]">
-                    <BiEdit />
-                  </button>
-                </div>
-              ))}
+                ))
+                .slice(0, 5)}
             </div>
-             {/* <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
+            {/* <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
                 <div className="flex gap-3 items-center">
                   <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
                     <CgFileDocument className="text-[#ffffff] text-2xl" />
@@ -702,7 +755,7 @@ const Page = () => {
                     </div> */}
                     <div className="w-full resume_form_box mb-3">
                       <Label className="mb-2 block" htmlFor="file-upload">
-                        LinkedIn Profile PDF <span>*</span>
+                        LinkedIn Profile PDF
                       </Label>
                       {/* <div className="field_box flex items-center">
                         <div className="p-3">
@@ -712,8 +765,10 @@ const Page = () => {
                       <div>
                         <FileInput
                           id="file-upload"
+                          accept=".pdf" // Optional: Hint to the browser for PDF only
+                          helperText="Upload your PDF document (Max 5MB)"
                           {...register("linkedin_profile_file", {
-                            required: true,
+                            required: false,
                           })}
                           aria-invalid={
                             errors.linkedin_profile_file ? "true" : "false"
@@ -729,9 +784,7 @@ const Page = () => {
                     </div>
                     <div className="w-full resume_form_box mb-3">
                       <div className="mb-1 block">
-                        <Label htmlFor="base">
-                          Portfolio Link <span>*</span>
-                        </Label>
+                        <Label htmlFor="base">Portfolio Link</Label>
                       </div>
                       <div className="field_box flex items-center">
                         <div className="p-3">
@@ -742,7 +795,7 @@ const Page = () => {
                           type="url"
                           sizing="md"
                           placeholder="https://yourname.design"
-                          {...register("portfolio_link", { required: true })}
+                          {...register("portfolio_link", { required: false })}
                           aria-invalid={
                             errors.portfolio_link ? "true" : "false"
                           }
@@ -758,9 +811,7 @@ const Page = () => {
                   <div className="">
                     <div className="w-full resume_form_box mb-3">
                       <div className="mb-1 block">
-                        <Label htmlFor="base">
-                          GitHub Profile Link <span>*</span>
-                        </Label>
+                        <Label htmlFor="base">GitHub Profile Link</Label>
                       </div>
                       <div className="field_box flex items-center">
                         <div className="p-3">
@@ -771,7 +822,7 @@ const Page = () => {
                           type="url"
                           sizing="md"
                           placeholder="https://github.com/johndoe"
-                          {...register("github_profile", { required: true })}
+                          {...register("github_profile", { required: false })}
                           aria-invalid={
                             errors.github_profile ? "true" : "false"
                           }
@@ -785,9 +836,7 @@ const Page = () => {
                     </div>
                     <div className="w-full resume_form_box mb-3">
                       <div className="mb-1 block">
-                        <Label htmlFor="base">
-                          More About Candidate <span>*</span>
-                        </Label>
+                        <Label htmlFor="base">More About Candidate</Label>
                       </div>
                       <div className="field_box flex items-center">
                         <div className="p-3">
@@ -798,7 +847,7 @@ const Page = () => {
                           type="url"
                           sizing="md"
                           placeholder="Additional Info Link"
-                          {...register("other_link", { required: true })}
+                          {...register("other_link", { required: false })}
                           aria-invalid={errors.other_link ? "true" : "false"}
                         />
                       </div>
@@ -848,11 +897,11 @@ const Page = () => {
             </div>
             <div className="p-5 inset-shadow-xs">
               <button
-                // onClick={() => setOpenModalCreateResume(true)}
-                type="submit"
-                className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
+                disabled={loading}
+                className={`bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-white font-semibold w-full text-center rounded-[7px] 
+    ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                Choose Template
+                {loading ? "Loading..." : "Submit"}
               </button>
             </div>
           </form>
@@ -927,6 +976,86 @@ const Page = () => {
         </ModalBody>
       </Modal>
       {/* add modal for apply job ends here */}
+      {/* ATS score modal */}
+      <Modal
+        show={openATSmodal}
+        onClose={() => setopenATSmodal(false)}
+        size="md"
+        popup
+        className="apply_modal_area"
+      >
+        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+          {/* Header with Close */}
+          <div className="flex items-center justify-between px-5 py-3 border-b">
+            <h3 className="text-base font-semibold text-gray-800">ATS Score</h3>
+            <button
+              type="button"
+              onClick={() => setopenATSmodal(false)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Body */}
+          <ModalBody className="bg-white p-6">
+            <div className="flex justify-center">
+              <div
+                className="flex flex-col items-center rounded-2xl bg-white p-4 shadow-lg"
+                aria-label={`${label}: ${clamped} out of ${max}`}
+                role="img"
+              >
+                <div style={{ width: 140, height: 140 }} className="relative">
+                  <svg
+                    width={140}
+                    height={140}
+                    viewBox="0 0 140 140"
+                    className="block"
+                  >
+                    {/* Track */}
+                    <circle
+                      cx={70}
+                      cy={70}
+                      r={60}
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth={12}
+                    />
+                    {/* Progress */}
+                    <circle
+                      cx={70}
+                      cy={70}
+                      r={60}
+                      fill="none"
+                      stroke={ringColor}
+                      strokeWidth={12}
+                      strokeLinecap="round"
+                      strokeDasharray={`${progress} ${
+                        circumference - progress
+                      }`}
+                      transform="rotate(-90 70 70)"
+                    />
+                  </svg>
+
+                  {/* Center value */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xl font-semibold text-gray-700">
+                      {clamped}/{max}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Label badge */}
+                <div
+                  className={`mt-3 rounded-lg px-3 py-1 text-sm font-semibold ${badgeBg}`}
+                >
+                  {label}
+                </div>
+              </div>
+            </div>
+          </ModalBody>
+        </div>
+      </Modal>
     </div>
   );
 };
