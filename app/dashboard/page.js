@@ -281,6 +281,7 @@ const Page = () => {
     <div className={`${inter.className} antialiased`}>
       <ToastContainer />
       <div className="mb-0">
+        <div className="main-content">
         <div className="welcome_area py-8 px-9 rounded-[10px] mb-10">
           <h3 className="text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4">
             Welcome to Resume Builder, Soumyajit Chandra!
@@ -365,30 +366,28 @@ const Page = () => {
           </h3>
           <div className="lg:flex gap-4 pb-8 lg:pb-0">
             <div className="lg:w-8/12">
-              {recentResume
-                ?.map((resume) => (
-                  <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
-                    <div key={resume.id} className="flex justify-between ...">
-                      <div className="flex gap-3 items-center">
-                        <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                          <CgFileDocument className="text-white text-2xl" />
-                        </div>
-                        <div>
-                          <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                            {resume.resume_name}
-                          </h3>
-                          <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                            Created on {formatDate(resume.created_at)}
-                          </p>
-                        </div>
-                      </div>
-                      <button className="text-xl text-[#797979] hover:text-[#A635A2]">
-                        <BiEdit />
-                      </button>
+              {recentResume?.map((resume) => (
+                <div key={resume.id} className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
+                  <div className="flex gap-3 items-center">
+                    <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
+                      <CgFileDocument className="text-white text-2xl" />
+                    </div>
+                    <div>
+                      <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
+                        {resume.resume_name}
+                      </h3>
+                      <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                        Created on {formatDate(resume.created_at)}
+                      </p>
                     </div>
                   </div>
-                ))
-                .slice(0, 5)}
+                  <div>
+                    <button className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer">
+                      <BiEdit />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
             {/* <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
                 <div className="flex gap-3 items-center">
@@ -410,6 +409,8 @@ const Page = () => {
                   </button>
                 </div>
               </div> */}
+            </div>
+              
             <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
               <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
                 Resume Writing Tips
@@ -901,7 +902,7 @@ const Page = () => {
                 className={`bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-white font-semibold w-full text-center rounded-[7px] 
     ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                {loading ? "Loading..." : "Submit"}
+                {loading ? "Processing..." : "Submit"}
               </button>
             </div>
           </form>
