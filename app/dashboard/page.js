@@ -317,17 +317,17 @@ const Page = () => {
           <div className="lg:flex gap-4 pb-8 lg:pb-0">
             <div className="lg:w-8/12">
               {recentResume?.map((resume) => (
-                <div key={resume.id} className="flex justify-between ...">
+                <div key={resume.id} className="flex justify-between ... mb-2">
                   <div className="flex gap-3 items-center">
                     <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
                       <CgFileDocument className="text-white text-2xl" />
                     </div>
                     <div>
                       <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                        {resume.title}
+                        {resume.resume_name}
                       </h3>
                       <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                        Created on {formatDate(resume.createdAt)}
+                        Created on {formatDate(resume.created_at)}
                       </p>
                     </div>
                   </div>
