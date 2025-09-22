@@ -69,6 +69,8 @@ import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
 import { checkATS, improveResume } from "../reducers/DashboardSlice";
+import JdbasedModal from "./JdbasedModal";
+import JdBasedChooseModal from "./JdBasedChooseModal";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -108,6 +110,7 @@ const Page = () => {
     (state) => state.dash
   );
   const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
+    const [openModalCreateResumeJd, setOpenModalCreateResumeJd] = useState(false);
   const [openModalImproveexistingResume, setOpenModalImproveexistingResume] =
     useState(false);
   const [openModalAlertModal, setOpenModalAlertModal] = useState(false);
@@ -541,10 +544,24 @@ const Page = () => {
           </div>
         </ModalBody>
       </Modal>
+
+      {
+        openModalCreateResumeJd&&(
+          <JdBasedChooseModal
+          openModalCreateResumeJd={openModalCreateResumeJd}
+          setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
+
+
+
+          />
+        )
+      }
+
+
       {/* add modal for apply job ends here */}
 
-      {/* add modal for apply job start here */}
-      <Modal
+      {/* add modal for JD Based here */}
+      {/* <Modal
         size="4xl"
         className="apply_modal_area"
         show={openModalImproveexistingResume}
@@ -679,8 +696,22 @@ const Page = () => {
             </button>
           </div>
         </ModalBody>
-      </Modal>
-      {/* add modal for apply job ends here */}
+      </Modal> */}
+
+      {
+        openModalImproveexistingResume&&(
+          <JdbasedModal
+          openModalImproveexistingResume={openModalImproveexistingResume}
+          setOpenModalImproveexistingResume={setOpenModalImproveexistingResume}
+          alertContinueHandler={alertContinueHandler}
+          setOpenModalCreateResume={setOpenModalCreateResume}
+          setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
+
+          />
+        )
+      }
+
+      {/* add modal for JD Based ends here */}
 
       {/* add modal for Alert start here */}
       <Modal
