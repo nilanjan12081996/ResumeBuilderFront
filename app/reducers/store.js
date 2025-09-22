@@ -10,6 +10,7 @@ import ProfileSlice from '../reducers/ProfileSlice'
 import SearchHistroySlice from '../reducers/SearchHistroySlice'
 import ResumeHistorySlice from '../reducers/ResumeHistorySlice'
 import DashboardSlice from '../reducers/DashboardSlice'
+import LinkedinSlice from '../reducers/LinkedinSlice'
 
 const store = configureStore({
     reducer: {
@@ -21,7 +22,8 @@ const store = configureStore({
         profile: ProfileSlice,
         his: SearchHistroySlice,
        dash:DashboardSlice,
-        resHist:ResumeHistorySlice
+        resHist:ResumeHistorySlice,
+        linkedIn:LinkedinSlice
     },
     devTools: process.env.NODE_ENV,
 });

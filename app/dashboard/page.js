@@ -71,6 +71,7 @@ import { useForm } from "react-hook-form";
 import { checkATS, improveResume } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
+import LinkedInReWriteModal from "./LinkedInReWriteModal";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -942,7 +943,7 @@ const Page = () => {
       {/* add modal for apply job ends here */}
 
       {/* add modal for apply job start here */}
-      <Modal
+      {/* <Modal
         size="4xl"
         className="apply_modal_area"
         show={openModalLinkedInRewrite}
@@ -1006,7 +1007,18 @@ const Page = () => {
             </button>
           </div>
         </ModalBody>
-      </Modal>
+      </Modal> */}
+      {
+        openModalLinkedInRewrite&&(
+           <LinkedInReWriteModal
+           openModalLinkedInRewrite={openModalLinkedInRewrite}
+           setOpenModalLinkedInRewrite={setOpenModalLinkedInRewrite}
+           HandlerLinkedInRewrite={HandlerLinkedInRewrite}
+          />
+        )
+      }
+     
+
       {/* add modal for apply job ends here */}
       {/* ATS score modal */}
       <Modal

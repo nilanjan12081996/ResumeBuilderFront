@@ -7,6 +7,7 @@ import { useState } from "react";
 const JdBasedChooseModal=({  
     openModalCreateResumeJd,
     setOpenModalCreateResumeJd})=>{
+        const router = useRouter();
   const [selectedResume, setSelectedResume] = useState(null);
       const handleSelect = (id) => {
     setSelectedResume(id);
