@@ -13,7 +13,8 @@ const JdbasedModal=({openModalImproveexistingResume,
           setOpenModalImproveexistingResume,
           alertContinueHandler,
         setOpenModalCreateResume,
-      setOpenModalCreateResumeJd
+      setOpenModalCreateResumeJd,
+      setResumeId
       })=>{
 
 const{loading}=useSelector((state)=>state?.dash)
@@ -67,6 +68,7 @@ const dispatch=useDispatch()
     formData.append("job_description",data?.job_description)
     dispatch(jdBasedResume(formData)).then((res)=>{
         if(res?.payload?.status_code===201){
+          setResumeId(res?.payload?.data?.id)
             const basicInfoPayload={
                 jd_resume_id:res?.payload?.data?.id,
                 SuggestedRole:res?.payload?.raw_data?.basic_information?.SuggestedRole,
@@ -209,7 +211,7 @@ const dispatch=useDispatch()
                           <div className="w-full resume_form_box mb-3">
                             <div className="mb-1 block">
                               <Label htmlFor="base">
-                                Portfolio Link <span>*</span>
+                                Portfolio Link 
                               </Label>
                             </div>
                             <div className="field_box flex items-center">
@@ -230,7 +232,7 @@ const dispatch=useDispatch()
                           <div className="w-full resume_form_box mb-3">
                             <div className="mb-1 block">
                               <Label htmlFor="base">
-                                GitHub Profile Link <span>*</span>
+                                GitHub Profile Link
                               </Label>
                             </div>
                             <div className="field_box flex items-center">
@@ -275,7 +277,7 @@ const dispatch=useDispatch()
                           <div className="w-full resume_form_box mb-3">
                             <div className="mb-1 block">
                               <Label htmlFor="base">
-                                Other Link <span>*</span>
+                                Other Link 
                               </Label>
                             </div>
                             <div className="field_box flex items-center">

@@ -1,4 +1,5 @@
 import { Label, TextInput } from "flowbite-react"
+import { useEffect } from "react"
 import { BiLogoLinkedinSquare, BiSolidBriefcase, BiSolidPhone, BiSolidUser } from "react-icons/bi"
 import { BsGithub } from "react-icons/bs"
 import { FaGlobe } from "react-icons/fa"
@@ -6,7 +7,19 @@ import { FaLocationDot } from "react-icons/fa6"
 import { MdEmail } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const PersonalInfoJd=({register,errors})=>{
+const PersonalInfoJd=({register,errors,jdBasedDetailsData,setValue})=>{
+
+    useEffect(()=>{
+      setValue("full_name",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.candidate_name)
+       setValue("email",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.email)
+       setValue("phone",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.phone)
+      //  setValue("location",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.location)
+      setValue("title",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.role)
+      setValue("personal_web",jdBasedDetailsData?.data?.[0]?.other_url_link)
+      setValue("github_profile",jdBasedDetailsData?.data?.[0]?.github_url_link)
+      setValue("linkdin_profile",jdBasedDetailsData?.data?.[0]?.linkedin_url_link)
+      setValue("goal",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.summery)
+  },[jdBasedDetailsData,setValue])
     return(
         <>
    

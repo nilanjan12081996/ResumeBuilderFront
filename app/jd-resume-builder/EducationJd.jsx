@@ -117,7 +117,7 @@
 
 "use client";
 import { Checkbox, Datepicker, Label, Textarea, TextInput } from "flowbite-react"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiSolidBank } from "react-icons/bi"
 import { BsFillPlusCircleFill } from "react-icons/bs"
 import { FaLocationDot } from "react-icons/fa6"
@@ -125,7 +125,25 @@ import { HiAcademicCap } from "react-icons/hi2"
 import { MdDelete } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const EducationJd = ({educationEntries,setEducationEntries}) => {
+const EducationJd = ({educationEntries,setEducationEntries,jdBasedDetailsData,setValue}) => {
+  useEffect(() => {
+  if (jdBasedDetailsData?.data?.[0]?.education) {
+    const mappedEducation = jdBasedDetailsData?.data?.[0]?.education.map((edu) => ({
+      id: edu.id,
+      institution: edu.college || "",
+      location: edu.location || "",
+      degree: edu.course?.split(" in ")[0] || "",   // e.g. "Master of Science (M.Sc.)"
+      field_study: edu.course?.split(" in ")[1] || "", // e.g. "Computer Science"
+      start_time: edu.start_date || null,   // if available
+      end_time: edu.course_completed !== "1970-01-01" ? edu.course_completed : null,
+      cgpa: edu.cgpa || "",
+      additionalInfo: edu.aditional_info || "",
+      currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
+    }));
+
+    setEducationEntries(mappedEducation);
+  }
+}, [jdBasedDetailsData]);
         const addEducation = () => {
     setEducationEntries([...educationEntries,  {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}]);
   };

@@ -72,6 +72,7 @@ import { checkATS, improveResume } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
+import LinkedInChooseModal from "./LinkedInChooseModal";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -112,6 +113,8 @@ const Page = () => {
   );
   const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
     const [openModalCreateResumeJd, setOpenModalCreateResumeJd] = useState(false);
+     const [openModalCreateResumeLinkedIn, setOpenModalCreateResumeLinkedIn] = useState(false);
+     const[resumeId,setResumeId]=useState()
   const [openModalImproveexistingResume, setOpenModalImproveexistingResume] =
     useState(false);
   const [openModalAlertModal, setOpenModalAlertModal] = useState(false);
@@ -551,8 +554,16 @@ const Page = () => {
           <JdBasedChooseModal
           openModalCreateResumeJd={openModalCreateResumeJd}
           setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
+          resumeId={resumeId}
+          />
+        )
+      }
 
-
+      {
+        openModalCreateResumeLinkedIn&&(
+          <LinkedInChooseModal
+          openModalCreateResumeLinkedIn={openModalCreateResumeLinkedIn}
+          setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
 
           />
         )
@@ -562,142 +573,7 @@ const Page = () => {
       {/* add modal for apply job ends here */}
 
       {/* add modal for JD Based here */}
-      {/* <Modal
-        size="4xl"
-        className="apply_modal_area"
-        show={openModalImproveexistingResume}
-        onClose={() => setOpenModalImproveexistingResume(false)}
-      >
-        <ModalHeader className="bg-white text-black modal_header">
-          <div className="flex items-center gap-1">
-            <HiClipboardList className="text-[#800080] text-3xl" />
-            ATS Friendly Resume
-          </div>
-        </ModalHeader>
-        <ModalBody className="bg-white p-0 rounded-b-[4px]">
-          <div className="lg:flex gap-5 p-5">
-            <div className="lg:w-6/12 p-0 pr-0">
-              <div className="resume_form_area">
-                <div className="">
-                  <div className="w-full resume_form_box mb-3">
-                    <div className="mb-1 block">
-                      <Label htmlFor="base">
-                        LinkedIn Profile Link <span>*</span>
-                      </Label>
-                    </div>
-                    <div className="field_box flex items-center">
-                      <div className="p-3">
-                        <BiLogoLinkedinSquare className="text-[#928F8F]" />
-                      </div>
-                      <TextInput
-                        id="base"
-                        type="text"
-                        sizing="md"
-                        placeholder="https://www.linkedin.com/in/johndoe"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full resume_form_box mb-3">
-                    <div className="mb-1 block">
-                      <Label htmlFor="base">
-                        Portfolio Link <span>*</span>
-                      </Label>
-                    </div>
-                    <div className="field_box flex items-center">
-                      <div className="p-3">
-                        <FaGlobe className="text-[#928F8F]" />
-                      </div>
-                      <TextInput
-                        id="base"
-                        type="text"
-                        sizing="md"
-                        placeholder="https://yourname.design"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="">
-                  <div className="w-full resume_form_box mb-3">
-                    <div className="mb-1 block">
-                      <Label htmlFor="base">
-                        GitHub Profile Link <span>*</span>
-                      </Label>
-                    </div>
-                    <div className="field_box flex items-center">
-                      <div className="p-3">
-                        <BsGithub className="text-[#928F8F]" />
-                      </div>
-                      <TextInput
-                        id="base"
-                        type="text"
-                        sizing="md"
-                        placeholder="https://github.com/johndoe"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full resume_form_box mb-3">
-                    <div className="mb-1 block">
-                      <Label htmlFor="base">
-                        More About Candidate <span>*</span>
-                      </Label>
-                    </div>
-                    <div className="field_box flex items-center">
-                      <div className="p-3">
-                        <BsFillInfoCircleFill className="text-[#928F8F]" />
-                      </div>
-                      <TextInput
-                        id="base"
-                        type="text"
-                        sizing="md"
-                        placeholder="Additional Info"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full resume_form_box mb-3">
-                    <div className="mb-1 block">
-                      <Label htmlFor="base">
-                        Job Description <span>*</span>
-                      </Label>
-                    </div>
-                    <div className="flex items-center">
-                      <Textarea
-                        id="comment"
-                        placeholder="Write a little bit about your job..."
-                        required
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="lg:w-6/12">
-              <div className="flex w-full items-center justify-center">
-                <Label
-                  htmlFor="dropzone-file"
-                  className="resume_upload_box_small flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-                >
-                  <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                    <BiImport className="text-[70px] text-[#92278F]" />
-                    <p className="mb-2 text-xl text-[#92278F]">
-                      Import your Resume
-                    </p>
-                  </div>
-                  <FileInput id="dropzone-file" className="hidden" />
-                </Label>
-              </div>
-            </div>
-          </div>
-          <div className="p-5 inset-shadow-xs">
-            <button
-              onClick={() => alertContinueHandler(true)}
-              className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
-            >
-              Choose Template
-            </button>
-          </div>
-        </ModalBody>
-      </Modal> */}
+      
 
       {
         openModalImproveexistingResume&&(
@@ -707,6 +583,7 @@ const Page = () => {
           alertContinueHandler={alertContinueHandler}
           setOpenModalCreateResume={setOpenModalCreateResume}
           setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
+          setResumeId={setResumeId}
 
           />
         )
@@ -1014,6 +891,7 @@ const Page = () => {
            openModalLinkedInRewrite={openModalLinkedInRewrite}
            setOpenModalLinkedInRewrite={setOpenModalLinkedInRewrite}
            HandlerLinkedInRewrite={HandlerLinkedInRewrite}
+           setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
           />
         )
       }

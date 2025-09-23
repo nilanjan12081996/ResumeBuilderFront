@@ -4,12 +4,9 @@ import resume1 from "../assets/imagesource/resume1.png";
 import resume2 from "../assets/imagesource/resume2.png";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-const JdBasedChooseModal=({  
+const LinkedInChooseModal=({  
     openModalCreateResumeJd,
-    setOpenModalCreateResumeJd,
-    resumeId
-  })=>{
-    const encodedId = btoa(resumeId);
+    setOpenModalCreateResumeJd})=>{
         const router = useRouter();
   const [selectedResume, setSelectedResume] = useState(null);
       const handleSelect = (id) => {
@@ -20,7 +17,7 @@ const JdBasedChooseModal=({
       toast.error("Please select a resume first!");
       return;
     }
-    router.push(`/jd-resume-builder?template=${selectedResume}&id=${encodedId}`);
+    router.push(`/jd-resume-builder?template=${selectedResume}`);
   };
     return(
         <>
@@ -132,4 +129,4 @@ const JdBasedChooseModal=({
         </>
     )
 }
-export default JdBasedChooseModal
+export default LinkedInChooseModal

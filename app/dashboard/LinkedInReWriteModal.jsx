@@ -9,7 +9,8 @@ import { linkedInBasicInfo, linkedInEduInfo, linkedInExpInfo, linkedInLangInfo, 
 const LinkedInReWriteModal=({
      openModalLinkedInRewrite,
     setOpenModalLinkedInRewrite,
-    HandlerLinkedInRewrite
+    HandlerLinkedInRewrite,
+    setOpenModalCreateResumeLinkedIn
 })=>{
     const{loading}=useSelector((state)=>state?.linkedIn)
     const dispatch=useDispatch()
@@ -39,11 +40,23 @@ const LinkedInReWriteModal=({
             dispatch(linkedInPdf(formData)).then((res)=>{
                 console.log(res,"res");
                 if(res?.payload?.status_code===201){
-                  dispatch(linkedInBasicInfo({lkdin_resume_id:res?.payload?.created_data?.id,...res?.payload?.raw_data?.linkedin_rewrite_data?.personal_info}))
-                  dispatch(linkedInExpInfo({lkdin_resume_id:res?.payload?.created_data?.id,experience_info:res?.payload?.raw_data?.linkedin_rewrite_data?.experience_info}))
-                  dispatch(linkedInEduInfo({lkdin_resume_id:res?.payload?.created_data?.id,education_info:res?.payload?.raw_data?.linkedin_rewrite_data?.education_info}))
-                  dispatch(linkedInSkillInfo({lkdin_resume_id:res?.payload?.created_data?.id,skill_info:res?.payload?.raw_data?.linkedin_rewrite_data?.skill_info}))
-                  dispatch(linkedInLangInfo({lkdin_resume_id:res?.payload?.created_data?.id,language_info:res?.payload?.raw_data?.linkedin_rewrite_data?.language_info}))
+                  try{
+                    Promise.all([
+                  dispatch(linkedInBasicInfo({lkdin_resume_id:res?.payload?.created_data?.id,...res?.payload?.raw_data?.linkedin_rewrite_data?.personal_info})),
+                  dispatch(linkedInExpInfo({lkdin_resume_id:res?.payload?.created_data?.id,experience_info:res?.payload?.raw_data?.linkedin_rewrite_data?.experience_info})),
+                  dispatch(linkedInEduInfo({lkdin_resume_id:res?.payload?.created_data?.id,education_info:res?.payload?.raw_data?.linkedin_rewrite_data?.education_info})),
+                  dispatch(linkedInSkillInfo({lkdin_resume_id:res?.payload?.created_data?.id,skill_info:res?.payload?.raw_data?.linkedin_rewrite_data?.skill_info})),
+                  dispatch(linkedInLangInfo({lkdin_resume_id:res?.payload?.created_data?.id,language_info:res?.payload?.raw_data?.linkedin_rewrite_data?.language_info})),
+
+
+                    ])
+
+                    HandlerLinkedInRewrite()
+                  }catch(error){
+                     console.error("Error while saving resume sections", error);
+                      toast.error("Something went wrong while saving resume data");
+                  }
+                 
                 }
                 
             })

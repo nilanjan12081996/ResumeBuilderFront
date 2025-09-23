@@ -222,6 +222,25 @@ export const jdBasedResumeLanguageInfo=createAsyncThunk(
     }
 )
 
+export const jdBasedResumeDetails=createAsyncThunk(
+    'jdBasedResumeDetails',
+     async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/js-based-resume/get-all-details', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
 const initialState={
 error:false,
 loading:false,
@@ -235,7 +254,8 @@ cerInfo:{},
 achInfo:{},
 proInfo:{},
 skillsInfo:{},
-langInfo:{}
+langInfo:{},
+jdBasedDetailsData:{}
 }
 
 const DashboardSlice=createSlice(
@@ -389,6 +409,19 @@ const DashboardSlice=createSlice(
                 state.langInfo=payload
             })
             .addCase(jdBasedResumeLanguageInfo.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(jdBasedResumeDetails.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(jdBasedResumeDetails.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.jdBasedDetailsData=payload
+            })
+            .addCase(jdBasedResumeDetails.rejected,(state,{payload})=>{
                 state.error=payload
                 state.loading=false
             })

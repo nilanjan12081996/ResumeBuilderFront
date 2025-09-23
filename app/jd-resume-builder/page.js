@@ -53,7 +53,7 @@ import 'react-tabs/style/react-tabs.css';
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select } from "flowbite-react";
 
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
@@ -69,22 +69,29 @@ import SkillsJd from './SkillsJd';
 import PersonalProjectJd from './PersonalProjectJd';
 import CertificatesJd from './CertificatesJd';
 import AchivmentsJd from './AchivmentsJd';
+import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
 
 const page = () => {
+  const{jdBasedDetailsData}=useSelector((state)=>state?.dash)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
   const template = searchParams.get("template");
+  const id=atob(searchParams.get("id"))
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
+  const componentRef = useRef();
+  const dispatch=useDispatch()
+  useEffect(()=>{
+    dispatch(jdBasedResumeDetails({jd_resume_id:id}))
+  },[id])
 
-   const componentRef = useRef();
- 
+  console.log("jdBasedDetailsData",jdBasedDetailsData);
+  
 
-const dispatch=useDispatch()
  const [experiences, setExperiences] = useState([
     {
       id: Date.now(),
@@ -127,8 +134,14 @@ const dispatch=useDispatch()
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm();
+
+
+//   useEffect(()=>{
+//     setValue("full_name",jdBasedDetailsData?.data?.[0]?.basic_info?.candidate_name)
+// },[jdBasedDetailsData,setValue])
 
   const formValues = watch();
   const onSubmit=(data)=>{
@@ -361,11 +374,11 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                   <div className='mb-4'>
                       <div>
                         <TabPanel>
-                        <PersonalInfoJd register={register} errors={errors}/>
+                        <PersonalInfoJd register={register} errors={errors} jdBasedDetailsData={jdBasedDetailsData} setValue={setValue}/>
                         </TabPanel>
                         
                       <TabPanel>
-                      <EducationJd register={register} errors={errors} educationEntries={educationEntries}setEducationEntries={setEducationEntries}/>
+                      <EducationJd register={register} errors={errors} educationEntries={educationEntries}setEducationEntries={setEducationEntries} jdBasedDetailsData={jdBasedDetailsData} setValue={setValue}/>
                       </TabPanel>
                         
 
