@@ -42,7 +42,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     }
     const onSubmit=(data)=>{
         const payload1={
-            signup_type_id:chooseResumeType,
+            sign_up_type:chooseResumeType,
             fullname:data?.first_name+" "+data?.last_name,
             username:data?.username,
             email:data?.email,
