@@ -1,11 +1,25 @@
 import { Label, TextInput } from "flowbite-react"
+import { useEffect } from "react"
 import { BiCodeAlt } from "react-icons/bi"
 import { BsFillPlusCircleFill } from "react-icons/bs"
 import { FaTags } from "react-icons/fa"
 import { MdDelete } from "react-icons/md"
 
-const SkillsJd=({register, errors, skills,setSkills})=>{
+const SkillsJd=({register, errors, skills, setSkills, jdBasedDetailsData})=>{
 
+  useEffect(() => {
+    if (jdBasedDetailsData?.data?.[0]?.skill?.length > 0) {
+      const existingSkills = jdBasedDetailsData.data[0].skill.map((sk, index) => ({
+        id: Date.now() + index,
+        skill_category: sk.categoty || "",
+        skill: JSON.parse(sk.skill_set || "[]").join(", "),
+      }));
+      setSkills(existingSkills);
+    } else {
+      setSkills([{ id: Date.now(), skill_category: "", skill: "" }]);
+    }
+  }, [jdBasedDetailsData, setSkills]);
+  
      const addSkils = () => {
     setSkills([...skills, { id: Date.now(), skill_category: "", skill: "" }]);
   };
