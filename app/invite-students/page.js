@@ -63,7 +63,12 @@ import { BiFilter } from "react-icons/bi";
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker,
      Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
-import api from '../reducers/api';
+
+import serverApi from '../reducers/serverApi';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { inviteStudents } from '../reducers/InviteSlice';
+import { toast, ToastContainer } from 'react-toastify';
 
 
 
@@ -74,39 +79,75 @@ const inter = Inter({
 })
 
 const page = () => {
-    const handleDownload = async () => {
-    try {
-      const response = await api.get("https://hiringeyenewapi.bestworks.cloud/api/download-csv");
- 
-      if (!response.ok) throw new Error("Network response was not ok");
- 
-      // Get blob
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
- 
-      // Create a link and trigger click
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "sample.csv"; // default file name
-      document.body.appendChild(a);
-      a.click();
- 
-      // Cleanup
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-    }
-  };
- 
+    const dispatch=useDispatch()
+
+const handleDownload = async () => {
+  try {
+    // Tell axios to expect a blob
+    const response = await serverApi.get("/api/usercsv/download", {
+      responseType: "blob",
+    });
+
+    // Create blob URL
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // Create <a> element to trigger download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample.csv"; // file name
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error downloading file:", error);
+  }
+};
+
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
+ const csvFile=watch("file")
+  const onSubmit=(data)=>{
+    const formData=new FormData()
+       if (data.file && data.file[0]) {
+          
+          formData.append("file", data.file[0]);
+        } else {
+          console.error("No resume file selected");
+          toast.error("Please select a resume file to upload");
+          return;
+        }
+     dispatch(inviteStudents(formData)).then((res)=>{
+        console.log("csvREs",res);
+        
+     })
+  }
+
+     useEffect(() => {
+      if (csvFile && csvFile[0]) {
+        console.log("Resume file selected:", csvFile[0]);
+      }
+    }, [csvFile]);
+       
+          
   return (
     <div className={`${inter.className} antialiased pb-8`}>
+        <ToastContainer/>
         <div className='mb-5 lg:mb-10 pt-6'>
             <h2 className='text-xl lg:text-[30px] leading-[30px] text-[#151515] font-semibold mb-1 lg:mb-4'>Invite Students</h2>
             <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Easily invite and manage student profiles with seamless Excel upload or manual entry.</p>
         </div>
         <div className='bg-white rounded-[10px] p-5 lg:p-10 lg:flex gap-6 mb-5'>
             <div className='lg:w-6/12 mb-4 lg:mb-0'>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='mb-0'>
                     <div>
                         <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
@@ -119,18 +160,33 @@ const page = () => {
                             <div className="flex flex-col items-center justify-center pb-6 pt-5">
                                 <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
                                 <p className="my-2 text-xl text-[#000000]">
-                                    Select a CSV file to import
-                                </p>
+                                     {/* Import your Resume */}
+                                    {csvFile && csvFile[0]
+                                    ? csvFile[0].name
+                                    : "Select a CSV file to import"}  
+                                        </p>
+                                
                                 <p className='text-[#A4A4A4] text-base'>or drag and drop it here</p>
                             </div>
-                            <FileInput id="dropzone-file" className="hidden" />
+                            <FileInput {...register("file",{ required: true })}
+                            accept='.csv'
+                            id="dropzone-file" className="hidden" 
+                             aria-invalid={errors.resume_file ? "true" : "false"}
+                            />
                         </Label>
+                  
                     </div> 
+                           {errors.file?.type === "required" && (
+                  <p className="text-red-700 text-sm" role="alert">
+                    Please upload csv
+                  </p>
+                )}
                     <div className='lg:flex gap-4 mt-3'>
-                        <button onClick={handleDownload} class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
+                        <button type='button' onClick={handleDownload} class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
                         <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">Invite Students</button>
                     </div>
                 </div>
+                </form>
             </div>
             <div className='lg:w-6/12'>
                 <div className=''>
