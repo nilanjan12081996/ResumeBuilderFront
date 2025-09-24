@@ -252,7 +252,7 @@ const Page = () => {
             <div className="mb-5">
                 <div className="flex gap-4">
                     <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="border bg-[#FFF5E2] border-[#FFF5E2] rounded-[10px] px-5 py-7 cursor-pointer">
+                        <div className="border bg-[#FFF5E2] border-[#FFF5E2] rounded-[10px] px-5 py-7">
                             <div className="bg-[#ffffff] w-[74px] h-[74px] rounded-full mb-5 flex items-center justify-center">
                               <CgFileDocument className="text-[#C78919] text-[40px]" />
                             </div>
@@ -264,7 +264,7 @@ const Page = () => {
                                Get Started <BsArrowRightShort className="text-2xl" />
                             </Link>
                         </div>
-                        <div className="border bg-[#E0EFFF] border-[#E0EFFF] rounded-[10px] px-5 py-7 cursor-pointer">
+                        <div className="border bg-[#E0EFFF] border-[#E0EFFF] rounded-[10px] px-5 py-7">
                             <div className="bg-[#ffffff] w-[74px] h-[74px] rounded-full mb-5 flex items-center justify-center">
                               <BiLogoLinkedinSquare className="text-[#2781E5] text-[40px]" />
                             </div>
