@@ -165,7 +165,7 @@
 // export default WorkExp;
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checkbox, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
 import { BiCodeAlt, BiSolidBriefcase, BiSolidBuilding } from "react-icons/bi";
 import { BsFillPlusCircleFill } from "react-icons/bs";
@@ -173,7 +173,37 @@ import { FaTags } from "react-icons/fa";
 import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 
-const WorkExpJd = ({experiences, setExperiences}) => {
+const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
+
+ useEffect(() => {
+  console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
+  if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
+    const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
+      let skills = [];
+      try {
+        skills = JSON.parse(exp.skill_set); // string to array convert
+      } catch (e) {
+        skills = [];
+      }
+
+      return {
+        id: exp.id,
+        company_name: exp.company_name || "",
+        position: exp.Position || "",
+        location: exp.location || "",
+        skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
+        start_date: exp.start_date ? new Date(exp.start_date) : null,
+        end_date: exp.end_date ? new Date(exp.end_date) : null,
+        current_work: false,
+        projects: exp.projects || [
+          { id: Date.now(), title: "", role: "", technology: "", description: "" }
+        ]
+      };
+    });
+    setExperiences(formattedExperiences);
+  }
+}, [jdBasedDetailsData]);
+
 
 
   // Delete experience
@@ -221,7 +251,7 @@ const WorkExpJd = ({experiences, setExperiences}) => {
     ));
   };
 
-    const addExperience = () => {
+  const addExperience = () => {
     setExperiences([
       ...experiences,
       {
@@ -230,7 +260,7 @@ const WorkExpJd = ({experiences, setExperiences}) => {
         position: "",
         location: "",
         skill: "",
-        start_date:null,
+        start_date: null,
         end_date: null,
         current_work: false,
         projects: [{ id: Date.now() + 1, title: "", role: "", technology: "", description: "" }]
@@ -253,14 +283,14 @@ const WorkExpJd = ({experiences, setExperiences}) => {
               </div>
               <div className="flex justify-end items-center gap-2">
                 <button
-                type="button"
+                  type="button"
                   onClick={addExperience}
                   className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
                 >
                   <BsFillPlusCircleFill className="text-sm" /> Add Experience
                 </button>
                 <button
-                type="button"
+                  type="button"
                   onClick={() => deleteExperience(exp.id)}
                   className="bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1"
                 >
@@ -285,8 +315,8 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                       type="text"
                       sizing="md"
                       placeholder="Company or Organization Name"
-                    value={exp.company_name}
-                    onChange={(e) => updateExperienceField(exp.id, "company_name", e.target.value)}
+                      value={exp.company_name}
+                      onChange={(e) => updateExperienceField(exp.id, "company_name", e.target.value)}
                     />
                   </div>
                 </div>
@@ -304,7 +334,7 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                       sizing="md"
                       placeholder="Job Title or Role"
                       value={exp.position}
-                    onChange={(e) => updateExperienceField(exp.id, "position", e.target.value)}
+                      onChange={(e) => updateExperienceField(exp.id, "position", e.target.value)}
                     />
                   </div>
                 </div>
@@ -324,8 +354,8 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                       type="text"
                       sizing="md"
                       placeholder="City, Country"
-                        value={exp.location}
-                    onChange={(e) => updateExperienceField(exp.id, "location", e.target.value)}
+                      value={exp.location}
+                      onChange={(e) => updateExperienceField(exp.id, "location", e.target.value)}
                     />
                   </div>
                 </div>
@@ -345,8 +375,8 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                       type="text"
                       sizing="md"
                       placeholder="Add your Skills"
-                        value={exp.skill}
-                    onChange={(e) => updateExperienceField(exp.id, "skill", e.target.value)}
+                      value={exp.skill}
+                      onChange={(e) => updateExperienceField(exp.id, "skill", e.target.value)}
                     />
                   </div>
                 </div>
@@ -360,14 +390,14 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                     </Label>
                   </div>
                   <div className="field_box_date">
-                    <Datepicker 
-                    id={`start-date-${exp.id}`}
-                   value={exp.start_date} // from your state
-      onChange={(date) => {
-    if (date instanceof Date && !isNaN(date)) {
-      updateExperienceField(exp.id, "start_date", date);
-    }
-  }}
+                    <Datepicker
+                      id={`start-date-${exp.id}`}
+                      value={exp.start_date} // from your state
+                      onChange={(date) => {
+                        if (date instanceof Date && !isNaN(date)) {
+                          updateExperienceField(exp.id, "start_date", date);
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -378,15 +408,15 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                     </Label>
                   </div>
                   <div className="field_box_date">
-                    <Datepicker 
-                     id={`end-date-${exp.id}`}
-                   value={exp.end_date ? new Date(exp.end_date) : null}  // from your state
-      // disabled={exp.endDate}
-  onChange={(date) => {
-    if (date instanceof Date && !isNaN(date)) {
-      updateExperienceField(exp.id, "end_date", date);
-    }
-  }}
+                    <Datepicker
+                      id={`end-date-${exp.id}`}
+                      value={exp.end_date ? new Date(exp.end_date) : null}  // from your state
+                      // disabled={exp.endDate}
+                      onChange={(date) => {
+                        if (date instanceof Date && !isNaN(date)) {
+                          updateExperienceField(exp.id, "end_date", date);
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -395,11 +425,11 @@ const WorkExpJd = ({experiences, setExperiences}) => {
           </div>
 
           <div className="flex items-center gap-2 resume_form_box mb-4 ml-1">
-            <Checkbox  id={`current-${exp.id}`}
-    checked={exp.current_work || false}
-    onChange={(e) =>
-      updateExperienceField(exp.id, "current_work", e.target.checked)
-    } />
+            <Checkbox id={`current-${exp.id}`}
+              checked={exp.current_work || false}
+              onChange={(e) =>
+                updateExperienceField(exp.id, "current_work", e.target.checked)
+              } />
             <Label htmlFor="age">Currently studying here</Label>
           </div>
 
@@ -415,14 +445,14 @@ const WorkExpJd = ({experiences, setExperiences}) => {
 
                     <div className="flex justify-end items-center gap-2">
                       <button
-                      type="button"
+                        type="button"
                         onClick={() => addProject(exp.id)}
                         className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
                       >
                         <BsFillPlusCircleFill className="text-sm" /> Add Project
                       </button>
                       <button
-                      type="button"
+                        type="button"
                         onClick={() => deleteProject(exp.id, proj.id)}
                         className="bg-[#ffffff] hover:bg-[#000000] border border-[#D5D5D5] rounded-[7px] text-[10px] leading-[30px] text-[#828282] hover:text-[#92278F] font-medium cursor-pointer px-2 flex items-center gap-1"
                       >
@@ -445,10 +475,10 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                           type="text"
                           sizing="md"
                           placeholder="Name of the project"
-                           value={proj.title}
-              onChange={(e) =>
-                updateProjectField(exp.id, proj.id, "title", e.target.value)
-              }
+                          value={proj.title}
+                          onChange={(e) =>
+                            updateProjectField(exp.id, proj.id, "title", e.target.value)
+                          }
                         />
                       </div>
                     </div>
@@ -466,9 +496,9 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                           sizing="md"
                           placeholder="E.g Developer, Designer, etc."
                           value={proj.role}
-              onChange={(e) =>
-                updateProjectField(exp.id, proj.id, "role", e.target.value)
-              }
+                          onChange={(e) =>
+                            updateProjectField(exp.id, proj.id, "role", e.target.value)
+                          }
                         />
                       </div>
                     </div>
@@ -484,14 +514,14 @@ const WorkExpJd = ({experiences, setExperiences}) => {
                           <BiCodeAlt className="text-[#928F8F]" />
                         </div>
                         <TextInput
-                         id={`proj-tech-${proj.id}`}
+                          id={`proj-tech-${proj.id}`}
                           type="text"
                           sizing="md"
                           placeholder="Enter the technologies used in this project"
-                           value={proj.technology}
-              onChange={(e) =>
-                updateProjectField(exp.id, proj.id, "technology", e.target.value)
-              }
+                          value={proj.technology}
+                          onChange={(e) =>
+                            updateProjectField(exp.id, proj.id, "technology", e.target.value)
+                          }
                         />
                       </div>
                     </div>
@@ -499,18 +529,18 @@ const WorkExpJd = ({experiences, setExperiences}) => {
 
                   <div className="w-full resume_form_box mb-3">
                     <div className="mb-1 block">
-                      <Label  id={`proj-desc-${proj.id}`}>Description</Label>
+                      <Label id={`proj-desc-${proj.id}`}>Description</Label>
                     </div>
                     <div className="flex items-center">
                       <Textarea
-                         id={`proj-desc-${proj.id}`}
+                        id={`proj-desc-${proj.id}`}
                         placeholder="Write a description about the project"
-                       
+
                         rows={3}
                         value={proj.description}
-            onChange={(e) =>
-              updateProjectField(exp.id, proj.id, "description", e.target.value)
-            }
+                        onChange={(e) =>
+                          updateProjectField(exp.id, proj.id, "description", e.target.value)
+                        }
                       />
                     </div>
                   </div>
