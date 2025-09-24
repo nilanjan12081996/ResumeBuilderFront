@@ -63,6 +63,7 @@ import { BiFilter } from "react-icons/bi";
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker,
      Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
+import api from '../reducers/api';
 
 
 
@@ -73,6 +74,31 @@ const inter = Inter({
 })
 
 const page = () => {
+    const handleDownload = async () => {
+    try {
+      const response = await api.get("https://hiringeyenewapi.bestworks.cloud/api/download-csv");
+ 
+      if (!response.ok) throw new Error("Network response was not ok");
+ 
+      // Get blob
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+ 
+      // Create a link and trigger click
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "sample.csv"; // default file name
+      document.body.appendChild(a);
+      a.click();
+ 
+      // Cleanup
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
+ 
   return (
     <div className={`${inter.className} antialiased pb-8`}>
         <div className='mb-5 lg:mb-10 pt-6'>
@@ -101,7 +127,7 @@ const page = () => {
                         </Label>
                     </div> 
                     <div className='lg:flex gap-4 mt-3'>
-                        <button class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
+                        <button onClick={handleDownload} class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
                         <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">Invite Students</button>
                     </div>
                 </div>
