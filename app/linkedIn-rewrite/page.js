@@ -52,6 +52,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select } from "flowbite-react";
+import LinkedInTemplate from './LinkedInTemplate';
 
 const page = () => {
   return (
@@ -630,7 +631,8 @@ const page = () => {
                 </div>
               </div>
               <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                 <Image src={resume4} alt="resume4" className='' />
+                 {/* <Image src={resume4} alt="resume4" className='' /> */}
+                 <LinkedInTemplate/>
               </div>
             </div>
 

@@ -66,9 +66,10 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import serverApi from '../reducers/serverApi';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { inviteStudents, inviteStudentsMannually, saveInvitedStudent } from '../reducers/InviteSlice';
 import { toast, ToastContainer } from 'react-toastify';
+import StudentList from './StudentList';
 
 
 
@@ -79,6 +80,7 @@ const inter = Inter({
 })
 
 const page = () => {
+    const{loading_for_csv,loading_for_manual,loading}=useSelector((state)=>state?.inviteStd)
     const dispatch=useDispatch()
 
 const handleDownload = async () => {
@@ -146,15 +148,15 @@ const handleDownload = async () => {
         }
      dispatch(inviteStudents(formData)).then((res)=>{
         console.log("csvREs",res);
-        if(res?.payload?.data?.status_code===200){
-            dispatch(saveInvitedStudent({user:res?.payload?.data?.allIds})).then((res)=>{
-                 console.log(res,"resmap");
-                if(res?.payload?.status_code===201){
-                    toast.success(res?.payload?.message)
-                }
-            })
+        // if(res?.payload?.data?.status_code===200){
+        //     dispatch(saveInvitedStudent({user:res?.payload?.data?.allIds})).then((res)=>{
+        //          console.log(res,"resmap");
+        //         if(res?.payload?.status_code===201){
+        //             toast.success(res?.payload?.message)
+        //         }
+        //     })
 
-        }
+        // }
         
      })
   }
@@ -230,9 +232,9 @@ const onSubmitManual = async (data) => {
 
     // ✅ After all students invited, call saveInvitedStudent with all IDs
     if (invitedIds.length > 0) {
-      const mapPayload = { user: invitedIds };
+      //const mapPayload = { user: invitedIds };
 
-      const mapRes = await dispatch(saveInvitedStudent(mapPayload)).unwrap();
+    //  const mapRes = await dispatch(saveInvitedStudent(mapPayload)).unwrap();
 
       if (mapRes?.status_code === 201) {
         toast.success("All invited students mapped successfully");
@@ -255,7 +257,7 @@ useEffect(() => {
     }, [csvFile]);
 
 
-       
+
           
   return (
     <div className={`${inter.className} antialiased pb-8`}>
@@ -302,7 +304,7 @@ useEffect(() => {
                 )}
                     <div className='lg:flex gap-4 mt-3'>
                         <button type='button' onClick={handleDownload} class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
-                        <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">Invite Students</button>
+                        <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">{loading_for_csv||loading?"Waiting...":"Invite Students"}</button>
                     </div>
                 </div>
                 </form>
@@ -545,7 +547,7 @@ useEffect(() => {
       type="submit"
       className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
     >
-      Add Student
+    {loading_for_manual||loading?"Waiting...":"Add Student"}  
     </button>
   </div>
 
@@ -555,7 +557,7 @@ useEffect(() => {
             </form>
             </div>
         </div>
-        <div className='bg-white rounded-[10px] p-5 lg:p-10'>
+        {/* <div className='bg-white rounded-[10px] p-5 lg:p-10'>
             <div className='lg:flex justify-between items-center mb-4'>
                 <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invited Students</h4>
                 <div className='flex items-center gap-2 lg:w-3/12 search_section'>
@@ -659,7 +661,8 @@ useEffect(() => {
                     </Table>
                 </div>
             </div>
-        </div>
+        </div> */}
+        <StudentList/>
     </div>
   )
 }

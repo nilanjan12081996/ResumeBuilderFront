@@ -64,6 +64,26 @@ export const saveInvitedStudent=createAsyncThunk(
         }
     }
 )
+
+export const invitedStudentsList=createAsyncThunk(
+    'invitedStudentsList',
+      async ({page,limit}, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.get(`/api/usercsv/list?limit=${limit}&page=${page}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
 const initialState={
     loading:false,
     error:false,
@@ -71,7 +91,9 @@ const initialState={
     manualData:[],
     saveData:[],
     loading_for_csv:false,
-    loading_for_manual:false
+    loading_for_manual:false,
+    studentsData:[],
+    studentLoading:false
 }
 const InviteSlice=createSlice(
 {
@@ -117,6 +139,19 @@ const InviteSlice=createSlice(
                 state.loading=false
                 state.error=payload
             })
+            .addCase(invitedStudentsList.pending,(state)=>{
+                state.studentLoading=true
+            })
+            .addCase(invitedStudentsList.fulfilled,(state,{payload})=>{
+                state.studentLoading=false
+                state.studentsData=payload
+                state.error=false
+            })
+            .addCase(invitedStudentsList.rejected,(state,{payload})=>{
+                state.studentLoading=false
+                state.error=payload
+            })
         }
 }
 )
+export default InviteSlice.reducer;
