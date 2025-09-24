@@ -280,7 +280,7 @@ const Page = () => {
                 </div>
             </div>
             <div className="pb-14">
-                <div className="lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-8 mb-4">
+                <div className="lg:flex justify-between items-center bg-white border-[#e0e0e1] rounded-[10px] px-5 py-8 mb-4">
                     <div className="flex gap-3 items-center mb-4 lg:mb-0">
                         <div>
                             <h3 className="text-[#000000] text-[22px] leading-[22px] font-medium pb-2">
