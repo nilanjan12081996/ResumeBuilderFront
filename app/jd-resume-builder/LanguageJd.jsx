@@ -62,7 +62,7 @@
 // }
 // export default Language
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Label, TextInput, Select } from "flowbite-react";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { FaLanguage } from "react-icons/fa";
@@ -174,7 +174,24 @@ import { MdDelete } from "react-icons/md";
 
 // export default Language;
 
-const LanguageJd = ({ languages, setLanguages }) => {
+const LanguageJd = ({ jdBasedDetailsData, languages, setLanguages }) => {
+   useEffect(() => {
+    if (jdBasedDetailsData?.data?.length > 0) {
+      const existingLanguages = jdBasedDetailsData.data[0].language || [];
+      if (existingLanguages.length > 0) {
+        setLanguages(
+          existingLanguages.map((lang, index) => ({
+            id: Date.now() + index,
+            language_name: lang.language_name || "",
+            proficiency: lang.proficiency || "",
+          }))
+        );
+      } else {
+        setLanguages([{ id: Date.now(), language_name: "", proficiency: "" }]);
+      }
+    }
+  }, [jdBasedDetailsData]);
+
   const addLanguage = () => {
     setLanguages([...languages, { id: Date.now(), language_name: "", proficiency: "" }]);
   };
