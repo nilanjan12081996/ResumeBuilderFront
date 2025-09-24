@@ -7,10 +7,10 @@ export const inviteStudents=createAsyncThunk(
     'inviteStudents',
       async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/csv/upload-csv', userInput);
+            const response = await serverApi.post('/api/usercsv/upload', userInput);
             console.log("res",response);
             
-            if (response?.data?.data?.status_code === 200) {
+            if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {

@@ -55,10 +55,10 @@ console.log("studentsData",studentsData);
                                           <Checkbox />
                                         </TableHeadCell>
                                         <TableHeadCell className='bg-[#f0f0f0]'>Name</TableHeadCell>
-                                        <TableHeadCell className='bg-[#f0f0f0]'>Date </TableHeadCell>
+                                        <TableHeadCell className='bg-[#f0f0f0]'>Last Date </TableHeadCell>
                                         <TableHeadCell className='bg-[#f0f0f0]'>Mobile No</TableHeadCell>
                                         <TableHeadCell className='bg-[#f0f0f0]'>Email ID</TableHeadCell>
-                                        <TableHeadCell className='bg-[#f0f0f0]'>Credit</TableHeadCell>
+                                        <TableHeadCell className='bg-[#f0f0f0]'>Number of Resume</TableHeadCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody className="divide-y">
@@ -69,13 +69,15 @@ console.log("studentsData",studentsData);
                                            <Checkbox />
                                         </TableCell>
                                         <TableCell className="bg-[#ffffff] border-b border-[#f0f0f0]">{stds?.user?.fullname}</TableCell>
-                                        <TableCell className="bg-[#ffffff] border-b border-[#f0f0f0]">{convertToSubmitFormat(stds?.user?.created_at)}</TableCell>
+                                        <TableCell className="bg-[#ffffff] border-b border-[#f0f0f0]">{convertToSubmitFormat(stds?.last_date)}</TableCell>
                                         <TableCell className="bg-[#ffffff] border-b border-[#f0f0f0]">{stds?.user?.phone}</TableCell>
                                         <TableCell className="bg-[#ffffff] border-b border-[#f0f0f0]">{stds?.user?.email}</TableCell>
-                                        <TableCell className='flex items-center gap-6 bg-[#ffffff] border-b border-[#f0f0f0] pb-[20px]'>
-                                            {/* <button className='text-[#4E7FFF] hover:text-black cursor-pointer'><AiOutlineEdit className='text-2xl' /></button>
-                                            <button className='text-[#FF4B4B] hover:text-black cursor-pointer'><MdOutlineDelete className='text-2xl' /></button> */}
-                                        </TableCell>
+                                        <TableCell className="bg-[#ffffff] border-b border-[#f0f0f0]">{stds?.resume_access}</TableCell>
+                                        {/* <TableCell className='flex items-center gap-6 bg-[#ffffff] border-b border-[#f0f0f0] pb-[20px]'>
+
+                                            <button className='text-[#4E7FFF] hover:text-black cursor-pointer'><AiOutlineEdit className='text-2xl' /></button>
+                                            <button className='text-[#FF4B4B] hover:text-black cursor-pointer'><MdOutlineDelete className='text-2xl' /></button>
+                                        </TableCell> */}
                                     </TableRow>
                                         ))
                                     }

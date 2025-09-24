@@ -67,7 +67,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 import serverApi from '../reducers/serverApi';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { inviteStudents, inviteStudentsMannually, saveInvitedStudent } from '../reducers/InviteSlice';
+import { invitedStudentsList, inviteStudents, inviteStudentsMannually, saveInvitedStudent } from '../reducers/InviteSlice';
 import { toast, ToastContainer } from 'react-toastify';
 import StudentList from './StudentList';
 
@@ -140,7 +140,7 @@ const handleDownload = async () => {
     const formData=new FormData()
        if (data.file && data.file[0]) {
           
-          formData.append("file", data.file[0]);
+          formData.append("csv", data.file[0]);
         } else {
           console.error("No resume file selected");
           toast.error("Please select a resume file to upload");
@@ -148,15 +148,18 @@ const handleDownload = async () => {
         }
      dispatch(inviteStudents(formData)).then((res)=>{
         console.log("csvREs",res);
-        // if(res?.payload?.data?.status_code===200){
-        //     dispatch(saveInvitedStudent({user:res?.payload?.data?.allIds})).then((res)=>{
-        //          console.log(res,"resmap");
-        //         if(res?.payload?.status_code===201){
-        //             toast.success(res?.payload?.message)
-        //         }
-        //     })
+        if(res?.payload?.response?.data?.status_code===422)
+        {
+            toast.error(res?.payload?.response?.data?.message)
+        }
+        else if(res?.payload?.status_code===200){
+           dispatch(invitedStudentsList({
+                       page:1,
+                       limit:10
+                   }))
+                   toast.success(res?.payload?.message)
 
-        // }
+        }
         
      })
   }
