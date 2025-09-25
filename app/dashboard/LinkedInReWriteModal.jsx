@@ -42,6 +42,8 @@ const LinkedInReWriteModal=({
             dispatch(linkedInPdf(formData)).then((res)=>{
                 console.log(res,"res");
                 if(res?.payload?.status_code===201){
+                  console.log("res?.payload?.created_data?.id",res?.payload?.created_data?.id);
+                  
                   setResumeIdLkdin(res?.payload?.created_data?.id)
                   try{
                     Promise.all([
@@ -53,8 +55,11 @@ const LinkedInReWriteModal=({
 
 
                     ])
+                   
+                       HandlerLinkedInRewrite()
+                   
 
-                    HandlerLinkedInRewrite()
+                   
                   }catch(error){
                      console.error("Error while saving resume sections", error);
                       toast.error("Something went wrong while saving resume data");

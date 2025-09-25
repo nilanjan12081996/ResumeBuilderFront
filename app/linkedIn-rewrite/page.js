@@ -72,6 +72,8 @@ const page = () => {
   useEffect(()=>{
     dispatch(linkedgetDetails({lkdin_resume_id:id}))
   },[id])
+
+  
   return (
     <div className='lg:flex gap-5 pb-5'>
             <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
@@ -101,7 +103,7 @@ const page = () => {
                       <div className='mb-4'>
                           <div>
                             <TabPanel>
-                              <BasicInfoLkdin/>
+                              <BasicInfoLkdin lkdDetails={lkdDetails}/>
                             </TabPanel>
     
                             <TabPanel>

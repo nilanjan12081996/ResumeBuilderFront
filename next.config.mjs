@@ -9,7 +9,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'nodeapi.cryptointuit.org',
+        hostname: 'resumebuilder.hiringeye.ai',
         port: '',
         pathname: '/uploads/images/**',
       },

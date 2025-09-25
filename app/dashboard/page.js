@@ -146,8 +146,13 @@ const Page = () => {
   };
 
   const HandlerLinkedInRewrite = () => {
-    const encodedId = btoa(resumeIdLkdin);
+    console.log("resumeIdLkdin",resumeIdLkdin);
+    
+    if(resumeIdLkdin){
+      const encodedId = btoa(resumeIdLkdin);
     router.push(`/linkedIn-rewrite?id=${encodedId}`);
+    }
+    
   };
 
   const handleSelect = (id) => {

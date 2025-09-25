@@ -1,8 +1,12 @@
 import { Label, Textarea, TextInput } from "flowbite-react"
+import { useEffect } from "react"
 import { BiLogoLinkedinSquare, BiSolidBriefcase, BiSolidUser } from "react-icons/bi"
 import { FaLocationDot } from "react-icons/fa6"
 
-const BasicInfoLkdin=()=>{
+const BasicInfoLkdin=({lkdDetails})=>{
+    useEffect(()=>{
+
+    },[lkdDetails])
     return(
         <>
                 <div className='tab_wrap'>
