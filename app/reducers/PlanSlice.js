@@ -145,14 +145,13 @@ export const verifyOrder = createAsyncThunk(
 );
 export const currentSubscription = createAsyncThunk(
   "currentSubscription",
-  async (user_input, { rejectWithValue }) => {
+  async (ip_address, { rejectWithValue }) => {
     try {
-      const response = await api.post(
-        "/api/payment/current-subscription",
-        user_input
+      const response = await api.get(
+        `/api/payment/current-subscription?ip_address=${ip_address}`
       );
       console.log("currentSubscription API call - input:", response);
-      if (response?.data?.success === true) {
+      if (response?.data?.status === true) {
         return response.data;
       } else {
         if (response?.data?.errors) {

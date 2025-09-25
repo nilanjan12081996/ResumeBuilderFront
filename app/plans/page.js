@@ -33,6 +33,29 @@ const page = () => {
   const [amount, setAmount] = useState();
   const [currency, setCurrency] = useState();
   const [plan_id, sePlanid] = useState();
+console.log("currentSubscriptionData",currentSubscriptionData)
+
+  // Helper function to check if user has active subscription
+  const hasActiveSubscription = () => {
+    if (!currentSubscriptionData?.data?.length) return false;
+    
+    return currentSubscriptionData.data.some(sub => {
+      const endDate = new Date(sub.end_date);
+      const currentDate = new Date();
+      return sub.status === 1 && endDate > currentDate;
+    });
+  };
+
+  // Helper function to get current active subscription details
+  const getCurrentActiveSubscription = () => {
+    if (!currentSubscriptionData?.data?.length) return null;
+    
+    return currentSubscriptionData.data.find(sub => {
+      const endDate = new Date(sub.end_date);
+      const currentDate = new Date();
+      return sub.status === 1 && endDate > currentDate;
+    });
+  };
 
   const loadRazorpayScript = (() => {
     let loaded;
@@ -55,6 +78,12 @@ const page = () => {
   const handlePaymentModal = async (e, data) => {
     console.log("data", data);
     e.preventDefault();
+    
+    // Prevent payment if user has active subscription
+    if (hasActiveSubscription()) {
+      alert("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
+      return;
+    }
     // setAmount(data?.amount);
     // setCurrency(data?.currency);
     // sePlanid(data?.plan_id);
@@ -139,7 +168,7 @@ console.log("ipdata",ipData)
   }, [dispatch]);
   // console.log("plans", plans);
   useEffect(() => {
-    dispatch(currentSubscription({ip_address: ipData?.ip}))
+    dispatch(currentSubscription(ipData?.ip))
       .then((res) => {
         console.log("checkSubscription", res);
       })
@@ -147,7 +176,7 @@ console.log("ipdata",ipData)
         console.log("err", err);
       });
   }, [ipData]);
-  
+
   return (
     <>
       <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
@@ -157,6 +186,37 @@ console.log("ipdata",ipData)
                                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
                                  <p className="text-[#4C4B4B] text-base lg:text-[18px] leading-[30px] lg:px-32">Discover the ideal plan to fuel your business growth. Our pricing options are carefully crafted to cater to businesses.</p>
                               </div> */}
+            {/* Current Subscription Message */}
+            {hasActiveSubscription() && getCurrentActiveSubscription() && (
+              <div className="mb-6 mx-4 lg:mx-0">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-green-800">
+                        You have an active subscription
+                      </h3>
+                      <div className="mt-2 text-sm text-green-700">
+                        <p>
+                          <strong>Plan:</strong> {getCurrentActiveSubscription().Plan?.plan_name}
+                        </p>
+                        <p>
+                          <strong>Valid until:</strong> {new Date(getCurrentActiveSubscription().end_date).toLocaleDateString()}
+                        </p>
+                        <p>
+                          <strong>Features:</strong> {getCurrentActiveSubscription().Plan?.PlanAccess?.map(access => access.plan_access_description).join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="subscription_tab_section">
               <Tabs>
                 <TabList>
@@ -228,19 +288,26 @@ console.log("ipdata",ipData)
                                       </div>
                                     </div>
                                     <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-                                      <button
-                                        onClick={(e) =>
-                                          handlePaymentModal(e, {
-                                            amount: pln?.planPrice?.price,
-                                            currency: pln?.planPrice?.currency,
-                                            plan_id: pln?.planPrice?.plan_id,
-                                          })
-                                        }
-                                        className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                                      >
-                                        {/* {loading? "Processing...": "Get Started"} */}
-                                        Get Started
-                                      </button>
+                                    <button
+  onClick={(e) =>
+    !hasActiveSubscription() &&
+    handlePaymentModal(e, {
+      amount: pln?.planPrice?.price,
+      currency: pln?.planPrice?.currency,
+      plan_id: pln?.planPrice?.plan_id,
+    })
+  }
+  disabled={hasActiveSubscription()}
+  className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
+    ${
+      hasActiveSubscription()
+        ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+        : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+    }`}
+>
+  {hasActiveSubscription() ? "Already Subscribed" : "Get Started"}
+</button>
+
                                     </div>
                                   </div>
                                 </div>
@@ -373,19 +440,26 @@ console.log("ipdata",ipData)
                                       </div>
                                     </div>
                                     <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-                                      <button
-                                        onClick={(e) =>
-                                          handlePaymentModal(e, {
-                                            amount: pln?.planPrice?.price,
-                                            currency: pln?.planPrice?.currency,
-                                            plan_id: pln?.planPrice?.plan_id,
-                                          })
-                                        }
-                                        className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                                      >
-                                        {/* {loading? "Processing...": "Get Started"} */}
-                                        Get Started
-                                      </button>
+                                    <button
+  onClick={(e) =>
+    !hasActiveSubscription() &&
+    handlePaymentModal(e, {
+      amount: pln?.planPrice?.price,
+      currency: pln?.planPrice?.currency,
+      plan_id: pln?.planPrice?.plan_id,
+    })
+  }
+  disabled={hasActiveSubscription()}
+  className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
+    ${
+      hasActiveSubscription()
+        ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+        : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+    }`}
+>
+  {hasActiveSubscription() ? "Already Subscribed" : "Get Started"}
+</button>
+
                                     </div>
                                   </div>
                                 </div>
@@ -682,18 +756,26 @@ console.log("ipdata",ipData)
                                       </div>
                                     </div>
                                     <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                      <button
-                                        onClick={(e) =>
-                                          handlePaymentModal(e, {
-                                            amount: pln?.planPrice?.price,
-                                            currency: pln?.planPrice?.currency,
-                                            plan_id: pln?.planPrice?.plan_id,
-                                          })
-                                        }
-                                        className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                                      >
-                                        Get Started
-                                      </button>
+                                    <button
+  onClick={(e) =>
+    !hasActiveSubscription() &&
+    handlePaymentModal(e, {
+      amount: pln?.planPrice?.price,
+      currency: pln?.planPrice?.currency,
+      plan_id: pln?.planPrice?.plan_id,
+    })
+  }
+  disabled={hasActiveSubscription()}
+  className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
+    ${
+      hasActiveSubscription()
+        ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+        : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+    }`}
+>
+  {hasActiveSubscription() ? "Already Subscribed" : "Get Started"}
+</button>
+
                                     </div>
                                   </div>
                                 </div>
