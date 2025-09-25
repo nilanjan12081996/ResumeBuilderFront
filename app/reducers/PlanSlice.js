@@ -143,6 +143,28 @@ export const verifyOrder = createAsyncThunk(
     }
   }
 );
+export const currentSubscription = createAsyncThunk(
+  "currentSubscription",
+  async (user_input, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        "/api/payment/current-subscription",
+        user_input
+      );
+      if (response?.data?.success === true) {
+        return response.data;
+      } else {
+        if (response?.data?.errors) {
+          return rejectWithValue(response.data.errors);
+        } else {
+          return rejectWithValue("Something went wrong.");
+        }
+      }
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
 
 const initialState = {
   plans: [],
@@ -153,6 +175,7 @@ const initialState = {
   ipData: "",
   createOrderData: {},
   verifyOrderData: {},
+  currentSubscriptionData: {},
 };
 
 const PlanSlice = createSlice({
@@ -231,6 +254,18 @@ const PlanSlice = createSlice({
         state.error = false;
       })
       .addCase(verifyOrder.rejected, (state, { payload }) => {
+        state.loading = false;
+        state.error = payload;
+      })
+       .addCase(currentSubscription.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(currentSubscription.fulfilled, (state, { payload }) => {
+        state.loading = false;
+        state.currentSubscriptionData = payload;
+        state.error = false;
+      })
+      .addCase(currentSubscription.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload;
       });
