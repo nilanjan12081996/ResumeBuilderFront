@@ -19,9 +19,14 @@ const StudentList=()=>{
   };
     useEffect(()=>{
         dispatch(invitedStudentsList({
-            page:1,
-            limit:10
-        }))
+            page:currentPage,
+            limit:limit
+        })).then((res)=>{
+            console.log("inviteRes",res);
+            const total=res?.payload?.page
+            setTotalPage(Number.isInteger(total) && total > 0 ? total : 1)
+            
+        })
 },[currentPage,limit])
 console.log("studentsData",studentsData);
 
@@ -87,7 +92,10 @@ console.log("studentsData",studentsData);
                             </Table>
                         </div>
                     </div>
-                       <div className="flex justify-center items-center mt-4 pagination_sec">
+                    {
+                        studentsData?.page>1&&(
+                            <>
+                                 <div className="flex justify-center items-center mt-4 pagination_sec">
                                         <Pagination
                                           layout="pagination"
                                           currentPage={currentPage}
@@ -98,6 +106,10 @@ console.log("studentsData",studentsData);
                                           showIcons
                                         />
                                       </div>
+                            </>
+                        )
+                    }
+                  
                 </div>
         </>
     )
