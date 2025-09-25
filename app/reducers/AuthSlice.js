@@ -179,6 +179,11 @@ const authSlice = createSlice({
                     'resumeToken',
                     JSON.stringify({ token: access_token })
                 );
+
+                  sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
+                );
             })
             .addCase(registerCustomer.rejected, (state, { payload }) => {
 
