@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createOrder,
   createSubscriptions,
+  currentSubscription,
   getIpData,
   getPlans,
   verifyOrder,
@@ -19,7 +20,7 @@ import Check from "../../app/assets/imagesource/Check.png";
 import RazorPaymentModal from "../modal/RazorPaymentModal";
 
 const page = () => {
-  const { plans, loading, ipData, createOrderData, error } = useSelector(
+  const { plans, loading, ipData, createOrderData, error, currentSubscriptionData } = useSelector(
     (state) => state.planst
   );
   const { profileData } = useSelector((state) => state.profile);
@@ -91,11 +92,11 @@ const page = () => {
               razorpaySignature: response.razorpay_signature,
               transaction_id: orderResponse.transaction_id,
             };
-            try{
-              const res= await dispatch(verifyOrder(userData));
+            try {
+              const res = await dispatch(verifyOrder(userData));
               console.log("verifyOrder response:", res);
               alert("Payment Successful");
-            }catch(err){
+            } catch (err) {
               console.log(err);
             } finally {
             }
@@ -122,7 +123,7 @@ const page = () => {
       alert("Something went wrong. Please try again.");
     }
   };
-
+console.log("ipdata",ipData)
   useEffect(() => {
     dispatch(getIpData()).then((res) => {
       console.log("Ipres:", res);
@@ -137,10 +138,18 @@ const page = () => {
     });
   }, [dispatch]);
   // console.log("plans", plans);
-
+  useEffect(() => {
+    dispatch(currentSubscription({ip_address: ipData?.ip}))
+      .then((res) => {
+        console.log("checkSubscription", res);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+  }, [ipData]);
+  
   return (
     <>
-      
       <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
         <div className="purchase_section py-8 lg:py-20 px-0 lg:px-0">
           <div className="max-w-6xl mx-auto">
@@ -164,76 +173,80 @@ const page = () => {
                   <>
                     <TabPanel>
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                        {plans?.data?.filter(pln => pln?.plan_frequency === 1).map((pln, index) => {
-                          return (
-                            <>
-                              <div
-                                className="pt-0 border border-[#e9edff] rounded-[26px] bg-white"
-                                key={index}
-                              >
-                                <div className="py-8 px-6 relative">
-                                  {pln?.plan_name === "Gold" ? (
-                                    <Image
-                                      src={sub02}
-                                      alt="sub01"
-                                      className="mb-6"
-                                    />
-                                  ) : (
-                                    <Image
-                                      src={sub01}
-                                      alt="sub01"
-                                      className="mb-6"
-                                    />
-                                  )}
-                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                                    {pln?.plan_name}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mb-8">
-                                    <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                                      <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
-                                        {pln?.planPrice?.currency}
-                                      </span>{" "}
-                                      {pln?.planPrice?.price}
-                                    </p>
-                                  </div>
-                                  <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                    <div>
-                                      {pln?.PlanAccess?.map((pAccess) => {
-                                        return (
-                                          <>
-                                            <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                              <Image
-                                                src={Check}
-                                                alt="Check"
-                                                className="w-[14px] h-[14px] mr-2"
-                                              />{" "}
-                                              {pAccess?.plan_access_description}
-                                            </div>
-                                          </>
-                                        );
-                                      })}
+                        {plans?.data
+                          ?.filter((pln) => pln?.plan_frequency === 1)
+                          .map((pln, index) => {
+                            return (
+                              <>
+                                <div
+                                  className="pt-0 border border-[#e9edff] rounded-[26px] bg-white"
+                                  key={index}
+                                >
+                                  <div className="py-8 px-6 relative">
+                                    {pln?.plan_name === "Gold" ? (
+                                      <Image
+                                        src={sub02}
+                                        alt="sub01"
+                                        className="mb-6"
+                                      />
+                                    ) : (
+                                      <Image
+                                        src={sub01}
+                                        alt="sub01"
+                                        className="mb-6"
+                                      />
+                                    )}
+                                    <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
+                                      {pln?.plan_name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mb-8">
+                                      <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
+                                        <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
+                                          {pln?.planPrice?.currency}
+                                        </span>{" "}
+                                        {pln?.planPrice?.price}
+                                      </p>
+                                    </div>
+                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                      <div>
+                                        {pln?.PlanAccess?.map((pAccess) => {
+                                          return (
+                                            <>
+                                              <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                <Image
+                                                  src={Check}
+                                                  alt="Check"
+                                                  className="w-[14px] h-[14px] mr-2"
+                                                />{" "}
+                                                {
+                                                  pAccess?.plan_access_description
+                                                }
+                                              </div>
+                                            </>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                    <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
+                                      <button
+                                        onClick={(e) =>
+                                          handlePaymentModal(e, {
+                                            amount: pln?.planPrice?.price,
+                                            currency: pln?.planPrice?.currency,
+                                            plan_id: pln?.planPrice?.plan_id,
+                                          })
+                                        }
+                                        className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
+                                      >
+                                        {/* {loading? "Processing...": "Get Started"} */}
+                                        Get Started
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-                                    <button
-                                      onClick={(e) =>
-                                        handlePaymentModal(e, {
-                                          amount: pln?.planPrice?.price,
-                                          currency: pln?.planPrice?.currency,
-                                          plan_id: pln?.planPrice?.plan_id,
-                                        })
-                                      }
-                                      className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                                    >
-                                     {/* {loading? "Processing...": "Get Started"} */}
-                                     Get Started
-                                    </button>
-                                  </div>
                                 </div>
-                              </div>
-                            </>
-                          );
-                        })}
+                              </>
+                            );
+                          })}
 
                         {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                                              <div className="py-8 px-6 relative">
@@ -305,76 +318,80 @@ const page = () => {
                     </TabPanel>
                     <TabPanel>
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                        {plans?.data?.filter(pln => pln?.plan_frequency === 3).map((pln, index) => {
-                          return (
-                            <>
-                              <div
-                                className="pt-0 border border-[#e9edff] rounded-[26px] bg-white"
-                                key={index}
-                              >
-                                <div className="py-8 px-6 relative">
-                                  {pln?.plan_name === "Gold" ? (
-                                    <Image
-                                      src={sub02}
-                                      alt="sub01"
-                                      className="mb-6"
-                                    />
-                                  ) : (
-                                    <Image
-                                      src={sub01}
-                                      alt="sub01"
-                                      className="mb-6"
-                                    />
-                                  )}
-                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                                    {pln?.plan_name}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mb-8">
-                                    <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                                      <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
-                                        {pln?.planPrice?.currency}
-                                      </span>{" "}
-                                      {pln?.planPrice?.price}
-                                    </p>
-                                  </div>
-                                  <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                    <div>
-                                      {pln?.PlanAccess?.map((pAccess) => {
-                                        return (
-                                          <>
-                                            <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                              <Image
-                                                src={Check}
-                                                alt="Check"
-                                                className="w-[14px] h-[14px] mr-2"
-                                              />{" "}
-                                              {pAccess?.plan_access_description}
-                                            </div>
-                                          </>
-                                        );
-                                      })}
+                        {plans?.data
+                          ?.filter((pln) => pln?.plan_frequency === 3)
+                          .map((pln, index) => {
+                            return (
+                              <>
+                                <div
+                                  className="pt-0 border border-[#e9edff] rounded-[26px] bg-white"
+                                  key={index}
+                                >
+                                  <div className="py-8 px-6 relative">
+                                    {pln?.plan_name === "Gold" ? (
+                                      <Image
+                                        src={sub02}
+                                        alt="sub01"
+                                        className="mb-6"
+                                      />
+                                    ) : (
+                                      <Image
+                                        src={sub01}
+                                        alt="sub01"
+                                        className="mb-6"
+                                      />
+                                    )}
+                                    <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
+                                      {pln?.plan_name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mb-8">
+                                      <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
+                                        <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
+                                          {pln?.planPrice?.currency}
+                                        </span>{" "}
+                                        {pln?.planPrice?.price}
+                                      </p>
+                                    </div>
+                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                      <div>
+                                        {pln?.PlanAccess?.map((pAccess) => {
+                                          return (
+                                            <>
+                                              <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                <Image
+                                                  src={Check}
+                                                  alt="Check"
+                                                  className="w-[14px] h-[14px] mr-2"
+                                                />{" "}
+                                                {
+                                                  pAccess?.plan_access_description
+                                                }
+                                              </div>
+                                            </>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                    <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
+                                      <button
+                                        onClick={(e) =>
+                                          handlePaymentModal(e, {
+                                            amount: pln?.planPrice?.price,
+                                            currency: pln?.planPrice?.currency,
+                                            plan_id: pln?.planPrice?.plan_id,
+                                          })
+                                        }
+                                        className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
+                                      >
+                                        {/* {loading? "Processing...": "Get Started"} */}
+                                        Get Started
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-                                    <button
-                                      onClick={(e) =>
-                                        handlePaymentModal(e, {
-                                          amount: pln?.planPrice?.price,
-                                          currency: pln?.planPrice?.currency,
-                                          plan_id: pln?.planPrice?.plan_id,
-                                        })
-                                      }
-                                      className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                                    >
-                                     {/* {loading? "Processing...": "Get Started"} */}
-                                     Get Started
-                                    </button>
-                                  </div>
                                 </div>
-                              </div>
-                            </>
-                          );
-                        })}
+                              </>
+                            );
+                          })}
                       </div>
                     </TabPanel>
                   </>
@@ -613,72 +630,76 @@ const page = () => {
                   <>
                     <TabPanel>
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                        {plans?.data?.filter(pln => pln?.plan_frequency === 12).map((pln, index) => {
-                          return (
-                            <>
-                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                <div className="py-8 px-6 relative">
-                                  {pln?.plan_name === "Campus Plus" ? (
-                                    <Image
-                                      src={sub02}
-                                      alt="sub01"
-                                      className="mb-6"
-                                    />
-                                  ) : (
-                                    <Image
-                                      src={sub01}
-                                      alt="sub01"
-                                      className="mb-6"
-                                    />
-                                  )}
-                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                                    {pln?.plan_name}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mb-8">
-                                    <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                                      <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
-                                        {pln?.planPrice?.currency}
-                                      </span>{" "}
-                                      {pln?.planPrice?.price}
-                                    </p>
-                                  </div>
-                                  <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                    <div>
-                                      {pln?.PlanAccess?.map((pAccess) => {
-                                        return (
-                                          <>
-                                            <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                              <Image
-                                                src={Check}
-                                                alt="Check"
-                                                className="w-[14px] h-[14px] mr-2"
-                                              />{" "}
-                                              {pAccess?.plan_access_description}
-                                            </div>
-                                          </>
-                                        );
-                                      })}
+                        {plans?.data
+                          ?.filter((pln) => pln?.plan_frequency === 12)
+                          .map((pln, index) => {
+                            return (
+                              <>
+                                <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                  <div className="py-8 px-6 relative">
+                                    {pln?.plan_name === "Campus Plus" ? (
+                                      <Image
+                                        src={sub02}
+                                        alt="sub01"
+                                        className="mb-6"
+                                      />
+                                    ) : (
+                                      <Image
+                                        src={sub01}
+                                        alt="sub01"
+                                        className="mb-6"
+                                      />
+                                    )}
+                                    <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
+                                      {pln?.plan_name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mb-8">
+                                      <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
+                                        <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
+                                          {pln?.planPrice?.currency}
+                                        </span>{" "}
+                                        {pln?.planPrice?.price}
+                                      </p>
+                                    </div>
+                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                      <div>
+                                        {pln?.PlanAccess?.map((pAccess) => {
+                                          return (
+                                            <>
+                                              <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                <Image
+                                                  src={Check}
+                                                  alt="Check"
+                                                  className="w-[14px] h-[14px] mr-2"
+                                                />{" "}
+                                                {
+                                                  pAccess?.plan_access_description
+                                                }
+                                              </div>
+                                            </>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                      <button
+                                        onClick={(e) =>
+                                          handlePaymentModal(e, {
+                                            amount: pln?.planPrice?.price,
+                                            currency: pln?.planPrice?.currency,
+                                            plan_id: pln?.planPrice?.plan_id,
+                                          })
+                                        }
+                                        className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
+                                      >
+                                        Get Started
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                    <button
-                                      onClick={(e) =>
-                                        handlePaymentModal(e, {
-                                          amount: pln?.planPrice?.price,
-                                          currency: pln?.planPrice?.currency,
-                                          plan_id: pln?.planPrice?.plan_id,
-                                        })
-                                      }
-                                      className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                                    >
-                                      Get Started
-                                    </button>
-                                  </div>
                                 </div>
-                              </div>
-                            </>
-                          );
-                        })}
+                              </>
+                            );
+                          })}
 
                         {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                                              <div className="py-8 px-6 relative">

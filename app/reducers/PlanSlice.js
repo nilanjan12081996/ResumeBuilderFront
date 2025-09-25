@@ -151,6 +151,7 @@ export const currentSubscription = createAsyncThunk(
         "/api/payment/current-subscription",
         user_input
       );
+      console.log("currentSubscription API call - input:", response);
       if (response?.data?.success === true) {
         return response.data;
       } else {
