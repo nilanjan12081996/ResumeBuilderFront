@@ -383,30 +383,31 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                         
 
                         <TabPanel>
-                          <WorkExpJd experiences={experiences} setExperiences={setExperiences} register={register} errors={errors}/>
+                          <WorkExpJd experiences={experiences} setExperiences={setExperiences} register={register} jdBasedDetailsData={jdBasedDetailsData} errors={errors}/>
                         </TabPanel>
 
                         <TabPanel>
                          <LanguageJd 
                          languages={languages}
                           setLanguages={setLanguages}
+                          jdBasedDetailsData={jdBasedDetailsData}
                           />
                         </TabPanel>
 
                         <TabPanel>
-                          <SkillsJd register={register} errors={errors} skills={skills}setSkills={setSkills}/>
+                          <SkillsJd register={register} errors={errors} skills={skills} setSkills={setSkills} jdBasedDetailsData={jdBasedDetailsData}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <PersonalProjectJd register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro}/>
+                          <PersonalProjectJd register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} jdBasedDetailsData={jdBasedDetailsData}/>
                         </TabPanel>
 
                         <TabPanel>
-                         <CertificatesJd register={register} errors={errors} certificates={certificates} setCertificates={setCertificates}/>
+                         <CertificatesJd register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} jdBasedDetailsData={jdBasedDetailsData}/>
                         </TabPanel>
 
                         <TabPanel>  
-                         <AchivmentsJd register={register} errors={errors} achivments={achivments} setAchivments={setAchivments}/>
+                         <AchivmentsJd register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} jdBasedDetailsData={jdBasedDetailsData}/>
                         </TabPanel>
 
                       </div>

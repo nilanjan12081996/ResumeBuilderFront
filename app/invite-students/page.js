@@ -65,10 +65,11 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
      Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
 
 import serverApi from '../reducers/serverApi';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { inviteStudents } from '../reducers/InviteSlice';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { invitedStudentsList, inviteStudents, inviteStudentsMannually, saveInvitedStudent } from '../reducers/InviteSlice';
 import { toast, ToastContainer } from 'react-toastify';
+import StudentList from './StudentList';
 
 
 
@@ -79,6 +80,7 @@ const inter = Inter({
 })
 
 const page = () => {
+    const{loading_for_csv,loading_for_manual,loading}=useSelector((state)=>state?.inviteStd)
     const dispatch=useDispatch()
 
 const handleDownload = async () => {
@@ -114,12 +116,31 @@ const handleDownload = async () => {
     setValue,
     formState: { errors },
   } = useForm();
+
+    const {
+    register: register1,
+    handleSubmit: handleSubmit1,
+    control,
+    reset: reset1,
+    formState: { errors: errors1 },
+  } = useForm({
+     defaultValues: {
+      students: [
+        { name: "", email: "", phone: "", resume_count: "" } // start with one student
+      ]
+    }
+  });
+
+   const { fields, append, remove } = useFieldArray({
+    control,
+    name: "students",
+  });
  const csvFile=watch("file")
   const onSubmit=(data)=>{
     const formData=new FormData()
        if (data.file && data.file[0]) {
           
-          formData.append("file", data.file[0]);
+          formData.append("csv", data.file[0]);
         } else {
           console.error("No resume file selected");
           toast.error("Please select a resume file to upload");
@@ -127,16 +148,119 @@ const handleDownload = async () => {
         }
      dispatch(inviteStudents(formData)).then((res)=>{
         console.log("csvREs",res);
+        if(res?.payload?.response?.data?.status_code===422)
+        {
+            toast.error(res?.payload?.response?.data?.message)
+        }
+        else if(res?.payload?.status_code===200){
+           dispatch(invitedStudentsList({
+                       page:1,
+                       limit:10
+                   }))
+                   toast.success(res?.payload?.message)
+
+        }
         
      })
   }
 
-     useEffect(() => {
+// const onSubmitManual = (data) => {
+//   if (!data.students || data.students.length === 0) {
+//     toast.error("Please add at least one student");
+//     return;
+//   }
+
+//   // Loop through each student and dispatch
+//   data.students.forEach((student) => {
+//     const payload = {
+//       name: student.name,
+//       email: student.email,
+//       phone: student.phone,
+//       resume_count: student.resume_count,
+//     };
+
+//     dispatch(inviteStudentsMannually(payload))
+//       .unwrap()
+//       .then((res) => {
+//         console.log("Student invited:", res);
+//         if(res?.status_code===201){
+//             toast.success(`${student.name} invited successfully`);
+//         }
+        
+
+//       })
+//       .catch((err) => {
+//         console.error("Error inviting student:", err);
+//         toast.error(
+//           err?.message || `Failed to invite ${student.name}`
+//         );
+//       });
+//   });
+// };
+
+
+const onSubmitManual = async (data) => {
+  if (!data.students || data.students.length === 0) {
+    toast.error("Please add at least one student");
+    return;
+  }
+
+  try {
+    // store all invited student ids
+    const invitedIds = [];
+
+    // Loop through students one by one
+    for (const student of data.students) {
+      const payload = {
+        name: student.name,
+        email: student.email,
+        phone: student.phone,
+        resume_count: student.resume_count,
+      };
+
+      try {
+        const res = await dispatch(inviteStudentsMannually(payload)).unwrap();
+
+        if (res?.status_code === 201) {
+          toast.success(`${student.name} invited successfully`);
+          if (res?.allIds?.[0]) {
+            invitedIds.push(res?.allIds?.[0]); // ✅ collect student id
+          }
+        }
+      } catch (err) {
+        console.error("Error inviting student:", err);
+        toast.error(err?.message || `Failed to invite ${student.name}`);
+      }
+    }
+
+    // ✅ After all students invited, call saveInvitedStudent with all IDs
+    if (invitedIds.length > 0) {
+      //const mapPayload = { user: invitedIds };
+
+    //  const mapRes = await dispatch(saveInvitedStudent(mapPayload)).unwrap();
+
+      if (mapRes?.status_code === 201) {
+        toast.success("All invited students mapped successfully");
+        reset1()
+      }
+    }
+  } catch (err) {
+    console.error("Final error:", err);
+    toast.error("Something went wrong while saving invited students");
+  }
+};
+     
+
+
+
+useEffect(() => {
       if (csvFile && csvFile[0]) {
         console.log("Resume file selected:", csvFile[0]);
       }
     }, [csvFile]);
-       
+
+
+
           
   return (
     <div className={`${inter.className} antialiased pb-8`}>
@@ -183,20 +307,25 @@ const handleDownload = async () => {
                 )}
                     <div className='lg:flex gap-4 mt-3'>
                         <button type='button' onClick={handleDownload} class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
-                        <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">Invite Students</button>
+                        <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">{loading_for_csv||loading?"Waiting...":"Invite Students"}</button>
                     </div>
                 </div>
                 </form>
             </div>
             <div className='lg:w-6/12'>
+            <form onSubmit={handleSubmit1(onSubmitManual)}>
                 <div className=''>
-                    <div className='mb-0'>
+                    {/* <div className='mb-0'>
                         <div className='mb-4 flex items-center justify-between'>
                             <div className='w-6/12'>
                               <h4 className='text-[16px] lg:text-[20px] text-[#151515] font-semibold pb-1'>Invite students manually</h4>
                             </div>
                             <div className='flex justify-end items-center gap-2 w-6/12'>
-                                <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[32px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Another Student</button>
+                                <button
+                                 onClick={() =>
+                                        append({ name: "", email: "", phone: "", resume_count: "" })
+                                        }
+                                className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[32px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1'><BsFillPlusCircleFill className='text-sm' /> Add Another Student</button>
                             </div>  
                         </div>
                         <div className='resume_form_area'>
@@ -209,7 +338,14 @@ const handleDownload = async () => {
                                     <div className='p-3'>
                                         <BiSolidUser className='text-[#928F8F]' />
                                     </div>
-                                    <TextInput id="base" type="text" sizing="md" placeholder='Student Name' />
+                                    <TextInput {...register1("name",{required:"Name is Required"})} id="base" type="text" sizing="md" placeholder='Student Name' />
+                                    
+                                        {errors1?.name && (
+                                        <span className="text-red-500">
+                                            {errors1?.name?.message}
+                                        </span>
+                                        )}
+                                    
                                     </div>
                                 </div>
                             </div>
@@ -226,7 +362,12 @@ const handleDownload = async () => {
                                     <div className='p-3'>
                                         <MdEmail className='text-[#928F8F]' />
                                     </div>
-                                    <TextInput id="base" type="email" sizing="md" placeholder='Enter student email address' />
+                                    <TextInput {...register1("email",{required:"Email is required"})} id="base" type="email" sizing="md" placeholder='Enter student email address' />
+                                        {errors1?.email && (
+                                        <span className="text-red-500">
+                                            {errors1?.email?.message}
+                                        </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div className='lg:w-6/12 resume_form_box'>
@@ -237,7 +378,12 @@ const handleDownload = async () => {
                                     <div className='p-3'>
                                         <BiSolidPhone className='text-[#928F8F]' />
                                     </div>
-                                    <TextInput id="base" type="email" sizing="md" placeholder='+91-5362563762   ' />
+                                    <TextInput {...register1("phone",{required:"Phone is required"})} id="base" type="text" sizing="md" placeholder='+91-5362563762   ' />
+                                     {errors1?.phone && (
+                                        <span className="text-red-500">
+                                            {errors1?.phone?.message}
+                                        </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -253,22 +399,168 @@ const handleDownload = async () => {
                                         <div className='p-3'>
                                             <HiDocumentText className='text-[#928F8F]' />
                                         </div>
-                                        <Select required className='w-full'>
-                                            <option>Choose how many resumes you want to assign</option>
-                                            <option>01</option>
-                                            <option>02</option>
-                                            <option>03</option>
-                                        </Select>
+                                        <TextInput {...register1("resume_count",{required:"Resume Count is required",
+
+                                            valueAsNumber: true, // ensures it’s treated as number
+                                            max: {
+                                            value: 100,
+                                            message: "Value cannot be greater than 100",
+                                            },
+                                        })} id="base" type="text" sizing="md" placeholder='Max 100' />
+                                     {errors1?.resume_count && (
+                                        <span className="text-red-500">
+                                            {errors1?.resume_count?.message}
+                                        </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <button class="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]">Add Student</button>
-                    </div>
+                    </div> */}
+
+                      <div>
+    <div className="mb-4 flex items-center justify-between">
+      <h4 className="text-[16px] lg:text-[20px] text-[#151515] font-semibold pb-1">
+        Invite students manually
+      </h4>
+      <button
+        type="button"
+        onClick={() =>
+          append({ name: "", email: "", phone: "", resume_count: "" })
+        }
+        className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[32px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
+      >
+        <BsFillPlusCircleFill className="text-sm" /> Add Another Student
+      </button>
+    </div>
+
+    {/* Loop through students */}
+    {fields.map((field, index) => (
+      <div
+        key={field.id}
+        className="resume_form_area  p-4 rounded mb-4 relative"
+      >
+        {/* Student Name */}
+        <div className="resume_form_box mb-3">
+          <Label>Student Name <span>*</span></Label>
+          <div className="field_box flex items-center">
+            <div className="p-3">
+              <BiSolidUser className="text-[#928F8F]" />
+            </div>
+            <TextInput
+              {...register1(`students.${index}.name`, {
+                required: "Name is Required",
+              })}
+              type="text"
+              placeholder="Student Name"
+            />
+          </div>
+          {errors1?.students?.[index]?.name && (
+            <span className="text-red-500">
+              {errors1.students[index].name.message}
+            </span>
+          )}
+        </div>
+
+        {/* Email + Phone */}
+        <div className="lg:flex gap-4 mb-3">
+          <div className="lg:w-6/12 resume_form_box">
+            <Label>Email <span>*</span></Label>
+            <div className="field_box flex items-center">
+              <div className="p-3">
+                <MdEmail className="text-[#928F8F]" />
+              </div>
+              <TextInput
+                {...register1(`students.${index}.email`, {
+                  required: "Email is required",
+                })}
+                type="email"
+                placeholder="Enter student email"
+              />
+            </div>
+            {errors1?.students?.[index]?.email && (
+              <span className="text-red-500">
+                {errors1.students[index].email.message}
+              </span>
+            )}
+          </div>
+
+          <div className="lg:w-6/12 resume_form_box">
+            <Label>Phone <span>*</span></Label>
+            <div className="field_box flex items-center">
+              <div className="p-3">
+                <BiSolidPhone className="text-[#928F8F]" />
+              </div>
+              <TextInput
+                {...register1(`students.${index}.phone`, {
+                  required: "Phone is required",
+                })}
+                type="text"
+                placeholder="+91-5362563762"
+              />
+            </div>
+            {errors1?.students?.[index]?.phone && (
+              <span className="text-red-500">
+                {errors1.students[index].phone.message}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Resume Count */}
+        <div className="resume_form_box">
+          <Label>Resumes Assigned <span>*</span></Label>
+          <div className="field_box flex items-center">
+            <div className="p-3">
+              <HiDocumentText className="text-[#928F8F]" />
+            </div>
+            <TextInput
+              {...register1(`students.${index}.resume_count`, {
+                required: "Resume Count is required",
+                valueAsNumber: true,
+                max: { value: 100, message: "Value cannot be greater than 100" },
+              })}
+              type="number"
+              placeholder="Max 100"
+            />
+          </div>
+          {errors1?.students?.[index]?.resume_count && (
+            <span className="text-red-500">
+              {errors1.students[index].resume_count.message}
+            </span>
+          )}
+        </div>
+
+        {/* Delete button */}
+        {fields.length > 1 && (
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="absolute top-2 right-2 text-red-500 hover:text-black"
+          >
+            <MdOutlineDelete className="text-xl" />
+          </button>
+        )}
+      </div>
+    ))}
+
+    {/* Single Add Student button */}
+    <button
+      type="submit"
+      className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
+    >
+    {loading_for_manual||loading?"Waiting...":"Add Student"}  
+    </button>
+  </div>
+
+
+
                 </div>
+            </form>
             </div>
         </div>
-        <div className='bg-white rounded-[10px] p-5 lg:p-10'>
+        {/* <div className='bg-white rounded-[10px] p-5 lg:p-10'>
             <div className='lg:flex justify-between items-center mb-4'>
                 <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invited Students</h4>
                 <div className='flex items-center gap-2 lg:w-3/12 search_section'>
@@ -372,7 +664,8 @@ const handleDownload = async () => {
                     </Table>
                 </div>
             </div>
-        </div>
+        </div> */}
+        <StudentList/>
     </div>
   )
 }

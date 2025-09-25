@@ -153,6 +153,28 @@ const Sidebar = () => {
               </li>
 
               <li onClick={closeNavbar}>
+                <Link href="/main-dashboard"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('main-dashboard') &&
+                    'bg-graydark dark:bg-meta-4'
+                    }`}
+                  passHref>
+                  <HiHome className='text-2xl' />
+                  Main Dashboard
+                </Link>
+              </li>
+
+              <li onClick={closeNavbar}>
+                <Link href="/dashboard"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('dashboard') &&
+                    'bg-graydark dark:bg-meta-4'
+                    }`}
+                  passHref>
+                  <HiHome className='text-2xl' />
+                  Dashboard
+                </Link>
+              </li>
+
+              <li onClick={closeNavbar}>
                 <Link href="/resume-history"
                   className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-history') &&
                     'bg-graydark dark:bg-meta-4'
