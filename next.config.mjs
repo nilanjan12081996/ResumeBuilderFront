@@ -9,7 +9,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'resumebuilder.hiringeye.ai',
+        hostname: 'hiringeyenewapi.bestworks.cloud',
+        port: '',
+        pathname: '/uploads/images/**',
+      },
+         {
+        protocol: 'https',
+        hostname: 'hiringeyeuserservice.bestworks.cloud',
         port: '',
         pathname: '/uploads/images/**',
       },
