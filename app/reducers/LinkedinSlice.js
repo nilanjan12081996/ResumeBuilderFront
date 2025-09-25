@@ -122,6 +122,26 @@ export const linkedInLangInfo=createAsyncThunk(
     }
 )
 
+export const linkedgetDetails=createAsyncThunk(
+    'linkedgetDetails',
+      async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/linkedin-rewrite/get-all-details', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 
 const initialState={
 error:false,
@@ -131,7 +151,8 @@ linkedInBasicInfoData:{},
 lkdEduInfo:{},
 lkdExpInfo:{},
 lkdSkillInfo:{},
-lkdlangInfo:{}
+lkdlangInfo:{},
+lkdDetails:{}
 
 }
 
@@ -212,6 +233,18 @@ const LinkedinSlice=createSlice(
                 state.lkdlangInfo=payload
             })
             .addCase(linkedInLangInfo.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(linkedgetDetails.pending,(state,{payload})=>{
+                state.loading=true  
+            })
+            .addCase(linkedgetDetails.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.lkdDetails=payload
+            })
+            .addCase(linkedgetDetails.rejected,(state,{payload})=>{
                 state.error=payload
                 state.loading=false
             })
