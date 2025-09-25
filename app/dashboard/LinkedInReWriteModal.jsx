@@ -10,7 +10,9 @@ const LinkedInReWriteModal=({
      openModalLinkedInRewrite,
     setOpenModalLinkedInRewrite,
     HandlerLinkedInRewrite,
-    setOpenModalCreateResumeLinkedIn
+    setOpenModalCreateResumeLinkedIn,
+     resumeIdLkdin,
+      setResumeIdLkdin
 })=>{
     const{loading}=useSelector((state)=>state?.linkedIn)
     const dispatch=useDispatch()
@@ -40,6 +42,9 @@ const LinkedInReWriteModal=({
             dispatch(linkedInPdf(formData)).then((res)=>{
                 console.log(res,"res");
                 if(res?.payload?.status_code===201){
+                  console.log("res?.payload?.created_data?.id",res?.payload?.created_data?.id);
+                  
+                  setResumeIdLkdin(res?.payload?.created_data?.id)
                   try{
                     Promise.all([
                   dispatch(linkedInBasicInfo({lkdin_resume_id:res?.payload?.created_data?.id,...res?.payload?.raw_data?.linkedin_rewrite_data?.personal_info})),
@@ -50,8 +55,11 @@ const LinkedInReWriteModal=({
 
 
                     ])
+                   
+                       HandlerLinkedInRewrite()
+                   
 
-                    HandlerLinkedInRewrite()
+                   
                   }catch(error){
                      console.error("Error while saving resume sections", error);
                       toast.error("Something went wrong while saving resume data");

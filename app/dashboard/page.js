@@ -115,6 +115,7 @@ const Page = () => {
     const [openModalCreateResumeJd, setOpenModalCreateResumeJd] = useState(false);
      const [openModalCreateResumeLinkedIn, setOpenModalCreateResumeLinkedIn] = useState(false);
      const[resumeId,setResumeId]=useState()
+     const[resumeIdLkdin,setResumeIdLkdin]=useState()
   const [openModalImproveexistingResume, setOpenModalImproveexistingResume] =
     useState(false);
   const [openModalAlertModal, setOpenModalAlertModal] = useState(false);
@@ -145,7 +146,13 @@ const Page = () => {
   };
 
   const HandlerLinkedInRewrite = () => {
-    router.push("/linkedIn-rewrite");
+    console.log("resumeIdLkdin",resumeIdLkdin);
+    
+    if(resumeIdLkdin){
+      const encodedId = btoa(resumeIdLkdin);
+    router.push(`/linkedIn-rewrite?id=${encodedId}`);
+    }
+    
   };
 
   const handleSelect = (id) => {
@@ -892,6 +899,9 @@ const Page = () => {
            setOpenModalLinkedInRewrite={setOpenModalLinkedInRewrite}
            HandlerLinkedInRewrite={HandlerLinkedInRewrite}
            setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
+           resumeIdLkdin={resumeIdLkdin}
+           setResumeIdLkdin={setResumeIdLkdin}
+
           />
         )
       }

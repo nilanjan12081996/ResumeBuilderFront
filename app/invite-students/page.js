@@ -199,13 +199,8 @@ const handleDownload = async () => {
 // };
 
 
-const onSubmitManual = async (data) => {
-  if (!data.students || data.students.length === 0) {
-    toast.error("Please add at least one student");
-    return;
-  }
+const onSubmitManual =  (data) => {
 
-  try {
     // store all invited student ids
     const invitedIds = [];
 
@@ -218,37 +213,26 @@ const onSubmitManual = async (data) => {
         resume_count: student.resume_count,
       };
 
-      try {
-        const res = await dispatch(inviteStudentsMannually(payload)).unwrap();
-
-        if (res?.status_code === 201) {
-          toast.success(`${student.name} invited successfully`);
-          if (res?.allIds?.[0]) {
-            invitedIds.push(res?.allIds?.[0]); // ✅ collect student id
-          }
-        }
-      } catch (err) {
-        console.error("Error inviting student:", err);
-        toast.error(err?.message || `Failed to invite ${student.name}`);
-      }
-    }
-
-    // ✅ After all students invited, call saveInvitedStudent with all IDs
-    if (invitedIds.length > 0) {
-      //const mapPayload = { user: invitedIds };
-
-    //  const mapRes = await dispatch(saveInvitedStudent(mapPayload)).unwrap();
-
-      if (mapRes?.status_code === 201) {
-        toast.success("All invited students mapped successfully");
-        reset1()
-      }
-    }
-  } catch (err) {
-    console.error("Final error:", err);
-    toast.error("Something went wrong while saving invited students");
-  }
+     
+          dispatch(inviteStudentsMannually(payload)).then((res)=>{
+            console.log("res",res);
+            if(res?.payload?.response?.data?.status_code===422){
+              toast.error(res?.payload?.response?.data?.message)
+            }
+            else if(res?.payload?.status_code===201){
+              toast.success(res?.payload?.message)
+               dispatch(invitedStudentsList({
+                       page:1,
+                       limit:10
+                   }))
+                   toast.success(res?.payload?.message)
+            }
+            
+          })
+      
+        
 };
+}
      
 
 

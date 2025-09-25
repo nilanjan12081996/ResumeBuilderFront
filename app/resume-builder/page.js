@@ -50,7 +50,7 @@ import resume_score from "../assets/imagesource/resume_score.png";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select } from "flowbite-react";
+import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast } from "flowbite-react";
 import PersonalInfo from './PersonalInfo';
 import Education from './Education';
 import WorkExp from './WorkExp';
@@ -60,7 +60,7 @@ import PersonalProject from './PersonalProject';
 import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
@@ -68,11 +68,13 @@ import { useSearchParams } from 'next/navigation';
 import Template2 from '../temp/Template2';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { saveAs } from "file-saver";
+import { toast, ToastContainer } from 'react-toastify';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
 
 const page = () => {
+  const{loading}=useSelector((state)=>state?.resume)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
@@ -153,12 +155,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         }
        ))
     }
-  
-    
-    dispatch(saveEducationInfo(eduPayload))
-
-
-
     const payload = {
       resume_id: res?.payload?.id,
       data: experiences.map(exp => ({
@@ -177,7 +173,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         }))
       }))
     };
-    dispatch(saveWorkExp(payload))
+    
 
      const payloadLang = {
           user_id: parseUserId?.user_id,
@@ -187,7 +183,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             proficiency: lang.proficiency,
           })),
         };
-        dispatch(saveLanguageInfo(payloadLang))
+       
 
   
       const payloadSkills={
@@ -202,7 +198,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           
         ))
       }
-      dispatch(saveSkillInfo(payloadSkills))
+      
 
       const payloadProject={
          user_id: parseUserId?.user_id,
@@ -218,7 +214,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           }
          ))
       }
-      dispatch(saveProjectInfo(payloadProject))
+      
 
 
       const payloadCerticate={
@@ -233,7 +229,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           }
          ))
       }
-      dispatch(saveCertificatesInfo(payloadCerticate))
+      
 
       const payloadAchive={
          user_id: parseUserId?.user_id,
@@ -248,8 +244,14 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           }
          ))
       }
+      dispatch(saveEducationInfo(eduPayload))
+      dispatch(saveWorkExp(payload))
+       dispatch(saveLanguageInfo(payloadLang))
+       dispatch(saveSkillInfo(payloadSkills))
+       dispatch(saveProjectInfo(payloadProject))
+       dispatch(saveCertificatesInfo(payloadCerticate))
       dispatch(saveAchivmentInfo(payloadAchive))
-      
+        
 
     
   }
@@ -330,7 +332,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
   return (
     <div className='lg:flex gap-5 pb-5'>
       
-      
+      <ToastContainer/>
         <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
            <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
@@ -338,7 +340,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                 <HiClipboardList className='text-[#800080] text-2xl' />
                 <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
               </div>
-              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
+              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save Resume"} </button>
            </div>
            <div className='resume_tab_section'>
               <Tabs>
