@@ -145,14 +145,10 @@ const Page = () => {
     router.push(`/resume-builder?template=${selectedResume}`);
   };
 
-  const HandlerLinkedInRewrite = () => {
-    console.log("resumeIdLkdin",resumeIdLkdin);
+  const HandlerLinkedInRewrite = (id) => {
     
-    if(resumeIdLkdin){
-      const encodedId = btoa(resumeIdLkdin);
+      const encodedId = btoa(id);
     router.push(`/linkedIn-rewrite?id=${encodedId}`);
-    }
-    
   };
 
   const handleSelect = (id) => {

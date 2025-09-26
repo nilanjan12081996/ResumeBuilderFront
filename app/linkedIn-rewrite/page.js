@@ -63,20 +63,34 @@ import AwardLkdin from './AwardLkdin';
 import { useDispatch, useSelector } from 'react-redux';
 import { linkedgetDetails } from '../reducers/LinkedinSlice';
 import { useSearchParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 
 const page = () => {
   const{lkdDetails}=useSelector((state)=>state?.linkedIn)
   const dispatch=useDispatch()
   const searchParams = useSearchParams();
   const id=atob(searchParams.get("id"))
+  console.log("id",id);
+  
   useEffect(()=>{
     dispatch(linkedgetDetails({lkdin_resume_id:id}))
   },[id])
+    const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
+   const[educationEntries,setEducationEntries]=useState([
+      {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}
+    ])
   
   return (
     <div className='lg:flex gap-5 pb-5'>
+      
             <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
+            <form>
                <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
                   <div className='flex items-center gap-1'>
                     <HiClipboardList className='text-[#800080] text-2xl' />
@@ -103,11 +117,11 @@ const page = () => {
                       <div className='mb-4'>
                           <div>
                             <TabPanel>
-                              <BasicInfoLkdin lkdDetails={lkdDetails}/>
+                              <BasicInfoLkdin lkdDetails={lkdDetails} setValue={setValue} register={register}/>
                             </TabPanel>
     
                             <TabPanel>
-                             <EducationLkdin/>
+                             <EducationLkdin lkdDetails={lkdDetails} setValue={setValue} register={register}  educationEntries={educationEntries}setEducationEntries={setEducationEntries}/>
                             </TabPanel>
     
                             <TabPanel>
@@ -135,6 +149,7 @@ const page = () => {
                     </div>
                   </Tabs>
                </div>
+               </form>
             </div>
             <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
               <div className='flex items-center justify-between mb-4'>
@@ -151,7 +166,7 @@ const page = () => {
                  <LinkedInTemplate/>
               </div>
             </div>
-
+    
         </div>
   )
 }

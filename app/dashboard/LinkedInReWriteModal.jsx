@@ -43,8 +43,8 @@ const LinkedInReWriteModal=({
                 console.log(res,"res");
                 if(res?.payload?.status_code===201){
                   console.log("res?.payload?.created_data?.id",res?.payload?.created_data?.id);
-                  
-                  setResumeIdLkdin(res?.payload?.created_data?.id)
+                  const newId = res?.payload?.created_data?.id;
+                  setResumeIdLkdin(newId);
                   try{
                     Promise.all([
                   dispatch(linkedInBasicInfo({lkdin_resume_id:res?.payload?.created_data?.id,...res?.payload?.raw_data?.linkedin_rewrite_data?.personal_info})),
@@ -54,9 +54,11 @@ const LinkedInReWriteModal=({
                   dispatch(linkedInLangInfo({lkdin_resume_id:res?.payload?.created_data?.id,language_info:res?.payload?.raw_data?.linkedin_rewrite_data?.language_info})),
 
 
-                    ])
+                    ]).then(()=>{
+                      HandlerLinkedInRewrite(newId)
+                    })
                    
-                       HandlerLinkedInRewrite()
+                       
                    
 
                    
