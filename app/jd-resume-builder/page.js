@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -142,19 +142,18 @@ const page = () => {
   //   useEffect(()=>{
   //     setValue("full_name",jdBasedDetailsData?.data?.[0]?.basic_info?.candidate_name)
   // },[jdBasedDetailsData,setValue])
-
   const formValues = watch();
   const onSubmit = (data) => {
     console.log("data", data);
 
-    dispatch(savePersonalInfo({ ...data, basicinfo_id: jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.id })).then((res) => {
+    dispatch(jdBasedResumeBasicInfo({ ...data, basicinfo_id: jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.id, jd_resume_id: jdBasedDetailsData?.data?.[0]?.id})).then((res) => {
       console.log("res", res);
 
-      if (res?.payload?.status_code === 201) {
-
+      if (res?.payload?.status_code === 200) {
+        const jdResumeId = jdBasedDetailsData?.data?.[0]?.id;
         const eduPayload = {
-          resume_id: res?.payload?.id,
-          education_arr: educationEntries.map((edu) => (
+          jd_resume_id: jdResumeId,
+          data: educationEntries.map((edu) => (
             {
               id: edu?.id || null,
               institution: edu?.institution,
@@ -164,18 +163,19 @@ const page = () => {
               start_time: convertToSubmitFormat(edu?.start_time),
               end_time: convertToSubmitFormat(edu?.end_time),
               cgpa: edu?.gpa,
-              information: edu?.additionalInfo
+              information: edu?.additionalInfo,
+              // jd_resume_id: res?.payload?.jd_resume_id
             }
           ))
         }
 
 
-        dispatch(saveEducationInfo(eduPayload))
+        dispatch(jdBasedResumeEducationInfo(eduPayload))
 
 
 
         const payload = {
-          resume_id: res?.payload?.id,
+          jd_resume_id: jdResumeId,
           data: experiences.map(exp => ({
             id: exp?.id || null,
             company_name: exp.company_name,
@@ -193,25 +193,26 @@ const page = () => {
             }))
           }))
         };
-        dispatch(saveWorkExp(payload))
+        dispatch(jdBasedResumeExpInfo(payload))
 
         const payloadLang = {
+          jd_resume_id: jdResumeId,
           user_id: parseUserId?.user_id,
           resume_id: res?.payload?.id,
           data: languages.map((lang) => ({
-            id: lang?.id || null,
+            // id: lang?.id || null,
             language_name: lang.language_name,
             proficiency: lang.proficiency,
           })),
         };
-        dispatch(saveLanguageInfo(payloadLang))
+        dispatch(jdBasedResumeLanguageInfo(payloadLang))
 
-
+        console.log('skills',skills)
         const payloadSkills = {
+          jd_resume_id: jdResumeId,
           user_id: parseUserId?.user_id,
           data: skills.map((sk) => (
             {
-              id: sk?.id || null,
               resume_id: res?.payload?.id,
               skill_category: sk.skill_category,
               position: "test",
@@ -220,14 +221,14 @@ const page = () => {
 
           ))
         }
-        dispatch(saveSkillInfo(payloadSkills))
+        dispatch(jdBasedResumeSkillsInfo(payloadSkills))
 
         const payloadProject = {
+          jd_resume_id: jdResumeId,
           user_id: parseUserId?.user_id,
           resume_id: res?.payload?.id,
           data: personalPro.map((pPro) => (
             {
-              id: pPro?.id || null,
               project_title: pPro?.project_title,
               role: pPro?.role,
               start_time: convertToSubmitFormat(pPro?.start_time),
@@ -237,15 +238,15 @@ const page = () => {
             }
           ))
         }
-        dispatch(saveProjectInfo(payloadProject))
+        dispatch(jdBasedResumeProjectsInfo(payloadProject))
 
 
         const payloadCerticate = {
+          jd_resume_id: jdResumeId,
           user_id: parseUserId?.user_id,
           resume_id: res?.payload?.id,
           data: certificates.map((cer) => (
             {
-              id: cer?.id || null,
               certification_name: cer?.certification_name,
               issuing_organization: cer?.issuing_organization,
               obtained_date: convertToSubmitFormat(cer?.obtained_date),
@@ -253,14 +254,14 @@ const page = () => {
             }
           ))
         }
-        dispatch(saveCertificatesInfo(payloadCerticate))
+        dispatch(jdBasedResumeCertificateInfo(payloadCerticate))
 
         const payloadAchive = {
+          jd_resume_id: jdResumeId,
           user_id: parseUserId?.user_id,
           resume_id: res?.payload?.id,
           data: achivments.map((achiv) => (
             {
-              id: achiv?.id || null,
               achievement_title: achiv?.achievement_title,
               organization: achiv?.organization,
               receive_date: convertToSubmitFormat(achiv?.receive_date),
@@ -268,7 +269,7 @@ const page = () => {
             }
           ))
         }
-        dispatch(saveAchivmentInfo(payloadAchive))
+        dispatch(jdBasedResumeAchivmentInfo(payloadAchive))
 
 
 
