@@ -76,7 +76,7 @@ const ExpLkdin=({lkdDetails, experiences, setExperiences})=>{
                 onClick={handleAddExperience}
                 className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[30px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
               >
-                <BsFillPlusCircleFill className="text-sm" /> Add Education
+                <BsFillPlusCircleFill className="text-sm" /> Add Experience
               </button>
               <button
                 onClick={() => handleDelete(exp.id)}

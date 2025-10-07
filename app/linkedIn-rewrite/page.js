@@ -188,7 +188,7 @@ const page = () => {
               </div>
               <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
                  {/* <Image src={resume4} alt="resume4" className='' /> */}
-                 <LinkedInTemplate data={formValues}/>
+                 <LinkedInTemplate data={formValues} educationEntries={educationEntries} experiences={experiences}/>
               </div>
             </div>
     

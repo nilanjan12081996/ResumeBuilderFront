@@ -1,6 +1,6 @@
 import { Briefcase, GraduationCap } from "lucide-react";
 
-const LinkedInTemplate=({data})=> {
+const LinkedInTemplate=({data,educationEntries,experiences})=> {
   return (
     <div className="flex justify-center p-6 bg-gray-100 min-h-screen">
       <div className="w-full max-w-2xl rounded-xl shadow-md overflow-hidden bg-white">
@@ -27,7 +27,7 @@ const LinkedInTemplate=({data})=> {
         </div>
 
         {/* Experience */}
-        <div className="px-6 mt-6">
+        {/* <div className="px-6 mt-6">
           <h2 className="text-lg font-semibold mb-4">Experience</h2>
           <div className="flex items-start space-x-3">
             <div className="bg-purple-100 p-2 rounded-full">
@@ -67,10 +67,66 @@ const LinkedInTemplate=({data})=> {
               </ul>
             </div>
           </div>
+        </div> */}
+
+
+                <div className="px-6 mt-6">
+          <h2 className="text-lg font-semibold mb-4">Experience</h2>
+          {experiences && experiences.length > 0 ? (
+            experiences.map((exp, idx) => (
+              <div key={exp.id || idx} className="flex items-start space-x-3 mb-6">
+                <div className="bg-purple-100 p-2 rounded-full mt-1">
+                  <Briefcase className="text-purple-600 w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium">
+                    {exp.position || "Position not specified"}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {exp.company_name || "Company name not available"}{" "}
+                    {exp.job_type ? `· ${exp.job_type}` : ""}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {exp.start_date
+                      ? new Date(exp.start_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "N/A"}{" "}
+                    –{" "}
+                    {exp.current_work
+                      ? "Present"
+                      : exp.end_date
+                      ? new Date(exp.end_date).toLocaleDateString("en-US", {
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </p>
+
+                  {exp.job_description && (
+                    <p className="mt-2 text-sm text-gray-700 leading-relaxed">
+                      {exp.job_description}
+                    </p>
+                  )}
+
+                  {exp.skill && (
+                    <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                      {exp.skill.split(",").map((skillItem, i) => (
+                        <li key={i}>{skillItem.trim()}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No experience data available.</p>
+          )}
         </div>
 
         {/* Education */}
-        <div className="px-6 mt-6 mb-8">
+        {/* <div className="px-6 mt-6 mb-8">
           <h2 className="text-lg font-semibold mb-4">Education</h2>
           <div className="flex items-start space-x-3">
             <div className="bg-yellow-100 p-2 rounded-full">
@@ -84,7 +140,64 @@ const LinkedInTemplate=({data})=> {
               <p className="text-xs text-gray-500">Jan 2019 – Jan 2023</p>
             </div>
           </div>
+        </div> */}
+
+        <div className="px-6 mt-6 mb-8">
+  <h2 className="text-lg font-semibold mb-4">Education</h2>
+
+  {educationEntries && educationEntries.length > 0 ? (
+    educationEntries.map((edu, index) => (
+      <div
+        key={edu.id || index}
+        className="flex items-start space-x-3 mb-4 last:mb-0"
+      >
+        <div className="bg-yellow-100 p-2 rounded-full">
+          <GraduationCap className="text-yellow-600 w-5 h-5" />
         </div>
+        <div>
+          <h3 className="font-medium text-gray-900">
+            {edu.institution || "Institution Name"}
+          </h3>
+
+          <p className="text-sm text-gray-600">
+            {edu.degree ? `${edu.degree}` : ""}{" "}
+            {edu.field_study ? `, ${edu.field_study}` : ""}
+          </p>
+
+          {/* Date Range */}
+          <p className="text-xs text-gray-500">
+            {edu.start_time
+              ? new Date(edu.start_time).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })
+              : "Start"}{" "}
+            –{" "}
+            {edu.currentlyStudying
+              ? "Present"
+              : edu.end_time
+              ? new Date(edu.end_time).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })
+              : "End"}
+          </p>
+
+          {/* GPA or Additional Info (Optional) */}
+          {(edu.cgpa || edu.additionalInfo) && (
+            <p className="text-xs text-gray-500 mt-1">
+              {edu.cgpa ? `GPA: ${edu.cgpa}` : ""}{" "}
+              {edu.additionalInfo ? ` | ${edu.additionalInfo}` : ""}
+            </p>
+          )}
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-sm text-gray-500">No education details available.</p>
+  )}
+</div>
+
       </div>
     </div>
   );
