@@ -85,7 +85,22 @@ const page = () => {
    const[educationEntries,setEducationEntries]=useState([
       {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}
     ])
-  
+
+     const [experiences, setExperiences] = useState([
+         {
+          id: Date.now(),
+          company_name: "",
+          position: "",
+          location: "",
+          skill: "",
+          job_type: "",
+          start_date: null,
+          end_date: null,
+          current_work: false,
+          job_description: "",
+        },
+      ]);
+
   return (
     <div className='lg:flex gap-5 pb-5'>
       
@@ -125,7 +140,7 @@ const page = () => {
                             </TabPanel>
     
                             <TabPanel>
-                               <ExpLkdin/>
+                               <ExpLkdin lkdDetails={lkdDetails} experiences={experiences} setExperiences={setExperiences}/>
                             </TabPanel>
     
                             <TabPanel>
@@ -167,7 +182,9 @@ const page = () => {
               </div>
             </div>
     
-        </div>
+    </div>
+
+ 
   )
 }
 

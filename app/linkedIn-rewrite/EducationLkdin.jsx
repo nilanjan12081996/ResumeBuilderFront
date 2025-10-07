@@ -22,26 +22,43 @@ const EducationLkdin=({lkdDetails, setValue,register,educationEntries,setEducati
       )
     );
   };
-    useEffect(() => {
-    if (lkdDetails?.data?.[0]?.education_info) {
-      const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => ({
+useEffect(() => {
+  if (lkdDetails?.data?.[0]?.education_info) {
+    const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
+      // Try to separate field and degree if possible
+      let degree = "";
+      let field_study = "";
+      if (edu.course) {
+        // Look for parentheses (common LinkedIn format)
+        const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
+        if (match) {
+          field_study = match[1].trim();  // "Computer Science"
+          degree = match[2].trim();       // "Bachelor of Science - BS"
+        } else {
+          degree = edu.course; // fallback if no parentheses
+        }
+      }
+
+      return {
         id: edu.id,
         institution: edu.college || "",
         location: edu.location || "",
-        degree: edu.course || "",   // e.g. "Master of Science (M.Sc.)"
-        field_study: edu.course || "", // e.g. "Computer Science"
+        degree,
+        field_study,
         start_time: edu.course_start ? new Date(edu.course_start) : null,
-      end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
-        ? new Date(edu.course_completed)
-        : null,
+        end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
+          ? new Date(edu.course_completed)
+          : null,
         cgpa: edu.cgpa || "",
         additionalInfo: edu.aditional_info || "",
         currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
-      }));
-  
-      setEducationEntries(mappedEducation);
-    }
-  }, [lkdDetails]);
+      };
+    });
+
+    setEducationEntries(mappedEducation);
+  }
+}, [lkdDetails]);
+
     return(
         <>
          {/* <div className='tab_wrap'>
@@ -298,8 +315,8 @@ const EducationLkdin=({lkdDetails, setValue,register,educationEntries,setEducati
                         type="text" 
                         sizing="md" 
                         placeholder='e.g. 3.8/4.0 or 85%'
-                        value={entry.gpa}
-                        onChange={(e) => updateEducationField(entry.id, 'gpa', e.target.value)}
+                        value={entry.cgpa}
+                        onChange={(e) => updateEducationField(entry.id, 'cgpa', e.target.value)}
                       />
                     </div>
                   </div>
