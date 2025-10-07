@@ -79,8 +79,11 @@ const page = () => {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm();
+
+  const formValues = watch();
 
    const[educationEntries,setEducationEntries]=useState([
       {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}
@@ -100,6 +103,13 @@ const page = () => {
           job_description: "",
         },
       ]);
+
+        const [languages, setLanguages] = useState([
+          { id: Date.now(), language_name: "" },
+        ]);
+  const [skills, setSkills] = useState([
+    { id: Date.now(), skill_category: "", skill: "" }
+  ])
 
   return (
     <div className='lg:flex gap-5 pb-5'>
@@ -144,11 +154,11 @@ const page = () => {
                             </TabPanel>
     
                             <TabPanel>
-                              <LanguageLkdin/>
+                              <LanguageLkdin lkdDetails={lkdDetails} languages={languages} setLanguages={setLanguages}/>
                             </TabPanel>
     
                             <TabPanel>
-                             <SkillsLkdin/>
+                             <SkillsLkdin lkdDetails={lkdDetails} skills={skills} setSkills={setSkills}/>
                             </TabPanel>
     
                             <TabPanel>
@@ -178,7 +188,7 @@ const page = () => {
               </div>
               <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
                  {/* <Image src={resume4} alt="resume4" className='' /> */}
-                 <LinkedInTemplate/>
+                 <LinkedInTemplate data={formValues}/>
               </div>
             </div>
     

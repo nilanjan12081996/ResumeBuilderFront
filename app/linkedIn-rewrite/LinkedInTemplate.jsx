@@ -1,19 +1,19 @@
 import { Briefcase, GraduationCap } from "lucide-react";
 
-const LinkedInTemplate=()=> {
+const LinkedInTemplate=({data})=> {
   return (
     <div className="flex justify-center p-6 bg-gray-100 min-h-screen">
       <div className="w-full max-w-2xl rounded-xl shadow-md overflow-hidden bg-white">
         {/* Header Section */}
         <div className="bg-gray-200 h-28"></div>
         <div className="px-6 mt-10">
-          <h1 className="text-2xl font-semibold">Manisha Sharma</h1>
+          <h1 className="text-2xl font-semibold">{data?.candidate_name||"Manisha Sharma"}</h1>
           <p className="text-gray-600 mt-1">
-            Web development & UI/UX design specialist focused on building
-            intuitive, impactful digital products with innovative technologies.
+            {data?.summary||"Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
+            
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Hyderabad, Telangana, India
+          {data?.location||"Hyderabad, Telangana, India"}  
           </p>
         </div>
 
@@ -21,13 +21,8 @@ const LinkedInTemplate=()=> {
         <div className="px-6 mt-6">
           <h2 className="text-lg font-semibold mb-2">About</h2>
           <p className="text-gray-700 text-sm leading-relaxed">
-            Passionate and results-oriented professional with a strong background
-            in web development and UI/UX design. Experienced in creating effective
-            and engaging digital solutions, working on diverse projects ranging
-            from client websites to content creation platforms. Adept at blending
-            technical expertise with creative design to deliver user-friendly and
-            high-performing products. Always eager to learn new technologies and
-            contribute to innovative teams.
+            {data?.description||"Passionate and results-oriented professional with a strong background in web development and UI/UX design. Experienced in creating effective and engaging digital solutions, working on diverse projects ranging from client websites to content creation platforms. Adept at blending technical expertise with creative design to deliver user-friendly and high-performing products. Always eager to learn new technologies and contribute to innovative teams."}
+            
           </p>
         </div>
 

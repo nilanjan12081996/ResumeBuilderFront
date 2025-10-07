@@ -237,6 +237,30 @@ const Page = () => {
       clearFileInput();
   };
 
+// const handleAppChange=()=>{
+// const storedToken = sessionStorage.getItem("resumeToken");
+// const encodedToken = btoa(storedToken); // Encode
+// console.log(encodedToken);
+// }
+
+const handleAppChange = () => {
+  const storedToken = sessionStorage.getItem("resumeToken");
+
+  if (!storedToken) {
+    console.error("No token found in sessionStorage!");
+    return;
+  }
+
+  // Encode the token safely for URLs
+  const encodedToken = encodeURIComponent(btoa(storedToken));
+
+  // Example target app URL
+  // const targetAppUrl = `https://localhost:3001/loading-page?token=${encodedToken}`;
+   const targetAppUrl = `https://linkedinscraper.hiringeye.ai/loading-page?token=${encodedToken}`;
+
+  // Redirect
+  window.location.href = targetAppUrl;
+};
 
 
 
@@ -284,9 +308,9 @@ const Page = () => {
                             <p className="text-[#525252] text-[17px] leading-[27px] pb-6">
                               Generate engaging LinkedIn posts and comments that boost your professional presence. Stand out with AI-crafted content.
                             </p>
-                            <Link href="#" className="text-[18px] leading-[28px] text-[#2781E5] hover:text-black font-medium inline-flex items-center gap-1" passHref>
+                            <button onClick={()=>handleAppChange()} className="text-[18px] leading-[28px] text-[#2781E5] hover:text-black font-medium inline-flex items-center gap-1" passHref>
                                Get Started <BsArrowRightShort className="text-2xl" />
-                            </Link>
+                            </button>
                         </div>
                           ):(
                             <>
