@@ -29,26 +29,20 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
     } = useForm();
 
     const onSubmit = (data) => {
-        dispatch(loginCustomer(data)).then((res) => {
+        dispatch(loginCustomer({...data,app:1})).then((res) => {
             console.log("login res", res)
             if (res?.payload?.status_code === 200) {
-                // dispatch(checkSubscription()).then((res) => {
-                    // console.log("res", res);
-                    // if (res?.payload?.data) {
-
-                        setOpenLoginModal(false);
+           
+                        if(res?.payload?.data?.project?.length>1){
+                            setOpenLoginModal(false);
+                        router.push('/main-dashboard');
+                        }
+                        else{
+                             setOpenLoginModal(false);
                         router.push('/dashboard');
-                        // dispatch(getSearchHistory({ week: 0 }));
-                        // dispatch(getProfile())
-                   //  } 
-                    //else {
-
-                    //     setOpenLoginModal(false);
-                    //     router.push('/plans');
-                    //     dispatch(getSearchHistory({ week: 0 }));
-                    //     dispatch(getProfile())
-                    // }
-                // })
+                        }
+                        
+                
 
             } else if (res?.payload?.response?.data?.status_code === 401) {
                 setError(res?.payload?.response?.data?.message)

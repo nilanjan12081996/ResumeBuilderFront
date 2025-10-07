@@ -141,7 +141,8 @@ const initialState = {
     loading: false,
     isLoggedIn: false,
     loadingIccid: false,
-    signUpTypes:[]
+    signUpTypes:[],
+    loginData:[]
 };
 
 const authSlice = createSlice({
@@ -160,6 +161,9 @@ const authSlice = createSlice({
             sessionStorage.removeItem('user_id');
             sessionStorage.removeItem('fullname')
             sessionStorage.removeItem('signup_type_id')
+            localStorage.removeItem('projects')
+            sessionStorage.clear()
+            localStorage.clear()
         },
     },
     extraReducers: (builder) => {
@@ -229,9 +233,13 @@ const authSlice = createSlice({
                 state.error = false;
             })
             .addCase(loginCustomer.fulfilled, (state, { payload }) => {
+               
                 const { access_token, data, refresh_token } = payload;
+                console.log(data,"loginCustomer");
+                
                 state.loading = false;
                 state.isLoggedIn = true;
+                localStorage.setItem('projects',JSON.stringify({projects:data?.project}))
                 sessionStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
