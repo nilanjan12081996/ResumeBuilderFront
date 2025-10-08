@@ -57,6 +57,86 @@ console.log("currentSubscriptionData",currentSubscriptionData)
     });
   };
 
+  // Helper function to get the last plan for a specific frequency
+  const getLastPlan = (frequency) => {
+    if (!plans?.data?.length) return null;
+    
+    const filteredPlans = plans.data.filter((pln) => pln?.plan_frequency === frequency);
+    return filteredPlans.length > 0 ? filteredPlans[filteredPlans.length - 1] : null;
+  };
+
+  // Helper function to render a plan card
+  const renderPlanCard = (pln, isDisabled = false) => {
+    return (
+      <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+        <div className="py-8 px-6 relative">
+          {pln?.plan_name === "Gold" || pln?.plan_name === "Campus Plus" ? (
+            <Image
+              src={sub02}
+              alt="sub01"
+              className="mb-6"
+            />
+          ) : (
+            <Image
+              src={sub01}
+              alt="sub01"
+              className="mb-6"
+            />
+          )}
+          <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
+            {pln?.plan_name}
+          </h3>
+          <div className="flex items-center gap-2 mb-8">
+            <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
+              <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
+                {pln?.planPrice?.currency}
+              </span>{" "}
+              {pln?.planPrice?.price}
+            </p>
+          </div>
+          <div className="mb-14 border-t border-[#edf0ff] pt-8">
+            <div>
+              {pln?.PlanAccess?.map((pAccess, accessIndex) => {
+                return (
+                  <div key={accessIndex} className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                    <Image
+                      src={Check}
+                      alt="Check"
+                      className="w-[14px] h-[14px] mr-2"
+                    />{" "}
+                    {pAccess?.plan_access_description}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
+            <button
+              onClick={(e) =>
+                !isDisabled &&
+                !hasActiveSubscription() &&
+                handlePaymentModal(e, {
+                  amount: pln?.planPrice?.price,
+                  currency: pln?.planPrice?.currency,
+                  plan_id: pln?.planPrice?.plan_id,
+                })
+              }
+              disabled={isDisabled || hasActiveSubscription()}
+              className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
+                ${
+                  isDisabled || hasActiveSubscription()
+                    ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+                    : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+                }`}
+            >
+              {isDisabled ? "Already Subscribed" : hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const loadRazorpayScript = (() => {
     let loaded;
     return () =>
@@ -217,6 +297,57 @@ console.log("ipdata",ipData)
               </div>
             )}
 
+            {/* Show Last Plan when no subscription exists */}
+            {!hasActiveSubscription() && !currentSubscriptionData?.data?.length && (
+              <div className="mb-6 mx-4 lg:mx-0">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center mb-4">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-blue-800">
+                        Currently Active Plan: Free Plan
+                      </h3>
+                      <p className="text-sm text-blue-700">
+                        Choose from our available plans below to get started
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Show last plan for each frequency type */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {parsed?.signup_type_id == 1 && getLastPlan(1) && (
+                      <div className="bg-white rounded-lg p-4 border border-blue-200">
+                        <h4 className="font-medium text-gray-900 mb-2">Free Plan</h4>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {getLastPlan(1)?.planPrice?.currency} {getLastPlan(1)?.planPrice?.price}
+                        </p>
+                        <div className="text-xs text-gray-500">
+                          {getLastPlan(1)?.PlanAccess?.slice(0, 2).map(access => access.plan_access_description).join(', ')}
+                          {getLastPlan(1)?.PlanAccess?.length > 2 && '...'}
+                        </div>
+                      </div>
+                    )}
+                    {parsed?.signup_type_id == 2 && getLastPlan(12) && (
+                      <div className="bg-white rounded-lg p-4 border border-blue-200">
+                        <h4 className="font-medium text-gray-900 mb-2">Free Plan</h4>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {getLastPlan(12)?.planPrice?.currency} {getLastPlan(12)?.planPrice?.price}
+                        </p>
+                        <div className="text-xs text-gray-500">
+                          {getLastPlan(12)?.PlanAccess?.slice(0, 2).map(access => access.plan_access_description).join(', ')}
+                          {getLastPlan(12)?.PlanAccess?.length > 2 && '...'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="subscription_tab_section">
               <Tabs>
                 <TabList>
@@ -235,83 +366,13 @@ console.log("ipdata",ipData)
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                         {plans?.data
                           ?.filter((pln) => pln?.plan_frequency === 1)
-                          .map((pln, index) => {
+                          .map((pln, index, array) => {
+                            // Check if this is the last plan in the array
+                            const isLastPlan = index === array.length - 1;
                             return (
-                              <>
-                                <div
-                                  className="pt-0 border border-[#e9edff] rounded-[26px] bg-white"
-                                  key={index}
-                                >
-                                  <div className="py-8 px-6 relative">
-                                    {pln?.plan_name === "Gold" ? (
-                                      <Image
-                                        src={sub02}
-                                        alt="sub01"
-                                        className="mb-6"
-                                      />
-                                    ) : (
-                                      <Image
-                                        src={sub01}
-                                        alt="sub01"
-                                        className="mb-6"
-                                      />
-                                    )}
-                                    <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                                      {pln?.plan_name}
-                                    </h3>
-                                    <div className="flex items-center gap-2 mb-8">
-                                      <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                                        <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
-                                          {pln?.planPrice?.currency}
-                                        </span>{" "}
-                                        {pln?.planPrice?.price}
-                                      </p>
-                                    </div>
-                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                      <div>
-                                        {pln?.PlanAccess?.map((pAccess) => {
-                                          return (
-                                            <>
-                                              <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                <Image
-                                                  src={Check}
-                                                  alt="Check"
-                                                  className="w-[14px] h-[14px] mr-2"
-                                                />{" "}
-                                                {
-                                                  pAccess?.plan_access_description
-                                                }
-                                              </div>
-                                            </>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                    <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-                                    <button
-  onClick={(e) =>
-    !hasActiveSubscription() &&
-    handlePaymentModal(e, {
-      amount: pln?.planPrice?.price,
-      currency: pln?.planPrice?.currency,
-      plan_id: pln?.planPrice?.plan_id,
-    })
-  }
-  disabled={hasActiveSubscription()}
-  className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
-    ${
-      hasActiveSubscription()
-        ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
-        : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
-    }`}
->
-  {hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
-</button>
-
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
+                              <div key={index}>
+                                {renderPlanCard(pln, isLastPlan)}
+                              </div>
                             );
                           })}
 
@@ -387,83 +448,13 @@ console.log("ipdata",ipData)
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                         {plans?.data
                           ?.filter((pln) => pln?.plan_frequency === 3)
-                          .map((pln, index) => {
+                          .map((pln, index, array) => {
+                            // Check if this is the last plan in the array
+                            const isLastPlan = index === array.length - 1;
                             return (
-                              <>
-                                <div
-                                  className="pt-0 border border-[#e9edff] rounded-[26px] bg-white"
-                                  key={index}
-                                >
-                                  <div className="py-8 px-6 relative">
-                                    {pln?.plan_name === "Gold" ? (
-                                      <Image
-                                        src={sub02}
-                                        alt="sub01"
-                                        className="mb-6"
-                                      />
-                                    ) : (
-                                      <Image
-                                        src={sub01}
-                                        alt="sub01"
-                                        className="mb-6"
-                                      />
-                                    )}
-                                    <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                                      {pln?.plan_name}
-                                    </h3>
-                                    <div className="flex items-center gap-2 mb-8">
-                                      <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                                        <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
-                                          {pln?.planPrice?.currency}
-                                        </span>{" "}
-                                        {pln?.planPrice?.price}
-                                      </p>
-                                    </div>
-                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                      <div>
-                                        {pln?.PlanAccess?.map((pAccess) => {
-                                          return (
-                                            <>
-                                              <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                <Image
-                                                  src={Check}
-                                                  alt="Check"
-                                                  className="w-[14px] h-[14px] mr-2"
-                                                />{" "}
-                                                {
-                                                  pAccess?.plan_access_description
-                                                }
-                                              </div>
-                                            </>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                    <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-                                    <button
-  onClick={(e) =>
-    !hasActiveSubscription() &&
-    handlePaymentModal(e, {
-      amount: pln?.planPrice?.price,
-      currency: pln?.planPrice?.currency,
-      plan_id: pln?.planPrice?.plan_id,
-    })
-  }
-  disabled={hasActiveSubscription()}
-  className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
-    ${
-      hasActiveSubscription()
-        ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
-        : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
-    }`}
->
-  {hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
-</button>
-
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
+                              <div key={index}>
+                                {renderPlanCard(pln, isLastPlan)}
+                              </div>
                             );
                           })}
                       </div>
@@ -706,80 +697,13 @@ console.log("ipdata",ipData)
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                         {plans?.data
                           ?.filter((pln) => pln?.plan_frequency === 12)
-                          .map((pln, index) => {
+                          .map((pln, index, array) => {
+                            // Check if this is the last plan in the array
+                            const isLastPlan = index === array.length - 1;
                             return (
-                              <>
-                                <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                  <div className="py-8 px-6 relative">
-                                    {pln?.plan_name === "Campus Plus" ? (
-                                      <Image
-                                        src={sub02}
-                                        alt="sub01"
-                                        className="mb-6"
-                                      />
-                                    ) : (
-                                      <Image
-                                        src={sub01}
-                                        alt="sub01"
-                                        className="mb-6"
-                                      />
-                                    )}
-                                    <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                                      {pln?.plan_name}
-                                    </h3>
-                                    <div className="flex items-center gap-2 mb-8">
-                                      <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                                        <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
-                                          {pln?.planPrice?.currency}
-                                        </span>{" "}
-                                        {pln?.planPrice?.price}
-                                      </p>
-                                    </div>
-                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                      <div>
-                                        {pln?.PlanAccess?.map((pAccess) => {
-                                          return (
-                                            <>
-                                              <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                <Image
-                                                  src={Check}
-                                                  alt="Check"
-                                                  className="w-[14px] h-[14px] mr-2"
-                                                />{" "}
-                                                {
-                                                  pAccess?.plan_access_description
-                                                }
-                                              </div>
-                                            </>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                    <button
-  onClick={(e) =>
-    !hasActiveSubscription() &&
-    handlePaymentModal(e, {
-      amount: pln?.planPrice?.price,
-      currency: pln?.planPrice?.currency,
-      plan_id: pln?.planPrice?.plan_id,
-    })
-  }
-  disabled={hasActiveSubscription()}
-  className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
-    ${
-      hasActiveSubscription()
-        ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
-        : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
-    }`}
->
-  {hasActiveSubscription() ? "Already Subscribed" : "Get Started"}
-</button>
-
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
+                              <div key={index}>
+                                {renderPlanCard(pln, isLastPlan)}
+                              </div>
                             );
                           })}
 

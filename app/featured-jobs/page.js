@@ -10,7 +10,7 @@ import hiring_icon from "../assets/imagesource/hiring_icon.png";
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFeatureJob } from '../reducers/FeatureJobSlice';
-import striptags from 'striptags';
+// import striptags from 'striptags';
 import { Pagination } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 
@@ -57,7 +57,7 @@ const page = () => {
           <div className='bg-[#FFFFFF] rounded-[10px] px-8 py-8 shadow-lg'>
           <Image src={hiring_icon} alt="hiring_icon" className='mb-4' />
           <h3 className='text-[#560654] text-[20px] font-semibold pb-2'>{ftJobs?.job_role}</h3>
-          <p className='text-[#6C6C6C] text-[15px] leading-[22px] pb-4'>{striptags(ftJobs?.job_description)}</p>
+          {/* <p className='text-[#6C6C6C] text-[15px] leading-[22px] pb-4'>{striptags(ftJobs?.job_description)}</p> */}
           <Link className='bg-[#800080] hover:bg-[#151515] text-[15px] leading-[45px] text-[#ffffff] font-semibold block text-center rounded-[7px]' href={{pathname:"/featured-jobs-details",query:{id:btoa(ftJobs?.id)}}} >Read More</Link>
         </div>
           ))
