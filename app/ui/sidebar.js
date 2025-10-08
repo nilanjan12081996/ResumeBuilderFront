@@ -202,7 +202,8 @@ const Sidebar = () => {
                     }`}
                   passHref>
                   <VscChecklist className='text-2xl' />
-                  Plans
+                  {/* Plans */}
+                  Billing
                 </Link>
               </li>
 

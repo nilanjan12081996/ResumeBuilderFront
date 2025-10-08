@@ -9,7 +9,7 @@ import resume01 from "../assets/imagesource/resume01.png";
 
 import { FaArrowUpWideShort } from "react-icons/fa6";
 import { RiSearchLine } from "react-icons/ri";
-import { Select, TextInput } from 'flowbite-react';
+import { Pagination, Select, TextInput } from 'flowbite-react';
 import { CgFileDocument } from 'react-icons/cg';
 import { BiDownload } from "react-icons/bi";
 import { RiDraftLine } from "react-icons/ri";
@@ -32,10 +32,65 @@ const inter = Inter({
 const page = () => {
   const{rHistory}=useSelector((state)=>state?.resHist)
   const dispatch=useDispatch()
-  useEffect(()=>{
-dispatch(getResumeHistory({page:1,limit:10}))
-  },[])
+    const [totalPage, setTotalPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
+  const [typingTimeout, setTypingTimeout] = useState(null);
+  const [statusFlag, setStatusFlag] = useState("all");
+  const [sortByName, setSortByName] = useState(false);
 
+  useEffect(()=>{
+    const payload = {
+    page: currentPage,
+    limit: limit,
+    sortByName: sortByName ? "true" : "false",
+  };
+  if (searchQuery && searchQuery.trim() !== "") {
+    payload.searchQuery = searchQuery.trim();
+  }
+  if (statusFlag && statusFlag !== "all") {
+    payload.statusFlag = statusFlag;
+  }
+
+dispatch(getResumeHistory(payload)).then((res)=>{
+  console.log(res,"histRes");
+  const total=res?.payload?.pagination?.total_pages
+  setTotalPage(Number.isInteger(total) && total > 0 ? total : 1)
+})
+  },[currentPage,limit,searchQuery,statusFlag,sortByName])
+
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Optional: delay API call while user is typing (debounce)
+    if (typingTimeout) clearTimeout(typingTimeout);
+    setTypingTimeout(
+      setTimeout(() => {
+        // Trigger new search only if value is not empty or after typing stops
+        dispatch(getResumeHistory({ page: 1, limit, searchQuery: value })).then((res) => {
+          const total = res?.payload?.pagination?.total_pages;
+          setTotalPage(Number.isInteger(total) && total > 0 ? total : 1);
+          setCurrentPage(1);
+        });
+      }, 600) // waits 600ms after typing stops
+    );
+  };
+
+    const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      dispatch(getResumeHistory({ page: 1, limit, searchQuery })).then((res) => {
+        const total = res?.payload?.pagination?.total_pages;
+        setTotalPage(Number.isInteger(total) && total > 0 ? total : 1);
+        setCurrentPage(1);
+      });
+    }
+  };
   console.log("rHistory",rHistory);
   
   return (
@@ -49,18 +104,28 @@ dispatch(getResumeHistory({page:1,limit:10}))
             <div className='lg:w-10/12 mb-2 lg:mb-0'>
               <div className='bg-[#F3F4F6] rounded-[8px] flex gap-4 items-center'>
                  <button className='w-[42px] h-[42px] flex justify-center items-center cursor-pointer'><RiSearchLine className='text-xl text-[#999999]' /></button>
-                 <TextInput id="base" type="text" sizing="md" placeholder='Search resume...' className='w-full' />
+                 <TextInput
+                 value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
+                 id="base" type="text" sizing="md" placeholder='Search resume...' className='w-full' />
               </div>
             </div>
             <div className='lg:w-3/12'>
               <div className='flex justify-center items-center gap-4'>
-                <Select id="countries" className='w-[80%]' required>
-                    <option>All Status</option>
-                    <option>Status</option>
-                    <option>Status</option>
-                    <option>Status</option>
+                <Select value={statusFlag} onChange={(e) => setStatusFlag(e.target.value)} id="countries" className='w-[80%]'>
+                    <option value="all">All</option>
+                    <option value="saved">Saved</option>
+                    <option value="complete">Complete</option>
+                    <option value="downloaded">Downloaded</option>
+                     <option value="draft">Draft</option>
                 </Select>
-                <button className='bg-white hover:bg-[#a635a2] text-black hover:text-white border border-[#D5D5D5] rounded-[8px] w-[42px] h-[42px] flex justify-center items-center cursor-pointer'><FaArrowUpWideShort className='text-2xl' /></button>
+                <button  onClick={() => setSortByName((prev) => !prev)} 
+               // className='bg-white hover:bg-[#a635a2] text-black hover:text-white border border-[#D5D5D5] rounded-[8px] w-[42px] h-[42px] flex justify-center items-center cursor-pointer'
+               className={`${
+    sortByName ? "bg-[#a635a2] text-white" : "bg-white text-black"
+  } hover:bg-[#a635a2] hover:text-white border border-[#D5D5D5] rounded-[8px] w-[42px] h-[42px] flex justify-center items-center cursor-pointer`}
+                ><FaArrowUpWideShort className='text-2xl' /></button>
               </div>
             </div>
         </div>
@@ -169,123 +234,28 @@ dispatch(getResumeHistory({page:1,limit:10}))
             ))
           }
           
-
-           {/* <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
-              <div className='lg:flex gap-3 items-center'>
-                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center mb-2 lg:mb-0'>
-                  <CgFileDocument className='text-[#ffffff] text-2xl' />
-                </div>
-                <div className='mb-2 lg:mb-0'>
-                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                  <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
-                  </div>
-                </div>
-              </div>
-              <div className='flex items-center gap-4 lg:gap-8'>
-                <button className='text-[15px] text-[#186603] hover:text-[#ffffff] bg-[#DEFFD5] hover:bg-[#186603] rounded-3xl px-5 py-2 cursor-pointer'>Downloaded</button>
-                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
-                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
-              </div>
-          </div>
-
-           <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
-              <div className='lg:flex gap-3 items-center'>
-                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center mb-2 lg:mb-0'>
-                  <CgFileDocument className='text-[#ffffff] text-2xl' />
-                </div>
-                <div className='mb-2 lg:mb-0'>
-                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                  <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
-                  </div>
-                </div>
-              </div>
-              <div className='flex items-center gap-4 lg:gap-8'>
-                <button className='text-[15px] text-[#92278F] hover:text-[#ffffff] bg-[#EFE3FF] hover:bg-[#92278F] rounded-3xl px-5 py-2 cursor-pointer'>Saved</button>
-                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
-                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
-              </div>
-          </div>
-
-           <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
-              <div className='lg:flex gap-3 items-center'>
-                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center mb-2 lg:mb-0'>
-                  <CgFileDocument className='text-[#ffffff] text-2xl' />
-                </div>
-                <div className='mb-2 lg:mb-0'>
-                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                  <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
-                  </div>
-                </div>
-              </div>
-              <div className='flex items-center gap-4 lg:gap-8'>
-                <button className='text-[15px] text-[#186603] hover:text-[#ffffff] bg-[#DEFFD5] hover:bg-[#186603] rounded-3xl px-5 py-2 cursor-pointer'>Downloaded</button>
-                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
-                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
-              </div>
-          </div>
-
-           <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
-              <div className='lg:flex gap-3 items-center'>
-                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center mb-2 lg:mb-0'>
-                  <CgFileDocument className='text-[#ffffff] text-2xl' />
-                </div>
-                <div className='mb-2 lg:mb-0'>
-                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                  <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
-                  </div>
-                </div>
-              </div>
-              <div className='flex items-center gap-4 lg:gap-8'>
-                <button className='text-[15px] text-[#186603] hover:text-[#ffffff] bg-[#DEFFD5] hover:bg-[#186603] rounded-3xl px-5 py-2 cursor-pointer'>Downloaded</button>
-                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
-                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
-              </div>
-          </div>
-
-           <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
-              <div className='lg:flex gap-3 items-center'>
-                <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center mb-2 lg:mb-0'>
-                  <CgFileDocument className='text-[#ffffff] text-2xl' />
-                </div>
-                <div className='mb-2 lg:mb-0'>
-                  <h3 className='text-[#151515] text-base font-medium mb-1'>Software Developer Resume</h3>
-                  <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>4 Days ago</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Before analysis ATS Score: 80/100</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-0'>After analysis ATS Score: 80/100</p>
-                  </div>
-                </div>
-              </div>
-              <div className='flex items-center gap-4 lg:gap-8'>
-                <button className='text-[15px] text-[#92278F] hover:text-[#ffffff] bg-[#EFE3FF] hover:bg-[#92278F] rounded-3xl px-5 py-2 cursor-pointer'>Saved</button>
-                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
-                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
-              </div>
-          </div> */}
         </div>
+        {
+        
+          
+          rHistory?.pagination?.total_pages>1&&(
+             <div className="flex justify-center items-center mt-4 pagination_sec">
+                <Pagination
+                  layout="pagination"
+                  currentPage={currentPage}
+                  totalPages={totalPage}
+                  onPageChange={onPageChange}
+                  previousLabel=""
+                  nextLabel=""
+                  showIcons
+                />
+                </div>
+          )
+          
+        }
+             
       </div>
+      
     </div>
   )
 }

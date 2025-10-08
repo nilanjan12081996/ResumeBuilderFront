@@ -4,9 +4,20 @@ import api from './api';
 
 export const getResumeHistory=createAsyncThunk(
     'getResumeHistory',
-      async ({page,limit}, { rejectWithValue }) => {
+      async ({page,limit,searchQuery,statusFlag,sortByName}, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/api/resume-history/list?page=${page}&limit=${limit}`);
+             let url = `/api/resume-history/list?page=${page}&limit=${limit}`;
+               if (searchQuery && searchQuery.trim() !== "") {
+                url += `&searchQuery=${encodeURIComponent(searchQuery.trim())}`;
+                }
+                if(statusFlag&&statusFlag.trim()!==""){
+                    url+=`&statusFlag=${encodeURIComponent(statusFlag.trim())}`
+                }
+                if(sortByName&&sortByName.trim()!==""){
+                    url+=`&sortByName=${encodeURIComponent(sortByName.trim())}`
+                }
+                const response = await api.get(url);
+           // const response = await api.get(`/api/resume-history/list?page=${page}&limit=${limit}&searchQuery=${searchQuery}`);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
