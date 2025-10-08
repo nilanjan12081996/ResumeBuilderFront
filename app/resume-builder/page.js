@@ -61,7 +61,7 @@ import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
+import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -81,6 +81,8 @@ const page = () => {
   const template = searchParams.get("template");
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
+  const[type,setType]=useState()
+  const[isCreated,setIsCreated]=useState(false)
 
    const componentRef = useRef();
  
@@ -173,8 +175,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         }))
       }))
     };
-    
-
      const payloadLang = {
           user_id: parseUserId?.user_id,
           resume_id: res?.payload?.id,
@@ -183,9 +183,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             proficiency: lang.proficiency,
           })),
         };
-       
-
-  
       const payloadSkills={
         user_id: parseUserId?.user_id,
         data:skills.map((sk)=>(
@@ -198,8 +195,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           
         ))
       }
-      
-
       const payloadProject={
          user_id: parseUserId?.user_id,
          resume_id: res?.payload?.id,
@@ -214,9 +209,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           }
          ))
       }
-      
-
-
       const payloadCerticate={
          user_id: parseUserId?.user_id,
          resume_id: res?.payload?.id,
@@ -229,8 +221,6 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           }
          ))
       }
-      
-
       const payloadAchive={
          user_id: parseUserId?.user_id,
          resume_id: res?.payload?.id,
@@ -244,6 +234,10 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           }
          ))
       }
+      dispatch(saveForDraft({
+        flag:type,
+        id:res?.payload?.id
+      }))
       dispatch(saveEducationInfo(eduPayload))
       dispatch(saveWorkExp(payload))
        dispatch(saveLanguageInfo(payloadLang))
@@ -251,8 +245,9 @@ dispatch(savePersonalInfo(data)).then((res)=>{
        dispatch(saveProjectInfo(payloadProject))
        dispatch(saveCertificatesInfo(payloadCerticate))
       dispatch(saveAchivmentInfo(payloadAchive))
-        
-
+      
+      toast.success(res?.payload?.message)
+      setIsCreated(true)
     
   }
   
@@ -340,7 +335,28 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                 <HiClipboardList className='text-[#800080] text-2xl' />
                 <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
               </div>
-              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save Resume"} </button>
+              <div className='flex gap-2'>
+                <button disabled={isCreated} onClick={()=>setType("draft")} type="submit"
+                // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
+                 className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
+                          ${isCreated 
+                            ? "bg-gray-400 text-white cursor-not-allowed"
+                            : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
+                          }`}
+                 >
+                  <AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save as Draft"} </button>
+               <button
+                disabled={isCreated} onClick={()=>setType("save")} type="submit"
+                // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
+                className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
+                  ${isCreated 
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
+                  }`}
+                ><AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save Resume"} </button>
+              
+              </div>
+             
            </div>
            <div className='resume_tab_section'>
               <Tabs>
@@ -418,7 +434,14 @@ dispatch(savePersonalInfo(data)).then((res)=>{
             <div className='lg:flex items-center gap-3'>
               <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
               <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
-              <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
+              <button disabled={!isCreated} onClick={handlePrint}
+              // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'
+              className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
+              ${!isCreated
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
+              }`}
+              ><IoMdDownload className='text-[18px]' /> Download PDF</button>
             </div>
           </div>
           <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>

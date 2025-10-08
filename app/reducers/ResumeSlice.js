@@ -162,6 +162,26 @@ export const saveAchivmentInfo=createAsyncThunk(
     }
 )
 
+export const saveForDraft=createAsyncThunk(
+    'saveForDraft',
+        async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/draft/resumeInfo', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 
 const initialState={
 loading:false,
