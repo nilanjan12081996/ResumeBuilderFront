@@ -419,9 +419,7 @@ const Page = () => {
                   </button>
                 </div>
               </div> */}
-            </div>
-              
-            <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
+              <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
               <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
                 Resume Writing Tips
               </h3>
@@ -443,6 +441,30 @@ const Page = () => {
                 </li>
               </ul>
             </div>
+            </div>
+              
+            {/* <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
+              <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+                Resume Writing Tips
+              </h3>
+              <ul className="pl-4.5">
+                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                  Keep your resume to 1-2 pages maximum
+                </li>
+                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                  Use action verbs to describe your achievements
+                </li>
+                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                  Tailor your resume for each job application
+                </li>
+                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                  Include relevant keywords from the job posting
+                </li>
+                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                  Preview carefully before submitting
+                </li>
+              </ul>
+            </div> */}
           </div>
         </div>
       </div>
@@ -497,7 +519,7 @@ const Page = () => {
                     Professional Template
                   </p>
                 </li>
-                <li>
+                {/* <li>
                   <input type="radio" name="test" id="cb3" />
                   <label
                     for="cb3"
@@ -520,7 +542,7 @@ const Page = () => {
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
                     Modern Template
                   </p>
-                </li>
+                </li> */}
               </ul>
             </div>
             <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">
