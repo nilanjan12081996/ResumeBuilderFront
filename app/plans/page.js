@@ -305,7 +305,7 @@ console.log("ipdata",ipData)
         : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
     }`}
 >
-  {hasActiveSubscription() ? "Already Subscribed" : "Get Started"}
+  {hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
 </button>
 
                                     </div>
@@ -457,7 +457,7 @@ console.log("ipdata",ipData)
         : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
     }`}
 >
-  {hasActiveSubscription() ? "Already Subscribed" : "Get Started"}
+  {hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
 </button>
 
                                     </div>
