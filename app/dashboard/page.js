@@ -392,33 +392,17 @@ const Page = () => {
                     </div>
                   </div>
                   <div>
-                    <button className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer">
+                    <Link 
+                    href={resume.resume_type==="scratch_resume"?`/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`:``} 
+                    className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
+                    >
                       <BiEdit />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
             </div>
-            {/* <div className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
-                <div className="flex gap-3 items-center">
-                  <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                    <CgFileDocument className="text-[#ffffff] text-2xl" />
-                  </div>
-                  <div>
-                    <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                      Software Developer Resume
-                    </h3>
-                    <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                      Created on 7 July, 2025
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer">
-                    <BiEdit />
-                  </button>
-                </div>
-              </div> */}
+       
               <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
               <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
                 Resume Writing Tips

@@ -53,7 +53,7 @@ import 'react-tabs/style/react-tabs.css';
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast } from "flowbite-react";
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
+import { getSingleResume, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -74,20 +74,27 @@ import AchivmentsEdit from './AchivmentsEdit';
 // import html2docx from "html2docx";
 
 const page = () => {
-  const{loading}=useSelector((state)=>state?.resume)
+  const{loading,singleResumeInfo}=useSelector((state)=>state?.resume)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
-  const template = searchParams.get("template");
+   const template = searchParams.get("template");
+  const resumeId=searchParams.get("id")
   const user_id=sessionStorage.getItem('user_id')
   const parseUserId=JSON.parse(user_id)
   const[type,setType]=useState()
   const[isCreated,setIsCreated]=useState(false)
+console.log("template",template);
 
    const componentRef = useRef();
  
 
 const dispatch=useDispatch()
+useEffect(()=>{
+dispatch(getSingleResume({id:resumeId}))
+},[])
+console.log("singleResumeInfo",singleResumeInfo);
+
  const [experiences, setExperiences] = useState([
     {
       id: Date.now(),
@@ -130,6 +137,7 @@ const dispatch=useDispatch()
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm();
 
@@ -241,7 +249,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       dispatch(saveTemplate({
         templete_id:template,
         jd_id:res?.payload?.id,
-        jd_type:"scratch"
+        jd_type:"scratch",
+        user_id: parseUserId?.user_id
       }))
       dispatch(saveEducationInfo(eduPayload))
       dispatch(saveWorkExp(payload))
@@ -383,35 +392,46 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                   <div className='mb-4'>
                       <div>
                         <TabPanel>
-                        <PersonalInfoEdit register={register} errors={errors}/>
+                        <PersonalInfoEdit setValue={setValue} singleResumeInfo={singleResumeInfo} register={register} errors={errors}/>
                         </TabPanel>
                         
                       <TabPanel>
-                      <EducationEdit register={register} errors={errors} educationEntries={educationEntries}setEducationEntries={setEducationEntries}/>
+                      <EducationEdit setValue={setValue} singleResumeInfo={singleResumeInfo} register={register} errors={errors} educationEntries={educationEntries}setEducationEntries={setEducationEntries}/>
                       </TabPanel>
                         
 
                         <TabPanel>
-                          <WorkExpEdit experiences={experiences} setExperiences={setExperiences} register={register} errors={errors}/>
+                          <WorkExpEdit setValue={setValue} singleResumeInfo={singleResumeInfo} experiences={experiences} setExperiences={setExperiences} register={register} errors={errors}/>
                         </TabPanel>
 
                         <TabPanel>
-                         <LanguageEdit 
+                         <LanguageEdit
+                         setValue={setValue} 
+                         singleResumeInfo={singleResumeInfo} 
                          languages={languages}
                           setLanguages={setLanguages}
                           />
                         </TabPanel>
 
                         <TabPanel>
-                          <SkillsEdit register={register} errors={errors} skills={skills}setSkills={setSkills}/>
+                          <SkillsEdit
+                          setValue={setValue} 
+                         singleResumeInfo={singleResumeInfo} 
+                          register={register} errors={errors} skills={skills}setSkills={setSkills}/>
                         </TabPanel>
 
                         <TabPanel>
-                          <PersonalProjectEdit register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro}/>
+                          <PersonalProjectEdit
+                           setValue={setValue} 
+                         singleResumeInfo={singleResumeInfo} 
+                          register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro}/>
                         </TabPanel>
 
                         <TabPanel>
-                         <CertificatesEdit register={register} errors={errors} certificates={certificates} setCertificates={setCertificates}/>
+                         <CertificatesEdit
+                          setValue={setValue} 
+                         singleResumeInfo={singleResumeInfo} 
+                         register={register} errors={errors} certificates={certificates} setCertificates={setCertificates}/>
                         </TabPanel>
 
                         <TabPanel>  

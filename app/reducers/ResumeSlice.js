@@ -202,6 +202,25 @@ export const saveTemplate=createAsyncThunk(
     }
 )
 
+export const getSingleResume=createAsyncThunk(
+    'getSingleResume',
+        async ({id}, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/resume/personal-info/get-scratch-resume-info/${id}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
 
 const initialState={
 loading:false,
@@ -214,7 +233,8 @@ saveSkinfo:"",
 saveProInfo:"",
 saveCerInfo:"",
 saveAchiveInfo:"",
-saveTemplateInfo:""
+saveTemplateInfo:"",
+singleResumeInfo:""
 }
 const ResumeSlice=createSlice(
     {
@@ -327,6 +347,18 @@ const ResumeSlice=createSlice(
                 state.error=false
             })
             .addCase(saveTemplate.rejected,(state,{payload})=>{
+                state.loading=false
+                state.error=payload
+            })
+            .addCase(getSingleResume.pending,(state)=>{
+                state.loading=true
+            })
+            .addCase(getSingleResume.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.singleResumeInfo=payload
+                state.error=false
+            })
+            .addCase(getSingleResume.rejected,(state,{payload})=>{
                 state.loading=false
                 state.error=payload
             })
