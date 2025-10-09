@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { Inter } from 'next/font/google';
 
 import resume01 from "../assets/imagesource/resume01.png";
-
+import resume1 from "../assets/imagesource/resume1.png";
+import resume2 from "../assets/imagesource/resume2.png";
 const inter = Inter({
   subsets: ['latin'], // or ['latin-ext'] etc.
   weight: ['400', '500', '600', '700'], // specify desired weights
@@ -23,11 +24,21 @@ const page = () => {
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 pb-8'>
         <div>
           <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
-           <Image src={resume01} alt="resume01" className='' />
+           {/* <Image src={resume01} alt="resume01" className='' /> */}
+           <Image src={resume1} alt="resume01" className="h-[400px]" />
           </div>
+            <button className='bg-[#800080] rounded-[7px] px-4 py-2 text-white'> Use Template</button>
           <p className='text-[#000000] text-xl font-semibold text-center'>Modern Template</p>
         </div>
-        <div>
+              <div>
+          <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
+           {/* <Image src={resume01} alt="resume01" className='' /> */}
+          <Image src={resume2} alt="resume01" className="h-[400px]" />
+          </div>
+          <button className='bg-[#800080] rounded-[7px] px-4 py-2 text-white'> Use Template</button>
+          <p className='text-[#000000] text-xl font-semibold text-center'> Professional Template</p>
+        </div>
+        {/* <div>
           <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
@@ -39,7 +50,7 @@ const page = () => {
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Technical Template</p>
         </div>
-                <div>
+        <div>
           <div className='bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-3 lg:mb-6'>
            <Image src={resume01} alt="resume01" className='' />
           </div>
@@ -56,7 +67,7 @@ const page = () => {
            <Image src={resume01} alt="resume01" className='' />
           </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Technical Template</p>
-        </div>
+        </div> */}
       </div>
     </div>
   )

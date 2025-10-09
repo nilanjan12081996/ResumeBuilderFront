@@ -584,13 +584,12 @@ dispatch(updatePersonalInfo({id:singleResumeInfo?.data?.personal_info?.id,...dat
             <div className='lg:flex items-center gap-3'>
               <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
               <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
-              <button disabled={!isCreated} onClick={handlePrint}
+              <button  onClick={handlePrint}
               // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'
-              className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
-              ${!isCreated
-                ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
-              }`}
+              className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5 bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer
+              
+              `
+            }
               ><IoMdDownload className='text-[18px]' /> Download PDF</button>
             </div>
           </div>
