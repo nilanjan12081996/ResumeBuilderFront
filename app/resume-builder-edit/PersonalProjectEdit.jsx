@@ -7,23 +7,23 @@ import { MdDelete } from "react-icons/md"
 
 const PersonalProjectEdit=({setValue,singleResumeInfo,personalPro, setPersonalPro})=>{
 
-useEffect(() => {
-    if (singleResumeInfo?.data?.project_info?.length > 0) {
-      const formattedProjects = singleResumeInfo.data.project_info.map((proj) => ({
-        id: proj.id,
-        project_title: proj.project_title || "",
-        role: proj.role || "",
-        start_time: proj.start_time ? new Date(proj.start_time) : null,
-        end_time: proj.end_time ? new Date(proj.end_time) : null,
-        project_url: proj.project_url || "",
-        // convert skill array → comma-separated string
-        skill: Array.isArray(proj.skill) ? proj.skill.join(", ") : proj.skill || "",
-        description: proj.description || "",
-      }));
+// useEffect(() => {
+//     if (singleResumeInfo?.data?.project_info?.length > 0) {
+//       const formattedProjects = singleResumeInfo.data.project_info.map((proj) => ({
+//         id: proj.id,
+//         project_title: proj.project_title || "",
+//         role: proj.role || "",
+//         start_time: proj.start_time ? new Date(proj.start_time) : null,
+//         end_time: proj.end_time ? new Date(proj.end_time) : null,
+//         project_url: proj.project_url || "",
+//         // convert skill array → comma-separated string
+//         skill: Array.isArray(proj.skill) ? proj.skill.join(", ") : proj.skill || "",
+//         description: proj.description || "",
+//       }));
 
-      setPersonalPro(formattedProjects);
-    }
-  }, [singleResumeInfo]);
+//       setPersonalPro(formattedProjects);
+//     }
+//   }, [singleResumeInfo]);
          const addProjects = () => {
     setPersonalPro([...personalPro, {id:Date.now(),project_title:"",role:"",start_time:null,end_time:null,project_url:"",skill:"",description:""}]);
   };

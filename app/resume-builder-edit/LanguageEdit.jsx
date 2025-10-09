@@ -10,16 +10,16 @@ import { MdDelete } from "react-icons/md";
 
 const LanguageEdit = ({ setValue,singleResumeInfo,  languages, setLanguages }) => {
 
-    useEffect(() => {
-    if (singleResumeInfo?.data?.language_info?.length > 0) {
-      const formattedLanguages = singleResumeInfo.data.language_info.map(lang => ({
-        id: lang.id,
-        language_name: lang.language_name || "",
-        proficiency: lang.proficiency || "",
-      }));
-      setLanguages(formattedLanguages);
-    }
-  }, [singleResumeInfo]);
+  //   useEffect(() => {
+  //   if (singleResumeInfo?.data?.language_info?.length > 0) {
+  //     const formattedLanguages = singleResumeInfo.data.language_info.map(lang => ({
+  //       id: lang.id,
+  //       language_name: lang.language_name || "",
+  //       proficiency: lang.proficiency || "",
+  //     }));
+  //     setLanguages(formattedLanguages);
+  //   }
+  // }, [singleResumeInfo]);
   const addLanguage = () => {
     setLanguages([...languages, { id: Date.now(), language_name: "", proficiency: "" }]);
   };

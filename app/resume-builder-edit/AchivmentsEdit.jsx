@@ -1,10 +1,24 @@
 import { Datepicker, Label, Textarea, TextInput } from "flowbite-react"
+import { useEffect } from "react"
 import { BiSolidBuilding } from "react-icons/bi"
 import { BsFillPlusCircleFill } from "react-icons/bs"
 import { FaTrophy } from "react-icons/fa"
 import { MdDelete } from "react-icons/md"
 
-const AchivmentsEdit=({achivments, setAchivments})=>{
+const AchivmentsEdit=({setValue,singleResumeInfo,achivments, setAchivments})=>{
+//           useEffect(() => {
+//   if (singleResumeInfo?.data?.achievement_info?.length > 0) {
+//     const formattedAchievements = singleResumeInfo.data.achievement_info.map((ach) => ({
+//       id: ach.id,
+//       achievement_title: ach.achivements_title || "", // map spelling
+//       organization: ach.organization || "",
+//       receive_date: ach.receive_date ? new Date(ach.receive_date) : null,
+//       description: ach.description || "",
+//     }));
+
+//     setAchivments(formattedAchievements);
+//   }
+// }, [singleResumeInfo]);
           const addAchivments = () => {
     setAchivments([...achivments, {id:Date.now(),achievement_title:"",organization:"",receive_date:null,description:""}]);
   };

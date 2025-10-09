@@ -393,7 +393,10 @@ const Page = () => {
                   </div>
                   <div>
                     <Link 
-                    href={resume.resume_type==="scratch_resume"?`/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`:``} 
+                    href={
+                      resume.resume_type==="scratch_resume"?`/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
+                      :resume.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(resume.id.toString())}`:resume.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
+                      :resume.resume_type==="improve_resume"?"":""} 
                     className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
                     >
                       <BiEdit />

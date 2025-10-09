@@ -11,29 +11,29 @@ import { MdDelete } from "react-icons/md";
 
 const WorkExpEdit = ({setValue, singleResumeInfo, experiences, setExperiences}) => {
 
-  useEffect(() => {
-  if (singleResumeInfo?.data?.experience_info?.length > 0) {
-    const formattedExperiences = singleResumeInfo.data.experience_info.map(exp => ({
-      id: exp.id,
-      company_name: exp.company || "",
-      position: exp.position || "",
-      location: exp.location || "",
-      skill: exp.skill?.join(", ") || "", // convert array to string
-      start_date: exp.start_time ? new Date(exp.start_time) : null,
-      end_date: exp.end_time ? new Date(exp.end_time) : null,
-      current_work: exp.current_work === 1, // convert 1/0 to boolean
-      projects: exp.experience_project_info?.map(proj => ({
-        id: proj.id,
-        title: proj.project_title || "",
-        role: proj.role || "",
-        technology: proj.skill?.join(", ") || "", // again convert array to string
-        description: proj.description || "",
-      })) || []
-    }));
+//   useEffect(() => {
+//   if (singleResumeInfo?.data?.experience_info?.length > 0) {
+//     const formattedExperiences = singleResumeInfo.data.experience_info.map(exp => ({
+//       id: exp.id,
+//       company_name: exp.company || "",
+//       position: exp.position || "",
+//       location: exp.location || "",
+//       skill: exp.skill?.join(", ") || "", // convert array to string
+//       start_date: exp.start_time ? new Date(exp.start_time) : null,
+//       end_date: exp.end_time ? new Date(exp.end_time) : null,
+//       current_work: exp.current_work === 1, // convert 1/0 to boolean
+//       projects: exp.experience_project_info?.map(proj => ({
+//         id: proj.id,
+//         title: proj.project_title || "",
+//         role: proj.role || "",
+//         technology: proj.skill?.join(", ") || "", // again convert array to string
+//         description: proj.description || "",
+//       })) || []
+//     }));
 
-    setExperiences(formattedExperiences);
-  }
-}, [singleResumeInfo]);
+//     setExperiences(formattedExperiences);
+//   }
+// }, [singleResumeInfo]);
 
   // Delete experience
   const deleteExperience = (expId) => {

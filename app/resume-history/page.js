@@ -21,6 +21,7 @@ import { MdDataUsage } from "react-icons/md";
 import { useDispatch, useSelector } from 'react-redux';
 import { getResumeHistory } from '../reducers/ResumeHistorySlice';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
+import Link from "next/link";
 
 
 const inter = Inter({
@@ -227,7 +228,17 @@ dispatch(getResumeHistory(payload)).then((res)=>{
               <div className='flex items-center gap-4 lg:gap-8'>
                 <button className={`text-[15px] ${hist?.process_status===0?"text-[#ae2991]":hist?.process_status===1?"text-[#AE7100]":"text-[#42AE29]"}  hover:text-[#ffffff] ${hist?.process_status===0?"bg-[#d8bed2]":hist?.process_status===1?"bg-[#F7FFD5]":"bg-[#a1bd9b]"}  ${hist?.process_status===0?"hover:bg-[#ae2991]":hist?.process_status===1?"hover:bg-[#AE7100]":"hover:bg-[#42AE29]"} rounded-3xl px-5 py-2 cursor-pointer`}>{hist?.process_status===0?"Saved":hist?.process_status===1?"Draft":"Downloaded"}</button>
                 <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
-                <button className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'><BiEdit className='text-xl mr-1' /> Edit</button>
+                <Link
+                  href={
+                  hist.resume_type==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
+                  :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`:hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
+                  :hist.resume_type==="improve_resume"?"":""} 
+                className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'>
+                  <BiEdit className='text-xl mr-1' />
+                 Edit
+                 </Link>
+
+          
               </div>
           </div>
 

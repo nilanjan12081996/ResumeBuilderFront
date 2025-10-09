@@ -53,7 +53,7 @@ import 'react-tabs/style/react-tabs.css';
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast } from "flowbite-react";
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSingleResume, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
+import { getSingleResume, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp, updatePersonalInfo } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -142,18 +142,130 @@ console.log("singleResumeInfo",singleResumeInfo);
   } = useForm();
 
   const formValues = watch();
+
+  useEffect(() => {
+    if (singleResumeInfo?.data?.education_info?.length > 0) {
+      const formattedEducation = singleResumeInfo.data?.education_info.map((edu) => ({
+        id: edu.id,
+        institution: edu.institution || "",
+        location: edu.location || "",
+        field_study: edu.field_study || "",
+        degree: edu.degree || "",
+        start_time: edu.start_time ? new Date(edu.start_time) : null,
+        end_time: edu.end_time ? new Date(edu.end_time) : null,
+        cgpa: edu.cgpa || "",
+        additionalInfo: edu.information || "",
+        currentlyStudying: !edu.end_time, // optional logic
+      }));
+      setEducationEntries(formattedEducation);
+    }
+  }, [singleResumeInfo]);
+
+   useEffect(() => {
+  if (singleResumeInfo?.data?.experience_info?.length > 0) {
+    const formattedExperiences = singleResumeInfo.data.experience_info.map(exp => ({
+      id: exp.id,
+      company_name: exp.company || "",
+      position: exp.position || "",
+      location: exp.location || "",
+      skill: exp.skill?.join(", ") || "", // convert array to string
+      start_date: exp.start_time ? new Date(exp.start_time) : null,
+      end_date: exp.end_time ? new Date(exp.end_time) : null,
+      current_work: exp.current_work === 1, // convert 1/0 to boolean
+      projects: exp.experience_project_info?.map(proj => ({
+        id: proj.id,
+        title: proj.project_title || "",
+        role: proj.role || "",
+        technology: proj.skill?.join(", ") || "", // again convert array to string
+        description: proj.description || "",
+      })) || []
+    }));
+
+    setExperiences(formattedExperiences);
+  }
+}, [singleResumeInfo]);
+
+  useEffect(() => {
+    if (singleResumeInfo?.data?.language_info?.length > 0) {
+      const formattedLanguages = singleResumeInfo.data.language_info.map(lang => ({
+        id: lang.id,
+        language_name: lang.language_name || "",
+        proficiency: lang.proficiency || "",
+      }));
+      setLanguages(formattedLanguages);
+    }
+  }, [singleResumeInfo]);
+    useEffect(() => {
+    if (singleResumeInfo?.data?.skill_info?.length > 0) {
+      const formattedSkills = singleResumeInfo.data?.skill_info.map((sk) => ({
+        id: sk.id,
+        skill_category: sk.skill_category || "",
+        skill: Array.isArray(sk.skill) ? sk.skill.join(", ") : sk.skill || "",
+      }));
+      setSkills(formattedSkills);
+    }
+  }, [singleResumeInfo]);
+
+  useEffect(() => {
+    if (singleResumeInfo?.data?.project_info?.length > 0) {
+      const formattedProjects = singleResumeInfo.data.project_info.map((proj) => ({
+        id: proj.id,
+        project_title: proj.project_title || "",
+        role: proj.role || "",
+        start_time: proj.start_time ? new Date(proj.start_time) : null,
+        end_time: proj.end_time ? new Date(proj.end_time) : null,
+        project_url: proj.project_url || "",
+        // convert skill array → comma-separated string
+        skill: Array.isArray(proj.skill) ? proj.skill.join(", ") : proj.skill || "",
+        description: proj.description || "",
+      }));
+
+      setPersonalPro(formattedProjects);
+    }
+  }, [singleResumeInfo]);
+
+
+    useEffect(() => {
+    if (singleResumeInfo?.data?.certificate_info?.length > 0) {
+      const formattedCertificates = singleResumeInfo.data.certificate_info.map((cer) => ({
+        id: cer.id,
+        certification_name: cer.certification_name || "",
+        issuing_organization: cer.issuing_organization || "",
+        obtained_date: cer.obtained_date ? new Date(cer.obtained_date) : null,
+        certification_id: cer.certification_id || "",
+      }));
+      setCertificates(formattedCertificates);
+    }
+  }, [singleResumeInfo]);
+
+     useEffect(() => {
+  if (singleResumeInfo?.data?.achievement_info?.length > 0) {
+    const formattedAchievements = singleResumeInfo.data.achievement_info.map((ach) => ({
+      id: ach.id,
+      achievement_title: ach.achivements_title || "", // map spelling
+      organization: ach.organization || "",
+      receive_date: ach.receive_date ? new Date(ach.receive_date) : null,
+      description: ach.description || "",
+    }));
+
+    setAchivments(formattedAchievements);
+  }
+}, [singleResumeInfo]);
+
+
   const onSubmit=(data)=>{
     console.log("data",data);
       
-dispatch(savePersonalInfo(data)).then((res)=>{
+dispatch(updatePersonalInfo({id:singleResumeInfo?.data?.personal_info?.id,...data})).then((res)=>{
   console.log("res",res);
  
-  if(res?.payload?.status_code===201){
+  if(res?.payload?.status_code===200){
      
     const eduPayload={
-       resume_id: res?.payload?.id,
+       resume_id: resumeId,
        education_arr:educationEntries.map((edu)=>(
         {
+          id:edu?.id,
           institution:edu?.institution,
           location:edu?.location,
           field_study:edu?.field_study,
@@ -165,9 +277,14 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         }
        ))
     }
+ 
+    console.log("experiences",experiences);
+    
+    
     const payload = {
-      resume_id: res?.payload?.id,
+      resume_id: resumeId,
       data: experiences.map(exp => ({
+        id:exp?.id,
         company_name: exp.company_name,
         position: exp.position,
         location: exp.location,
@@ -176,6 +293,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         end_date:convertToSubmitFormat(exp.end_date),
         current_work: exp.current_work ? 1 : 0,
         projects: exp.projects.map(proj => ({
+          id:proj.id,
           title: proj.title,
           role: proj.role,
           technology: proj.technology.split(",").map(t => t.trim()),
@@ -185,8 +303,9 @@ dispatch(savePersonalInfo(data)).then((res)=>{
     };
      const payloadLang = {
           user_id: parseUserId?.user_id,
-          resume_id: res?.payload?.id,
+          resume_id: resumeId,
           data: languages.map((lang) => ({
+            id:lang?.id,
             language_name: lang.language_name,
             proficiency: lang.proficiency,
           })),
@@ -195,7 +314,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
         user_id: parseUserId?.user_id,
         data:skills.map((sk)=>(
           {
-            resume_id:res?.payload?.id,
+            resume_id:resumeId,
+            id:sk.id,
             skill_category:sk.skill_category,
             position:"test",
             skill:sk.skill.split(',').map(t=>t.trim())
@@ -205,9 +325,10 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       }
       const payloadProject={
          user_id: parseUserId?.user_id,
-         resume_id: res?.payload?.id,
+         resume_id: resumeId,
          data:personalPro.map((pPro)=>(
           {
+            id:pPro?.id,
             project_title:pPro?.project_title,
             role:pPro?.role,
             start_time:convertToSubmitFormat(pPro?.start_time),
@@ -219,9 +340,10 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       }
       const payloadCerticate={
          user_id: parseUserId?.user_id,
-         resume_id: res?.payload?.id,
+         resume_id: resumeId,
          data:certificates.map((cer)=>(
           {
+            id:cer?.id,
             certification_name:cer?.certification_name,
             issuing_organization:cer?.issuing_organization,
             obtained_date:convertToSubmitFormat(cer?.obtained_date),
@@ -231,10 +353,10 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       }
       const payloadAchive={
          user_id: parseUserId?.user_id,
-         resume_id: res?.payload?.id,
+         resume_id: resumeId,
          data:achivments.map((achiv)=>(
           {
-
+            id:achiv.id,
             achievement_title:achiv?.achievement_title,
             organization:achiv?.organization,
             receive_date:convertToSubmitFormat(achiv?.receive_date),
@@ -244,11 +366,11 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       }
       dispatch(saveForDraft({
         flag:type,
-        id:res?.payload?.id
+        id:resumeId
       }))
       dispatch(saveTemplate({
         templete_id:template,
-        jd_id:res?.payload?.id,
+        jd_id:resumeId,
         jd_type:"scratch",
         user_id: parseUserId?.user_id
       }))
@@ -350,15 +472,15 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                 <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
               </div>
               <div className='flex gap-2'>
-                <button disabled={isCreated} onClick={()=>setType("draft")} type="submit"
-                // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
+                {/* <button disabled={isCreated} onClick={()=>setType("draft")} type="submit"
+               
                  className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
                           ${isCreated 
                             ? "bg-gray-400 text-white cursor-not-allowed"
                             : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
                           }`}
                  >
-                  <AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save as Draft"} </button>
+                  <AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save as Draft"} </button> */}
                <button
                 disabled={isCreated} onClick={()=>setType("save")} type="submit"
                 // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
@@ -367,7 +489,7 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
                   }`}
-                ><AiFillSave className='text-[18px]' />{loading?"Waiting...":"Save Resume"} </button>
+                ><AiFillSave className='text-[18px]' />{loading?"Waiting...":"Update Resume"} </button>
               
               </div>
              
@@ -435,7 +557,10 @@ dispatch(savePersonalInfo(data)).then((res)=>{
                         </TabPanel>
 
                         <TabPanel>  
-                         <AchivmentsEdit register={register} errors={errors} achivments={achivments} setAchivments={setAchivments}/>
+                         <AchivmentsEdit
+                         setValue={setValue} 
+                         singleResumeInfo={singleResumeInfo} 
+                         register={register} errors={errors} achivments={achivments} setAchivments={setAchivments}/>
                         </TabPanel>
 
                       </div>

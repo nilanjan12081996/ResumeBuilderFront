@@ -23,6 +23,26 @@ export const savePersonalInfo=createAsyncThunk(
     }
 )
 
+export const updatePersonalInfo=createAsyncThunk(
+    'updatePersonalInfo',
+      async ({id,...data}, { rejectWithValue }) => {
+        try {
+            const response = await api.patch(`/api/resume/personal-info/update/${id}`,data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 export const saveEducationInfo=createAsyncThunk(
     'saveEducationInfo',
       async (userInput, { rejectWithValue }) => {
@@ -234,7 +254,8 @@ saveProInfo:"",
 saveCerInfo:"",
 saveAchiveInfo:"",
 saveTemplateInfo:"",
-singleResumeInfo:""
+singleResumeInfo:"",
+updateBasicInfoData:""
 }
 const ResumeSlice=createSlice(
     {
@@ -359,6 +380,18 @@ const ResumeSlice=createSlice(
                 state.error=false
             })
             .addCase(getSingleResume.rejected,(state,{payload})=>{
+                state.loading=false
+                state.error=payload
+            })
+            .addCase(updatePersonalInfo.pending,(state)=>{
+                state.loading=true
+            })
+            .addCase(updatePersonalInfo.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.updateBasicInfoData=payload
+                state.error=false
+            })
+            .addCase(updatePersonalInfo.rejected,(state,{payload})=>{
                 state.loading=false
                 state.error=payload
             })

@@ -12,23 +12,23 @@ import { TabPanel } from "react-tabs"
 
 const EducationEdit = ({setValue, singleResumeInfo,educationEntries,setEducationEntries}) => {
 
-      useEffect(() => {
-    if (singleResumeInfo?.data?.education_info?.length > 0) {
-      const formattedEducation = singleResumeInfo.data?.education_info.map((edu) => ({
-        id: edu.id,
-        institution: edu.institution || "",
-        location: edu.location || "",
-        field_study: edu.field_study || "",
-        degree: edu.degree || "",
-        start_time: edu.start_time ? new Date(edu.start_time) : null,
-        end_time: edu.end_time ? new Date(edu.end_time) : null,
-        cgpa: edu.cgpa || "",
-        additionalInfo: edu.information || "",
-        currentlyStudying: !edu.end_time, // optional logic
-      }));
-      setEducationEntries(formattedEducation);
-    }
-  }, [singleResumeInfo]);
+  //     useEffect(() => {
+  //   if (singleResumeInfo?.data?.education_info?.length > 0) {
+  //     const formattedEducation = singleResumeInfo.data?.education_info.map((edu) => ({
+  //       id: edu.id,
+  //       institution: edu.institution || "",
+  //       location: edu.location || "",
+  //       field_study: edu.field_study || "",
+  //       degree: edu.degree || "",
+  //       start_time: edu.start_time ? new Date(edu.start_time) : null,
+  //       end_time: edu.end_time ? new Date(edu.end_time) : null,
+  //       cgpa: edu.cgpa || "",
+  //       additionalInfo: edu.information || "",
+  //       currentlyStudying: !edu.end_time, // optional logic
+  //     }));
+  //     setEducationEntries(formattedEducation);
+  //   }
+  // }, [singleResumeInfo]);
 
     const addEducation = () => {
     setEducationEntries([...educationEntries,  {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}]);

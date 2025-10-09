@@ -7,16 +7,16 @@ import { MdDelete } from "react-icons/md"
 
 const SkillsEdit=({ setValue,singleResumeInfo,register, errors, skills,setSkills})=>{
 
-  useEffect(() => {
-    if (singleResumeInfo?.data?.skill_info?.length > 0) {
-      const formattedSkills = singleResumeInfo.data?.skill_info.map((sk) => ({
-        id: sk.id,
-        skill_category: sk.skill_category || "",
-        skill: Array.isArray(sk.skill) ? sk.skill.join(", ") : sk.skill || "",
-      }));
-      setSkills(formattedSkills);
-    }
-  }, [singleResumeInfo]);
+  // useEffect(() => {
+  //   if (singleResumeInfo?.data?.skill_info?.length > 0) {
+  //     const formattedSkills = singleResumeInfo.data?.skill_info.map((sk) => ({
+  //       id: sk.id,
+  //       skill_category: sk.skill_category || "",
+  //       skill: Array.isArray(sk.skill) ? sk.skill.join(", ") : sk.skill || "",
+  //     }));
+  //     setSkills(formattedSkills);
+  //   }
+  // }, [singleResumeInfo]);
 
      const addSkils = () => {
     setSkills([...skills, { id: Date.now(), skill_category: "", skill: "" }]);
