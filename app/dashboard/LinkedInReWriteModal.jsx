@@ -55,7 +55,7 @@ const LinkedInReWriteModal=({
 
 
                     ]).then(()=>{
-                      HandlerLinkedInRewrite(newId``)
+                      HandlerLinkedInRewrite(newId)
                     })
                    
                        
