@@ -490,7 +490,7 @@ const Page = () => {
                     type="radio"
                     name="test"
                     id="cb1"
-                    onChange={() => handleSelect("resume1")}
+                    onChange={() => handleSelect(1)}
                   />
                   <label
                     for="cb1"
@@ -507,7 +507,7 @@ const Page = () => {
                     type="radio"
                     name="test"
                     id="cb2"
-                    onChange={() => handleSelect("resume2")}
+                    onChange={() => handleSelect(2)}
                   />
                   <label
                     for="cb2"
@@ -546,14 +546,14 @@ const Page = () => {
               </ul>
             </div>
             <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">
-              {selectedResume === "resume1" && (
+              {selectedResume === 1 && (
                 <Image
                   src={resume1}
                   alt="resume01"
                   className="h-[600px] w-[500px]"
                 />
               )}
-              {selectedResume === "resume2" && (
+              {selectedResume === 2 && (
                 <Image
                   src={resume2}
                   alt="resume01"

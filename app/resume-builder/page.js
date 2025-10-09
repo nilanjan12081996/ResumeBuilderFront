@@ -61,7 +61,7 @@ import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveWorkExp } from '../reducers/ResumeSlice';
+import { saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -237,6 +237,11 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       dispatch(saveForDraft({
         flag:type,
         id:res?.payload?.id
+      }))
+      dispatch(saveTemplate({
+        templete_id:template,
+        jd_id:res?.payload?.id,
+        jd_type:"scratch"
       }))
       dispatch(saveEducationInfo(eduPayload))
       dispatch(saveWorkExp(payload))
@@ -447,25 +452,25 @@ dispatch(savePersonalInfo(data)).then((res)=>{
           <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
              {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
              {
-              template==="resume1"&&(
+              template==1&&(
                 <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates}/>
               )
              }
              {
-              template==="resume2"&&(
+              template==2&&(
               <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates}/>
               )
              }
              
           </div>
-          <div className='flex items-center justify-between mb-0'>
+          {/* <div className='flex items-center justify-between mb-0'>
             <div className='flex items-center gap-1'>
               <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
             </div>
             <div className='flex items-center gap-3'>
               <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* add modal for apply job start here */}
