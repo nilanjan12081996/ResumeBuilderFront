@@ -16,6 +16,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFeatureJobDetails } from "../reducers/FeatureJobSlice";
 import striptags from "striptags";
 import { convertToSubmitFormat } from "../utils/DateSubmitFormatter";
+import ApplyJobModal from "./ApplyJobModal";
+import { ToastContainer } from "react-toastify";
 
 
 const page = () => {
@@ -49,6 +51,7 @@ const parseResponsibilities = (htmlString) => {
 const responsibilitiesData = parseResponsibilities(jobDetails?.data?.responsibilities || "");
   return (
     <div className='bg-[#ffffff] rounded-[10px] p-6 lg:p-10'>
+      <ToastContainer/>
         <div className='flex gap-2 items-center mb-8 mt-3 lg:mt-0'>
             <Link className='bg-[#92278F] hover:bg-[#151515] rounded-[7px] w-[32px] h-[32px] flex justify-center items-center' href="/featured-jobs" passHref>
                <CgArrowLeft className='text-white text-[18px]' />
@@ -164,7 +167,7 @@ const responsibilitiesData = parseResponsibilities(jobDetails?.data?.responsibil
             </div>
         </div>
         {/* add modal for apply job start here */}
-          <Modal size="7xl" className="apply_modal_area" show={openJobApplyModal} onClose={() => setOpenJobApplyModal(false)}>   
+          {/* <Modal size="7xl" className="apply_modal_area" show={openJobApplyModal} onClose={() => setOpenJobApplyModal(false)}>   
                 <ModalHeader className='bg-white text-black modal_header'>
                   Upload Resume or Select Resume
                 </ModalHeader>
@@ -224,7 +227,12 @@ const responsibilitiesData = parseResponsibilities(jobDetails?.data?.responsibil
                        <button onClick={() => setOpenJobApplyModal(true)} className='bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]'>Apply Job</button>
                     </div>
                 </ModalBody>
-            </Modal>
+          </Modal> */}
+          <ApplyJobModal 
+          openJobApplyModal={openJobApplyModal}
+          setOpenJobApplyModal={setOpenJobApplyModal}
+          id={id}
+          />
         {/* add modal for apply job ends here */}
     </div>
   )

@@ -220,8 +220,8 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                       })()}
                     </p>
 
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8'>After analysis ATS Score: 80/100</p>
+                    {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8'>After analysis ATS Score: 80/100</p> */}
                   </div>
                 </div>
               </div>

@@ -42,11 +42,32 @@ export const getFeatureJobDetails=createAsyncThunk(
     }
 )
 
+export const applyJobs=createAsyncThunk(
+    'applyJobs',
+        async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post(`/api/apply-job/apply`,userInput);
+            if (response?.data?.status_code === 201) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 const initialState={
     loading:false,
     error:false,
     jobs:[],
-    jobDetails:{}
+    jobDetails:{},
+    applyJobData:""
 }
 const FeatureJobSlice=createSlice(
     {
@@ -77,6 +98,18 @@ const FeatureJobSlice=createSlice(
             .addCase(getFeatureJobDetails.rejected,(state,{payload})=>{
                 state.error=payload
                 state.loading=false
+            })
+            .addCase(applyJobs.pending,(state)=>{
+                state.loading=true
+            })
+            .addCase(applyJobs.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.applyJobData=payload
+                state.error=false
+            })
+            .addCase(applyJobs.rejected,(state,{payload})=>{
+                state.loading=false
+                state.error=payload
             })
       
 
