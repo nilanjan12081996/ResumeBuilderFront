@@ -1,10 +1,24 @@
 import { Datepicker, Label, TextInput } from "flowbite-react";
+import { useEffect } from "react";
 import { BiSolidBuilding } from "react-icons/bi";
 import { BsFillPersonVcardFill, BsFillPlusCircleFill } from "react-icons/bs";
 import { FaCertificate } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
-const CertificatesEdit=({certificates, setCertificates})=>{
+const CertificatesEdit=({setValue,singleResumeInfo,certificates, setCertificates})=>{
+
+  //   useEffect(() => {
+  //   if (singleResumeInfo?.data?.certificate_info?.length > 0) {
+  //     const formattedCertificates = singleResumeInfo.data.certificate_info.map((cer) => ({
+  //       id: cer.id,
+  //       certification_name: cer.certification_name || "",
+  //       issuing_organization: cer.issuing_organization || "",
+  //       obtained_date: cer.obtained_date ? new Date(cer.obtained_date) : null,
+  //       certification_id: cer.certification_id || "",
+  //     }));
+  //     setCertificates(formattedCertificates);
+  //   }
+  // }, [singleResumeInfo]);
           const addCertificates = () => {
     setCertificates([...certificates,{id:Date.now(),certification_name:"",issuing_organization:"",obtained_date:null,certification_id:""}]);
   };

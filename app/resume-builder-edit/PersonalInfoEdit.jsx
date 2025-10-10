@@ -1,4 +1,5 @@
 import { Label, TextInput } from "flowbite-react"
+import { useEffect } from "react"
 import { BiLogoLinkedinSquare, BiSolidBriefcase, BiSolidPhone, BiSolidUser } from "react-icons/bi"
 import { BsGithub } from "react-icons/bs"
 import { FaGlobe } from "react-icons/fa"
@@ -6,7 +7,18 @@ import { FaLocationDot } from "react-icons/fa6"
 import { MdEmail } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const PersonalInfoEdit=({register,errors})=>{
+const PersonalInfoEdit=({setValue, singleResumeInfo,register,errors})=>{
+    useEffect(()=>{
+     setValue("full_name",singleResumeInfo?.data?.personal_info?.full_name)
+        setValue("email",singleResumeInfo?.data?.personal_info?.email)
+        setValue("phone",singleResumeInfo?.data?.personal_info?.phone)
+        setValue("location",singleResumeInfo?.data?.personal_info?.location)
+       setValue("title",singleResumeInfo?.data?.personal_info?.title)
+       setValue("personal_web",singleResumeInfo?.data?.personal_info?.personal_web)
+       setValue("github_profile",singleResumeInfo?.data?.personal_info?.github_profile)
+       setValue("linkdin_profile",singleResumeInfo?.data?.personal_info?.linkdin_profile)
+       setValue("goal",singleResumeInfo?.data?.personal_info?.goal)
+    },[singleResumeInfo])
     return(
         <>
    

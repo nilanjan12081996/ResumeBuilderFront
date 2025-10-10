@@ -241,7 +241,8 @@ dispatch(savePersonalInfo(data)).then((res)=>{
       dispatch(saveTemplate({
         templete_id:template,
         jd_id:res?.payload?.id,
-        jd_type:"scratch"
+        jd_type:"scratch",
+        user_id:parseUserId?.user_id
       }))
       dispatch(saveEducationInfo(eduPayload))
       dispatch(saveWorkExp(payload))
