@@ -90,7 +90,7 @@ const page = () => {
   }, [id])
 
   console.log("jdBasedDetailsData", jdBasedDetailsData);
-
+  
 
   const [experiences, setExperiences] = useState([
     {
@@ -444,12 +444,12 @@ const page = () => {
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
           {
-            template === "resume1" && (
+            template ==1 && (
               <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }
           {
-            template === "resume2" && (
+            template ==2 && (
               <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }

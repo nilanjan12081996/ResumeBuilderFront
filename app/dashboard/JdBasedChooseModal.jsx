@@ -4,12 +4,17 @@ import resume1 from "../assets/imagesource/resume1.png";
 import resume2 from "../assets/imagesource/resume2.png";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { saveTemplate } from "../reducers/ResumeSlice";
 const JdBasedChooseModal=({  
     openModalCreateResumeJd,
     setOpenModalCreateResumeJd,
     resumeId
   })=>{
     const encodedId = btoa(resumeId);
+    const dispatch=useDispatch()
+      const user_id = sessionStorage.getItem('user_id')
+  const parseUserId = JSON.parse(user_id)
         const router = useRouter();
   const [selectedResume, setSelectedResume] = useState(null);
       const handleSelect = (id) => {
@@ -20,6 +25,14 @@ const JdBasedChooseModal=({
       toast.error("Please select a resume first!");
       return;
     }
+    dispatch(saveTemplate(
+      {
+        templete_id:selectedResume,
+        jd_id:resumeId,
+        jd_type:"jd",
+        user_id:parseUserId?.user_id
+      }
+    ))
     router.push(`/jd-resume-builder?template=${selectedResume}&id=${encodedId}`);
   };
     return(
@@ -45,7 +58,7 @@ const JdBasedChooseModal=({
                     type="radio"
                     name="test"
                     id="cb1"
-                    onChange={() => handleSelect("resume1")}
+                    onChange={() => handleSelect(1)}
                   />
                   <label
                     for="cb1"
@@ -62,7 +75,7 @@ const JdBasedChooseModal=({
                     type="radio"
                     name="test"
                     id="cb2"
-                    onChange={() => handleSelect("resume2")}
+                    onChange={() => handleSelect(2)}
                   />
                   <label
                     for="cb2"
@@ -101,14 +114,14 @@ const JdBasedChooseModal=({
               </ul>
             </div>
             <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">
-              {selectedResume === "resume1" && (
+              {selectedResume === 1 && (
                 <Image
                   src={resume1}
                   alt="resume01"
                   className="h-[600px] w-[500px]"
                 />
               )}
-              {selectedResume === "resume2" && (
+              {selectedResume === 2 && (
                 <Image
                   src={resume2}
                   alt="resume01"
