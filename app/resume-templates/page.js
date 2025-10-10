@@ -8,6 +8,7 @@ import { Inter } from 'next/font/google';
 import resume01 from "../assets/imagesource/resume01.png";
 import resume1 from "../assets/imagesource/resume1.png";
 import resume2 from "../assets/imagesource/resume2.png";
+import Link from 'next/link';
 const inter = Inter({
   subsets: ['latin'], // or ['latin-ext'] etc.
   weight: ['400', '500', '600', '700'], // specify desired weights
@@ -27,7 +28,9 @@ const page = () => {
            {/* <Image src={resume01} alt="resume01" className='' /> */}
            <Image src={resume1} alt="resume01" className="h-[400px]" />
           </div>
-            <button className='bg-[#800080] rounded-[7px] px-4 py-2 text-white'> Use Template</button>
+          <div className='flex justify-center mb-2'>
+            <Link href="/resume-builder?template=1" className='bg-[#800080] rounded-[7px] px-4 py-2 text-white'> Use Template</Link>
+            </div>
           <p className='text-[#000000] text-xl font-semibold text-center'>Modern Template</p>
         </div>
               <div>
@@ -35,7 +38,10 @@ const page = () => {
            {/* <Image src={resume01} alt="resume01" className='' /> */}
           <Image src={resume2} alt="resume01" className="h-[400px]" />
           </div>
-          <button className='bg-[#800080] rounded-[7px] px-4 py-2 text-white'> Use Template</button>
+          <div className='flex justify-center mb-2'>
+            <Link href="/resume-builder?template=2" className='bg-[#800080] rounded-[7px] px-4 py-2 text-white'> Use Template</Link>
+          </div>
+          
           <p className='text-[#000000] text-xl font-semibold text-center'> Professional Template</p>
         </div>
         {/* <div>
