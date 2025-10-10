@@ -241,6 +241,187 @@ export const jdBasedResumeDetails=createAsyncThunk(
         }
     }
 )
+
+export const updateBasicInfo=createAsyncThunk(
+    'updateBasicInfo',
+     async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.put('/api/improve-resume/update-basic-info', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateExperience=createAsyncThunk(
+    'updateExperience',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-experience/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateEducation=createAsyncThunk(
+    'updateEducation',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-education/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateSkills=createAsyncThunk(
+    'updateSkills',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-skills/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateLanguage=createAsyncThunk(
+    'updateLanguage',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-language/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateExtraProject=createAsyncThunk(
+    'updateExtraProject',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-extra-project/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateCertification=createAsyncThunk(
+    'updateCertification',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-certification/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const updateAchievements=createAsyncThunk(
+    'updateAchievements',
+     async ({ basicInfoId, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(`/api/improve-resume/add-update-achievements/${basicInfoId}`, data);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+export const getUpdateResumeInfo=createAsyncThunk(
+    'getUpdateResumeInfo',
+     async ({ basicInfoId }, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/improve-resume/get-improve-resume-info/${basicInfoId}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+
 const initialState={
 error:false,
 loading:false,
@@ -255,7 +436,16 @@ achInfo:{},
 proInfo:{},
 skillsInfo:{},
 langInfo:{},
-jdBasedDetailsData:{}
+jdBasedDetailsData:{},
+updateBasicInfoData:{},
+updateExperienceData:{},
+updateEducationData:{},
+updateSkillsData:{},
+updateLanguageData:{},
+updateExtraProjectData:{},
+updateCertificationData:{},
+updateAchievementsData:{},
+getUpdateResumeInfoData:{}
 }
 
 const DashboardSlice=createSlice(
@@ -425,7 +615,123 @@ const DashboardSlice=createSlice(
                 state.error=payload
                 state.loading=false
             })
-           
+            .addCase(updateBasicInfo.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateBasicInfo.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateBasicInfoData=payload
+            })
+            .addCase(updateBasicInfo.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateExperience.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateExperience.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateExperienceData=payload
+            })
+            .addCase(updateExperience.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateEducation.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateEducation.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateEducationData=payload
+            })
+            .addCase(updateEducation.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateSkills.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateSkills.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateSkillsData=payload
+            })
+            .addCase(updateSkills.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateLanguage.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateLanguage.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateLanguageData=payload
+            })
+            .addCase(updateLanguage.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateExtraProject.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateExtraProject.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateExtraProjectData=payload
+            })
+            .addCase(updateExtraProject.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateCertification.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateCertification.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateCertificationData=payload
+            })
+            .addCase(updateCertification.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(updateAchievements.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(updateAchievements.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.updateAchievementsData=payload
+            })
+            .addCase(updateAchievements.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(getUpdateResumeInfo.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(getUpdateResumeInfo.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.getUpdateResumeInfoData=payload
+            })
+            .addCase(getUpdateResumeInfo.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
         }
     }
 )

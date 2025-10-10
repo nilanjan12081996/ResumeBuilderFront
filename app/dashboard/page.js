@@ -165,6 +165,10 @@ const Page = () => {
 
     // clear state variables if you are tracking them
   };
+  const handleNavigate = () => {
+    console.log("selectedResume",selectedResume);
+    router.push(`/improve-resume-builder?template=resume1`);
+  };
 
   const {
     register,
@@ -1003,6 +1007,7 @@ const Page = () => {
                 </div>
               </div>
             </div>
+              <Button onClick={handleNavigate} className="bg-[#800080] hover:bg-[#151515] mt-6 cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]">Continue</Button>
           </ModalBody>
         </div>
       </Modal>
