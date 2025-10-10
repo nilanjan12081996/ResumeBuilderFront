@@ -106,6 +106,8 @@ const inter = Inter({
 
 const Page = () => {
   const { recentResume } = useSelector((state) => state?.resHist);
+  const{profData}=useSelector((state)=>state?.auth)
+console.log("profData",profData);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -304,7 +306,7 @@ const Page = () => {
         <div className="main-content">
         <div className="welcome_area py-8 px-9 rounded-[10px] mb-10">
           <h3 className="text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4">
-            Welcome to Resume Builder, Soumyajit Chandra!
+            Welcome to Resume Builder, {profData?.data?.fullname}!
           </h3>
           <p className="text-[18px] leading-[25px] text-white font-normal mb-0 lg:pr-20">
             Create a professional resume in minutes with our easy-to-use

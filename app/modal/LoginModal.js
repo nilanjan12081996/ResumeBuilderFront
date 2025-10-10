@@ -6,11 +6,11 @@ import Link from "next/link";
 import loginImg from "../assets/imagesource/login_img.png";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { loginCustomer } from "../reducers/AuthSlice";
+import { getProfile, loginCustomer } from "../reducers/AuthSlice";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useState } from "react";
-import { checkSubscription, getProfile } from "../reducers/ProfileSlice";
+import { checkSubscription } from "../reducers/ProfileSlice";
 import { getSearchHistory } from "../reducers/SearchHistroySlice";
 
 import { RiGoogleFill } from "react-icons/ri";
@@ -41,7 +41,7 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
                              setOpenLoginModal(false);
                         router.push('/dashboard');
                         }
-                        
+                        dispatch(getProfile())
                 
 
             } else if (res?.payload?.response?.data?.status_code === 401) {

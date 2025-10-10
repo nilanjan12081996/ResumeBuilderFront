@@ -12,9 +12,9 @@ import { Poppins } from 'next/font/google';
 import { useState } from "react";
 import { usePathname } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../reducers/AuthSlice';
+import { getProfile, logout } from '../reducers/AuthSlice';
 import { useRouter } from 'next/navigation';
-import { getProfile } from '../reducers/ProfileSlice';
+
 import { FaRectangleList } from 'react-icons/fa6';
 import Link from 'next/link';
 import { FaUser } from 'react-icons/fa';
@@ -54,10 +54,10 @@ const Insideheader = () => {
     }
 
   };
-  // useEffect(() => {
-  //   dispatch(getProfile())
-  // }, [])
-  // console.log("headrr", profileData);
+  useEffect(() => {
+    dispatch(getProfile())
+  }, [])
+
 
 
   return (

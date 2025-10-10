@@ -117,6 +117,23 @@ export const loginCustomer = createAsyncThunk(
     }
 );
 
+export const getProfile = createAsyncThunk(
+    'getProfile',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.get('/api/auth/profile', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response?.data?.response);
+
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
 export const detectIccid = createAsyncThunk(
     'detectIccid',
     async (iccid, { rejectWithValue }) => {
@@ -142,7 +159,8 @@ const initialState = {
     isLoggedIn: false,
     loadingIccid: false,
     signUpTypes:[],
-    loginData:[]
+    loginData:[],
+    profData:[]
 };
 
 const authSlice = createSlice({
@@ -320,6 +338,22 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = payload;
             })
+            .addCase(getProfile.pending, (state) => {
+                state.message = null;
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getProfile.fulfilled, (state, { payload }) => {
+              
+                state.loading = false;
+                state.profData=payload
+            })
+            .addCase(getProfile.rejected, (state, { payload }) => {
+
+                state.loading = false;
+                state.error = payload;
+            })
+            
 
 
     },
