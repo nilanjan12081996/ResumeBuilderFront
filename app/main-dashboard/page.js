@@ -100,6 +100,7 @@ const Page = () => {
   console.log("parseLoginData",parseLoginData);
   
   const { recentResume } = useSelector((state) => state?.resHist);
+  const{profData}=useSelector((state)=>state?.auth)
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -272,7 +273,7 @@ const handleAppChange = () => {
         <div className="main-content">
             <div className="welcome_area py-8 px-9 rounded-[10px] mb-5">
                 <h3 className="text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4">
-                    Welcome to your HiringEye Dashboard, Soumyajit Chandra!
+                    Welcome to your HiringEye Dashboard, {profData?.data?.fullname}!
                 </h3>
                 <p className="text-[18px] leading-[25px] text-white font-normal mb-0 lg:pr-20">
                     Boost your career with AI-powered tools. Create professional resumes and generate engaging LinkedIn content effortlessly.

@@ -6,7 +6,7 @@ import registerStepone from "../assets/imagesource/register_stepone.png";
 import { useForm } from "react-hook-form";
 import VerifyOtpModal from "./verifyOtpModal";
 import { useDispatch, useSelector } from "react-redux";
-import { registerCustomer, registerCustomerOrg } from "../reducers/AuthSlice";
+import { getProfile, registerCustomer, registerCustomerOrg } from "../reducers/AuthSlice";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { checkSubscription } from "../reducers/ProfileSlice";
@@ -56,6 +56,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
  dispatch(registerCustomer(payload1)).then((res)=>{
     console.log("resRegind",res);
       if(res?.payload?.status_code===201){
+                    dispatch(getProfile())
                     setOpenRegisterModal(false);
                         router.push('/plans');
                     //    handlePriceModal()
