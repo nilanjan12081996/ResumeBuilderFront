@@ -174,21 +174,21 @@ import { MdDelete } from "react-icons/md";
 
 // export default Language;
 
-const LanguageJd = ({ improveResumeData, languages, setLanguages }) => {
+const LanguageJd = ({ getUpdateResumeInfoData, languages, setLanguages }) => {
    useEffect(() => {
-    if (improveResumeData?.raw_data?.languages?.Languages?.length > 0) {
-      const existingLanguages = improveResumeData.raw_data.languages.Languages;
+    if (getUpdateResumeInfoData?.data?.imp_language_info?.length > 0) {
+      const existingLanguages = getUpdateResumeInfoData.data.imp_language_info;
       setLanguages(
         existingLanguages.map((lang, index) => ({
-          id: `lang-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
-          language_name: lang.language_name || "",
-          proficiency: lang.proficiency || "",
+          id: lang.id,
+          language_name: lang.language || "",
+          proficiency: "", // Not available in new data structure
         }))
       );
     } else {
       setLanguages([{ id: `lang-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, language_name: "", proficiency: "" }]);
     }
-  }, [improveResumeData]);
+  }, [getUpdateResumeInfoData]);
 
   const addLanguage = () => {
     setLanguages([...languages, { id: `lang-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, language_name: "", proficiency: "" }]);

@@ -231,8 +231,9 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                 <Link
                   href={
                   hist.resume_type==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
-                  :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`:hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
-                  :hist.resume_type==="improve_resume"?"":""} 
+                  :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`
+                  :hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
+                  :hist.resume_type==="improve_resume"?`/improve-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`:""} 
                 className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'>
                   <BiEdit className='text-xl mr-1' />
                  Edit

@@ -5,28 +5,28 @@ import { BsFillPersonVcardFill, BsFillPlusCircleFill } from "react-icons/bs";
 import { FaCertificate } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
-const CertificatesJd = ({ improveResumeData, certificates, setCertificates }) => {
+const CertificatesJd = ({ getUpdateResumeInfoData, certificates, setCertificates }) => {
 
 
 useEffect(() => {
-  console.log('CertificatesJd',improveResumeData?.raw_data?.certifications?.Certifications)
-  if (improveResumeData?.raw_data?.certifications?.Certifications?.length > 0) {
-    console.log('CertificatesJd', improveResumeData.raw_data.certifications.Certifications);
+  console.log('CertificatesJd',getUpdateResumeInfoData?.data?.imp_certification_info)
+  if (getUpdateResumeInfoData?.data?.imp_certification_info?.length > 0) {
+    console.log('CertificatesJd', getUpdateResumeInfoData.data.imp_certification_info);
 
-    const certs = improveResumeData.raw_data.certifications.Certifications.map((cert, index) => ({
-      id: `cert-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
-      certification_name: cert.CertificationName || "",
-      issuing_organization: cert.Issuing_Organization || "",
-      obtained_date: cert.DateObtained ? (() => {
+    const certs = getUpdateResumeInfoData.data.imp_certification_info.map((cert, index) => ({
+      id: cert.id,
+      certification_name: cert.certification_name || "",
+      issuing_organization: cert.issuing_organization || "",
+      obtained_date: cert.date_obtained ? (() => {
         try {
-          const date = new Date(cert.DateObtained);
+          const date = new Date(cert.date_obtained);
           return isNaN(date.getTime()) ? null : date;
         } catch (e) {
-          console.error('Error parsing certificate date:', cert.DateObtained, e);
+          console.error('Error parsing certificate date:', cert.date_obtained, e);
           return null;
         }
       })() : null,
-      certification_id: cert.Certification_ID || ""
+      certification_id: cert.certification_id || ""
     }));
 
     setCertificates(certs);
@@ -41,7 +41,7 @@ useEffect(() => {
       }
     ]);
   }
-}, [improveResumeData, setCertificates]);
+}, [getUpdateResumeInfoData, setCertificates]);
 
 
 

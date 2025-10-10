@@ -73,6 +73,7 @@ import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
 import LinkedInChooseModal from "./LinkedInChooseModal";
+import ImproveResumeChooseModal from "./ImproveResumeChooseModal";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -124,6 +125,8 @@ const Page = () => {
     openModalImproveExistingResumeTwo,
     setOpenModalImproveExistingResumeTwo,
   ] = useState(false);
+  const[openImproveResumeChooseModal, setOpenImproveResumeChooseModal]=useState(false)
+  const[improveResumeId,setImproveResumeId]=useState()
 
   const [openModalLinkedInRewrite, setOpenModalLinkedInRewrite] =
     useState(false);
@@ -167,7 +170,7 @@ const Page = () => {
   };
   const handleNavigate = () => {
     console.log("selectedResume",selectedResume);
-    router.push(`/improve-resume-builder?template=resume1`);
+    setOpenImproveResumeChooseModal(true);
   };
 
   const {
@@ -226,6 +229,7 @@ const Page = () => {
     dispatch(improveResume(formData))
       .then((res) => {
         console.log(" res ", res);
+        setImproveResumeId(res?.payload?.data?.id);
         const userData = {
           imp_resume_id: res?.payload?.data?.id,
           raw_data: res?.payload?.raw_data,
@@ -233,7 +237,9 @@ const Page = () => {
         dispatch(checkATS(userData))
           .then((res) => {
             // toast.success(res?.payload?.message || "ATS score");
+            console.log("ATSresponse",res)
             setATSscore(res?.payload?.data?.ats_score);
+            
             setopenATSmodal(true);
           })
           .catch((err) => {
@@ -401,7 +407,7 @@ const Page = () => {
                       resume.resume_type==="scratch_resume"?`/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
                       :resume.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(resume.id.toString())}`
                       :resume.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${btoa(resume.id.toString())}&template=${resume?.template_detail?.[0]?.templete_id}`
-                      :resume.resume_type==="improve_resume"?"":""} 
+                      :resume.resume_type==="improve_resume"?`/improve-resume-builder?id=${btoa(resume.id.toString())}&template=${resume?.template_detail?.[0]?.templete_id}`:""} 
                     className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
                     >
                       <BiEdit />
@@ -627,7 +633,8 @@ const Page = () => {
           </p>
           <div className="p-5">
             <button
-              onClick={() => setOpenModalCreateResume(true)}
+              onClick={() => 
+                (true)}
               className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
             >
               Continue
@@ -912,6 +919,16 @@ const Page = () => {
            resumeIdLkdin={resumeIdLkdin}
            setResumeIdLkdin={setResumeIdLkdin}
 
+          />
+        )
+      }
+
+      {
+        openImproveResumeChooseModal&&(
+          <ImproveResumeChooseModal
+          openImproveResumeChooseModal={openImproveResumeChooseModal}
+          setOpenImproveResumeChooseModal={setOpenImproveResumeChooseModal}
+          improveResumeId={improveResumeId}
           />
         )
       }

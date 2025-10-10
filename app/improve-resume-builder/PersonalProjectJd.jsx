@@ -5,42 +5,42 @@ import { BsFillPlusCircleFill } from "react-icons/bs"
 import { FaDiagramProject } from "react-icons/fa6"
 import { MdDelete } from "react-icons/md"
 
-const PersonalProjectJd = ({ personalPro, setPersonalPro, improveResumeData }) => {
+const PersonalProjectJd = ({ personalPro, setPersonalPro, getUpdateResumeInfoData }) => {
 
   useEffect(() => {
-    console.log('PersonalProjectJd',improveResumeData?.raw_data?.projects?.Projects)
-    if (improveResumeData?.raw_data?.projects?.Projects?.length > 0) {
-      const existingProjects = improveResumeData.raw_data.projects.Projects.map((proj, index) => ({
-        id: `proj-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
-        project_title: proj.ProjectName || "",
-        role: proj.YourRole || "",
-        start_time: proj.Duration?.StartDate ? (() => {
+    console.log('PersonalProjectJd',getUpdateResumeInfoData?.data?.imp_extra_project_info)
+    if (getUpdateResumeInfoData?.data?.imp_extra_project_info?.length > 0) {
+      const existingProjects = getUpdateResumeInfoData.data.imp_extra_project_info.map((proj, index) => ({
+        id: proj.id,
+        project_title: proj.project_name || "",
+        role: proj.role || "",
+        start_time: proj.start_date ? (() => {
           try {
-            const date = new Date(proj.Duration.StartDate);
+            const date = new Date(proj.start_date);
             return isNaN(date.getTime()) ? null : date;
           } catch (e) {
-            console.error('Error parsing project start date:', proj.Duration.StartDate, e);
+            console.error('Error parsing project start date:', proj.start_date, e);
             return null;
           }
         })() : null,
-        end_time: proj.Duration?.EndDate ? (() => {
+        end_time: proj.end_date ? (() => {
           try {
-            const date = new Date(proj.Duration.EndDate);
+            const date = new Date(proj.end_date);
             return isNaN(date.getTime()) ? null : date;
           } catch (e) {
-            console.error('Error parsing project end date:', proj.Duration.EndDate, e);
+            console.error('Error parsing project end date:', proj.end_date, e);
             return null;
           }
         })() : null,
         project_url: "",
-        skill: Array.isArray(proj.Technologies) ? proj.Technologies.join(", ") : "",
-        description: proj.Description || ""
+        skill: Array.isArray(proj.technology) ? proj.technology.join(", ") : "",
+        description: proj.description || ""
       }));
       setPersonalPro(existingProjects);
     } else {
       setPersonalPro([{ id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, project_title: "", role: "", start_time: null, end_time: null, project_url: "", skill: "", description: "" }]);
     }
-  }, [improveResumeData, setPersonalPro]);
+  }, [getUpdateResumeInfoData, setPersonalPro]);
   const addProjects = () => {
     setPersonalPro([...personalPro, { id: `proj-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, project_title: "", role: "", start_time: null, end_time: null, project_url: "", skill: "", description: "" }]);
   };

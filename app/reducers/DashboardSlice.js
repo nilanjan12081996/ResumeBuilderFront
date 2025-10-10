@@ -264,9 +264,9 @@ export const updateBasicInfo=createAsyncThunk(
 
 export const updateExperience=createAsyncThunk(
     'updateExperience',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/api/improve-resume/add-update-experience/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-experience/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -284,9 +284,10 @@ export const updateExperience=createAsyncThunk(
 
 export const updateEducation=createAsyncThunk(
     'updateEducation',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
+  
         try {
-            const response = await api.put(`/api/improve-resume/add-update-education/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-education/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -304,9 +305,9 @@ export const updateEducation=createAsyncThunk(
 
 export const updateSkills=createAsyncThunk(
     'updateSkills',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/api/improve-resume/add-update-skills/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-skills/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -324,9 +325,9 @@ export const updateSkills=createAsyncThunk(
 
 export const updateLanguage=createAsyncThunk(
     'updateLanguage',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/api/improve-resume/add-update-language/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-language/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -344,9 +345,9 @@ export const updateLanguage=createAsyncThunk(
 
 export const updateExtraProject=createAsyncThunk(
     'updateExtraProject',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/api/improve-resume/add-update-extra-project/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-extra-project/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -364,9 +365,9 @@ export const updateExtraProject=createAsyncThunk(
 
 export const updateCertification=createAsyncThunk(
     'updateCertification',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/api/improve-resume/add-update-certification/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-certification/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -384,9 +385,9 @@ export const updateCertification=createAsyncThunk(
 
 export const updateAchievements=createAsyncThunk(
     'updateAchievements',
-     async ({ basicInfoId, data }, { rejectWithValue }) => {
+     async ({ resumeid, data }, { rejectWithValue }) => {
         try {
-            const response = await api.put(`/api/improve-resume/add-update-achievements/${basicInfoId}`, data);
+            const response = await api.put(`/api/improve-resume/add-update-achievements/${resumeid}`, data);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -403,9 +404,9 @@ export const updateAchievements=createAsyncThunk(
 )
 export const getUpdateResumeInfo=createAsyncThunk(
     'getUpdateResumeInfo',
-     async ({ basicInfoId }, { rejectWithValue }) => {
+     async ({ id }, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/api/improve-resume/get-improve-resume-info/${basicInfoId}`);
+            const response = await api.get(`/api/improve-resume/get-improve-resume-info/${id}`);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {

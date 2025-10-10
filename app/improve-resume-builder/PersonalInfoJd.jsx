@@ -7,20 +7,20 @@ import { FaLocationDot } from "react-icons/fa6"
 import { MdEmail } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const PersonalInfoJd=({register,errors,improveResumeData,setValue})=>{
+const PersonalInfoJd=({register,errors,getUpdateResumeInfoData,setValue})=>{
 
     // useEffect(()=>{
-    //   setValue("full_name",improveResumeData?.raw_data?.basic_information?.CandidateFullName)
-    //    setValue("email",improveResumeData?.raw_data?.basic_information?.EmailAddress)
-    //    setValue("phone",improveResumeData?.raw_data?.basic_information?.PhoneNumber)
-    //   //  setValue("location",improveResumeData?.raw_data?.basic_information?.Location)
-    //   setValue("title",improveResumeData?.raw_data?.basic_information?.ProfessionalTitle)
-    //   setValue("personal_web",improveResumeData?.data?.other_url_link)
-    //   setValue("github_profile",improveResumeData?.data?.github_url_link)
-    //   setValue("linkdin_profile",improveResumeData?.data?.linkedin_url_link)
-    //   setValue("goal",improveResumeData?.raw_data?.basic_information?.Summary)
-  // },[improveResumeData,setValue])
-  console.log("improveResumeDataPersonalinfo",improveResumeData);
+    //   setValue("full_name",getUpdateResumeInfoData?.data?.imp_basic_info?.candidate_name)
+    //    setValue("email",getUpdateResumeInfoData?.data?.imp_basic_info?.email)
+    //    setValue("phone",getUpdateResumeInfoData?.data?.imp_basic_info?.phone)
+    //   //  setValue("location",getUpdateResumeInfoData?.data?.imp_basic_info?.location)
+    //   setValue("title",getUpdateResumeInfoData?.data?.imp_basic_info?.professional_title)
+    //   setValue("personal_web",getUpdateResumeInfoData?.data?.other_url_link)
+    //   setValue("github_profile",getUpdateResumeInfoData?.data?.github_url_link)
+    //   setValue("linkdin_profile",getUpdateResumeInfoData?.data?.linkedin_url_link)
+    //   setValue("goal",getUpdateResumeInfoData?.data?.imp_basic_info?.summery)
+  // },[getUpdateResumeInfoData,setValue])
+  console.log("getUpdateResumeInfoDataPersonalinfo",getUpdateResumeInfoData);
     return(
         <>
    

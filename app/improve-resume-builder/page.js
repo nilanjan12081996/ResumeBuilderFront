@@ -93,46 +93,17 @@ const page = () => {
   const {error, improveResumeData, loading, getUpdateResumeInfoData } = useSelector((state) => state?.dash)
 
 
-  console.log("improveResumeData", improveResumeData);
+  // console.log("improveResumeData", improveResumeData);
   console.log("getUpdateResumeInfoData", getUpdateResumeInfoData);
 
-  const [experiences, setExperiences] = useState([
-    {
-      id: `exp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      company_name: "",
-      position: "",
-      location: "",
-      skill: "",
-      start_date: null,
-      end_date: null,
-      current_work: false,
-      projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
-    }
-  ]);
-
-  const [languages, setLanguages] = useState([
-    { id: `lang-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, language_name: "", proficiency: "" },
-  ]);
-
-  const [skills, setSkills] = useState([
-    { id: `skill-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, skill_category: "", skill: "" }
-  ])
-
-  const [personalPro, setPersonalPro] = useState([
-    { id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, project_title: "", role: "", start_time: null, end_time: null, project_url: "", skill: "", description: "" }
-  ])
-
-  const [certificates, setCertificates] = useState([
-    { id: `cert-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, certification_name: "", issuing_organization: "", obtained_date: null, certification_id: "" }
-  ])
-
-  const [achivments, setAchivments] = useState([
-    { id: `ach-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }
-  ])
-
-  const [educationEntries, setEducationEntries] = useState([
-    { id: `edu-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
-  ])
+  const [experiences, setExperiences] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [personalPro, setPersonalPro] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [achivments, setAchivments] = useState([]);
+  const [educationEntries, setEducationEntries] = useState([]);
+  // const [resumeid, setResumeid] = useState();
 
   const {
     register,
@@ -142,20 +113,164 @@ const page = () => {
     formState: { errors },
   } = useForm();
 
+  useEffect(()=>{
+    dispatch(getUpdateResumeInfo({ id: id })).then((res)=>{
+     
+      // console.log("resumeid", res.payload?.data?.id);
+    })
+  },[])
+
 
   useEffect(()=>{
-    if (improveResumeData?.raw_data?.basic_information) {
-      setValue("full_name", improveResumeData.raw_data.basic_information.CandidateFullName)
-      setValue("email", improveResumeData.raw_data.basic_information.EmailAddress)
-      setValue("phone", improveResumeData.raw_data.basic_information.PhoneNumber)
-      setValue("location", improveResumeData.raw_data.basic_information.Location) // Default location since not in data
-      setValue("title", improveResumeData.raw_data.basic_information.ProfessionalTitle)
-      setValue("personal_web", improveResumeData.data?.other_url_link)
-      setValue("github_profile", improveResumeData.data?.github_url_link)
-      setValue("linkdin_profile", improveResumeData.data?.linkedin_url_link)
-      setValue("goal", improveResumeData.raw_data.basic_information.Summary)
+    if (getUpdateResumeInfoData?.data?.imp_basic_info) {
+      const basicInfo = getUpdateResumeInfoData.data.imp_basic_info;
+      setValue("full_name", basicInfo.candidate_name)
+      setValue("email", basicInfo.email)
+      setValue("phone", basicInfo.phone)
+      setValue("location", "") // Location not available in new data structure
+      setValue("title", basicInfo.professional_title)
+      setValue("personal_web", getUpdateResumeInfoData.data?.other_url_link)
+      setValue("github_profile", getUpdateResumeInfoData.data?.github_url_link)
+      setValue("linkdin_profile", getUpdateResumeInfoData.data?.linkedin_url_link)
+      setValue("goal", basicInfo.summery)
     }
-  },[improveResumeData, setValue])
+  },[getUpdateResumeInfoData, setValue])
+
+  // Populate education entries from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_education_info && getUpdateResumeInfoData.data.imp_education_info.length > 0) {
+      const educationData = getUpdateResumeInfoData.data.imp_education_info.map(edu => ({
+        id: edu.id,
+        institution: edu.college,
+        location: edu.location,
+        field_study: edu.course,
+        degree: edu.course,
+        start_time: null, // Not available in new data structure
+        end_time: edu.course_completed ? new Date(edu.course_completed) : null,
+        cgpa: edu.cgpa,
+        additionalInfo: edu.aditional_info
+      }));
+      setEducationEntries(educationData);
+    } else if (getUpdateResumeInfoData && educationEntries.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setEducationEntries([{ id: `edu-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }]);
+    }
+  }, [getUpdateResumeInfoData]);
+
+  // Populate experience entries from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_experience_info && getUpdateResumeInfoData.data.imp_experience_info.length > 0) {
+      const experienceData = getUpdateResumeInfoData.data.imp_experience_info.map(exp => ({
+        id: exp.id,
+        company_name: exp.company_name,
+        position: exp.Position,
+        location: exp.location,
+        skill: exp.skill_set ? exp.skill_set.join(", ") : "",
+        start_date: exp.start_date ? new Date(exp.start_date) : null,
+        end_date: exp.end_date ? new Date(exp.end_date) : null,
+        current_work: !exp.end_date,
+        projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
+      }));
+      setExperiences(experienceData);
+    } else if (getUpdateResumeInfoData && experiences.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setExperiences([{
+        id: `exp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        company_name: "",
+        position: "",
+        location: "",
+        skill: "",
+        start_date: null,
+        end_date: null,
+        current_work: false,
+        projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
+      }]);
+    }
+  }, [getUpdateResumeInfoData]);
+
+  // Populate skills from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_skill_info && getUpdateResumeInfoData.data.imp_skill_info.length > 0) {
+      const skillsData = getUpdateResumeInfoData.data.imp_skill_info.map(skill => ({
+        id: skill.id,
+        skill_category: skill.categoty,
+        skill: skill.skill_set ? skill.skill_set.join(", ") : ""
+      }));
+      setSkills(skillsData);
+    } else if (getUpdateResumeInfoData && skills.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setSkills([{ id: `skill-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, skill_category: "", skill: "" }]);
+    }
+  }, [getUpdateResumeInfoData]);
+
+  // Populate languages from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_language_info && getUpdateResumeInfoData.data.imp_language_info.length > 0) {
+      const languageData = getUpdateResumeInfoData.data.imp_language_info.map(lang => ({
+        id: lang.id,
+        language_name: lang.language,
+        proficiency: "" // Not available in new data structure
+      }));
+      setLanguages(languageData);
+    } else if (getUpdateResumeInfoData && languages.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setLanguages([{ id: `lang-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, language_name: "", proficiency: "" }]);
+    }
+  }, [getUpdateResumeInfoData]);
+
+  // Populate personal projects from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_extra_project_info && getUpdateResumeInfoData.data.imp_extra_project_info.length > 0) {
+      const projectData = getUpdateResumeInfoData.data.imp_extra_project_info.map(proj => ({
+        id: proj.id,
+        project_title: proj.project_name,
+        role: proj.role,
+        start_time: proj.start_date ? new Date(proj.start_date) : null,
+        end_time: proj.end_date ? new Date(proj.end_date) : null,
+        project_url: "",
+        skill: proj.technology ? proj.technology.join(", ") : "",
+        description: proj.description
+      }));
+      setPersonalPro(projectData);
+    } else if (getUpdateResumeInfoData && personalPro.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setPersonalPro([{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, project_title: "", role: "", start_time: null, end_time: null, project_url: "", skill: "", description: "" }]);
+    }
+  }, [getUpdateResumeInfoData]);
+
+  // Populate certificates from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_certification_info && getUpdateResumeInfoData.data.imp_certification_info.length > 0) {
+      const certificateData = getUpdateResumeInfoData.data.imp_certification_info.map(cert => ({
+        id: cert.id,
+        certification_name: cert.certification_name,
+        issuing_organization: cert.issuing_organization,
+        obtained_date: cert.date_obtained ? new Date(cert.date_obtained) : null,
+        certification_id: cert.certification_id
+      }));
+      setCertificates(certificateData);
+    } else if (getUpdateResumeInfoData && certificates.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setCertificates([{ id: `cert-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, certification_name: "", issuing_organization: "", obtained_date: null, certification_id: "" }]);
+    }
+  }, [getUpdateResumeInfoData]);
+
+  // Populate achievements from getUpdateResumeInfoData
+  useEffect(() => {
+    if (getUpdateResumeInfoData?.data?.imp_achievement_info && getUpdateResumeInfoData.data.imp_achievement_info.length > 0) {
+      const achievementData = getUpdateResumeInfoData.data.imp_achievement_info.map(ach => ({
+        id: ach.id,
+        achievement_title: ach.achivement_name,
+        organization: ach.achivement_organization_name,
+        receive_date: ach.achivement_date ? new Date(ach.achivement_date) : null,
+        description: ach.description
+      }));
+      setAchivments(achievementData);
+    } else if (getUpdateResumeInfoData && achivments.length === 0) {
+      // Add empty entry if no data and no existing entries
+      setAchivments([{ id: `ach-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }]);
+    }
+  }, [getUpdateResumeInfoData]);
   
   const formValues = watch();
   console.log("formValues", formValues);
@@ -173,10 +288,19 @@ const page = () => {
 
     try {
       // Get basic info ID from improveResumeData
-      const basicInfoId = improveResumeData?.data?.id;
+      const basicInfoId = getUpdateResumeInfoData?.data?.imp_basic_info?.id;
+      const resumeid = getUpdateResumeInfoData?.data?.id;
+      console.log("resumeidonsubmit", resumeid);
+      console.log("getUpdateResumeInfoData", getUpdateResumeInfoData);
+      console.log("getUpdateResumeInfoData?.data", getUpdateResumeInfoData?.data);
       
       if (!basicInfoId) {
         console.error("Basic info ID not found");
+        return;
+      }
+      
+      if (!resumeid) {
+        console.error("Resume ID not found");
         return;
       }
 
@@ -213,7 +337,8 @@ const page = () => {
         }))
       }));
       
-      await dispatch(updateExperience({ basicInfoId, data: experiencePayload }));
+      console.log("Dispatching updateExperience with resumeid:", resumeid);
+      await dispatch(updateExperience({ resumeid, data: experiencePayload }));
 
       // 3. Update Education
       const educationPayload = educationEntries.map(edu => ({
@@ -226,7 +351,7 @@ const page = () => {
         AdditionalInformation: edu.additionalInfo || ""
       }));
       
-      await dispatch(updateEducation({ basicInfoId, data: educationPayload }));
+      await dispatch(updateEducation({ resumeid, data: educationPayload }));
 
       // 4. Update Skills
       const skillsPayload = skills.map(sk => ({
@@ -235,7 +360,7 @@ const page = () => {
         Skills: sk.skill ? sk.skill.split(',').map(s => s.trim()).filter(s => s) : []
       }));
       
-      await dispatch(updateSkills({ basicInfoId, data: skillsPayload }));
+      await dispatch(updateSkills({ resumeid, data: skillsPayload }));
 
       // 5. Update Languages
       const languagePayload = languages.map(lang => ({
@@ -243,7 +368,7 @@ const page = () => {
         Language: lang.language_name || ""
       }));
       
-      await dispatch(updateLanguage({ basicInfoId, data: languagePayload }));
+      await dispatch(updateLanguage({ resumeid, data: languagePayload }));
 
       // 6. Update Extra Projects
       const extraProjectPayload = personalPro.map(pPro => ({
@@ -258,7 +383,7 @@ const page = () => {
         }
       }));
       
-      await dispatch(updateExtraProject({ basicInfoId, data: extraProjectPayload }));
+      await dispatch(updateExtraProject({ resumeid, data: extraProjectPayload }));
 
       // 7. Update Certifications
       const certificationPayload = certificates.map(cer => ({
@@ -270,7 +395,7 @@ const page = () => {
         Description: "" // Add description field if needed
       }));
       
-      await dispatch(updateCertification({ basicInfoId, data: certificationPayload }));
+      await dispatch(updateCertification({ resumeid, data: certificationPayload }));
 
       // 8. Update Achievements
       const achievementsPayload = achivments.map(achiv => ({
@@ -281,10 +406,10 @@ const page = () => {
         Description: achiv.description || ""
       }));
       
-      await dispatch(updateAchievements({ basicInfoId, data: achievementsPayload }));
+      await dispatch(updateAchievements({ resumeid, data: achievementsPayload }));
 
       console.log("All updates completed successfully!");
-      await dispatch(getUpdateResumeInfo({ basicInfoId }));
+      await dispatch(getUpdateResumeInfo({ id }));
 
     } catch (error) {
       console.error("Error updating resume data:", error);
@@ -394,40 +519,40 @@ const page = () => {
                 <div className='mb-4'>
                   <div>
                     <TabPanel key="personal-info">
-                      <PersonalInfoJd register={register} errors={errors} improveResumeData={improveResumeData} setValue={setValue} />
+                      <PersonalInfoJd register={register} errors={errors} getUpdateResumeInfoData={getUpdateResumeInfoData} setValue={setValue} />
                     </TabPanel>
 
                     <TabPanel key="education">
-                      <EducationJd register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} improveResumeData={improveResumeData} setValue={setValue} />
+                      <EducationJd register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} getUpdateResumeInfoData={getUpdateResumeInfoData} setValue={setValue} />
                     </TabPanel>
 
 
                     <TabPanel key="work-experience">
-                      <WorkExpJd experiences={experiences} setExperiences={setExperiences} register={register} improveResumeData={improveResumeData} errors={errors} />
+                      <WorkExpJd experiences={experiences} setExperiences={setExperiences} register={register} getUpdateResumeInfoData={getUpdateResumeInfoData} errors={errors} />
                     </TabPanel>
 
                     <TabPanel key="languages">
                       <LanguageJd
                         languages={languages}
                         setLanguages={setLanguages}
-                        improveResumeData={improveResumeData}
+                        getUpdateResumeInfoData={getUpdateResumeInfoData}
                       />
                     </TabPanel>
 
                     <TabPanel key="skills">
-                      <SkillsJd register={register} errors={errors} skills={skills} setSkills={setSkills} improveResumeData={improveResumeData} />
+                      <SkillsJd register={register} errors={errors} skills={skills} setSkills={setSkills} getUpdateResumeInfoData={getUpdateResumeInfoData} />
                     </TabPanel>
 
                     <TabPanel key="personal-projects">
-                      <PersonalProjectJd register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} improveResumeData={improveResumeData} />
+                      <PersonalProjectJd register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} getUpdateResumeInfoData={getUpdateResumeInfoData} />
                     </TabPanel>
 
                     <TabPanel key="certificates">
-                      <CertificatesJd register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} improveResumeData={improveResumeData} />
+                      <CertificatesJd register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} getUpdateResumeInfoData={getUpdateResumeInfoData} />
                     </TabPanel>
 
                     <TabPanel key="achievements">
-                      <AchivmentsJd register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} improveResumeData={improveResumeData} />
+                      <AchivmentsJd register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} getUpdateResumeInfoData={getUpdateResumeInfoData} />
                     </TabPanel>
 
                   </div>
@@ -457,12 +582,13 @@ const page = () => {
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
           {
-            template === "resume1" ? (
+            template ==1 && (
               <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-            ) : template === "resume2" ? (
+            )
+          }
+          {
+            template ==2 && (
               <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-            ) : (
-              <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }
 

@@ -5,20 +5,20 @@ import { BsFillPlusCircleFill } from "react-icons/bs"
 import { FaTags } from "react-icons/fa"
 import { MdDelete } from "react-icons/md"
 
-const SkillsJd=({register, errors, skills, setSkills, improveResumeData})=>{
+const SkillsJd=({register, errors, skills, setSkills, getUpdateResumeInfoData})=>{
 
   useEffect(() => {
-    if (improveResumeData?.raw_data?.skills?.Skills?.length > 0) {
-      const existingSkills = improveResumeData.raw_data.skills.Skills.map((sk, index) => ({
-        id: `skill-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
-        skill_category: sk.Skill_Category || "",
-        skill: Array.isArray(sk.Skills) ? sk.Skills.join(", ") : "",
+    if (getUpdateResumeInfoData?.data?.imp_skill_info?.length > 0) {
+      const existingSkills = getUpdateResumeInfoData.data.imp_skill_info.map((sk, index) => ({
+        id: sk.id,
+        skill_category: sk.categoty || "",
+        skill: Array.isArray(sk.skill_set) ? sk.skill_set.join(", ") : "",
       }));
       setSkills(existingSkills);
     } else {
       setSkills([{ id: `skill-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, skill_category: "", skill: "" }]);
     }
-  }, [improveResumeData, setSkills]);
+  }, [getUpdateResumeInfoData, setSkills]);
   
      const addSkils = () => {
     setSkills([...skills, { id: `skill-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, skill_category: "", skill: "" }]);

@@ -173,51 +173,45 @@ import { FaTags } from "react-icons/fa";
 import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 
-const WorkExpJd = ({ improveResumeData, experiences, setExperiences }) => {
+const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => {
 
  useEffect(() => {
-  console.log('improveResumeDataExp', improveResumeData?.raw_data?.experience?.Experience);
-  if (improveResumeData?.raw_data?.experience?.Experience?.length > 0) {
-    const formattedExperiences = improveResumeData.raw_data.experience.Experience.map(exp => {
+  console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
+  if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
+    const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
       return {
-        id: `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        company_name: exp.CompanyName || "",
+        id: exp.id,
+        company_name: exp.company_name || "",
         position: exp.Position || "",
-        location: exp.Location || "",
-        skill: Array.isArray(exp.SkillSet) ? exp.SkillSet.join(",") : "",
-        start_date: exp.Duration?.StartDate ? (() => {
+        location: exp.location || "",
+        skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
+        start_date: exp.start_date ? (() => {
           try {
-            const date = new Date(exp.Duration.StartDate);
+            const date = new Date(exp.start_date);
             return isNaN(date.getTime()) ? null : date;
           } catch (e) {
-            console.error('Error parsing start date:', exp.Duration.StartDate, e);
+            console.error('Error parsing start date:', exp.start_date, e);
             return null;
           }
         })() : null,
-        end_date: exp.Duration?.EndDate && exp.Duration.EndDate !== "Present" ? (() => {
+        end_date: exp.end_date ? (() => {
           try {
-            const date = new Date(exp.Duration.EndDate);
+            const date = new Date(exp.end_date);
             return isNaN(date.getTime()) ? null : date;
           } catch (e) {
-            console.error('Error parsing end date:', exp.Duration.EndDate, e);
+            console.error('Error parsing end date:', exp.end_date, e);
             return null;
           }
         })() : null,
-        current_work: exp.Duration?.EndDate === "Present",
-        projects: exp.Projects?.map(proj => ({
-          id: `proj-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          title: proj.Project_title || "",
-          role: proj.Role || "",
-          technology: Array.isArray(proj.technologies_used) ? proj.technologies_used.join(",") : "",
-          description: proj.Description || ""
-        })) || [
+        current_work: !exp.end_date,
+        projects: [
           { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
         ]
       };
     });
     setExperiences(formattedExperiences);
   }
-}, [improveResumeData]);
+}, [getUpdateResumeInfoData]);
 
 
 

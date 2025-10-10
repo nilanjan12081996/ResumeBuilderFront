@@ -5,27 +5,27 @@ import { BsFillPlusCircleFill } from "react-icons/bs"
 import { FaTrophy } from "react-icons/fa"
 import { MdDelete } from "react-icons/md"
 
-const AchivmentsJd = ({ improveResumeData, achivments, setAchivments }) => {
+const AchivmentsJd = ({ getUpdateResumeInfoData, achivments, setAchivments }) => {
   useEffect(() => {
     if (
-      improveResumeData?.raw_data?.achievements?.Achievements?.length > 0
+      getUpdateResumeInfoData?.data?.imp_achievement_info?.length > 0
     ) {
       console.log(
         "AchivmentsJd",
-        improveResumeData.raw_data.achievements.Achievements
+        getUpdateResumeInfoData.data.imp_achievement_info
       );
 
-      const achievements = improveResumeData.raw_data.achievements.Achievements.map(
+      const achievements = getUpdateResumeInfoData.data.imp_achievement_info.map(
         (ach, index) => ({
-          id: `ach-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
-          achievement_title: ach.achievement_title || "",
-          organization: ach.organization || "",
-          receive_date: ach.receive_date ? (() => {
+          id: ach.id,
+          achievement_title: ach.achivement_name || "",
+          organization: ach.achivement_organization_name || "",
+          receive_date: ach.achivement_date ? (() => {
             try {
-              const date = new Date(ach.receive_date);
+              const date = new Date(ach.achivement_date);
               return isNaN(date.getTime()) ? null : date;
             } catch (e) {
-              console.error('Error parsing achievement date:', ach.receive_date, e);
+              console.error('Error parsing achievement date:', ach.achivement_date, e);
               return null;
             }
           })() : null,
@@ -45,7 +45,7 @@ const AchivmentsJd = ({ improveResumeData, achivments, setAchivments }) => {
         },
       ]);
     }
-  }, [improveResumeData, setAchivments]);
+  }, [getUpdateResumeInfoData, setAchivments]);
 
   const addAchivments = () => {
     setAchivments([...achivments, { id: `ach-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }]);

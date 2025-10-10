@@ -10,33 +10,33 @@ import { HiAcademicCap } from "react-icons/hi2"
 import { MdDelete } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const EducationJd = ({educationEntries,setEducationEntries,improveResumeData,setValue}) => {
+const EducationJd = ({educationEntries,setEducationEntries,getUpdateResumeInfoData,setValue}) => {
   useEffect(() => {
-  if (improveResumeData?.raw_data?.education?.Education) {
-    const mappedEducation = improveResumeData?.raw_data?.education?.Education.map((edu) => ({
-      id: `edu-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      institution: edu.CollegeUniversity || "",
-      location: edu.Location || "",
-      degree: edu.CourseDegree || "",
-      field_study: edu.CourseDegree || "",
+  if (getUpdateResumeInfoData?.data?.imp_education_info) {
+    const mappedEducation = getUpdateResumeInfoData?.data?.imp_education_info.map((edu) => ({
+      id: edu.id,
+      institution: edu.college || "",
+      location: edu.location || "",
+      degree: edu.course || "",
+      field_study: edu.course || "",
       start_time: null,   // Not available in the new structure
-      end_time: edu.GraduationYear ? (() => {
+      end_time: edu.course_completed ? (() => {
         try {
-          const date = new Date(edu.GraduationYear);
+          const date = new Date(edu.course_completed);
           return isNaN(date.getTime()) ? null : date;
         } catch (e) {
-          console.error('Error parsing graduation year:', edu.GraduationYear, e);
+          console.error('Error parsing course completion date:', edu.course_completed, e);
           return null;
         }
       })() : null,
-      cgpa: edu.GPAorGrade || "",
-      additionalInfo: edu.AdditionalInformation || "",
+      cgpa: edu.cgpa || "",
+      additionalInfo: edu.aditional_info || "",
       currentlyStudying: false,
     }));
 
     setEducationEntries(mappedEducation);
   }
-}, [improveResumeData]);
+}, [getUpdateResumeInfoData]);
         const addEducation = () => {
     setEducationEntries([...educationEntries,  {id:`edu-new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}]);
   };
