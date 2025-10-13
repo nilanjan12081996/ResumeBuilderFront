@@ -24,6 +24,28 @@ export const getPlans = createAsyncThunk(
     }
   }
 );
+
+export const getPlansHome = createAsyncThunk(
+  "getPlansHome",
+  async ({ plan_type, ip_address }, { rejectWithValue }) => {
+    try {
+      const response = await api.get(
+        `/api/plan/list?page=1&limit=20&plan_type=${plan_type}&ip_address=${ip_address}`
+      );
+      if (response?.data?.status_code === 200) {
+        return response.data;
+      } else {
+        if (response?.data?.errors) {
+          return rejectWithValue(response.data.errors);
+        } else {
+          return rejectWithValue("Something went wrong.");
+        }
+      }
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
 export const createSubscriptions = createAsyncThunk(
   "createSubscriptions",
   async (user_input, { rejectWithValue }) => {
@@ -176,6 +198,7 @@ const initialState = {
   createOrderData: {},
   verifyOrderData: {},
   currentSubscriptionData: {},
+  plansHomeData:{}
 };
 
 const PlanSlice = createSlice({
@@ -268,7 +291,20 @@ const PlanSlice = createSlice({
       .addCase(currentSubscription.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload;
-      });
+      })
+      .addCase(getPlansHome.pending,(state)=>{
+        state.loading=true
+      })
+      .addCase(getPlansHome.fulfilled,(state,{payload})=>{
+        state.loading=false
+        state.plansHomeData=payload
+        state.error=false
+      })
+      .addCase(getPlansHome.rejected,(state,{payload})=>{
+        state.loading=false
+        state.error=payload
+      })
+      ;
   },
 });
 export default PlanSlice.reducer;

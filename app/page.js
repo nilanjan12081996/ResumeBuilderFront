@@ -47,13 +47,15 @@ import 'react-tabs/style/react-tabs.css';
 import { Button, Select, TextInput } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { getPlans } from "./reducers/PlanSlice";
 import { features } from "process";
 import { getCoins } from "./reducers/CoinSlice";
 import { useRouter } from "next/navigation";
 import LoginModal from "./modal/LoginModal";
 import TradingCoinList from "./TradingCoinList";
 import FreeResumeTemplates from "./FreeResumeTemplates/page";
+import RegistrationModal from "./modal/RegistrationModal";
+import ChoiceModal from "./modal/ChoiceModal";
+import { getIpData, getPlans, getPlansHome } from "./reducers/PlanSlice";
 
 
 
@@ -65,7 +67,7 @@ const poppins = Poppins({
 });
 
 export default function Home() {
-   const { plans } = useSelector((state) => state?.planst)
+  
    const { coins } = useSelector((state) => state?.coinData)
    const dispatch = useDispatch()
    const [searchTerm, setSearchTerm] = useState("");
@@ -75,7 +77,41 @@ export default function Home() {
    const [showDropdown, setShowDropdown] = useState(false);
    const router = useRouter();
    const [openLoginModal, setOpenLoginModal] = useState(false);
+   const [openChoiceModal,setOpenChoiceModal]=useState(false)
+   const [chooseResumeType,setChooseResumeType]=useState()
+   const [openVerifyOtpModal, setOpenVerifyOtpModal] = useState(false);
+   const [openPricModal, setOpenPriceModal] = useState(false)
+    const [openRegisterModal, setOpenRegisterModal] = useState(false);
+      const { plans, loading, ipData, createOrderData, error, currentSubscriptionData,plansHomeData } = useSelector(
+    (state) => state.planst
+  );
 
+  useEffect(() => {
+     dispatch(getIpData()).then((res) => {
+       console.log("Ipres:", res);
+       if (res?.payload?.ip) {
+         dispatch(
+           getPlans({
+             plan_type:1,
+             ip_address: res?.payload?.ip,
+           })
+         );
+       }
+        if (res?.payload?.ip) {
+         dispatch(
+           getPlansHome({
+             plan_type:2,
+             ip_address: res?.payload?.ip,
+           })
+         );
+       }
+     });
+   }, [dispatch]);
+
+   console.log("plans",plans);
+   console.log("plansHomeData",plansHomeData);
+   
+   
    return (
       <div className={`${poppins.variable} antialiased home_wrapper_arera`}>
 
@@ -120,7 +156,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <Link className="text-xs lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE MY REUSME</Link>
+                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -138,7 +174,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <Link className="text-xs lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CREATE ATS FRIENDLY REUSME</Link>
+                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
                         </div>
                      </div>
                   </div>
@@ -150,7 +186,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
-                           <Link className="text-xs lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block" href="/" passHref>CUSTOMIZE MY REUSME</Link>
+                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -226,7 +262,7 @@ export default function Home() {
                      <p className="text-[#585858] text-sm leading-[24px] pb-4">
                         We are looking for a creative and detail-oriented UI/UX Designer to join our team. The ideal candidate will be...
                      </p>
-                     <button className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
+                     <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
                   </div>
                   <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
                      <div className="mb-3">
@@ -236,7 +272,7 @@ export default function Home() {
                      <p className="text-[#585858] text-sm leading-[24px] pb-4">
                         We are seeking an experienced and visionary Senior Product Designer to join our growing team...
                      </p>
-                     <button className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
+                     <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
                   </div>
                   <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
                      <div className="mb-3">
@@ -246,7 +282,7 @@ export default function Home() {
                      <p className="text-[#585858] text-sm leading-[24px] pb-4">
                         We are looking for a User Experience (UX) Designer to join our team and help craft seamless, intuitive   ...
                      </p>
-                     <button className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
+                     <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
                   </div>
                </div>
             </div>
@@ -287,29 +323,55 @@ export default function Home() {
                         <Tab>Quarterly </Tab>
                         <Tab>Annual </Tab>
                      </TabList>
-
+            
                      <TabPanel>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                              <div className="py-8 px-6 relative">
-                                 <Image src={sub01} alt='sub01' className='mb-6' />
-                                 <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Free</h3>
-                                 <div className="flex items-center gap-2 mb-8">
-                                    <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹0</p>
-                                 </div>
-                                 <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                    <div>
+                           {
+                              plans?.data?.map((oneTime)=>(
+                                 <>
+                                 {
+                                    oneTime?.plan_frequency===1&&(
+                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                     <div className="py-8 px-6 relative">
+                        <Image src={sub01} alt='sub01' className='mb-6' />
+                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                        <div className="flex items-center gap-2 mb-8">
+                           <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                              {/* <div className="pt-4">
+                              <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                           </div> */}
+                        </div>
+                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                           <div>
+                              
+                                
+                                 {
+                                    oneTime?.PlanAccess?.map((planAccessName)=>(
+                                       <>
                                        <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                          <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 3 resumes (with watermark)
+                                        <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                       {planAccessName?.plan_access_description}
                                        </div>
-                                    </div>
-                                 </div>
-                                 <div className="absolute left-0 lg:bottom-[-20px] bottom-[15px] w-full px-6">
-                                    <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                 </div>
-                              </div>
+                                       </>
+                                    ))
+                                 } 
+                            
                            </div>
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                        </div>
+                        <div className="absolute left-0 bottom-[20px] w-full px-6">
+                           <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                        </div>
+                              </div>
+                                 </div>
+                                    )
+                                 }
+                                 
+                                 
+                                 </>
+                                  
+                              ))
+                           }
+                           {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                               <div className="py-8 px-6 relative">
                                  <Image src={sub01} alt='sub01' className='mb-6' />
                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
@@ -330,8 +392,8 @@ export default function Home() {
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
-                           </div>
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
+                           </div> */}
+                           {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
                               <div className="py-8 px-6 relative">
                                  <Image src={sub02} alt='sub02' className='mb-6' />
                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
@@ -374,13 +436,14 @@ export default function Home() {
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
-                           </div>
+                           </div> */}
                            
                         </div>
                      </TabPanel>
                      <TabPanel>
                          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                           
+                           {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                               <div className="py-8 px-6 relative">
                                  <Image src={sub01} alt='sub01' className='mb-6' />
                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Free</h3>
@@ -398,56 +461,58 @@ export default function Home() {
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
-                           </div>
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                              <div className="py-8 px-6 relative">
-                                 <Image src={sub01} alt='sub01' className='mb-6' />
-                                 <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
-                                 <div className="flex items-center gap-2 mb-8">
-                                    <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹799</p>
-                                     <div className="pt-4">
-                                       <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹999</p>
-                                    </div>
-                                 </div>
-                                 <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                    <div>
+                           </div> */}
+                                      {
+                              plans?.data?.map((oneTime)=>(
+                                 <>
+                                 {
+                                    oneTime?.plan_frequency===3&&(
+                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                     <div className="py-8 px-6 relative">
+                        <Image src={sub01} alt='sub01' className='mb-6' />
+                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                        <div className="flex items-center gap-2 mb-8">
+                           <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                              {/* <div className="pt-4">
+                              <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                           </div> */}
+                        </div>
+                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                           <div>
+                              
+                                
+                                 {
+                                    oneTime?.PlanAccess?.map((planAccessName)=>(
+                                       <>
                                        <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                          <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 8 resumes (premium ATS score) + 8 JD specific resume
+                                        <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                       {planAccessName?.plan_access_description}
                                        </div>
-                                    </div>
-                                 </div>
-                                 <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                    <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                 </div>
-                              </div>
+                                       </>
+                                    ))
+                                 } 
+                            
                            </div>
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
-                              <div className="py-8 px-6 relative">
-                                 <Image src={sub02} alt='sub02' className='mb-6' />
-                                 <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
-                                 <div className="flex items-center gap-2 mb-8">
-                                    <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1299</p>
-                                    <div className="pt-4">
-                                       <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹1599</p>
-                                    </div>
-                                 </div>
-                                 <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                    <div>
-                                       <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                          <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 8 resumes + 2 LinkedIn rewrites
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                    <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                 </div>
+                        </div>
+                        <div className="absolute left-0 bottom-[20px] w-full px-6">
+                           <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                        </div>
                               </div>
-                           </div>
+                                 </div>
+                                    )
+                                 }
+                                 
+                                 
+                                 </>
+                                  
+                              ))
+                           }
+                        
                         </div>
                      </TabPanel>
                      <TabPanel>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                           {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                               <div className="py-8 px-6 relative">
                                  <Image src={sub01} alt='sub01' className='mb-6' />
                                  <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Basic</h3>
@@ -552,7 +617,53 @@ export default function Home() {
                                     <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
                                  </div>
                               </div>
+                           </div> */}
+
+                                            {
+                              plansHomeData?.data?.map((oneTime)=>(
+                                 <>
+                                 {
+                                    oneTime?.plan_frequency===12&&(
+                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                     <div className="py-8 px-6 relative">
+                        <Image src={sub01} alt='sub01' className='mb-6' />
+                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                        <div className="flex items-center gap-2 mb-8">
+                           <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                              {/* <div className="pt-4">
+                              <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                           </div> */}
+                        </div>
+                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                           <div>
+                              
+                                
+                                 {
+                                    oneTime?.PlanAccess?.map((planAccessName)=>(
+                                       <>
+                                       <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                        <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                       {planAccessName?.plan_access_description}
+                                       </div>
+                                       </>
+                                    ))
+                                 } 
+                            
                            </div>
+                        </div>
+                        <div className="absolute left-0 bottom-[20px] w-full px-6">
+                           <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                        </div>
+                              </div>
+                                 </div>
+                                    )
+                                 }
+                                 
+                                 
+                                 </>
+                                  
+                              ))
+                           }
                            
                         </div>
                      </TabPanel>
@@ -566,8 +677,33 @@ export default function Home() {
             <LoginModal
                openLoginModal={openLoginModal}
                setOpenLoginModal={setOpenLoginModal}
+               setOpenRegisterModal={setOpenRegisterModal}
+                setOpenChoiceModal={setOpenChoiceModal}
             />
          }
+
+               {openRegisterModal &&
+              <RegistrationModal
+                openRegisterModal={openRegisterModal}
+                setOpenRegisterModal={setOpenRegisterModal}
+                openVerifyOtpModal={openVerifyOtpModal}
+                setOpenVerifyOtpModal={setOpenVerifyOtpModal}
+                setOpenLoginModal={setOpenLoginModal}
+                openPricModal={openPricModal}
+                setOpenPriceModal={setOpenPriceModal}
+                chooseResumeType={chooseResumeType}
+              />
+            }
+                {
+            openChoiceModal&&(
+              <ChoiceModal
+              openChoiceModal={openChoiceModal}
+              setOpenChoiceModal={setOpenChoiceModal}
+              setChooseResumeType={setChooseResumeType}
+              setOpenRegisterModal={setOpenRegisterModal}
+              />
+            )
+          }
       </div>
 
    );
