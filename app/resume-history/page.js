@@ -248,7 +248,7 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                 Preview
                 </button> */}
                    <Link
-              href={
+                  href={
                   hist.resume_type==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
                   :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`
                   :hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
