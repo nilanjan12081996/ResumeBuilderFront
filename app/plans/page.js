@@ -66,7 +66,13 @@ console.log("currentSubscriptionData",currentSubscriptionData)
   };
 
   // Helper function to render a plan card
-  const renderPlanCard = (pln, isDisabled = false) => {
+  const renderPlanCard = (pln) => {
+    // Check if this is a free plan (price is 0 or null)
+    const isFreePlan = pln?.planPrice?.price === 0 || pln?.planPrice?.price === null || pln?.planPrice?.price === undefined;
+    
+    // Disable button if it's a free plan and user has no current subscription
+    const shouldDisableButton = isFreePlan && !hasActiveSubscription();
+    
     return (
       <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
         <div className="py-8 px-6 relative">
@@ -113,7 +119,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
           <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
             <button
               onClick={(e) =>
-                !isDisabled &&
+                !shouldDisableButton &&
                 !hasActiveSubscription() &&
                 handlePaymentModal(e, {
                   amount: pln?.planPrice?.price,
@@ -121,15 +127,15 @@ console.log("currentSubscriptionData",currentSubscriptionData)
                   plan_id: pln?.planPrice?.plan_id,
                 })
               }
-              disabled={isDisabled || hasActiveSubscription()}
+              disabled={shouldDisableButton || hasActiveSubscription()}
               className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
                 ${
-                  isDisabled || hasActiveSubscription()
+                  shouldDisableButton || hasActiveSubscription()
                     ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
                     : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
                 }`}
             >
-              {isDisabled ? "Already Subscribed" : hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
+              {shouldDisableButton ? "Current Plan" : hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
             </button>
           </div>
         </div>
@@ -318,7 +324,7 @@ console.log("ipdata",ipData)
                   </div>
                   
                   {/* Show last plan for each frequency type */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {parsed?.signup_type_id == 1 && getLastPlan(1) && (
                       <div className="bg-white rounded-lg p-4 border border-blue-200">
                         <h4 className="font-medium text-gray-900 mb-2">Free Plan</h4>
@@ -343,7 +349,7 @@ console.log("ipdata",ipData)
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}
@@ -366,12 +372,10 @@ console.log("ipdata",ipData)
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                         {plans?.data
                           ?.filter((pln) => pln?.plan_frequency === 1)
-                          .map((pln, index, array) => {
-                            // Check if this is the last plan in the array
-                            const isLastPlan = index === array.length - 1;
+                          .map((pln, index) => {
                             return (
                               <div key={index}>
-                                {renderPlanCard(pln, isLastPlan)}
+                                {renderPlanCard(pln)}
                               </div>
                             );
                           })}
@@ -448,12 +452,10 @@ console.log("ipdata",ipData)
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                         {plans?.data
                           ?.filter((pln) => pln?.plan_frequency === 3)
-                          .map((pln, index, array) => {
-                            // Check if this is the last plan in the array
-                            const isLastPlan = index === array.length - 1;
+                          .map((pln, index) => {
                             return (
                               <div key={index}>
-                                {renderPlanCard(pln, isLastPlan)}
+                                {renderPlanCard(pln)}
                               </div>
                             );
                           })}
@@ -697,12 +699,10 @@ console.log("ipdata",ipData)
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                         {plans?.data
                           ?.filter((pln) => pln?.plan_frequency === 12)
-                          .map((pln, index, array) => {
-                            // Check if this is the last plan in the array
-                            const isLastPlan = index === array.length - 1;
+                          .map((pln, index) => {
                             return (
                               <div key={index}>
-                                {renderPlanCard(pln, isLastPlan)}
+                                {renderPlanCard(pln)}
                               </div>
                             );
                           })}

@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, updateBasicInfo, updateExperience, updateEducation, updateSkills, updateLanguage, updateExtraProject, updateCertification, updateAchievements, getUpdateResumeInfo } from '../reducers/DashboardSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, updateBasicInfo, updateExperience, updateEducation, updateSkills, updateLanguage, updateExtraProject, updateCertification, updateAchievements, getUpdateResumeInfo, atsScoreAnalyze } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -90,7 +90,7 @@ const page = () => {
   //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
   // }, [id])
 
-  const {error, improveResumeData, loading, getUpdateResumeInfoData } = useSelector((state) => state?.dash)
+  const {error, improveResumeData, loading, getUpdateResumeInfoData, atsScoreAnalyzeData } = useSelector((state) => state?.dash)
 
 
   // console.log("improveResumeData", improveResumeData);
@@ -282,6 +282,93 @@ const page = () => {
   console.log("personalPro", personalPro);
   console.log("certificates", certificates);
   console.log("achivments", achivments);
+  console.log("atsScoreAnalyzeData", atsScoreAnalyzeData);
+
+  // Function to handle ATS score analysis
+  const handleAnalyzeResume = async () => {
+    const resumeid = getUpdateResumeInfoData?.data?.id;
+    if (resumeid) {
+      await dispatch(atsScoreAnalyze({ id: resumeid }));
+      setOpenModalAnalyzeResume(true);
+    }
+  };
+
+  // Dynamic ATS Score Component
+  const ATSScoreComponent = ({ score, label = "Resume Score" }) => {
+    const clamped = Math.min(Math.max(score || 0, 0), 100);
+    const max = 100;
+    const circumference = 2 * Math.PI * 60; // radius = 60
+    const progress = (clamped / max) * circumference;
+    
+    // Color based on score
+    let ringColor = "#ef4444"; // red
+    let badgeBg = "bg-red-100 text-red-800";
+    
+    if (clamped >= 80) {
+      ringColor = "#22c55e"; // green
+      badgeBg = "bg-green-100 text-green-800";
+    } else if (clamped >= 60) {
+      ringColor = "#f59e0b"; // yellow
+      badgeBg = "bg-yellow-100 text-yellow-800";
+    }
+
+    return (
+      <div className="flex justify-center">
+        <div
+          className="flex flex-col items-center rounded-2xl bg-white p-4 shadow-lg"
+          aria-label={`${label}: ${clamped} out of ${max}`}
+          role="img"
+        >
+          <div style={{ width: 140, height: 140 }} className="relative">
+            <svg
+              width={140}
+              height={140}
+              viewBox="0 0 140 140"
+              className="block"
+            >
+              {/* Track */}
+              <circle
+                cx={70}
+                cy={70}
+                r={60}
+                fill="none"
+                stroke="#e5e7eb"
+                strokeWidth={12}
+              />
+              {/* Progress */}
+              <circle
+                cx={70}
+                cy={70}
+                r={60}
+                fill="none"
+                stroke={ringColor}
+                strokeWidth={12}
+                strokeLinecap="round"
+                strokeDasharray={`${progress} ${
+                  circumference - progress
+                }`}
+                transform="rotate(-90 70 70)"
+              />
+            </svg>
+
+            {/* Center value */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xl font-semibold text-gray-700">
+                {clamped}/{max}
+              </span>
+            </div>
+          </div>
+
+          {/* Label badge */}
+          <div
+            className={`mt-3 rounded-lg px-3 py-1 text-sm font-semibold ${badgeBg}`}
+          >
+            {label}
+          </div>
+        </div>
+      </div>
+    );
+  };
   
   const onSubmit = async (data) => {
     console.log("data", data);
@@ -574,7 +661,7 @@ const page = () => {
             <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
           </div>
           <div className='lg:flex items-center gap-3'>
-            <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
+            <button onClick={handleAnalyzeResume} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
             <button onClick={() => console.log('Download DOCX clicked')} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
             <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
@@ -608,12 +695,20 @@ const page = () => {
         <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
         <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
           <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
-            <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-            <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-              <Image src={resume_sections_view} alt="resume_sections_view" className='' />
+            <h3 className='text-base font-medium mb-4 text-[#151515]'>Current Resume Preview</h3>
+            <div className='border border-[#E5E5E5] rounded-[8px] mb-4 max-h-[600px] overflow-y-auto'>
+              {template == 1 && (
+                <Template1 data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+              )}
+              {template == 2 && (
+                <Template2 data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+              )}
             </div>
             <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
-              <Image src={resume_score} alt="resume_score" className='mb-0' />
+              <ATSScoreComponent 
+                score={atsScoreAnalyzeData?.data?.new_ats || 0} 
+                label="Resume Score" 
+              />
             </div>
           </div>
           <div>
@@ -631,20 +726,31 @@ const page = () => {
           <div className='flex gap-4'>
             <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
               <h3 className='text-base font-medium mb-4 text-[#151515]'>Before</h3>
-              <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+              <div className='border border-[#E5E5E5] rounded-[8px] mb-4 max-h-[600px] overflow-y-auto'>
                 <Image src={resume_sections_view} alt="resume_sections_view" className='' />
               </div>
               <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[10px] bottom-[20px] p-5'>
-                <Image src={resume_score} alt="resume_score" className='mb-0' />
+                <ATSScoreComponent 
+                  score={atsScoreAnalyzeData?.data?.old_ats || 0} 
+                  label="Before Score" 
+                />
               </div>
             </div>
             <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
               <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-              <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                <Image src={resume_sections_view} alt="resume_sections_view" className='' />
+              <div className='border border-[#E5E5E5] rounded-[8px] mb-4 max-h-[600px] overflow-y-auto'>
+                {template == 1 && (
+                  <Template1 data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+                )}
+                {template == 2 && (
+                  <Template2 data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+                )}
               </div>
               <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute right-[10px] bottom-[20px] p-5'>
-                <Image src={resume_score2} alt="resume_score2" className='mb-0' />
+                <ATSScoreComponent 
+                  score={atsScoreAnalyzeData?.data?.new_ats || 0} 
+                  label="After Score" 
+                />
               </div>
             </div>
           </div>

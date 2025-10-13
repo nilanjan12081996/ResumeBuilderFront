@@ -421,6 +421,25 @@ export const getUpdateResumeInfo=createAsyncThunk(
         }
     }
 )
+export const atsScoreAnalyze=createAsyncThunk(
+    'atsScoreAnalyze',
+     async ({ id }, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/improve-resume/get-ats-score-analyze?imp_resume_id=${id}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
 
 
 const initialState={
@@ -446,7 +465,8 @@ updateLanguageData:{},
 updateExtraProjectData:{},
 updateCertificationData:{},
 updateAchievementsData:{},
-getUpdateResumeInfoData:{}
+getUpdateResumeInfoData:{},
+atsScoreAnalyzeData:{}
 }
 
 const DashboardSlice=createSlice(
@@ -730,6 +750,19 @@ const DashboardSlice=createSlice(
                 state.getUpdateResumeInfoData=payload
             })
             .addCase(getUpdateResumeInfo.rejected,(state,{payload})=>{
+                state.error=payload
+                state.loading=false
+            })
+            .addCase(atsScoreAnalyze.pending,(state,{payload})=>{
+                state.loading=true
+               
+            })
+            .addCase(atsScoreAnalyze.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.error=false
+                state.atsScoreAnalyzeData=payload
+            })
+            .addCase(atsScoreAnalyze.rejected,(state,{payload})=>{
                 state.error=payload
                 state.loading=false
             })
