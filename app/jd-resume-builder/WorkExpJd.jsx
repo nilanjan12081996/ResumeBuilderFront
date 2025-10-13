@@ -172,37 +172,44 @@ import { BsFillPlusCircleFill } from "react-icons/bs";
 import { FaTags } from "react-icons/fa";
 import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
+import ResuMateQuestionModal from "../modal/ResuMateQuestionModal";
+import { getGeneratedQuestions } from "../reducers/DashboardSlice";
+import { useDispatch } from "react-redux";
 
 const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
 
- useEffect(() => {
-  console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
-  if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
-    const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
-      let skills = [];
-      try {
-        skills = JSON.parse(exp.skill_set); // string to array convert
-      } catch (e) {
-        skills = [];
-      }
+  const [showResuMate, setShowResuMate] = useState(false);
+  // const [selectedExpId, setSelectedExpId] = useState(null);
+  const dispatch = useDispatch()
 
-      return {
-        id: exp.id,
-        company_name: exp.company_name || "",
-        position: exp.Position || "",
-        location: exp.location || "",
-        skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
-        start_date: exp.start_date ? new Date(exp.start_date) : null,
-        end_date: exp.end_date ? new Date(exp.end_date) : null,
-        current_work: false,
-        projects: exp.projects || [
-          { id: Date.now(), title: "", role: "", technology: "", description: "" }
-        ]
-      };
-    });
-    setExperiences(formattedExperiences);
-  }
-}, [jdBasedDetailsData]);
+  useEffect(() => {
+    console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
+    if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
+      const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
+        let skills = [];
+        try {
+          skills = JSON.parse(exp.skill_set); // string to array convert
+        } catch (e) {
+          skills = [];
+        }
+
+        return {
+          id: exp.id,
+          company_name: exp.company_name || "",
+          position: exp.Position || "",
+          location: exp.location || "",
+          skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
+          start_date: exp.start_date ? new Date(exp.start_date) : null,
+          end_date: exp.end_date ? new Date(exp.end_date) : null,
+          current_work: false,
+          projects: exp.projects || [
+            { id: Date.now(), title: "", role: "", technology: "", description: "" }
+          ]
+        };
+      });
+      setExperiences(formattedExperiences);
+    }
+  }, [jdBasedDetailsData]);
 
 
 
@@ -267,6 +274,20 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
       }
     ]);
   };
+
+  // const openResuMateModal = (expId) => {
+  //   setSelectedExpId(expId);
+  //   setShowResuMate(true);
+  //   if (!expId) return;
+
+  //   // Fetch generated questions from API
+  //   // dispatch(getGeneratedQuestions({ jd_based_resume_id: expId }));
+  // };
+  // const closeResuMateModal = () => {
+  //   setShowResuMate(false);
+  //   setSelectedExpId(null);
+  // };
+
   return (
     <>
       {experiences.map((exp, expIndex) => (
@@ -550,6 +571,29 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
           ))}
         </div>
       ))}
+      {/* =================== Change 3: Fixed Open ResuMate Button =================== */}
+      <div className="">
+        <button
+          type="button"
+          onClick={() => setShowResuMate(true)}
+          className="bg-[#E8F0FE] hover:bg-[#4C6EF5] rounded-[7px] text-[12px] leading-[30px] text-[#2F4CCA] hover:text-[#ffffff] font-medium cursor-pointer px-4 py-2 flex items-center gap-2 shadow-lg"
+        >
+          ResuMate
+        </button>
+
+      </div>
+
+      {/* =================== Change 4: ResuMate Modal =================== */}
+      {/* {console.log("showResuMate", showResuMate)
+      }
+      {showResuMate && (
+        <ResuMateQuestionModal
+          showResuMate={showResuMate}
+          setShowResuMate={setShowResuMate}
+          selectedExpId={selectedExpId} // pass selected experience id
+        />
+      )} */}
+
     </>
   );
 };

@@ -90,7 +90,7 @@ const page = () => {
   }, [id])
 
   console.log("jdBasedDetailsData", jdBasedDetailsData);
-  
+
 
   const [experiences, setExperiences] = useState([
     {
@@ -143,10 +143,152 @@ const page = () => {
   //     setValue("full_name",jdBasedDetailsData?.data?.[0]?.basic_info?.candidate_name)
   // },[jdBasedDetailsData,setValue])
   const formValues = watch();
+
+  useEffect(() => {
+    console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
+    if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
+      const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
+        let skills = [];
+        try {
+          skills = JSON.parse(exp.skill_set); // string to array convert
+        } catch (e) {
+          skills = [];
+        }
+
+        return {
+          id: exp.id,
+          company_name: exp.company_name || "",
+          position: exp.Position || "",
+          location: exp.location || "",
+          skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
+          start_date: exp.start_date ? new Date(exp.start_date) : null,
+          end_date: exp.end_date ? new Date(exp.end_date) : null,
+          current_work: false,
+          projects: exp.projects || [
+            { id: Date.now(), title: "", role: "", technology: "", description: "" }
+          ]
+        };
+      });
+      setExperiences(formattedExperiences);
+    }
+  }, [jdBasedDetailsData]);
+
+   useEffect(() => {
+    if (jdBasedDetailsData?.data?.[0]?.skill?.length > 0) {
+      const existingSkills = jdBasedDetailsData.data[0].skill.map((sk, index) => ({
+        id: Date.now() + index,
+        skill_category: sk.categoty || "",
+        skill: JSON.parse(sk.skill_set || "[]").join(", "),
+      }));
+      setSkills(existingSkills);
+    } else {
+      setSkills([{ id: Date.now(), skill_category: "", skill: "" }]);
+    }
+  }, [jdBasedDetailsData, setSkills]);
+
+ useEffect(() => {
+    if (jdBasedDetailsData?.data?.length > 0) {
+      const existingLanguages = jdBasedDetailsData.data[0].language || [];
+      if (existingLanguages.length > 0) {
+        setLanguages(
+          existingLanguages.map((lang, index) => ({
+            id: Date.now() + index,
+            language_name: lang.language_name || "",
+            proficiency: lang.proficiency || "",
+          }))
+        );
+      } else {
+        setLanguages([{ id: Date.now(), language_name: "", proficiency: "" }]);
+      }
+    }
+  }, [jdBasedDetailsData]);  
+
+  useEffect(() => {
+    if (
+      jdBasedDetailsData?.data?.length > 0 &&
+      jdBasedDetailsData.data[0]?.resume_achievement?.length > 0
+    ) {
+      console.log(
+        "AchivmentsJd",
+        jdBasedDetailsData.data[0].resume_achievement
+      );
+
+      const achievements = jdBasedDetailsData.data[0].resume_achievement.map(
+        (ach, index) => ({
+          id: ach.id || Date.now() + index,
+          achievement_title: ach.achivement_name || "",
+          organization: ach.achivement_organization_name || "",
+          receive_date: ach.achivement_date
+            ? new Date(ach.achivement_date)
+            : null,
+          description: ach.description || "",
+        })
+      );
+
+      setAchivments(achievements);
+    } else {
+      setAchivments([
+        {
+          id: Date.now(),
+          achievement_title: "",
+          organization: "",
+          receive_date: null,
+          description: "",
+        },
+      ]);
+    }
+  }, [jdBasedDetailsData, setAchivments]);
+
+    useEffect(() => {
+    console.log('PersonalProjectJd',jdBasedDetailsData?.data?.[0]?.project)
+    if (jdBasedDetailsData?.data?.[0]?.project?.length > 0) {
+      const existingProjects = jdBasedDetailsData.data[0].project.map((proj, index) => ({
+        id: Date.now() + index,
+        project_title: proj.Project_title || "",
+        role: proj.Role || "",
+        start_time: proj.start_time ? new Date(proj.start_time) : null,
+        end_time: proj.end_time ? new Date(proj.end_time) : null,
+        project_url: proj.project_url || "",
+        skill: proj.skill_set_use ? JSON.parse(proj.skill_set_use).join(", ") : "",
+        description: proj.description || ""
+      }));
+      setPersonalPro(existingProjects);
+    } else {
+      setPersonalPro([{ id: Date.now(), project_title: "", role: "", start_time: null, end_time: null, project_url: "", skill: "", description: "" }]);
+    }
+  }, [jdBasedDetailsData, setPersonalPro]);
+
+  useEffect(() => {
+  // console.log('CertificatesJd',jdBasedDetailsData?.data[0]?.certification)
+  if (jdBasedDetailsData?.data?.length > 0 && jdBasedDetailsData?.data[0]?.certification?.length > 0) {
+    console.log('CertificatesJd', jdBasedDetailsData.data[0].certification);
+
+    const certs = jdBasedDetailsData.data[0].certification.map((cert, index) => ({
+      id: cert.id || Date.now() + index,
+      certification_name: cert.certification_name || "",
+      issuing_organization: cert.certification_organization_name || "",
+      obtained_date: cert.certification_date ? new Date(cert.certification_date) : null,
+      certification_id: cert.certification_id || ""
+    }));
+
+    setCertificates(certs);
+  } else {
+    setCertificates([
+      {
+        id: Date.now(),
+        certification_name: "",
+        issuing_organization: "",
+        obtained_date: null,
+        certification_id: ""
+      }
+    ]);
+  }
+}, [jdBasedDetailsData, setCertificates]);
+
   const onSubmit = (data) => {
     console.log("data", data);
 
-    dispatch(jdBasedResumeBasicInfo({ ...data, basicinfo_id: jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.id, jd_resume_id: jdBasedDetailsData?.data?.[0]?.id})).then((res) => {
+    dispatch(jdBasedResumeBasicInfo({ ...data, basicinfo_id: jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.id, jd_resume_id: jdBasedDetailsData?.data?.[0]?.id })).then((res) => {
       console.log("res", res);
 
       if (res?.payload?.status_code === 200) {
@@ -207,7 +349,7 @@ const page = () => {
         };
         dispatch(jdBasedResumeLanguageInfo(payloadLang))
 
-        console.log('skills',skills)
+        console.log('skills', skills)
         const payloadSkills = {
           jd_resume_id: jdResumeId,
           user_id: parseUserId?.user_id,
@@ -444,12 +586,12 @@ const page = () => {
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
           {
-            template ==1 && (
+            template == 1 && (
               <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }
           {
-            template ==2 && (
+            template == 2 && (
               <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }
