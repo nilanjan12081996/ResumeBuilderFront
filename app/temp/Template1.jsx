@@ -6,7 +6,61 @@ const Template1= forwardRef(({data,education,experiences,skills,languages,person
   return (
     
       <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
-        <style jsx>{`
+        {/* <style jsx>{`
+        @media print {
+ 
+          .min-h-screen {
+            min-height: auto !important;
+          }
+          
+          .bg-\\[\\#f6f8fa\\] {
+            background: white !important;
+          }
+          
+          .shadow-lg {
+            box-shadow: none !important;
+          }
+          
+          .rounded-xl {
+            border-radius: 0 !important;
+          }
+          
+        
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          
+         
+          .w-\\[800px\\] {
+            width: 100% !important;
+            max-width: none !important;
+          }
+      .print-watermark {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            z-index: 9999;
+            pointer-events: none;
+            white-space: nowrap;
+            user-select: none;
+          }
+      `}</style> */}
+
+
+
+      <style jsx>{`
+        /* Hide watermark on screen, show only when printing */
+        .print-watermark {
+          display: none;
+        }
+
         @media print {
           .min-h-screen {
             min-height: auto !important;
@@ -35,8 +89,29 @@ const Template1= forwardRef(({data,education,experiences,skills,languages,person
             width: 100% !important;
             max-width: none !important;
           }
+
+          /* Show watermark only when printing */
+          .print-watermark {
+            display: block;
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            z-index: 9999;
+            pointer-events: none;
+            white-space: nowrap;
+            user-select: none;
+          }
         }
       `}</style>
+          <div className="print-watermark">
+             Hiring Eye
+        </div>
       <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px]">
         {/* Sidebar: Left */}
         <div className="w-2/5 bg-[#eff2fc] p-6 rounded-xl flex flex-col justify-start">
