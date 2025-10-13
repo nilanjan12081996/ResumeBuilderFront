@@ -299,7 +299,7 @@ console.log("ipdata",ipData)
 
             {/* Show Last Plan when no subscription exists */}
             {!hasActiveSubscription() && !currentSubscriptionData?.data?.length && (
-              <div className="mb-6 mx-4 lg:mx-0">
+              <div className="mb-6 mx-4 lg:mx-0 px-4">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-center mb-4">
                     <div className="flex-shrink-0">
