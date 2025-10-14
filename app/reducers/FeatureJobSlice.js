@@ -22,6 +22,26 @@ export const getFeatureJob=createAsyncThunk(
     }
 )
 
+export const getFeatureJobOutSide=createAsyncThunk(
+    'getFeatureJobOutSide',
+      async ({page,limit}, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/feature-job/list?page=${page}&limit=${limit}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 export const getFeatureJobDetails=createAsyncThunk(
     'getFeatureJobDetails',
         async ({id}, { rejectWithValue }) => {
@@ -67,7 +87,8 @@ const initialState={
     error:false,
     jobs:[],
     jobDetails:{},
-    applyJobData:""
+    applyJobData:"",
+    fetJobsOutSide:[]
 }
 const FeatureJobSlice=createSlice(
     {
@@ -108,6 +129,18 @@ const FeatureJobSlice=createSlice(
                 state.error=false
             })
             .addCase(applyJobs.rejected,(state,{payload})=>{
+                state.loading=false
+                state.error=payload
+            })
+            .addCase(getFeatureJobOutSide.pending,(state)=>{
+                state.loading=true
+            })
+            .addCase(getFeatureJobOutSide.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.fetJobsOutSide=payload
+                state.error=false
+            })
+            .addCase(getFeatureJobOutSide.rejected,(state,{payload})=>{
                 state.loading=false
                 state.error=payload
             })

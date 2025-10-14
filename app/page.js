@@ -56,6 +56,8 @@ import FreeResumeTemplates from "./FreeResumeTemplates/page";
 import RegistrationModal from "./modal/RegistrationModal";
 import ChoiceModal from "./modal/ChoiceModal";
 import { getIpData, getPlans, getPlansHome } from "./reducers/PlanSlice";
+import { getFeatureJobOutSide } from "./reducers/FeatureJobSlice";
+import striptags from "striptags";
 
 
 
@@ -69,6 +71,7 @@ const poppins = Poppins({
 export default function Home() {
   
    const { coins } = useSelector((state) => state?.coinData)
+   const{fetJobsOutSide}=useSelector((state)=>state?.featJob)
    const dispatch = useDispatch()
    const [searchTerm, setSearchTerm] = useState("");
    const [selectedCurrency, setSelectedCurrency] = useState('USD');
@@ -110,6 +113,11 @@ export default function Home() {
 
    console.log("plans",plans);
    console.log("plansHomeData",plansHomeData);
+
+   useEffect(()=>{
+      dispatch(getFeatureJobOutSide({page:1,limit:3}))
+   },[])
+   console.log("fetJobsOutSide",fetJobsOutSide);
    
    
    return (
@@ -254,17 +262,23 @@ export default function Home() {
                   <p className="text-[#2A2A2A] text-[18px] leading-[30px] lg:px-40 px-10 text-center">Discover roles that match your skills and goals.</p>
                </div>
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
+                  {
+                     fetJobsOutSide?.data?.map((fetJobs)=>(
+                        <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
                      <div className="mb-3">
                         <Image src={hiring_icon} alt='hiring_icon' className='mb-2' />
-                        <h3 className="text-[#320731] text-xl leading-[30px] ml-0">UI / UX Designer</h3>
+                        <h3 className="text-[#320731] text-xl leading-[30px] ml-0">{fetJobs?.job_role}</h3>
                      </div>
                      <p className="text-[#585858] text-sm leading-[24px] pb-4">
-                        We are looking for a creative and detail-oriented UI/UX Designer to join our team. The ideal candidate will be...
+                        {/* We are looking for a creative and detail-oriented UI/UX Designer to join our team. The ideal candidate will be... */}
+                        {striptags(fetJobs?.job_description.slice(0,200))} ...
                      </p>
                      <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
                   </div>
-                  <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
+                     ))
+                  }
+                  
+                  {/* <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
                      <div className="mb-3">
                         <Image src={hiring_icon} alt='hiring_icon' className='mb-2' />
                         <h3 className="text-[#320731] text-xl leading-[30px] ml-0">Sr.Product Designer</h3>
@@ -283,7 +297,7 @@ export default function Home() {
                         We are looking for a User Experience (UX) Designer to join our team and help craft seamless, intuitive   ...
                      </p>
                      <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
-                  </div>
+                  </div> */}
                </div>
             </div>
          </div>
