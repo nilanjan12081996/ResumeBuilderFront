@@ -165,21 +165,19 @@
 // export default WorkExp;
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Checkbox, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
 import { BiCodeAlt, BiSolidBriefcase, BiSolidBuilding } from "react-icons/bi";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { FaTags } from "react-icons/fa";
 import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
-import ResuMateQuestionModal from "../modal/ResuMateQuestionModal";
-import { getGeneratedQuestions } from "../reducers/DashboardSlice";
 import { useDispatch } from "react-redux";
+import ResuMateQuestionModal from "../modal/ResuMateQuestionModal";
 
 const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
-
   const [showResuMate, setShowResuMate] = useState(false);
-  // const [selectedExpId, setSelectedExpId] = useState(null);
+  const buttonRef = useRef(null);
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -274,19 +272,6 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
       }
     ]);
   };
-
-  // const openResuMateModal = (expId) => {
-  //   setSelectedExpId(expId);
-  //   setShowResuMate(true);
-  //   if (!expId) return;
-
-  //   // Fetch generated questions from API
-  //   // dispatch(getGeneratedQuestions({ jd_based_resume_id: expId }));
-  // };
-  // const closeResuMateModal = () => {
-  //   setShowResuMate(false);
-  //   setSelectedExpId(null);
-  // };
 
   return (
     <>
@@ -571,28 +556,26 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
           ))}
         </div>
       ))}
-      {/* =================== Change 3: Fixed Open ResuMate Button =================== */}
-      <div className="">
+      {/* ===================  ResuMate Button =================== */}
+       <div className="relative">
+      <div>
         <button
+          ref={buttonRef} // 👈 added this line
           type="button"
-          onClick={() => setShowResuMate(true)}
           className="bg-[#E8F0FE] hover:bg-[#4C6EF5] rounded-[7px] text-[12px] leading-[30px] text-[#2F4CCA] hover:text-[#ffffff] font-medium cursor-pointer px-4 py-2 flex items-center gap-2 shadow-lg"
+          onClick={() => setShowResuMate(true)}
         >
           ResuMate
         </button>
-
       </div>
 
-      {/* =================== Change 4: ResuMate Modal =================== */}
-      {/* {console.log("showResuMate", showResuMate)
-      }
-      {showResuMate && (
-        <ResuMateQuestionModal
-          showResuMate={showResuMate}
-          setShowResuMate={setShowResuMate}
-          selectedExpId={selectedExpId} // pass selected experience id
-        />
-      )} */}
+      {/* Pass buttonRef to the modal */}
+      <ResuMateQuestionModal
+        showResuMate={showResuMate}
+        setShowResuMate={setShowResuMate}
+        buttonRef={buttonRef} // 👈 added this line
+      />
+    </div>
 
     </>
   );
