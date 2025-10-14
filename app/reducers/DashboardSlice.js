@@ -443,29 +443,32 @@ export const atsScoreAnalyze = createAsyncThunk(
 
 // Add for chat
 
+// Add JD-based questions
 export const getGeneratedQuestions = createAsyncThunk(
-    "dashboard/getGeneratedQuestions",
-    async (userInput, { rejectWithValue }) => {
-        try {
-            const response = await api.post("/api/js-based-resume/add-question", userInput);
-            return response?.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || "Something went wrong.");
-        }
+  "dashboard/getGeneratedQuestions",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/api/js-based-resume/add-question", payload);
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong.");
     }
+  }
 );
 
+
 export const improveExperience = createAsyncThunk(
-    "dashboard/improveExperience",
-    async (userInput, { rejectWithValue }) => {
-        try {
-            const response = await api.post("/api/js-based-resume/improve-experience", userInput);
-            return response?.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || "Something went wrong.");
-        }
+  "dashboard/improveExperience",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/api/js-based-resume/improve-experience", payload);
+      return response?.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong.");
     }
+  }
 );
+
 
     const initialState = {
         error: false,
@@ -807,7 +810,7 @@ const DashboardSlice = createSlice(
                         state.loading = false;
                         state.error = payload;
                     })
-                                      
+
                     .addCase(atsScoreAnalyze.pending, (state, { payload }) => {
                         state.loading = true
 

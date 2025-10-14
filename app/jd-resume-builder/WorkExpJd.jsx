@@ -272,6 +272,13 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
       }
     ]);
   };
+  // console.log('sp', jdBasedDetailsData)
+
+  const jd_resume_id = jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.jd_resume_id;
+   const jd_questions = jdBasedDetailsData?.data?.[0]?.JdBaseResumeQuestion;
+  
+   console.log("jd_questions",jd_questions)
+
 
   return (
     <>
@@ -557,25 +564,25 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
         </div>
       ))}
       {/* ===================  ResuMate Button =================== */}
-       <div className="relative">
-      <div>
+      <div className="relative">
         <button
-          ref={buttonRef} // 👈 added this line
+          ref={buttonRef}
           type="button"
           className="bg-[#E8F0FE] hover:bg-[#4C6EF5] rounded-[7px] text-[12px] leading-[30px] text-[#2F4CCA] hover:text-[#ffffff] font-medium cursor-pointer px-4 py-2 flex items-center gap-2 shadow-lg"
           onClick={() => setShowResuMate(true)}
         >
           ResuMate
         </button>
-      </div>
 
-      {/* Pass buttonRef to the modal */}
-      <ResuMateQuestionModal
-        showResuMate={showResuMate}
-        setShowResuMate={setShowResuMate}
-        buttonRef={buttonRef} // 👈 added this line
-      />
-    </div>
+        <ResuMateQuestionModal
+          showResuMate={showResuMate}
+          setShowResuMate={setShowResuMate}
+          buttonRef={buttonRef}
+          jd_based_resume_id={jd_resume_id}
+          jd_questions={jd_questions}
+          experiences={experiences}
+        />
+      </div>
 
     </>
   );
