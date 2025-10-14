@@ -241,6 +241,10 @@ const authSlice = createSlice({
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
+                 sessionStorage.setItem(
+                    'user_id',
+                    JSON.stringify({ user_id: data?.id })
+                );
             })
             .addCase(registerCustomer.rejected, (state, { payload }) => {
 

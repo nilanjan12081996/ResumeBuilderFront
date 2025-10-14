@@ -1,8 +1,84 @@
 import { Briefcase, GraduationCap } from "lucide-react";
+import { forwardRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { currentSubscription, getIpData } from "../reducers/PlanSlice";
 
-const LinkedInTemplate=({data,educationEntries,experiences})=> {
+const LinkedInTemplate=forwardRef(({data,educationEntries,experiences},ref)=> {
+  const {  ipData, createOrderData, error, currentSubscriptionData } = useSelector(
+    (state) => state.planst
+  );
+const dispatch=useDispatch()
+  useEffect(()=>{
+  dispatch(getIpData()).then((res)=>{
+     if (res?.payload?.ip) {
+      dispatch(currentSubscription(res?.payload?.ip))
+     }
+  })
+  },[])
+  console.log("currentSubscriptionData",currentSubscriptionData);
   return (
-    <div className="flex justify-center p-6 bg-gray-100 min-h-screen">
+    <div ref={ref} className="flex justify-center p-6 bg-gray-100 min-h-screen">
+      <style jsx>{`
+        /* Hide watermark on screen, show only when printing */
+        .print-watermark {
+          display: none;
+        }
+
+        @media print {
+          .min-h-screen {
+            min-height: auto !important;
+          }
+          
+          .bg-\\[\\#f6f8fa\\] {
+            background: white !important;
+          }
+          
+          .shadow-lg {
+            box-shadow: none !important;
+          }
+          
+          .rounded-xl {
+            border-radius: 0 !important;
+          }
+          
+          /* Ensure colors print correctly */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          
+          /* Optimize for A4 */
+          .w-\\[800px\\] {
+            width: 100% !important;
+            max-width: none !important;
+          }
+
+          /* Show watermark only when printing */
+          .print-watermark {
+            display: block;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            z-index: 9999;
+            pointer-events: none;
+            white-space: nowrap;
+            user-select: none;
+          }
+        }
+      `}</style>
+
+         <div className="print-watermark">
+          {
+            currentSubscriptionData?.data?.length===0&&('Hiring Eye')
+          }   
+          {/* Hiring Eye */}
+        </div>
       <div className="w-full max-w-2xl rounded-xl shadow-md overflow-hidden bg-white">
         {/* Header Section */}
         <div className="bg-gray-200 h-28"></div>
@@ -201,5 +277,5 @@ const LinkedInTemplate=({data,educationEntries,experiences})=> {
       </div>
     </div>
   );
-}
+})
 export default LinkedInTemplate

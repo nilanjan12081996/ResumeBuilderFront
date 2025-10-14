@@ -1,8 +1,24 @@
-import { forwardRef } from "react"
+import { forwardRef, useEffect } from "react"
 import { convertToSubmitFormat } from "../utils/DateSubmitFormatter"
+import { useDispatch, useSelector } from "react-redux";
+import { currentSubscription, getIpData } from "../reducers/PlanSlice";
 
 const Template2=forwardRef(({ data, education, experiences, skills, languages, personalPro, achivments, certificates},ref)=>{
-    return(
+   
+  const {  ipData, createOrderData, error, currentSubscriptionData } = useSelector(
+    (state) => state.planst
+  );
+const dispatch=useDispatch()
+  useEffect(()=>{
+  dispatch(getIpData()).then((res)=>{
+     if (res?.payload?.ip) {
+      dispatch(currentSubscription(res?.payload?.ip))
+     }
+  })
+  },[])
+  console.log("currentSubscriptionData",currentSubscriptionData);
+  
+  return(
         <>
      <div ref={ref} className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8">
        {/* <style jsx>{`
@@ -112,7 +128,9 @@ const Template2=forwardRef(({ data, education, experiences, skills, languages, p
       
           <div className="print-watermark">
           
-             Hiring Eye
+            {
+              currentSubscriptionData?.data?.length===0&&('Hiring Eye')
+            }   
            
         </div>
       <div className="max-w-4xl mx-auto bg-white shadow-xl">

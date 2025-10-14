@@ -69,12 +69,16 @@ import SkillsEdit from './SkillsEdit';
 import PersonalProjectEdit from './PersonalProjectEdit';
 import CertificatesEdit from './CertificatesEdit';
 import AchivmentsEdit from './AchivmentsEdit';
+import { currentSubscription, getIpData } from '../reducers/PlanSlice';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
 
 const page = () => {
   const{loading,singleResumeInfo}=useSelector((state)=>state?.resume)
+  const {  ipData, createOrderData, error, currentSubscriptionData } = useSelector(
+    (state) => state.planst
+  );
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
@@ -90,6 +94,16 @@ console.log("template",template);
  
 
 const dispatch=useDispatch()
+
+// useEffect(()=>{
+// dispatch(getIpData()).then((res)=>{
+//    if (res?.payload?.ip) {
+//     dispatch(currentSubscription(res?.payload?.ip))
+//    }
+// })
+// },[])
+// console.log("currentSubscriptionData",currentSubscriptionData);
+
 useEffect(()=>{
 dispatch(getSingleResume({id:resumeId}))
 },[])
@@ -582,7 +596,7 @@ dispatch(updatePersonalInfo({id:singleResumeInfo?.data?.personal_info?.id,...dat
               <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
             </div>
             <div className='lg:flex items-center gap-3'>
-              <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
+              {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
               <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
               <button  onClick={handlePrint}
               // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 
@@ -65,6 +65,7 @@ import { linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInExpInfo, 
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
+import { useReactToPrint } from 'react-to-print';
 
 const page = () => {
   const { lkdDetails } = useSelector((state) => state?.linkedIn)
@@ -72,7 +73,7 @@ const page = () => {
   const searchParams = useSearchParams();
   const id = atob(searchParams.get("id"))
   console.log("id", id);
-
+     const componentRef = useRef();
   useEffect(() => {
     dispatch(linkedgetDetails({ lkdin_resume_id: id }))
   }, [id])
@@ -204,7 +205,48 @@ const page = () => {
       }
     });
   };
+   const handlePrint = useReactToPrint({
+    contentRef: componentRef, // Updated for newer versions of react-to-print
+    documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
+    pageStyle: `
+    @page {
+      size: A4;
+      margin: 0.5in;
+    }
 
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0;
+    }
+
+    /* Disable browser default headers and footers */
+    @page {
+      margin: 0;
+    }
+
+    /* Hide default header/footer added by Chrome/Edge/WPS */
+    @page :header {
+      display: none;
+    }
+    @page :footer {
+      display: none;
+    }
+  `,
+    onBeforeGetContent: () => {
+      // Optional: You can do something before printing starts
+      console.log('Starting PDF generation...');
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 100);
+      });
+    },
+    onAfterPrint: () => {
+      // Optional: You can do something after printing
+      console.log('PDF generated successfully!');
+    },
+  });
 
 
   return (
@@ -279,12 +321,12 @@ const page = () => {
             <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
           </div>
           <div className='flex items-center gap-3'>
-            <button className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
+            <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
         </div>
         <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume4} alt="resume4" className='' /> */}
-          <LinkedInTemplate data={formValues} educationEntries={educationEntries} experiences={experiences} />
+          <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} />
         </div>
       </div>
 
