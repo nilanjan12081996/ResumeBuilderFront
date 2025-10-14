@@ -5,6 +5,8 @@ import { BiImport, BiLogoLinkedinSquare } from "react-icons/bi"
 import { HiClipboardList } from "react-icons/hi"
 import { useDispatch, useSelector } from "react-redux"
 import { linkedInBasicInfo, linkedInEduInfo, linkedInExpInfo, linkedInLangInfo, linkedInPdf, linkedInSkillInfo } from "../reducers/LinkedinSlice"
+import { addCountResume } from "../reducers/ResumeSlice"
+import { toast } from "react-toastify"
 
 const LinkedInReWriteModal=({
      openModalLinkedInRewrite,
@@ -39,7 +41,10 @@ const LinkedInReWriteModal=({
               toast.error("Please select a resume file to upload");
               return;
             }
-            dispatch(linkedInPdf(formData)).then((res)=>{
+
+            dispatch(addCountResume({ref_type:"linkedin_resume"})).then((res)=>{
+               if(res?.payload?.status_code===200){
+                    dispatch(linkedInPdf(formData)).then((res)=>{
                 console.log(res,"res");
                 if(res?.payload?.status_code===201){
                   console.log("res?.payload?.created_data?.id",res?.payload?.created_data?.id);
@@ -70,6 +75,15 @@ const LinkedInReWriteModal=({
                 }
                 
             })
+               }
+                else if(res?.payload?.response?.data?.status_code===400){
+                       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{
+                         autoClose:false
+                       })
+                     }
+            })
+
+            
       }
     return(
         <>
