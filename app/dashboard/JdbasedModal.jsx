@@ -8,6 +8,7 @@ import { HiClipboardList } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { jdBasedResume, jdBasedResumeAchivmentInfo, jdBasedResumeBasicInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeExpInfo, jdBasedResumeLanguageInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo } from "../reducers/DashboardSlice";
+import { addCountResume } from "../reducers/ResumeSlice";
 
 const JdbasedModal=({openModalImproveexistingResume,
           setOpenModalImproveexistingResume,
@@ -66,7 +67,10 @@ const dispatch=useDispatch()
         )
     }
     formData.append("job_description",data?.job_description)
-    dispatch(jdBasedResume(formData)).then((res)=>{
+
+    dispatch(addCountResume({ref_type:"jd_based_resume"})).then((res)=>{
+      if(res?.payload?.status_code===200){
+           dispatch(jdBasedResume(formData)).then((res)=>{
         if(res?.payload?.status_code===201){
           setResumeId(res?.payload?.data?.id)
             const basicInfoPayload={
@@ -131,6 +135,15 @@ const dispatch=useDispatch()
         }
         }
     })
+      }
+      else if(res?.payload?.response?.data?.status_code===400)
+      {
+        toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{
+                  autoClose:false
+                })
+      }
+    })
+ 
     }
     return(
         <>
