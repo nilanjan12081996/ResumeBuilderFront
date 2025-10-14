@@ -134,6 +134,41 @@ export const getProfile = createAsyncThunk(
     }
 );
 
+export const updateProfile = createAsyncThunk(
+    'updateProfile',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.post('/api/user/profile-update', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response?.data?.response);
+
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+export const changePassword = createAsyncThunk(
+    'changePassword',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.post('/api/user/password-update', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response?.data?.response);
+
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+
 export const detectIccid = createAsyncThunk(
     'detectIccid',
     async (iccid, { rejectWithValue }) => {

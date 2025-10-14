@@ -31,6 +31,7 @@ import { BiSolidBriefcase } from "react-icons/bi";
 import { VscChecklist } from "react-icons/vsc";
 
 import { HiUserAdd } from "react-icons/hi";
+import { CgProfile } from 'react-icons/cg';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -245,7 +246,16 @@ const Sidebar = () => {
                   Check Temp
                 </Link>
               </li> */}
-
+                    <li onClick={closeNavbar}>
+                <Link href="/profile"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('profile') &&
+                    'bg-graydark dark:bg-meta-4'
+                    }`}
+                  passHref>
+                  <CgProfile className='text-2xl' />
+                  My Profile
+                </Link>
+              </li>
           
 
               
