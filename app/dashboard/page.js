@@ -74,6 +74,7 @@ import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
 import LinkedInChooseModal from "./LinkedInChooseModal";
 import ImproveResumeChooseModal from "./ImproveResumeChooseModal";
+import { addCountResume } from "../reducers/ResumeSlice";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -106,8 +107,8 @@ const inter = Inter({
 
 const Page = () => {
   const { recentResume } = useSelector((state) => state?.resHist);
-  const{profData}=useSelector((state)=>state?.auth)
-console.log("profData",profData);
+  const { profData } = useSelector((state) => state?.auth);
+  console.log("profData", profData);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -115,10 +116,11 @@ console.log("profData",profData);
     (state) => state.dash
   );
   const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
-    const [openModalCreateResumeJd, setOpenModalCreateResumeJd] = useState(false);
-     const [openModalCreateResumeLinkedIn, setOpenModalCreateResumeLinkedIn] = useState(false);
-     const[resumeId,setResumeId]=useState()
-     const[resumeIdLkdin,setResumeIdLkdin]=useState()
+  const [openModalCreateResumeJd, setOpenModalCreateResumeJd] = useState(false);
+  const [openModalCreateResumeLinkedIn, setOpenModalCreateResumeLinkedIn] =
+    useState(false);
+  const [resumeId, setResumeId] = useState();
+  const [resumeIdLkdin, setResumeIdLkdin] = useState();
   const [openModalImproveexistingResume, setOpenModalImproveexistingResume] =
     useState(false);
   const [openModalAlertModal, setOpenModalAlertModal] = useState(false);
@@ -127,8 +129,9 @@ console.log("profData",profData);
     openModalImproveExistingResumeTwo,
     setOpenModalImproveExistingResumeTwo,
   ] = useState(false);
-  const[openImproveResumeChooseModal, setOpenImproveResumeChooseModal]=useState(false)
-  const[improveResumeId,setImproveResumeId]=useState()
+  const [openImproveResumeChooseModal, setOpenImproveResumeChooseModal] =
+    useState(false);
+  const [improveResumeId, setImproveResumeId] = useState();
 
   const [openModalLinkedInRewrite, setOpenModalLinkedInRewrite] =
     useState(false);
@@ -151,8 +154,7 @@ console.log("profData",profData);
   };
 
   const HandlerLinkedInRewrite = (id) => {
-    
-      const encodedId = btoa(id);
+    const encodedId = btoa(id);
     router.push(`/linkedIn-rewrite?id=${encodedId}`);
   };
 
@@ -171,7 +173,7 @@ console.log("profData",profData);
     // clear state variables if you are tracking them
   };
   const handleNavigate = () => {
-    console.log("selectedResume",selectedResume);
+    console.log("selectedResume", selectedResume);
     setOpenImproveResumeChooseModal(true);
   };
 
@@ -227,7 +229,7 @@ console.log("profData",profData);
     for (let [key, value] of formData.entries()) {
       console.log(key, value);
     }
-    
+
     dispatch(improveResume(formData))
       .then((res) => {
         console.log(" res ", res);
@@ -239,9 +241,9 @@ console.log("profData",profData);
         dispatch(checkATS(userData))
           .then((res) => {
             // toast.success(res?.payload?.message || "ATS score");
-            console.log("ATSresponse",res)
+            console.log("ATSresponse", res);
             setATSscore(res?.payload?.data?.ats_score);
-            
+
             setopenATSmodal(true);
           })
           .catch((err) => {
@@ -254,10 +256,21 @@ console.log("profData",profData);
           err?.message || "An error occurred while improving the resume."
         );
       });
-      clearFileInput();
+    clearFileInput();
   };
 
-  const onSubmit = (data) => handleResumeImprove(data);
+  const onSubmit = (data) => {
+    dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
+      if (res?.payload?.status_code === 200) {
+        handleResumeImprove(data);
+      } else {
+        // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
+        toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+          autoClose: false,
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     dispatch(getRecentResume()).then((res) => {
@@ -304,145 +317,165 @@ console.log("profData",profData);
       <ToastContainer />
       <div className="mb-0">
         <div className="main-content">
-        <div className="welcome_area py-8 px-9 rounded-[10px] mb-10">
-          <h3 className="text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4">
-            Welcome to Resume Builder, {profData?.data?.fullname}!
-          </h3>
-          <p className="text-[18px] leading-[25px] text-white font-normal mb-0 lg:pr-20">
-            Create a professional resume in minutes with our easy-to-use
-            builder. Choose from our collection of templates and get hired
-            faster.
-          </p>
-        </div>
-        <div className="mb-10">
-          <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
-            Quick Actions
-          </h3>
-          <div className="flex gap-4">
-            <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
-              <div
-                onClick={() => setOpenModalCreateResume(true)}
-                className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-              >
-                <div className="bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                  <BiPlus className="text-[#00A63E] text-[30px]" />
+          <div className="welcome_area py-8 px-9 rounded-[10px] mb-10">
+            <h3 className="text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4">
+              Welcome to Resume Builder, {profData?.data?.fullname}!
+            </h3>
+            <p className="text-[18px] leading-[25px] text-white font-normal mb-0 lg:pr-20">
+              Create a professional resume in minutes with our easy-to-use
+              builder. Choose from our collection of templates and get hired
+              faster.
+            </p>
+          </div>
+          <div className="mb-10">
+            <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
+              Quick Actions
+            </h3>
+            <div className="flex gap-4">
+              <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div
+                  onClick={() => setOpenModalCreateResume(true)}
+                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
+                >
+                  <div className="bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+                    <BiPlus className="text-[#00A63E] text-[30px]" />
+                  </div>
+                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+                    Create Resume From Scratch
+                  </h3>
+                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+                    Start fresh with a new resume using our professional
+                    templates
+                  </p>
                 </div>
-                <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                  Create Resume From Scratch
-                </h3>
-                <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                  Start fresh with a new resume using our professional templates
-                </p>
-              </div>
-              <div
-                onClick={() => setOpenModalImproveExistingResumeTwo(true)}
-                className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-              >
-                <div className="bg-[#DBEAFE] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                  <RiExchange2Line className="text-[#2B7FFF] text-[30px]" />
+                <div
+                  onClick={() => setOpenModalImproveExistingResumeTwo(true)}
+                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
+                >
+                  <div className="bg-[#DBEAFE] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+                    <RiExchange2Line className="text-[#2B7FFF] text-[30px]" />
+                  </div>
+                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+                    Improve existing resume
+                  </h3>
+                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+                    Upload and enhance your current resume with AI-powered
+                    suggestions
+                  </p>
                 </div>
-                <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                  Improve existing resume
-                </h3>
-                <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                  Upload and enhance your current resume with AI-powered
-                  suggestions
-                </p>
-              </div>
-              <div
-                onClick={() => setOpenModalImproveexistingResume(true)}
-                className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-              >
-                <div className="bg-[#FFEDD4] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                  <BiBriefcaseAlt className="text-[#FF886D] text-[30px]" />
+                <div
+                  onClick={() => setOpenModalImproveexistingResume(true)}
+                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
+                >
+                  <div className="bg-[#FFEDD4] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+                    <BiBriefcaseAlt className="text-[#FF886D] text-[30px]" />
+                  </div>
+                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+                    JD based resume
+                  </h3>
+                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+                    Upload and enhance your current resume with AI-powered
+                    suggestions
+                  </p>
                 </div>
-                <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                  JD based resume
-                </h3>
-                <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                  Upload and enhance your current resume with AI-powered
-                  suggestions
-                </p>
-              </div>
-              <div
-                onClick={() => setOpenModalLinkedInRewrite(true)}
-                className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-              >
-                <div className="bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                  <BiLogoLinkedin className="text-[#9747FF] text-[30px]" />
+                <div
+                  onClick={() => setOpenModalLinkedInRewrite(true)}
+                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
+                >
+                  <div className="bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+                    <BiLogoLinkedin className="text-[#9747FF] text-[30px]" />
+                  </div>
+                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+                    LinkedIn Rewrite
+                  </h3>
+                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+                    Get AI-powered suggestions to enhance and optimize your
+                    LinkedIn profile.
+                  </p>
                 </div>
-                <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                  LinkedIn Rewrite
-                </h3>
-                <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                  Get AI-powered suggestions to enhance and optimize your
-                  LinkedIn profile.
-                </p>
               </div>
             </div>
           </div>
-        </div>
-        <div className="mb-14">
-          <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
-            Recent Resumes
-          </h3>
-          <div className="lg:flex gap-4 pb-8 lg:pb-0">
-            <div className="lg:w-8/12">
-              {recentResume?.map((resume) => (
-                <div key={resume.id} className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4">
-                  <div className="flex gap-3 items-center">
-                    <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                      <CgFileDocument className="text-white text-2xl" />
+          <div className="mb-14">
+            <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
+              Recent Resumes
+            </h3>
+            <div className="lg:flex gap-4 pb-8 lg:pb-0">
+              <div className="lg:w-8/12">
+                {recentResume?.map((resume) => (
+                  <div
+                    key={resume.id}
+                    className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4"
+                  >
+                    <div className="flex gap-3 items-center">
+                      <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
+                        <CgFileDocument className="text-white text-2xl" />
+                      </div>
+                      <div>
+                        <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
+                          {resume.resume_name}
+                        </h3>
+                        <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                          Created on {formatDate(resume.created_at)}
+                        </p>
+                      </div>
                     </div>
                     <div>
-                      <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                        {resume.resume_name}
-                      </h3>
-                      <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                        Created on {formatDate(resume.created_at)}
-                      </p>
+                      <Link
+                        href={
+                          resume.resume_type === "scratch_resume"
+                            ? `/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
+                            : resume.resume_type === "linkedin_resume"
+                            ? `/linkedIn-rewrite?id=${btoa(
+                                resume.id.toString()
+                              )}`
+                            : resume.resume_type === "jd_based_resume"
+                            ? `/jd-resume-builder?id=${btoa(
+                                resume.id.toString()
+                              )}&template=${
+                                resume?.template_detail?.[0]?.templete_id
+                              }`
+                            : resume.resume_type === "improve_resume"
+                            ? `/improve-resume-builder?id=${btoa(
+                                resume.id.toString()
+                              )}&template=${
+                                resume?.template_detail?.[0]?.templete_id
+                              }`
+                            : ""
+                        }
+                        className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
+                      >
+                        <BiEdit />
+                      </Link>
                     </div>
                   </div>
-                  <div>
-                    <Link 
-                    href={
-                      resume.resume_type==="scratch_resume"?`/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
-                      :resume.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(resume.id.toString())}`
-                      :resume.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${btoa(resume.id.toString())}&template=${resume?.template_detail?.[0]?.templete_id}`
-                      :resume.resume_type==="improve_resume"?`/improve-resume-builder?id=${btoa(resume.id.toString())}&template=${resume?.template_detail?.[0]?.templete_id}`:""} 
-                    className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
-                    >
-                      <BiEdit />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-       
+                ))}
+              </div>
+
               <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
-              <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                Resume Writing Tips
-              </h3>
-              <ul className="pl-4.5">
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Keep your resume to 1-2 pages maximum
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Use action verbs to describe your achievements
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Tailor your resume for each job application
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Include relevant keywords from the job posting
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Preview carefully before submitting
-                </li>
-              </ul>
+                <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+                  Resume Writing Tips
+                </h3>
+                <ul className="pl-4.5">
+                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                    Keep your resume to 1-2 pages maximum
+                  </li>
+                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                    Use action verbs to describe your achievements
+                  </li>
+                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                    Tailor your resume for each job application
+                  </li>
+                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                    Include relevant keywords from the job posting
+                  </li>
+                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+                    Preview carefully before submitting
+                  </li>
+                </ul>
+              </div>
             </div>
-            </div>
-              
+
             {/* <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
               <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
                 Resume Writing Tips
@@ -574,45 +607,35 @@ console.log("profData",profData);
         </ModalBody>
       </Modal>
 
-      {
-        openModalCreateResumeJd&&(
-          <JdBasedChooseModal
+      {openModalCreateResumeJd && (
+        <JdBasedChooseModal
           openModalCreateResumeJd={openModalCreateResumeJd}
           setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
           resumeId={resumeId}
-          />
-        )
-      }
+        />
+      )}
 
-      {
-        openModalCreateResumeLinkedIn&&(
-          <LinkedInChooseModal
+      {openModalCreateResumeLinkedIn && (
+        <LinkedInChooseModal
           openModalCreateResumeLinkedIn={openModalCreateResumeLinkedIn}
           setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
-
-          />
-        )
-      }
-
+        />
+      )}
 
       {/* add modal for apply job ends here */}
 
       {/* add modal for JD Based here */}
-      
 
-      {
-        openModalImproveexistingResume&&(
-          <JdbasedModal
+      {openModalImproveexistingResume && (
+        <JdbasedModal
           openModalImproveexistingResume={openModalImproveexistingResume}
           setOpenModalImproveexistingResume={setOpenModalImproveexistingResume}
           alertContinueHandler={alertContinueHandler}
           setOpenModalCreateResume={setOpenModalCreateResume}
           setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
           setResumeId={setResumeId}
-
-          />
-        )
-      }
+        />
+      )}
 
       {/* add modal for JD Based ends here */}
 
@@ -635,8 +658,7 @@ console.log("profData",profData);
           </p>
           <div className="p-5">
             <button
-              onClick={() => 
-                (true)}
+              onClick={() => true}
               className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
             >
               Continue
@@ -911,30 +933,24 @@ console.log("profData",profData);
           </div>
         </ModalBody>
       </Modal> */}
-      {
-        openModalLinkedInRewrite&&(
-           <LinkedInReWriteModal
-           openModalLinkedInRewrite={openModalLinkedInRewrite}
-           setOpenModalLinkedInRewrite={setOpenModalLinkedInRewrite}
-           HandlerLinkedInRewrite={HandlerLinkedInRewrite}
-           setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
-           resumeIdLkdin={resumeIdLkdin}
-           setResumeIdLkdin={setResumeIdLkdin}
+      {openModalLinkedInRewrite && (
+        <LinkedInReWriteModal
+          openModalLinkedInRewrite={openModalLinkedInRewrite}
+          setOpenModalLinkedInRewrite={setOpenModalLinkedInRewrite}
+          HandlerLinkedInRewrite={HandlerLinkedInRewrite}
+          setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
+          resumeIdLkdin={resumeIdLkdin}
+          setResumeIdLkdin={setResumeIdLkdin}
+        />
+      )}
 
-          />
-        )
-      }
-
-      {
-        openImproveResumeChooseModal&&(
-          <ImproveResumeChooseModal
+      {openImproveResumeChooseModal && (
+        <ImproveResumeChooseModal
           openImproveResumeChooseModal={openImproveResumeChooseModal}
           setOpenImproveResumeChooseModal={setOpenImproveResumeChooseModal}
           improveResumeId={improveResumeId}
-          />
-        )
-      }
-     
+        />
+      )}
 
       {/* add modal for apply job ends here */}
       {/* ATS score modal */}
@@ -1014,7 +1030,12 @@ console.log("profData",profData);
                 </div>
               </div>
             </div>
-              <Button onClick={handleNavigate} className="bg-[#800080] hover:bg-[#151515] mt-6 cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]">Continue</Button>
+            <Button
+              onClick={handleNavigate}
+              className="bg-[#800080] hover:bg-[#151515] mt-6 cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
+            >
+              Continue
+            </Button>
           </ModalBody>
         </div>
       </Modal>

@@ -6,14 +6,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { saveTemplate } from "../reducers/ResumeSlice";
-import { toast } from "react-toastify";
-
 const ImproveResumeChooseModal=({  
     openImproveResumeChooseModal,
     setOpenImproveResumeChooseModal,
-    improveResumeId
+    resumeId
   })=>{
-    const encodedId = btoa(improveResumeId);
+    const encodedId = btoa(resumeId);
     const dispatch=useDispatch()
       const user_id = sessionStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
@@ -30,7 +28,7 @@ const ImproveResumeChooseModal=({
     dispatch(saveTemplate(
       {
         templete_id:selectedResume,
-        jd_id:improveResumeId,
+        jd_id:resumeId,
         jd_type:"improve",
         user_id:parseUserId?.user_id
       }
@@ -46,7 +44,7 @@ const ImproveResumeChooseModal=({
         onClose={() => setOpenImproveResumeChooseModal(false)}
       >
         <ModalHeader className="bg-white text-black modal_header">
-          Select Template for Improved Resume
+          Upload Resume or Select Resume
         </ModalHeader>
         <ModalBody className="bg-white p-0 rounded-b-[4px]">
           <div className="lg:flex justify-center items-center gap-5 p-5">

@@ -401,8 +401,16 @@ const page = () => {
         ProfessionalTitle: data.title || "",
         Summary: data.goal || ""
       };
+
+      dispatch(addCountResume({ref_type:"jd_based_resume"})).then(res=>{
+        if(res?.payload?.status_code===200){
+
+           dispatch(updateBasicInfo(basicInfoPayload));
+        }else{
+          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{autoClose:false})
+        }
+      })
       
-      await dispatch(updateBasicInfo(basicInfoPayload));
 
       // 2. Update Experience
       const experiencePayload = experiences.map(exp => ({
