@@ -5,8 +5,12 @@ const Template2=forwardRef(({ data, education, experiences, skills, languages, p
     return(
         <>
      <div ref={ref} className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8">
-       <style jsx>{`
+       {/* <style jsx>{`
         @media print {
+        .print-watermark {
+          display: none;
+        }
+          
           .min-h-screen {
             min-height: auto !important;
           }
@@ -23,6 +27,57 @@ const Template2=forwardRef(({ data, education, experiences, skills, languages, p
             border-radius: 0 !important;
           }
           
+       
+          * {
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          
+          
+          .w-\\[800px\\] {
+            width: 100% !important;
+            max-width: none !important;
+          }
+
+         .print-watermark {
+            display: block;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            z-index: 9999;
+            pointer-events: none;
+            white-space: nowrap;
+            user-select: none;
+          }
+
+        }
+      `}</style> */}
+
+      <style jsx>{`
+        /* Hide watermark on screen, show only when printing */
+        .print-watermark {
+          display: none;
+        }
+
+        @media print {
+          .min-h-screen {
+            min-height: auto !important;
+          }
+          
+          .bg-gray-50 {
+            background: white !important;
+          }
+          
+          .shadow-xl {
+            box-shadow: none !important;
+          }
+          
           /* Ensure colors print correctly */
           * {
             -webkit-print-color-adjust: exact !important;
@@ -30,12 +85,36 @@ const Template2=forwardRef(({ data, education, experiences, skills, languages, p
           }
           
           /* Optimize for A4 */
-          .w-\\[800px\\] {
+          .max-w-4xl {
             width: 100% !important;
             max-width: none !important;
           }
+
+          /* Show watermark only when printing */
+          .print-watermark {
+            display: block;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            z-index: 9999;
+            pointer-events: none;
+            white-space: nowrap;
+            user-select: none;
+          }
         }
       `}</style>
+      
+          <div className="print-watermark">
+          
+             Hiring Eye
+           
+        </div>
       <div className="max-w-4xl mx-auto bg-white shadow-xl">
         {/* Header */}
         <div className=" text-black px-6 py-8">

@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getResumeHistory } from '../reducers/ResumeHistorySlice';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import Link from "next/link";
+import ScratchResumeModal from '../previewmodal/ScratchResumeModal';
 
 
 const inter = Inter({
@@ -40,6 +41,20 @@ const page = () => {
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [statusFlag, setStatusFlag] = useState("all");
   const [sortByName, setSortByName] = useState(false);
+  const[openScratchModal,setOpenScratchModal]=useState(false)
+  const[openimvModal,setOpenImvModal]=useState(false)
+  const[templateId,setTemplateId]=useState()
+  const[resumeId,setResumeId]=useState()
+  const handleOpenScratchModal=(id,resumeid)=>{
+    setOpenScratchModal(true)
+    setTemplateId(id)
+    setResumeId(resumeid)
+  }
+  const handleOpenImvModal=(id,resumeid)=>{
+    setOpenImvModal(true)
+    setTemplateId(id)
+    setResumeId(resumeid)
+  }
 
   useEffect(()=>{
     const payload = {
@@ -205,7 +220,7 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                 <div className='mb-2 lg:mb-0'>
                   <h3 className='text-[#151515] text-base font-medium mb-1'>{hist?.resume_name}</h3>
                   <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p>
+                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: {hist?.template_detail?.[0]?.templete_id==1?"Modern":"Proffessional"}</p>
                     {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>{Math.floor(
     (new Date() - new Date(convertToSubmitFormat(hist?.created_at))) / (1000 * 60 * 60 * 24)
   )}{" "} Days ago</p> */}
@@ -227,13 +242,26 @@ dispatch(getResumeHistory(payload)).then((res)=>{
               </div>
               <div className='flex items-center gap-4 lg:gap-8'>
                 <button className={`text-[15px] ${hist?.process_status===0?"text-[#ae2991]":hist?.process_status===1?"text-[#AE7100]":"text-[#42AE29]"}  hover:text-[#ffffff] ${hist?.process_status===0?"bg-[#d8bed2]":hist?.process_status===1?"bg-[#F7FFD5]":"bg-[#a1bd9b]"}  ${hist?.process_status===0?"hover:bg-[#ae2991]":hist?.process_status===1?"hover:bg-[#AE7100]":"hover:bg-[#42AE29]"} rounded-3xl px-5 py-2 cursor-pointer`}>{hist?.process_status===0?"Saved":hist?.process_status===1?"Draft":"Downloaded"}</button>
-                <button className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' /> Preview</button>
+                {/* <button
+              onClick={hist?.resume_type==="scratch_resume"?  ()=> handleOpenScratchModal(hist?.template_detail?.[0]?.templete_id,hist.id):hist?.resume_type==="improve_resume"?()=>{handleOpenImvModal(hist?.template_detail?.[0]?.templete_id,hist.id)}:""}
+                className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' />
+                Preview
+                </button> */}
+                   <Link
+                  href={
+                  hist.resume_type==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
+                  :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`
+                  :hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
+                  :hist.resume_type==="improve_resume"?`/improve-resume-builder?id=${btoa(hist.id.toString())}&template=${hist?.template_detail?.[0]?.templete_id}`:""} 
+                className='text-[15px] text-[#2781E5] hover:text-[#0993D0] cursor-pointer flex items-center'><MdOutlinePreview className='text-xl mr-1' />
+                Preview
+                </Link>
                 <Link
                   href={
                   hist.resume_type==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
                   :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`
                   :hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
-                  :hist.resume_type==="improve_resume"?`/improve-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`:""} 
+                  :hist.resume_type==="improve_resume"?`/improve-resume-builder?id=${btoa(hist.id.toString())}&template=${hist?.template_detail?.[0]?.templete_id}`:""} 
                 className='text-[15px] text-[#42AE29] hover:text-[#186603] cursor-pointer flex items-center'>
                   <BiEdit className='text-xl mr-1' />
                  Edit
@@ -267,6 +295,16 @@ dispatch(getResumeHistory(payload)).then((res)=>{
         }
              
       </div>
+      {
+        openScratchModal&&(
+          <ScratchResumeModal
+          openScratchModal={openScratchModal}
+          setOpenScratchModal={setOpenScratchModal}
+          templateId={templateId}
+          resumeId={resumeId}
+          />
+        )
+      }
       
     </div>
   )

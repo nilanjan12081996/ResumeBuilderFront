@@ -81,7 +81,9 @@ const inter = Inter({
 
 const page = () => {
     const{loading_for_csv,loading_for_manual,loading}=useSelector((state)=>state?.inviteStd)
+ 
     const dispatch=useDispatch()
+
 
 const handleDownload = async () => {
   try {
@@ -254,6 +256,7 @@ useEffect(() => {
             <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Easily invite and manage student profiles with seamless Excel upload or manual entry.</p>
         </div>
         <div className='bg-white rounded-[10px] p-5 lg:p-10 lg:flex gap-6 mb-5'>
+        
             <div className='lg:w-6/12 mb-4 lg:mb-0'>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className='mb-0'>
@@ -268,7 +271,7 @@ useEffect(() => {
                             <div className="flex flex-col items-center justify-center pb-6 pt-5">
                                 <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
                                 <p className="my-2 text-xl text-[#000000]">
-                                     {/* Import your Resume */}
+                                    
                                     {csvFile && csvFile[0]
                                     ? csvFile[0].name
                                     : "Select a CSV file to import"}  

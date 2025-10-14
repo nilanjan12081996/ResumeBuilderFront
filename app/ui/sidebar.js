@@ -43,6 +43,7 @@ const Sidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch()
   const { historyData, pagination, loading } = useSelector(state => state.his);
+  const { profileData } = useSelector((state) => state?.profile)
   const loaderRef = useRef(null);
   const topLoaderRef = useRef(null);
   //console.log(sidebarOpen,"sidebarOpen");
@@ -217,8 +218,10 @@ const Sidebar = () => {
                   Featured Jobs
                 </Link>
               </li>
-
-              <li onClick={closeNavbar}>
+                    {
+                      profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id!==1&&(
+                        <>
+                         <li onClick={closeNavbar}>
                 <Link href="/invite-students"
                   className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
                     'bg-graydark dark:bg-meta-4'
@@ -228,6 +231,10 @@ const Sidebar = () => {
                   Invite Students
                 </Link>
               </li>
+                        </>
+                      )
+                    }
+             
                     {/* <li onClick={closeNavbar}>
                 <Link href="/temp"
                   className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
