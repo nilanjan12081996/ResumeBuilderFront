@@ -263,7 +263,7 @@ const Sidebar = () => {
               <li onClick={closeNavbar}>
                 <button
                 onClick={handleLogout}
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
+                  className={`group relative flex items-center gap-2 cursor-pointer rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] hover:[#a536a2] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
                     'bg-graydark dark:bg-meta-4 cursor-pointer'
                     }`}
                   passHref>

@@ -389,6 +389,11 @@ body {
   color: #a635a2;
 }
 
+.sidebar_menu nav ul li button:hover {
+  /* background: #023f9b; */
+  color: #a635a2;
+}
+
 /* .checkmate_section {
   background: url(../imagesource/checkmate_section_bg.png) no-repeat 0 0;
   background-size: contain;
@@ -486,7 +491,7 @@ body {
   z-index: 99999;
   cursor: pointer;
   position: absolute;
-  top: 72px;
+  top: 62px;
   background: #7f0082;
   width: 50px;
   height: 50px;

@@ -70,9 +70,8 @@ const Insideheader = () => {
         </div>
         <div>
           <div className='flex justify-end items-center gap-3'>
-            {/* <button onClick={handleLogout} className='mr-4 text-black cursor-pointer'>Logout</button> */}
-            <p className='text-base text-[#CDCDCD] ${leagueSpartan.className}'>{profileData?.data?.fullname}</p>
-            <div className='user_face'>
+            <p className='text-base text-[#cccccc] ${leagueSpartan.className}'>{profileData?.data?.fullname}</p>
+            {/* <div className='user_face'>
               {profileData?.data?.avatar ? (
                 <Image src={profileData?.data?.avatar} alt="userFace" width={50} height={50} className='rounded-full w-[50px] h-[50px]' />
 
@@ -81,7 +80,7 @@ const Insideheader = () => {
                   height={50} className='rounded-full w-[50px] h-[50px]' />
               )}
 
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

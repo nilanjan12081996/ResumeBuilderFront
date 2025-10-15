@@ -164,7 +164,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
+                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -182,7 +182,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
+                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
                         </div>
                      </div>
                   </div>
@@ -194,7 +194,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
-                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
+                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -345,37 +345,37 @@ export default function Home() {
                                  <>
                                  {
                                     oneTime?.plan_frequency===1&&(
-                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                     <div className="py-8 px-6 relative">
-                        <Image src={sub01} alt='sub01' className='mb-6' />
-                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                        <div className="flex items-center gap-2 mb-8">
-                           <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                              {/* <div className="pt-4">
-                              <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                           </div> */}
-                        </div>
-                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                           <div>
-                              
-                                
-                                 {
-                                    oneTime?.PlanAccess?.map((planAccessName)=>(
-                                       <>
-                                       <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                        <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                       {planAccessName?.plan_access_description}
+                                 <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                    <div className="py-8 px-6 relative min-h-[680px]">
+                                    <Image src={sub01} alt='sub01' className='mb-6' />
+                                    <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                    <div className="flex items-center gap-2 mb-8">
+                                       <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                                          {/* <div className="pt-4">
+                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                       </div> */}
+                                    </div>
+                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                       <div>
+                                          
+                                          
+                                             {
+                                                oneTime?.PlanAccess?.map((planAccessName)=>(
+                                                   <>
+                                                   <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                   <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                                   {planAccessName?.plan_access_description}
+                                                   </div>
+                                                   </>
+                                                ))
+                                             } 
+                                       
                                        </div>
-                                       </>
-                                    ))
-                                 } 
-                            
-                           </div>
-                        </div>
-                        <div className="absolute left-0 bottom-[20px] w-full px-6">
-                           <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                        </div>
-                              </div>
+                                    </div>
+                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                       <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                    </div>
+                                 </div>
                                  </div>
                                     )
                                  }
@@ -481,37 +481,37 @@ export default function Home() {
                                  <>
                                  {
                                     oneTime?.plan_frequency===3&&(
-                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                     <div className="py-8 px-6 relative">
-                        <Image src={sub01} alt='sub01' className='mb-6' />
-                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                        <div className="flex items-center gap-2 mb-8">
-                           <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                              {/* <div className="pt-4">
-                              <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                           </div> */}
-                        </div>
-                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                           <div>
-                              
-                                
-                                 {
-                                    oneTime?.PlanAccess?.map((planAccessName)=>(
-                                       <>
-                                       <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                        <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                       {planAccessName?.plan_access_description}
+                                 <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                    <div className="py-8 px-6 relative min-h-[680px]">
+                                    <Image src={sub01} alt='sub01' className='mb-6' />
+                                    <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                    <div className="flex items-center gap-2 mb-8">
+                                       <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                                          {/* <div className="pt-4">
+                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                       </div> */}
+                                    </div>
+                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                       <div>
+                                          
+                                          
+                                             {
+                                                oneTime?.PlanAccess?.map((planAccessName)=>(
+                                                   <>
+                                                   <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                   <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                                   {planAccessName?.plan_access_description}
+                                                   </div>
+                                                   </>
+                                                ))
+                                             } 
+                                       
                                        </div>
-                                       </>
-                                    ))
-                                 } 
-                            
-                           </div>
-                        </div>
-                        <div className="absolute left-0 bottom-[20px] w-full px-6">
-                           <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                        </div>
-                              </div>
+                                    </div>
+                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                       <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                    </div>
+                                 </div>
                                  </div>
                                     )
                                  }
@@ -638,37 +638,37 @@ export default function Home() {
                                  <>
                                  {
                                     oneTime?.plan_frequency===12&&(
-                              <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                     <div className="py-8 px-6 relative">
-                        <Image src={sub01} alt='sub01' className='mb-6' />
-                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                        <div className="flex items-center gap-2 mb-8">
-                           <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                              {/* <div className="pt-4">
-                              <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                           </div> */}
-                        </div>
-                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                           <div>
-                              
-                                
-                                 {
-                                    oneTime?.PlanAccess?.map((planAccessName)=>(
-                                       <>
-                                       <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                        <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                       {planAccessName?.plan_access_description}
+                                 <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                    <div className="py-8 px-6 relative min-h-[680px]">
+                                    <Image src={sub01} alt='sub01' className='mb-6' />
+                                    <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                    <div className="flex items-center gap-2 mb-8">
+                                       <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                                          {/* <div className="pt-4">
+                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                       </div> */}
+                                    </div>
+                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                       <div>
+                                          
+                                          
+                                             {
+                                                oneTime?.PlanAccess?.map((planAccessName)=>(
+                                                   <>
+                                                   <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                   <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                                   {planAccessName?.plan_access_description}
+                                                   </div>
+                                                   </>
+                                                ))
+                                             } 
+                                       
                                        </div>
-                                       </>
-                                    ))
-                                 } 
-                            
-                           </div>
-                        </div>
-                        <div className="absolute left-0 bottom-[20px] w-full px-6">
-                           <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                        </div>
-                              </div>
+                                    </div>
+                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                       <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                    </div>
+                                 </div>
                                  </div>
                                     )
                                  }

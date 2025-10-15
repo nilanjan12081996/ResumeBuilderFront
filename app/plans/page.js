@@ -74,8 +74,9 @@ console.log("currentSubscriptionData",currentSubscriptionData)
     const shouldDisableButton = isFreePlan && !hasActiveSubscription();
     
     return (
+    
       <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-        <div className="py-8 px-6 relative">
+        <div className="py-8 px-6 relative min-h-[680px]">
           {pln?.plan_name === "Gold" || pln?.plan_name === "Campus Plus" ? (
             <Image
               src={sub02}
@@ -89,11 +90,11 @@ console.log("currentSubscriptionData",currentSubscriptionData)
               className="mb-6"
             />
           )}
-          <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
+          <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">
             {pln?.plan_name}
           </h3>
           <div className="flex items-center gap-2 mb-8">
-            <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
+            <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">
               <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
                 {pln?.planPrice?.currency}
               </span>{" "}
