@@ -164,7 +164,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
+                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -182,7 +182,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
+                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
                         </div>
                      </div>
                   </div>
@@ -194,7 +194,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
-                           <button onClick={()=>setOpenLoginModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
+                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -255,7 +255,7 @@ export default function Home() {
 
 
          {/* Key benefits section start here */}
-         <div className="key_benefits_section px-4 pt-10 pb-10 lg:pt-20 lg:pb-20 bg-[#fbfbfb]">
+         {/* <div className="key_benefits_section px-4 pt-10 pb-10 lg:pt-20 lg:pb-20 bg-[#fbfbfb]">
             <div className='max-w-6xl mx-auto'>
                <div className="mb-10">
                   <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6 text-center">Featured <span className="text-[#A536A2]">Jobs</span></h2>
@@ -270,37 +270,17 @@ export default function Home() {
                         <h3 className="text-[#320731] text-xl leading-[30px] ml-0">{fetJobs?.job_role}</h3>
                      </div>
                      <p className="text-[#585858] text-sm leading-[24px] pb-4">
-                        {/* We are looking for a creative and detail-oriented UI/UX Designer to join our team. The ideal candidate will be... */}
+                       
                         {striptags(fetJobs?.job_description.slice(0,200))} ...
                      </p>
-                     <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
+                     <button onClick={()=>setOpenRegisterModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
                   </div>
                      ))
                   }
                   
-                  {/* <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
-                     <div className="mb-3">
-                        <Image src={hiring_icon} alt='hiring_icon' className='mb-2' />
-                        <h3 className="text-[#320731] text-xl leading-[30px] ml-0">Sr.Product Designer</h3>
-                     </div>
-                     <p className="text-[#585858] text-sm leading-[24px] pb-4">
-                        We are seeking an experienced and visionary Senior Product Designer to join our growing team...
-                     </p>
-                     <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
-                  </div>
-                  <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
-                     <div className="mb-3">
-                        <Image src={hiring_icon} alt='hiring_icon' className='mb-2' />
-                        <h3 className="text-[#320731] text-xl leading-[30px] ml-0">User Experience Designer</h3>
-                     </div>
-                     <p className="text-[#585858] text-sm leading-[24px] pb-4">
-                        We are looking for a User Experience (UX) Designer to join our team and help craft seamless, intuitive   ...
-                     </p>
-                     <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#7f007f] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Know More</button>
-                  </div> */}
                </div>
             </div>
-         </div>
+         </div> */}
          {/* Key benefits section ends here */}
 
 
@@ -333,9 +313,9 @@ export default function Home() {
                <div className="subscription_tab_section">
                   <Tabs>
                      <TabList>
-                        <Tab>One Time</Tab>
-                        <Tab>Quarterly </Tab>
-                        <Tab>Annual </Tab>
+                        <Tab>Build</Tab>
+                        <Tab>Break Through </Tab>
+                        <Tab>Institution </Tab>
                      </TabList>
             
                      <TabPanel>

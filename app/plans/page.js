@@ -360,11 +360,11 @@ console.log("ipdata",ipData)
                 <TabList>
                   {parsed?.signup_type_id == 1 && (
                     <>
-                      <Tab>One Time</Tab>
-                      <Tab>Quarterly</Tab>
+                      <Tab>Build</Tab>
+                      <Tab>Break Through</Tab>
                     </>
                   )}
-                  {parsed?.signup_type_id == 2 && <Tab>Annual</Tab>}
+                  {parsed?.signup_type_id == 2 && <Tab>Institution</Tab>}
                 </TabList>
 
                 {parsed?.signup_type_id == 1 && (
