@@ -75,7 +75,7 @@ import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 // import html2docx from "html2docx";
 
 const page = () => {
-  const { jdBasedDetailsData } = useSelector((state) => state?.dash)
+  const { jdBasedDetailsData, jdBasedAtsScoreAnalyzeData } = useSelector((state) => state?.dash)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();

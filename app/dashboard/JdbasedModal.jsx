@@ -85,10 +85,6 @@ const JdbasedModal = ({ openModalImproveexistingResume,
               jd_resume_id: res?.payload?.data?.id,
               raw_data: res?.payload?.raw_data
             }
-
-            const jdBasedAtsScoreAnalyzePayload = {
-              id: res?.payload?.data?.id
-            }
             const questionPayload = {
               jd_based_resume_id: res?.payload?.data?.id,
               generated_questions: res?.payload?.questions
@@ -155,8 +151,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
                   dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
                   dispatch(jdBasedResumeLanguageInfo(langPayload)),
                   dispatch(getGeneratedQuestions(questionPayload)),
-                  dispatch(checkJdAts(checkJdAtsPayload)),
-                  dispatch(jdBasedAtsScoreAnalyze(jdBasedAtsScoreAnalyzePayload))
+                  dispatch(checkJdAts(checkJdAtsPayload))
 
                 ]
               )
@@ -192,9 +187,6 @@ const JdbasedModal = ({ openModalImproveexistingResume,
               raw_data: res?.payload?.raw_data
             }
 
-            const jdBasedAtsScoreAnalyzePayload = {
-              id: res?.payload?.data?.id
-            }
             const questionPayload = {
               jd_based_resume_id: res?.payload?.data?.id,
               generated_questions: res?.payload?.questions
@@ -261,8 +253,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
                   dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
                   dispatch(jdBasedResumeLanguageInfo(langPayload)),
                   dispatch(getGeneratedQuestions(questionPayload)),
-                  dispatch(checkJdAts(checkJdAtsPayload)),
-                  dispatch(jdBasedAtsScoreAnalyze(jdBasedAtsScoreAnalyzePayload))
+                  dispatch(checkJdAts(checkJdAtsPayload))
 
                 ]
               )
