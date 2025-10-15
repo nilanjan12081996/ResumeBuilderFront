@@ -5,7 +5,7 @@ import { BiImport, BiLogoLinkedinSquare } from "react-icons/bi"
 import { HiClipboardList } from "react-icons/hi"
 import { useDispatch, useSelector } from "react-redux"
 import { linkedInBasicInfo, linkedInEduInfo, linkedInExpInfo, linkedInLangInfo, linkedInPdf, linkedInSkillInfo } from "../reducers/LinkedinSlice"
-import { addCountResume } from "../reducers/ResumeSlice"
+import { addCountResume, addCountResumeOrg } from "../reducers/ResumeSlice"
 import { toast } from "react-toastify"
 
 const LinkedInReWriteModal=({
@@ -18,6 +18,7 @@ const LinkedInReWriteModal=({
 })=>{
     const{loading}=useSelector((state)=>state?.linkedIn)
     const dispatch=useDispatch()
+     const { profileData } = useSelector((state) => state?.profile)
     const {
     register,
     handleSubmit,
@@ -42,7 +43,9 @@ const LinkedInReWriteModal=({
               return;
             }
 
-            dispatch(addCountResume({ref_type:"linkedin_resume"})).then((res)=>{
+            if(profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id===1)
+            {
+                dispatch(addCountResume({ref_type:"linkedin_resume"})).then((res)=>{
                if(res?.payload?.status_code===200){
                     dispatch(linkedInPdf(formData)).then((res)=>{
                 console.log(res,"res");
@@ -82,6 +85,50 @@ const LinkedInReWriteModal=({
                        })
                      }
             })
+            }
+            else{
+                dispatch(addCountResumeOrg({ref_type:"linkedin_resume"})).then((res)=>{
+               if(res?.payload?.status_code===200){
+                    dispatch(linkedInPdf(formData)).then((res)=>{
+                console.log(res,"res");
+                if(res?.payload?.status_code===201){
+                  console.log("res?.payload?.created_data?.id",res?.payload?.created_data?.id);
+                  const newId = res?.payload?.created_data?.id;
+                  setResumeIdLkdin(newId);
+                  try{
+                    Promise.all([
+                  dispatch(linkedInBasicInfo({lkdin_resume_id:res?.payload?.created_data?.id,...res?.payload?.raw_data?.linkedin_rewrite_data?.personal_info})),
+                  dispatch(linkedInExpInfo({lkdin_resume_id:res?.payload?.created_data?.id,experience_info:res?.payload?.raw_data?.linkedin_rewrite_data?.experience_info})),
+                  dispatch(linkedInEduInfo({lkdin_resume_id:res?.payload?.created_data?.id,education_info:res?.payload?.raw_data?.linkedin_rewrite_data?.education_info})),
+                  dispatch(linkedInSkillInfo({lkdin_resume_id:res?.payload?.created_data?.id,skill_info:res?.payload?.raw_data?.linkedin_rewrite_data?.skill_info})),
+                  dispatch(linkedInLangInfo({lkdin_resume_id:res?.payload?.created_data?.id,language_info:res?.payload?.raw_data?.linkedin_rewrite_data?.language_info})),
+
+
+                    ]).then(()=>{
+                      HandlerLinkedInRewrite(newId)
+                    })
+                   
+                       
+                   
+
+                   
+                  }catch(error){
+                     console.error("Error while saving resume sections", error);
+                      toast.error("Something went wrong while saving resume data");
+                  }
+                 
+                }
+                
+            })
+               }
+                else if(res?.payload?.response?.data?.status_code===400){
+                       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{
+                         autoClose:false
+                       })
+                     }
+            })
+            }
+          
 
             
       }
