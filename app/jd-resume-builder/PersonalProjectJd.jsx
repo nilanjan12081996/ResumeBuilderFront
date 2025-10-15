@@ -8,16 +8,16 @@ import { MdDelete } from "react-icons/md"
 const PersonalProjectJd = ({ personalPro, setPersonalPro, jdBasedDetailsData }) => {
 
   useEffect(() => {
-    console.log('PersonalProjectJd',jdBasedDetailsData?.data?.[0]?.project)
-    if (jdBasedDetailsData?.data?.[0]?.project?.length > 0) {
-      const existingProjects = jdBasedDetailsData.data[0].project.map((proj, index) => ({
+    console.log('ExtraProjectJd',jdBasedDetailsData?.data?.[0]?.extra_project)
+    if (jdBasedDetailsData?.data?.[0]?.extra_project?.length > 0) {
+      const existingProjects = jdBasedDetailsData.data[0].extra_project.map((proj, index) => ({
         id: Date.now() + index,
-        project_title: proj.Project_title || "",
-        role: proj.Role || "",
-        start_time: proj.start_time ? new Date(proj.start_time) : null,
-        end_time: proj.end_time ? new Date(proj.end_time) : null,
+        project_title: proj.project_name || "",
+        role: proj.role || "",
+        start_time: proj.start_date ? new Date(proj.start_date) : null,
+        end_time: proj.end_date ? new Date(proj.end_date) : null,
         project_url: proj.project_url || "",
-        skill: proj.skill_set_use ? JSON.parse(proj.skill_set_use).join(", ") : "",
+        skill: proj.technology ? JSON.parse(proj.technology).join(", ") : "",
         description: proj.description || ""
       }));
       setPersonalPro(existingProjects);

@@ -7,7 +7,7 @@ import { FaGlobe } from "react-icons/fa";
 import { HiClipboardList } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { getGeneratedQuestions, jdBasedResume, jdBasedResumeAchivmentInfo, jdBasedResumeBasicInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeExpInfo, jdBasedResumeLanguageInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo } from "../reducers/DashboardSlice";
+import { checkJdAts, getGeneratedQuestions, jdBasedAtsScoreAnalyze, jdBasedResume, jdBasedResumeAchivmentInfo, jdBasedResumeBasicInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeExpInfo, jdBasedResumeLanguageInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo } from "../reducers/DashboardSlice";
 import { addCountResume } from "../reducers/ResumeSlice";
 
 const JdbasedModal = ({ openModalImproveexistingResume,
@@ -73,6 +73,20 @@ const JdbasedModal = ({ openModalImproveexistingResume,
         dispatch(jdBasedResume(formData)).then((res) => {
           if (res?.payload?.status_code === 201) {
             setResumeId(res?.payload?.data?.id)
+
+            const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+            if (rawDataExperience) {
+              localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
+            }
+
+            const checkJdAtsPayload={
+              jd_resume_id: res?.payload?.data?.id,
+              raw_data: res?.payload?.raw_data
+            }
+
+            const jdBasedAtsScoreAnalyzePayload = {
+              id: res?.payload?.data?.id
+            }
             const questionPayload = {
               jd_based_resume_id: res?.payload?.data?.id,
               generated_questions: res?.payload?.questions
@@ -138,7 +152,9 @@ const JdbasedModal = ({ openModalImproveexistingResume,
                   dispatch(jdBasedResumeProjectsInfo(projectPayload)),
                   dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
                   dispatch(jdBasedResumeLanguageInfo(langPayload)),
-                  dispatch(getGeneratedQuestions(questionPayload))
+                  dispatch(getGeneratedQuestions(questionPayload)),
+                  dispatch(checkJdAts(checkJdAtsPayload)),
+                  dispatch(jdBasedAtsScoreAnalyze(jdBasedAtsScoreAnalyzePayload))
 
                 ]
               )
