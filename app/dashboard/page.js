@@ -74,7 +74,7 @@ import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
 import LinkedInChooseModal from "./LinkedInChooseModal";
 import ImproveResumeChooseModal from "./ImproveResumeChooseModal";
-import { addCountResume } from "../reducers/ResumeSlice";
+import { addCountResume, addCountResumeOrg } from "../reducers/ResumeSlice";
 
 // import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
 // import BalanceInfo from "../assets/imagesource/Balance_Info.png";
@@ -108,6 +108,7 @@ const inter = Inter({
 const Page = () => {
   const { recentResume } = useSelector((state) => state?.resHist);
   const { profData } = useSelector((state) => state?.auth);
+  const { profileData } = useSelector((state) => state?.profile)
   console.log("profData", profData);
 
   const router = useRouter();
@@ -260,16 +261,30 @@ const Page = () => {
   };
 
   const onSubmit = (data) => {
-    dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
-      if (res?.payload?.status_code === 200) {
-        handleResumeImprove(data);
-      } else {
-        // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-        toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-          autoClose: false,
-        });
-      }
-    });
+    if(profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id===1){
+      dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
+        if (res?.payload?.status_code === 200) {
+          handleResumeImprove(data);
+        } else {
+          // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
+          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+            autoClose: false,
+          });
+        }
+      });
+    }else{
+      dispatch(addCountResumeOrg({ ref_type: "improve_resume" })).then((res) => {
+        if (res?.payload?.status_code === 200) {
+          handleResumeImprove(data);
+        } else {
+          // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
+          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+            autoClose: false,
+          });
+        }
+      });
+    }
+   
   };
 
   useEffect(() => {
