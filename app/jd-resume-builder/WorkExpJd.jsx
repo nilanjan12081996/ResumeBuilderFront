@@ -181,6 +181,7 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    console.log('PersonalProjectJd', jdBasedDetailsData?.data?.[0]?.project)
     console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
     if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
       const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
@@ -191,6 +192,20 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
           skills = [];
         }
 
+        // add for exp projeect 
+        const jdProjects = jdBasedDetailsData?.data?.[0]?.project;
+        const relatedProjects = jdProjects
+          .filter((proj) => proj.exp_id === exp.id)
+          .map((proj) => ({
+            id: proj.id,
+            title: proj.Project_title || "",
+            role: proj.Role || "",
+            technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
+              ? JSON.parse(proj.skill_set_use).join(", ")
+              : proj.skill_set_use || "",
+            description: proj.description || "",
+          }));
+
         return {
           id: exp.id,
           company_name: exp.company_name || "",
@@ -200,9 +215,18 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
           start_date: exp.start_date ? new Date(exp.start_date) : null,
           end_date: exp.end_date ? new Date(exp.end_date) : null,
           current_work: false,
-          projects: exp.projects || [
-            { id: Date.now(), title: "", role: "", technology: "", description: "" }
-          ]
+          projects:
+            relatedProjects.length > 0
+              ? relatedProjects
+              : [
+                {
+                  id: Date.now(),
+                  title: "",
+                  role: "",
+                  technology: "",
+                  description: "",
+                },
+              ],
         };
       });
       setExperiences(formattedExperiences);
@@ -275,9 +299,10 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
   // console.log('sp', jdBasedDetailsData)
 
   const jd_resume_id = jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.jd_resume_id;
-   const jd_questions = jdBasedDetailsData?.data?.[0]?.JdBaseResumeQuestion;
-  
-   console.log("jd_questions",jd_questions)
+  const jd_questions = jdBasedDetailsData?.data?.[0]?.JdBaseResumeQuestion;
+  const user_id = jdBasedDetailsData?.data?.[0]?.id;
+
+  console.log("jd_questions", jd_questions)
 
 
   return (
@@ -568,7 +593,7 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
         <button
           ref={buttonRef}
           type="button"
-          className="bg-[#E8F0FE] hover:bg-[#4C6EF5] rounded-[7px] text-[12px] leading-[30px] text-[#2F4CCA] hover:text-[#ffffff] font-medium cursor-pointer px-4 py-2 flex items-center gap-2 shadow-lg"
+          className="bg-[#92278F] border border-[#92278F] hover:bg-[#fff] hover:text-[#92278F] rounded-[25px] text-[15px] text-[#fff] font-medium cursor-pointer px-6 py-2 mt-4 flex items-center gap-2 shadow-lg"
           onClick={() => setShowResuMate(true)}
         >
           ResuMate
@@ -581,6 +606,7 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
           jd_based_resume_id={jd_resume_id}
           jd_questions={jd_questions}
           experiences={experiences}
+          user_id={user_id}
         />
       </div>
 

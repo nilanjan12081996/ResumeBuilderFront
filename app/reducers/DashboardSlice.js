@@ -445,386 +445,461 @@ export const atsScoreAnalyze = createAsyncThunk(
 
 // Add JD-based questions
 export const getGeneratedQuestions = createAsyncThunk(
-  "dashboard/getGeneratedQuestions",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await api.post("/api/js-based-resume/add-question", payload);
-      return response?.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong.");
+    "dashboard/getGeneratedQuestions",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/api/js-based-resume/add-question", payload);
+            return response?.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || "Something went wrong.");
+        }
     }
-  }
 );
 
 
 export const improveExperience = createAsyncThunk(
-  "dashboard/improveExperience",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await api.post("/api/js-based-resume/improve-experience", payload);
-      return response?.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Something went wrong.");
+    "dashboard/improveExperience",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/api/js-based-resume/improve-experience", payload);
+            return response?.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || "Something went wrong.");
+        }
     }
-  }
+);
+
+export const checkJdAts = createAsyncThunk(
+    "checkJdAts",
+    async ({ jd_resume_id, raw_data }, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/api/js-based-resume/check-jd-ats", {
+                jd_resume_id,
+                raw_data,
+            });
+
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
 );
 
 
-    const initialState = {
-        error: false,
-        loading: false,
-        improveResumeData: {},
-        checkATSData: {},
-        jdBasedResumeData: {},
-        basiInfo: {},
-        eduInfo: {},
-        expInfo: {},
-        cerInfo: {},
-        achInfo: {},
-        proInfo: {},
-        skillsInfo: {},
-        langInfo: {},
-        jdBasedDetailsData: {},
-        updateBasicInfoData: {},
-        updateExperienceData: {},
-        updateEducationData: {},
-        updateSkillsData: {},
-        updateLanguageData: {},
-        updateExtraProjectData: {},
-        updateCertificationData: {},
-        updateAchievementsData: {},
-        getUpdateResumeInfoData: {},
-        atsScoreAnalyzeData: {},
-        generatedQuestionsData: {},
-        improveExperienceData: {},
+export const jdBasedAtsScoreAnalyze = createAsyncThunk(
+    'jdBasedAtsScoreAnalyze',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/js-based-resume/get-ats-score-analyze?jd_based_resume_id=${id}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
     }
+);
+
+
+
+const initialState = {
+    error: false,
+    loading: false,
+    improveResumeData: {},
+    checkATSData: {},
+    jdBasedResumeData: {},
+    basiInfo: {},
+    eduInfo: {},
+    expInfo: {},
+    cerInfo: {},
+    achInfo: {},
+    proInfo: {},
+    skillsInfo: {},
+    langInfo: {},
+    jdBasedDetailsData: {},
+    updateBasicInfoData: {},
+    updateExperienceData: {},
+    updateEducationData: {},
+    updateSkillsData: {},
+    updateLanguageData: {},
+    updateExtraProjectData: {},
+    updateCertificationData: {},
+    updateAchievementsData: {},
+    getUpdateResumeInfoData: {},
+    atsScoreAnalyzeData: {},
+    generatedQuestionsData: {},
+    improveExperienceData: {},
+    checkJdAtsData: {},
+    jdBasedAtsScoreAnalyzeData: {},
+}
 
 const DashboardSlice = createSlice(
-        {
-            name: "dashboard",
-            initialState,
-            reducers: {},
-            extraReducers: (builder) => {
-                builder.addCase(improveResume.pending, (state, { payload }) => {
-                    state.loading = true
+    {
+        name: "dashboard",
+        initialState,
+        reducers: {},
+        extraReducers: (builder) => {
+            builder.addCase(improveResume.pending, (state, { payload }) => {
+                state.loading = true
+            })
+            builder.addCase(improveResume.fulfilled, (state, { payload }) => {
+                state.loading = false
+                state.error = false
+                state.improveResumeData = payload
+            })
+                .addCase(improveResume.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
                 })
-                builder.addCase(improveResume.fulfilled, (state, { payload }) => {
+
+            builder.addCase(checkATS.pending, (state, { payload }) => {
+                state.loading = true
+
+            })
+            builder.addCase(checkATS.fulfilled, (state, { payload }) => {
+                state.loading = false
+                state.error = false
+                state.checkATSData = payload
+            })
+                .addCase(checkATS.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(jdBasedResume.pending, (state, { payload }) => {
+                    state.loading = true
+
+                })
+                .addCase(jdBasedResume.fulfilled, (state, { payload }) => {
                     state.loading = false
                     state.error = false
-                    state.improveResumeData = payload
+                    state.jdBasedResumeData = payload
                 })
-                    .addCase(improveResume.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-
-                builder.addCase(checkATS.pending, (state, { payload }) => {
+                .addCase(jdBasedResume.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(jdBasedResumeBasicInfo.pending, (state, { payload }) => {
                     state.loading = true
 
                 })
-                builder.addCase(checkATS.fulfilled, (state, { payload }) => {
+                .addCase(jdBasedResumeBasicInfo.fulfilled, (state, { payload }) => {
                     state.loading = false
                     state.error = false
-                    state.checkATSData = payload
+                    state.basiInfo = payload
                 })
-                    .addCase(checkATS.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(jdBasedResume.pending, (state, { payload }) => {
-                        state.loading = true
+                .addCase(jdBasedResumeBasicInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(jdBasedResumeEducationInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResume.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.jdBasedResumeData = payload
-                    })
-                    .addCase(jdBasedResume.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(jdBasedResumeBasicInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(jdBasedResumeEducationInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.eduInfo = payload
+                })
+                .addCase(jdBasedResumeEducationInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
 
-                    })
-                    .addCase(jdBasedResumeBasicInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.basiInfo = payload
-                    })
-                    .addCase(jdBasedResumeBasicInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(jdBasedResumeEducationInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                .addCase(jdBasedResumeExpInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeEducationInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.eduInfo = payload
-                    })
-                    .addCase(jdBasedResumeEducationInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
+                })
+                .addCase(jdBasedResumeExpInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.expInfo = payload
+                })
+                .addCase(jdBasedResumeExpInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
 
-                    .addCase(jdBasedResumeExpInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                .addCase(jdBasedResumeCertificateInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeExpInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.expInfo = payload
-                    })
-                    .addCase(jdBasedResumeExpInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-
-                    .addCase(jdBasedResumeCertificateInfo.pending, (state, { payload }) => {
-                        state.loading = true
-
-                    })
-                    .addCase(jdBasedResumeCertificateInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.cerInfo = payload
-                    })
-                    .addCase(jdBasedResumeCertificateInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
+                })
+                .addCase(jdBasedResumeCertificateInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.cerInfo = payload
+                })
+                .addCase(jdBasedResumeCertificateInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
 
 
-                    .addCase(jdBasedResumeAchivmentInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                .addCase(jdBasedResumeAchivmentInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeAchivmentInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.achInfo = payload
-                    })
-                    .addCase(jdBasedResumeAchivmentInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(jdBasedResumeProjectsInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(jdBasedResumeAchivmentInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.achInfo = payload
+                })
+                .addCase(jdBasedResumeAchivmentInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(jdBasedResumeProjectsInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeProjectsInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.proInfo = payload
-                    })
-                    .addCase(jdBasedResumeProjectsInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(jdBasedResumeSkillsInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(jdBasedResumeProjectsInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.proInfo = payload
+                })
+                .addCase(jdBasedResumeProjectsInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(jdBasedResumeSkillsInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeSkillsInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.skillsInfo = payload
-                    })
-                    .addCase(jdBasedResumeSkillsInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
+                })
+                .addCase(jdBasedResumeSkillsInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.skillsInfo = payload
+                })
+                .addCase(jdBasedResumeSkillsInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
 
-                    .addCase(jdBasedResumeLanguageInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                .addCase(jdBasedResumeLanguageInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeLanguageInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.langInfo = payload
-                    })
-                    .addCase(jdBasedResumeLanguageInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(jdBasedResumeDetails.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(jdBasedResumeLanguageInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.langInfo = payload
+                })
+                .addCase(jdBasedResumeLanguageInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(jdBasedResumeDetails.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(jdBasedResumeDetails.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.jdBasedDetailsData = payload
-                    })
-                    .addCase(jdBasedResumeDetails.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateBasicInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(jdBasedResumeDetails.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.jdBasedDetailsData = payload
+                })
+                .addCase(jdBasedResumeDetails.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateBasicInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateBasicInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateBasicInfoData = payload
-                    })
-                    .addCase(updateBasicInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateExperience.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateBasicInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateBasicInfoData = payload
+                })
+                .addCase(updateBasicInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateExperience.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateExperience.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateExperienceData = payload
-                    })
-                    .addCase(updateExperience.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateEducation.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateExperience.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateExperienceData = payload
+                })
+                .addCase(updateExperience.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateEducation.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateEducation.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateEducationData = payload
-                    })
-                    .addCase(updateEducation.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateSkills.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateEducation.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateEducationData = payload
+                })
+                .addCase(updateEducation.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateSkills.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateSkills.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateSkillsData = payload
-                    })
-                    .addCase(updateSkills.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateLanguage.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateSkills.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateSkillsData = payload
+                })
+                .addCase(updateSkills.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateLanguage.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateLanguage.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateLanguageData = payload
-                    })
-                    .addCase(updateLanguage.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateExtraProject.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateLanguage.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateLanguageData = payload
+                })
+                .addCase(updateLanguage.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateExtraProject.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateExtraProject.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateExtraProjectData = payload
-                    })
-                    .addCase(updateExtraProject.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateCertification.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateExtraProject.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateExtraProjectData = payload
+                })
+                .addCase(updateExtraProject.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateCertification.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateCertification.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateCertificationData = payload
-                    })
-                    .addCase(updateCertification.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(updateAchievements.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateCertification.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateCertificationData = payload
+                })
+                .addCase(updateCertification.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(updateAchievements.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(updateAchievements.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.updateAchievementsData = payload
-                    })
-                    .addCase(updateAchievements.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-                    .addCase(getUpdateResumeInfo.pending, (state, { payload }) => {
-                        state.loading = true
+                })
+                .addCase(updateAchievements.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.updateAchievementsData = payload
+                })
+                .addCase(updateAchievements.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+                .addCase(getUpdateResumeInfo.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(getUpdateResumeInfo.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.getUpdateResumeInfoData = payload
-                    })
-                    .addCase(getUpdateResumeInfo.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
+                })
+                .addCase(getUpdateResumeInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.getUpdateResumeInfoData = payload
+                })
+                .addCase(getUpdateResumeInfo.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
 
-                    // Add for chat
-                    .addCase(getGeneratedQuestions.pending, (state) => {
-                        state.loading = true;
-                    })
-                    .addCase(getGeneratedQuestions.fulfilled, (state, { payload }) => {
-                        state.loading = false;
-                        state.error = false;
-                        state.generatedQuestionsData = payload;
-                    })
-                    .addCase(getGeneratedQuestions.rejected, (state, { payload }) => {
-                        state.loading = false;
-                        state.error = payload;
-                    })
+                // Add for chat
+                .addCase(getGeneratedQuestions.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(getGeneratedQuestions.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.generatedQuestionsData = payload;
+                })
+                .addCase(getGeneratedQuestions.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
 
-                    .addCase(improveExperience.pending, (state) => {
-                        state.loading = true;
-                    })
-                    .addCase(improveExperience.fulfilled, (state, { payload }) => {
-                        state.loading = false;
-                        state.error = false;
-                        state.improveExperienceData = payload;
-                    })
-                    .addCase(improveExperience.rejected, (state, { payload }) => {
-                        state.loading = false;
-                        state.error = payload;
-                    })
+                .addCase(improveExperience.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(improveExperience.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.improveExperienceData = payload;
+                })
+                .addCase(improveExperience.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
 
-                    .addCase(atsScoreAnalyze.pending, (state, { payload }) => {
-                        state.loading = true
+                .addCase(atsScoreAnalyze.pending, (state, { payload }) => {
+                    state.loading = true
 
-                    })
-                    .addCase(atsScoreAnalyze.fulfilled, (state, { payload }) => {
-                        state.loading = false
-                        state.error = false
-                        state.atsScoreAnalyzeData = payload
-                    })
-                    .addCase(atsScoreAnalyze.rejected, (state, { payload }) => {
-                        state.error = payload
-                        state.loading = false
-                    })
-            }
+                })
+                .addCase(atsScoreAnalyze.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.error = false
+                    state.atsScoreAnalyzeData = payload
+                })
+                .addCase(atsScoreAnalyze.rejected, (state, { payload }) => {
+                    state.error = payload
+                    state.loading = false
+                })
+
+                .addCase(checkJdAts.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(checkJdAts.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.checkJdAtsData = payload;
+                })
+                .addCase(checkJdAts.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+                .addCase(jdBasedAtsScoreAnalyze.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(jdBasedAtsScoreAnalyze.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.jdBasedAtsScoreAnalyzeData = payload;
+                })
+                .addCase(jdBasedAtsScoreAnalyze.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
         }
-    )
+    }
+)
 export default DashboardSlice.reducer;

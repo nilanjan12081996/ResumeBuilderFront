@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoSend } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { improveExperience } from "../reducers/DashboardSlice";
+import hiring_icon from "../assets/imagesource/hiring_icon.png";
+import Image from "next/image";
 
 const ResuMateQuestionModal = ({
   showResuMate,
@@ -11,11 +13,14 @@ const ResuMateQuestionModal = ({
   buttonRef,
   jd_based_resume_id,
   jd_questions = [],
+  experiences,
+  user_id
 }) => {
   const dispatch = useDispatch();
   const modalRef = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const [chat, setChat] = useState([]);
+  const [answers, setAnswers] = useState({});
 
   // Initialize chat with questions
   useEffect(() => {
@@ -44,24 +49,71 @@ const ResuMateQuestionModal = ({
   }, [setShowResuMate, buttonRef]);
 
   // Handle submit answer
+  // const handleSubmit = async () => {
+  //   if (!inputValue.trim() || !jd_based_resume_id) return;
+
+  //   // Add answer to chat
+  //   const updatedChat = [
+  //     ...chat,
+  //     { type: "answer", message: inputValue.trim() },
+  //   ];
+  //   setChat(updatedChat);
+
+  //   // Prepare payload for API
+  //   const payload = {
+  //     user_id: "1",
+  //     jd_based_resume_id,
+  //     experience_data: [],
+  //     question_answers: {
+  //       general: { "Chatbox Input": inputValue.trim() },
+  //     },
+  //   };
+
+  //   try {
+  //     await dispatch(improveExperience(payload)).unwrap();
+  //     setInputValue("");
+  //   } catch (err) {
+  //     console.error("Error submitting answer:", err);
+  //   }
+  // };
+
+  const savedExperience = JSON.parse(localStorage.getItem('jd_resume_raw_experience'));
+  console.log(savedExperience);
+
   const handleSubmit = async () => {
     if (!inputValue.trim() || !jd_based_resume_id) return;
 
-    // Add answer to chat
-    const updatedChat = [
-      ...chat,
-      { type: "answer", message: inputValue.trim() },
-    ];
-    setChat(updatedChat);
+    // Find last asked question
+    const lastQuestion = chat.slice().reverse().find(msg => msg.type === "question");
+    if (!lastQuestion) return;
 
-    // Prepare payload for API
+    // Find which company that question belongs to
+    const questionData = jd_questions.find(q => q.question === lastQuestion.message);
+
+    // Default to "general" if no company
+    const companyName = questionData?.company_name || "general";
+    const questionText = lastQuestion.message;
+    const answerText = inputValue.trim();
+
+    // Update chat UI
+    setChat([...chat, { type: "answer", message: answerText }]);
+
+    // Correctly update answers object
+    const updatedAnswers = {
+      ...answers,
+      [companyName]: {
+        ...(answers[companyName] || {}),
+        [questionText]: answerText
+      }
+    };
+    setAnswers(updatedAnswers);
+
+    // Build payload
     const payload = {
-      user_id: "1",
+      user_id: `${user_id}`,
       jd_based_resume_id,
-      experience_data: [], // Optional, can fill if needed
-      question_answers: {
-        general: { "Chatbox Input": inputValue.trim() },
-      },
+      experience_data: savedExperience,
+      question_answers: updatedAnswers
     };
 
     try {
@@ -90,21 +142,41 @@ const ResuMateQuestionModal = ({
         </button>
       </div>
 
+      {/* Intro */}
+      <div className="px-4 py-3 text-sm text-gray-700">
+        <div className="flex gap-2">
+          <div>
+            <Image src={hiring_icon} alt="hiring_icon" width={60} className="bg-[#800080] rounded-sm" />
+          </div>
+          <p>
+            Hi! I’m ResuMate 🤖. Please answer a few questions to help me create a more impactful resume for you.
+          </p>
+        </div>
+      </div>
+
       {/* Chat messages */}
       <div className="px-4 py-3 flex-1 overflow-y-auto space-y-2 max-h-[250px]">
         {chat.map((item, idx) => (
           <div
             key={idx}
-            className={`flex ${
-              item.type === "question" ? "justify-start" : "justify-end"
-            }`}
-          >
-            <p
-              className={`p-2 rounded-xl max-w-[80%] text-sm break-words ${
-                item.type === "question"
-                  ? "bg-purple-50 border border-purple-100"
-                  : "bg-purple-600 text-white"
+            className={`flex ${item.type === "question" ? "justify-start" : "justify-end"
               }`}
+          >
+            {item.type === "question" && (
+              <div>
+                <Image
+                  src={hiring_icon}
+                  alt="hiring_icon"
+                  width={28}
+                  className="mr-2 bg-[#92278F] rounded-sm"
+                />
+              </div>
+            )}
+            <p
+              className={`p-2 rounded-xl max-w-[80%] text-sm break-words ${item.type === "question"
+                ? "bg-purple-50 border border-purple-100 text-gray-800"
+                : "bg-purple-600 text-white"
+                }`}
             >
               {item.message}
             </p>
@@ -112,23 +184,23 @@ const ResuMateQuestionModal = ({
         ))}
       </div>
 
-      {/* Footer input */}
-      <div className="px-4 py-3 flex items-center gap-2 -t">
+      {/* Footer input with icon inside */}
+      <div className="px-4 py-3 relative">
         <input
           type="text"
-          placeholder="Write your answer here..."
+          placeholder="Please answer the questions..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSubmit();
           }}
+          className="w-full border rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <button
           onClick={handleSubmit}
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+          className="absolute right-6 top-1/2 -translate-y-1/2 text-purple-600 hover:text-purple-700"
         >
-          Send
+          <IoSend size={20} />
         </button>
       </div>
     </div>
@@ -136,119 +208,3 @@ const ResuMateQuestionModal = ({
 };
 
 export default ResuMateQuestionModal;
-
-
-
-// "use client";
-
-// import { useEffect, useRef, useState } from "react";
-// import { IoClose } from "react-icons/io5";
-// import { useDispatch } from "react-redux";
-// import { getGeneratedQuestions } from "../reducers/DashboardSlice";
-
-// const ResuMateQuestionModal = ({
-//   showResuMate,
-//   setShowResuMate,
-//   buttonRef,
-//   jd_based_resume_id,
-//   experiences = [],
-// }) => {
-//   const dispatch = useDispatch();
-//   const modalRef = useRef(null);
-//   const [inputValue, setInputValue] = useState("");
-
-//   // Close modal on outside click
-//   useEffect(() => {
-//     const handleClickOutside = (e) => {
-//       if (
-//         modalRef.current &&
-//         !modalRef.current.contains(e.target) &&
-//         !buttonRef.current.contains(e.target)
-//       ) {
-//         setShowResuMate(false);
-//       }
-//     };
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => document.removeEventListener("mousedown", handleClickOutside);
-//   }, [setShowResuMate, buttonRef]);
-
-//   // ✅ Submit question -> API call
-//   const handleSubmit = async () => {
-//     if (!inputValue.trim() || !jd_based_resume_id) return;
-
-//     // 🔹 Extract all company names from experiences array
-//     const companyNames = experiences.map((exp) => exp.company_name).filter(Boolean);
-
-//     // 🔹 If no company found, fallback to "General"
-//     const generated_questions = {};
-
-//     if (companyNames.length > 0) {
-//       companyNames.forEach((company) => {
-//         generated_questions[company] = [inputValue.trim()];
-//       });
-//     } else {
-//       generated_questions["General"] = [inputValue.trim()];
-//     }
-
-//     const payload = {
-//       jd_based_resume_id,
-//       generated_questions,
-//     };
-
-//     console.log("📤 Submitting payload:", payload);
-
-//     try {
-//       await dispatch(getGeneratedQuestions(payload)).unwrap();
-//       setInputValue("");
-//     } catch (err) {
-//       console.error("❌ Error submitting question:", err);
-//       alert("Failed to submit question. Check console.");
-//     }
-//   };
-
-//   if (!showResuMate) return null;
-
-//   return (
-//     <div
-//       ref={modalRef}
-//       className="absolute bottom-[60px] left-0 w-[380px] bg-white border border-gray-200 shadow-2xl rounded-2xl overflow-hidden z-50 flex flex-col animate-slide-up"
-//     >
-//       {/* Header */}
-//       <div className="flex items-center justify-between px-4 py-3 border-b">
-//         <h3 className="text-base font-semibold text-gray-800">ResuMate 🤖</h3>
-//         <button
-//           onClick={() => setShowResuMate(false)}
-//           className="hover:bg-gray-100 p-1 rounded"
-//         >
-//           <IoClose size={18} />
-//         </button>
-//       </div>
-
-//       {/* Intro */}
-//       <div className="px-4 py-3 border-b text-sm text-gray-700">
-//         <p>
-//           Hi! I’m ResuMate 🤖. Please answer a few questions to help me create a more impactful resume for you.
-//         </p>
-//       </div>
-
-//       {/* Input + Submit */}
-//       <div className="p-4 flex items-center gap-2">
-//         <input
-//           type="text"
-//           placeholder="Type your question..."
-//           value={inputValue}
-//           onChange={(e) => setInputValue(e.target.value)}
-//           className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-//         />
-//         <button
-//           onClick={handleSubmit}
-//           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
-//         >
-//           Submit
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ResuMateQuestionModal;

@@ -217,6 +217,7 @@ const authSlice = createSlice({
             localStorage.removeItem('projects')
             sessionStorage.clear()
             localStorage.clear()
+            localStorage.removeItem('jd_resume_raw_experience')
         },
     },
     extraReducers: (builder) => {

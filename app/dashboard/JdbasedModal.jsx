@@ -7,8 +7,8 @@ import { FaGlobe } from "react-icons/fa";
 import { HiClipboardList } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { getGeneratedQuestions, jdBasedResume, jdBasedResumeAchivmentInfo, jdBasedResumeBasicInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeExpInfo, jdBasedResumeLanguageInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo } from "../reducers/DashboardSlice";
-import { addCountResume } from "../reducers/ResumeSlice";
+import { checkJdAts, getGeneratedQuestions, jdBasedAtsScoreAnalyze, jdBasedResume, jdBasedResumeAchivmentInfo, jdBasedResumeBasicInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeExpInfo, jdBasedResumeLanguageInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo } from "../reducers/DashboardSlice";
+import { addCountResume, addCountResumeOrg } from "../reducers/ResumeSlice";
 
 const JdbasedModal = ({ openModalImproveexistingResume,
   setOpenModalImproveexistingResume,
@@ -19,6 +19,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
 }) => {
 
   const { loading } = useSelector((state) => state?.dash)
+  const { profileData } = useSelector((state) => state?.profile)
   const dispatch = useDispatch()
   const {
     register,
@@ -68,11 +69,26 @@ const JdbasedModal = ({ openModalImproveexistingResume,
     }
     formData.append("job_description", data?.job_description)
 
-    dispatch(addCountResume({ ref_type: "jd_based_resume" })).then((res) => {
+    if(profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id===1){
+       dispatch(addCountResume({ ref_type: "jd_based_resume" })).then((res) => {
       if (res?.payload?.status_code === 200) {
         dispatch(jdBasedResume(formData)).then((res) => {
           if (res?.payload?.status_code === 201) {
             setResumeId(res?.payload?.data?.id)
+
+            const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+            if (rawDataExperience) {
+              localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
+            }
+
+            const checkJdAtsPayload={
+              jd_resume_id: res?.payload?.data?.id,
+              raw_data: res?.payload?.raw_data
+            }
+
+            const jdBasedAtsScoreAnalyzePayload = {
+              id: res?.payload?.data?.id
+            }
             const questionPayload = {
               jd_based_resume_id: res?.payload?.data?.id,
               generated_questions: res?.payload?.questions
@@ -138,7 +154,9 @@ const JdbasedModal = ({ openModalImproveexistingResume,
                   dispatch(jdBasedResumeProjectsInfo(projectPayload)),
                   dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
                   dispatch(jdBasedResumeLanguageInfo(langPayload)),
-                  dispatch(getGeneratedQuestions(questionPayload))
+                  dispatch(getGeneratedQuestions(questionPayload)),
+                  dispatch(checkJdAts(checkJdAtsPayload)),
+                  dispatch(jdBasedAtsScoreAnalyze(jdBasedAtsScoreAnalyzePayload))
 
                 ]
               )
@@ -157,6 +175,120 @@ const JdbasedModal = ({ openModalImproveexistingResume,
         })
       }
     })
+    }else{
+       dispatch(addCountResumeOrg({ ref_type: "jd_based_resume" })).then((res) => {
+      if (res?.payload?.status_code === 200) {
+        dispatch(jdBasedResume(formData)).then((res) => {
+          if (res?.payload?.status_code === 201) {
+            setResumeId(res?.payload?.data?.id)
+
+            const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+            if (rawDataExperience) {
+              localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
+            }
+
+            const checkJdAtsPayload={
+              jd_resume_id: res?.payload?.data?.id,
+              raw_data: res?.payload?.raw_data
+            }
+
+            const jdBasedAtsScoreAnalyzePayload = {
+              id: res?.payload?.data?.id
+            }
+            const questionPayload = {
+              jd_based_resume_id: res?.payload?.data?.id,
+              generated_questions: res?.payload?.questions
+            }
+            const basicInfoPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              SuggestedRole: res?.payload?.raw_data?.basic_information?.SuggestedRole,
+              CandidateFullName: res?.payload?.raw_data?.basic_information?.CandidateFullName,
+              EmailAddress: res?.payload?.raw_data?.basic_information?.EmailAddress,
+              PhoneNumber: res?.payload?.raw_data?.basic_information?.PhoneNumber,
+              ProfessionalTitle: res?.payload?.raw_data?.basic_information?.ProfessionalTitle,
+              Summary: res?.payload?.raw_data?.basic_information?.Summary
+            }
+            const educationPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.education?.Education
+            }
+            const expPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.experience?.Experience
+            }
+            const certPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.certifications?.Certifications
+            }
+            const achPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.achievements?.Achievements
+            }
+            const projectPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.projects?.Projects
+            }
+
+            const skillsPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.skills?.Skills
+            }
+            const langPayload = {
+              jd_resume_id: res?.payload?.data?.id,
+              data: res?.payload?.raw_data?.languages?.Languages
+            }
+            try {
+
+
+              Promise.all(
+                [
+                  dispatch(jdBasedResumeBasicInfo(basicInfoPayload)),
+                  dispatch(jdBasedResumeEducationInfo(educationPayload)),
+                  dispatch(jdBasedResumeExpInfo(expPayload))
+                    .then((res) => {
+                      if (res?.payload?.status_code === 200) {
+                        dispatch(getGeneratedQuestions(questionPayload));
+                      } else {
+                        console.log("Experience info failed");
+                      }
+                    })
+                    .catch((err) => {
+                      console.log("Error saving experience info:", err);
+                    }),
+                  dispatch(jdBasedResumeCertificateInfo(certPayload)),
+                  dispatch(jdBasedResumeAchivmentInfo(achPayload)),
+                  dispatch(jdBasedResumeProjectsInfo(projectPayload)),
+                  dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
+                  dispatch(jdBasedResumeLanguageInfo(langPayload)),
+                  dispatch(getGeneratedQuestions(questionPayload)),
+                  dispatch(checkJdAts(checkJdAtsPayload)),
+                  dispatch(jdBasedAtsScoreAnalyze(jdBasedAtsScoreAnalyzePayload))
+
+                ]
+              )
+              //  alertContinueHandler();
+              setOpenModalCreateResumeJd(true)
+            } catch (error) {
+              console.error("Error while saving resume sections", error);
+              toast.error("Something went wrong while saving resume data");
+            }
+          }
+        })
+      }
+      else if (res?.payload?.response?.data?.status_code === 400) {
+        toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+          autoClose: false
+        })
+      }
+    })
+    }
+   
+
+
+
+
+
+    
 
   }
   return (

@@ -130,6 +130,19 @@ const page = () => {
     { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
   ])
 
+  const [extraProjects, setExtraProjects] = useState([
+  {
+    id: Date.now(),
+    project_name: "",
+    role: "",
+    start_date: null,
+    end_date: null,
+    technology: "",
+    description: "",
+  }
+]);
+
+
   const {
     register,
     handleSubmit,
@@ -173,7 +186,7 @@ const page = () => {
     }
   }, [jdBasedDetailsData]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (jdBasedDetailsData?.data?.[0]?.skill?.length > 0) {
       const existingSkills = jdBasedDetailsData.data[0].skill.map((sk, index) => ({
         id: Date.now() + index,
@@ -186,7 +199,7 @@ const page = () => {
     }
   }, [jdBasedDetailsData, setSkills]);
 
- useEffect(() => {
+  useEffect(() => {
     if (jdBasedDetailsData?.data?.length > 0) {
       const existingLanguages = jdBasedDetailsData.data[0].language || [];
       if (existingLanguages.length > 0) {
@@ -201,7 +214,7 @@ const page = () => {
         setLanguages([{ id: Date.now(), language_name: "", proficiency: "" }]);
       }
     }
-  }, [jdBasedDetailsData]);  
+  }, [jdBasedDetailsData]);
 
   useEffect(() => {
     if (
@@ -239,8 +252,8 @@ const page = () => {
     }
   }, [jdBasedDetailsData, setAchivments]);
 
-    useEffect(() => {
-    console.log('PersonalProjectJd',jdBasedDetailsData?.data?.[0]?.project)
+  useEffect(() => {
+    console.log('PersonalProjectJd', jdBasedDetailsData?.data?.[0]?.project)
     if (jdBasedDetailsData?.data?.[0]?.project?.length > 0) {
       const existingProjects = jdBasedDetailsData.data[0].project.map((proj, index) => ({
         id: Date.now() + index,
@@ -258,32 +271,61 @@ const page = () => {
     }
   }, [jdBasedDetailsData, setPersonalPro]);
 
+// add for extra project
   useEffect(() => {
-  // console.log('CertificatesJd',jdBasedDetailsData?.data[0]?.certification)
-  if (jdBasedDetailsData?.data?.length > 0 && jdBasedDetailsData?.data[0]?.certification?.length > 0) {
-    console.log('CertificatesJd', jdBasedDetailsData.data[0].certification);
+    const extraProjData = jdBasedDetailsData?.data?.[0]?.extra_project;
 
-    const certs = jdBasedDetailsData.data[0].certification.map((cert, index) => ({
-      id: cert.id || Date.now() + index,
-      certification_name: cert.certification_name || "",
-      issuing_organization: cert.certification_organization_name || "",
-      obtained_date: cert.certification_date ? new Date(cert.certification_date) : null,
-      certification_id: cert.certification_id || ""
-    }));
-
-    setCertificates(certs);
-  } else {
-    setCertificates([
-      {
+    if (extraProjData?.length > 0) {
+      const formattedExtraProjects = extraProjData.map((proj, index) => ({
+        id: proj.id || Date.now() + index,
+        project_name: proj.project_name || "",
+        role: proj.role || "",
+        start_date: proj.start_date ? new Date(proj.start_date) : null,
+        end_date: proj.end_date ? new Date(proj.end_date) : null,
+        technology: proj.technology ? JSON.parse(proj.technology).join(", ") : "",
+        description: proj.description || "",
+      }));
+      setExtraProjects(formattedExtraProjects);
+    } else {
+      setExtraProjects([{
         id: Date.now(),
-        certification_name: "",
-        issuing_organization: "",
-        obtained_date: null,
-        certification_id: ""
-      }
-    ]);
-  }
-}, [jdBasedDetailsData, setCertificates]);
+        project_name: "",
+        role: "",
+        start_date: null,
+        end_date: null,
+        technology: "",
+        description: "",
+      }]);
+    }
+  }, [jdBasedDetailsData, setExtraProjects]);
+
+
+  useEffect(() => {
+    // console.log('CertificatesJd',jdBasedDetailsData?.data[0]?.certification)
+    if (jdBasedDetailsData?.data?.length > 0 && jdBasedDetailsData?.data[0]?.certification?.length > 0) {
+      console.log('CertificatesJd', jdBasedDetailsData.data[0].certification);
+
+      const certs = jdBasedDetailsData.data[0].certification.map((cert, index) => ({
+        id: cert.id || Date.now() + index,
+        certification_name: cert.certification_name || "",
+        issuing_organization: cert.certification_organization_name || "",
+        obtained_date: cert.certification_date ? new Date(cert.certification_date) : null,
+        certification_id: cert.certification_id || ""
+      }));
+
+      setCertificates(certs);
+    } else {
+      setCertificates([
+        {
+          id: Date.now(),
+          certification_name: "",
+          issuing_organization: "",
+          obtained_date: null,
+          certification_id: ""
+        }
+      ]);
+    }
+  }, [jdBasedDetailsData, setCertificates]);
 
   const onSubmit = (data) => {
     console.log("data", data);
