@@ -11,6 +11,7 @@ import ClientLayoutWrapper from "./clientLayoutWrapper";
 
 import Sidebar from "./ui/sidebar";
 import Insideheader from "./ui/insideheader";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 const poppins = Poppins({
@@ -30,19 +31,22 @@ export const metadata = {
   title: "HiringEye Resume",
   description: "HiringEye Resume",
 };
-
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
         className={`${inter.variable} antialiased`}
       >
+<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+
 
         <Providers>
           <ClientLayoutWrapper>
             {children}
           </ClientLayoutWrapper>
         </Providers>
+        </GoogleOAuthProvider>
 
         {/* <Providers>
           <main>

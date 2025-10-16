@@ -14,6 +14,7 @@ import { checkSubscription } from "../reducers/ProfileSlice";
 import { getSearchHistory } from "../reducers/SearchHistroySlice";
 
 import { RiGoogleFill } from "react-icons/ri";
+import { useGoogleLogin } from "@react-oauth/google";
 
 
 const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,setOpenChoiceModal }) => {
@@ -64,6 +65,19 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
         setOpenChoiceModal(true)
         setOpenLoginModal(false)
     }
+
+    
+      const googleLogin = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+    //    sessionStorage.setItem("googleAccessToken", codeResponse.access_token);
+      sessionStorage.setItem(
+        "googleAccessToken",
+        JSON.stringify({ token: codeResponse.access_token })
+      );
+      router.push("/google-redirect");
+    },
+    onError: (error) => console.log("Login Failed:", error),
+  });
 
     return (
         <>
@@ -130,7 +144,7 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
                                         <p className="text-[#525252] text-[14px] leading-[20px]">Or Continue With</p>
                                     </div>
                                     <div className="mt-4 flex justify-center items-center">
-                                        <button className="google_btn"><RiGoogleFill className="text-[18px] mr-1" /> Google</button>
+                                        <button onClick={()=>{googleLogin()}} className="google_btn"><RiGoogleFill className="text-[18px] mr-1" /> Google</button>
                                     </div>
                                     <div className="mt-6 text-center">
                                         <p className="text-[#615D5D] text-[14px] leading-[20px] font-normal">Don’t have an account? <Link onClick={() => handleSignup(true)} className="text-[#000000] hover:text-[#615D5D] font-medium" href="/" passHref>Sign Up</Link></p>

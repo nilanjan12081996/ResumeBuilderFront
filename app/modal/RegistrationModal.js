@@ -15,6 +15,7 @@ import { getSearchHistory } from "../reducers/SearchHistroySlice";
 
 import { RiGoogleFill } from "react-icons/ri";
 import Link from 'next/link';
+import { useGoogleLogin } from "@react-oauth/google";
 
 const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVerifyOtpModal, setOpenLoginModal, openPricModal, setOpenPriceModal,chooseResumeType }) => {
     const dispatch = useDispatch();
@@ -81,7 +82,17 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
  })
         }
        
-    
+// const googleLogin = useGoogleLogin({
+//     onSuccess: (codeResponse) => {
+//     //    sessionStorage.setItem("googleAccessToken", codeResponse.access_token);
+//       sessionStorage.setItem(
+//         "googleAccessToken",
+//         JSON.stringify({ token: codeResponse.access_token })
+//       );
+//       router.push("/google-redirect");
+//     },
+//     onError: (error) => console.log("Login Failed:", error),
+//   });
 
     return (
         <>
@@ -230,12 +241,12 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                             )
                                         }
                                     </form>
-                                    <div className="mt-4 text-center continue_width">
+                                    {/* <div className="mt-4 text-center continue_width">
                                         <p className="text-[#525252] text-[14px] leading-[20px]">Or Continue With</p>
                                     </div>
                                     <div className="mt-4 flex justify-center items-center">
-                                        <button className="google_btn"><RiGoogleFill className="text-[18px] mr-1" /> Google</button>
-                                    </div>
+                                        <button onClick={()=>{googleLogin()}} className="google_btn"><RiGoogleFill className="text-[18px] mr-1" /> Google</button>
+                                    </div> */}
                                     <div className="mt-6 text-center">
                                         <p className="text-[#615D5D] text-[14px] leading-[20px] font-normal">Already have an account? <Link onClick={() => openLoginModal(true)} className="text-[#000000] hover:text-[#615D5D] font-medium" href="/" passHref>Log In</Link></p>
                                     </div>

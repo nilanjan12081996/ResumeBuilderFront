@@ -186,6 +186,43 @@ export const detectIccid = createAsyncThunk(
     }
 );
 
+export const googleSignIn = createAsyncThunk(
+  'auth/google-signIn',
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await serverApi.post('api/auth/google-login', token);
+      if (response?.data?.status_code === 200) {
+        console.log(response?.data,"response?.data")
+        return response.data;
+      } else {
+        // Handle the case when status code is not 200
+        return rejectWithValue(response.data.message);
+      }
+    } catch (error) {
+      let errors = errorHandler(error);
+      return rejectWithValue(errors);
+    }
+  }
+);
+
+export const addType = createAsyncThunk(
+  'auth/addType',
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await serverApi.post('api/auth/add-type', token);
+      if (response?.data?.status_code === 200) {
+        console.log(response?.data,"response?.data")
+        return response.data;
+      } else {
+        // Handle the case when status code is not 200
+        return rejectWithValue(response.data.message);
+      }
+    } catch (error) {
+      let errors = errorHandler(error);
+      return rejectWithValue(errors);
+    }
+  }
+);
 
 const initialState = {
     message: null,
@@ -195,7 +232,9 @@ const initialState = {
     loadingIccid: false,
     signUpTypes:[],
     loginData:[],
-    profData:[]
+    profData:[],
+    isGoogleLoggedIn: null,
+    addTypeData:""
 };
 
 const authSlice = createSlice({
@@ -392,6 +431,42 @@ const authSlice = createSlice({
 
                 state.loading = false;
                 state.error = payload;
+            })
+                 .addCase(googleSignIn.pending,(state)=>{
+                state.loading=false
+                
+            })
+            .addCase(googleSignIn.fulfilled,(state,{payload})=>{
+                console.log("response?.data",payload)
+                 const { access_token, data, refresh_token } = payload;
+                state.loading = false;
+                state.isLoggedIn = true;
+                state.isGoogleLoggedIn=true
+                sessionStorage.setItem(
+                    'user_id',
+                    JSON.stringify({ user_id: data?.id })
+                );
+                console.log("response?.data",access_token)
+                // sessionStorage.setItem(
+                //     'resumeToken',
+                //     JSON.stringify({ token: access_token })
+                // );
+            })
+            .addCase(googleSignIn.rejected,(state,{payload})=>{
+                state.loading=false
+                state.error=payload
+            })
+            .addCase(addType.pending,(state)=>{
+                state.loading=true
+            })
+            .addCase(addType.fulfilled,(state,{payload})=>{
+                state.loading=false
+                state.addTypeData=payload
+                state.error=false
+            })
+            .addCase(addType.rejected,(state,{payload})=>{
+                state.loading=false
+                state.error=payload
             })
             
 
