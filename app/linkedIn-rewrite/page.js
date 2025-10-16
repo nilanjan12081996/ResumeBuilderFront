@@ -73,7 +73,7 @@ const page = () => {
   const searchParams = useSearchParams();
   const id = atob(searchParams.get("id"))
   console.log("id", id);
-     const componentRef = useRef();
+  const componentRef = useRef();
   useEffect(() => {
     dispatch(linkedgetDetails({ lkdin_resume_id: id }))
   }, [id])
@@ -86,6 +86,66 @@ const page = () => {
   } = useForm();
 
   const formValues = watch();
+
+  useEffect(() => {
+    if (lkdDetails?.data?.[0]?.experience_info) {
+      const mappedExp = lkdDetails?.data?.[0]?.experience_info?.map((exp) => (
+        {
+          id: exp.id,
+          company_name: exp.company_name || "",
+          position: exp.position || "",
+          location: exp.location || "",
+          skill: exp.skill_set || "",
+          job_type: exp.job_type || "",
+          start_date: exp.start_date || null,
+          end_date: exp.end_date || null,
+          current_work: exp.end_date === null, // mark current if no end_date
+          job_description: exp.job_description || "",
+        }
+      ))
+      setExperiences(mappedExp)
+    }
+  }, [lkdDetails])
+
+  useEffect(() => {
+    if (lkdDetails?.data?.[0]?.education_info) {
+      const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
+        // Try to separate field and degree if possible
+        let degree = "";
+        let field_study = "";
+        if (edu.course) {
+          // Look for parentheses (common LinkedIn format)
+          const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
+          if (match) {
+            field_study = match[1].trim();  // "Computer Science"
+            degree = match[2].trim();       // "Bachelor of Science - BS"
+          } else {
+            degree = edu.course; // fallback if no parentheses
+          }
+        }
+
+        return {
+          id: edu.id,
+          institution: edu.college || "",
+          location: edu.location || "",
+          degree,
+          field_study,
+          start_time: edu.course_start ? new Date(edu.course_start) : null,
+          end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
+            ? new Date(edu.course_completed)
+            : null,
+          cgpa: edu.cgpa || "",
+          additionalInfo: edu.aditional_info || "",
+          currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
+        };
+      });
+
+      setEducationEntries(mappedEducation);
+    }
+  }, [lkdDetails]);
+
+
+
 
   const [educationEntries, setEducationEntries] = useState([
     { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
@@ -109,9 +169,32 @@ const page = () => {
   const [languages, setLanguages] = useState([
     { id: Date.now(), language_name: "" },
   ]);
+
+  useEffect(() => {
+    if (lkdDetails?.data?.[0]?.language_info?.length > 0) {
+      const mappedLanguages = lkdDetails.data[0].language_info.map((lang) => ({
+        id: lang.id,
+        language_name: lang.language || "",
+        proficiency: lang.level || "",
+      }));
+      setLanguages(mappedLanguages);
+    }
+  }, [lkdDetails, setLanguages]);
+
   const [skills, setSkills] = useState([
     { id: Date.now(), skill_category: "", skill: "" }
   ])
+
+  useEffect(() => {
+    if (lkdDetails?.data?.[0]?.skills_info?.length > 0) {
+      const formattedSkills = lkdDetails?.data?.[0]?.skills_info.map((s) => ({
+        id: s.id,
+        skill_category: s.category || "",
+        skill: s.skill_set || "",
+      }));
+      setSkills(formattedSkills);
+    }
+  }, [lkdDetails?.data?.[0]?.skills_info]);
 
   const onSubmit = (data) => {
     console.log("LinkedIn Submit Data:", data);
@@ -205,7 +288,7 @@ const page = () => {
       }
     });
   };
-   const handlePrint = useReactToPrint({
+  const handlePrint = useReactToPrint({
     contentRef: componentRef, // Updated for newer versions of react-to-print
     documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
     pageStyle: `
@@ -326,7 +409,7 @@ const page = () => {
         </div>
         <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume4} alt="resume4" className='' /> */}
-          <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} />
+          <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} languages={languages} skills={skills} />
         </div>
       </div>
 

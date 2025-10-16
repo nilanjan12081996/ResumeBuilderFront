@@ -1,21 +1,22 @@
-import { Briefcase, GraduationCap } from "lucide-react";
+import { Briefcase, Globe, GraduationCap, Lightbulb } from "lucide-react";
 import { forwardRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { currentSubscription, getIpData } from "../reducers/PlanSlice";
 
-const LinkedInTemplate=forwardRef(({data,educationEntries,experiences},ref)=> {
-  const {  ipData, createOrderData, error, currentSubscriptionData } = useSelector(
+const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, languages, skills }, ref) => {
+  const { ipData, createOrderData, error, currentSubscriptionData } = useSelector(
     (state) => state.planst
   );
-const dispatch=useDispatch()
-  useEffect(()=>{
-  dispatch(getIpData()).then((res)=>{
-     if (res?.payload?.ip) {
-      dispatch(currentSubscription(res?.payload?.ip))
-     }
-  })
-  },[])
-  console.log("currentSubscriptionData",currentSubscriptionData);
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(getIpData()).then((res) => {
+      if (res?.payload?.ip) {
+        dispatch(currentSubscription(res?.payload?.ip))
+      }
+    })
+  }, [])
+  console.log("currentSubscriptionData", currentSubscriptionData);
+  console.log('skills', skills)
   return (
     <div ref={ref} className="flex justify-center p-6 bg-gray-100 min-h-screen">
       <style jsx>{`
@@ -73,23 +74,23 @@ const dispatch=useDispatch()
         }
       `}</style>
 
-         <div className="print-watermark">
-          {
-            currentSubscriptionData?.data?.length===0&&('Hiring Eye')
-          }   
-          {/* Hiring Eye */}
-        </div>
+      <div className="print-watermark">
+        {
+          currentSubscriptionData?.data?.length === 0 && ('Hiring Eye')
+        }
+        {/* Hiring Eye */}
+      </div>
       <div className="w-full max-w-2xl rounded-xl shadow-md overflow-hidden bg-white">
         {/* Header Section */}
         <div className="bg-gray-200 h-28"></div>
         <div className="px-6 mt-10">
-          <h1 className="text-2xl font-semibold">{data?.candidate_name||"Manisha Sharma"}</h1>
+          <h1 className="text-2xl font-semibold">{data?.candidate_name || "Manisha Sharma"}</h1>
           <p className="text-gray-600 mt-1">
-            {data?.summary||"Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
-            
+            {data?.summary || "Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
+
           </p>
           <p className="text-sm text-gray-500 mt-2">
-          {data?.location||"Hyderabad, Telangana, India"}  
+            {data?.location || "Hyderabad, Telangana, India"}
           </p>
         </div>
 
@@ -97,8 +98,8 @@ const dispatch=useDispatch()
         <div className="px-6 mt-6">
           <h2 className="text-lg font-semibold mb-2">About</h2>
           <p className="text-gray-700 text-sm leading-relaxed">
-            {data?.description||"Passionate and results-oriented professional with a strong background in web development and UI/UX design. Experienced in creating effective and engaging digital solutions, working on diverse projects ranging from client websites to content creation platforms. Adept at blending technical expertise with creative design to deliver user-friendly and high-performing products. Always eager to learn new technologies and contribute to innovative teams."}
-            
+            {data?.description || "Passionate and results-oriented professional with a strong background in web development and UI/UX design. Experienced in creating effective and engaging digital solutions, working on diverse projects ranging from client websites to content creation platforms. Adept at blending technical expertise with creative design to deliver user-friendly and high-performing products. Always eager to learn new technologies and contribute to innovative teams."}
+
           </p>
         </div>
 
@@ -146,7 +147,7 @@ const dispatch=useDispatch()
         </div> */}
 
 
-                <div className="px-6 mt-6">
+        <div className="px-6 mt-6">
           <h2 className="text-lg font-semibold mb-4">Experience</h2>
           {experiences && experiences.length > 0 ? (
             experiences.map((exp, idx) => (
@@ -165,19 +166,19 @@ const dispatch=useDispatch()
                   <p className="text-xs text-gray-500">
                     {exp.start_date
                       ? new Date(exp.start_date).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })
+                        month: "short",
+                        year: "numeric",
+                      })
                       : "N/A"}{" "}
                     –{" "}
                     {exp.current_work
                       ? "Present"
                       : exp.end_date
-                      ? new Date(exp.end_date).toLocaleDateString("en-US", {
+                        ? new Date(exp.end_date).toLocaleDateString("en-US", {
                           month: "short",
                           year: "numeric",
                         })
-                      : "N/A"}
+                        : "N/A"}
                   </p>
 
                   {exp.job_description && (
@@ -219,60 +220,121 @@ const dispatch=useDispatch()
         </div> */}
 
         <div className="px-6 mt-6 mb-8">
-  <h2 className="text-lg font-semibold mb-4">Education</h2>
+          <h2 className="text-lg font-semibold mb-4">Education</h2>
 
-  {educationEntries && educationEntries.length > 0 ? (
-    educationEntries.map((edu, index) => (
-      <div
-        key={edu.id || index}
-        className="flex items-start space-x-3 mb-4 last:mb-0"
-      >
-        <div className="bg-yellow-100 p-2 rounded-full">
-          <GraduationCap className="text-yellow-600 w-5 h-5" />
-        </div>
-        <div>
-          <h3 className="font-medium text-gray-900">
-            {edu.institution || "Institution Name"}
-          </h3>
+          {educationEntries && educationEntries.length > 0 ? (
+            educationEntries.map((edu, index) => (
+              <div
+                key={edu.id || index}
+                className="flex items-start space-x-3 mb-4 last:mb-0"
+              >
+                <div className="bg-yellow-100 p-2 rounded-full">
+                  <GraduationCap className="text-yellow-600 w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">
+                    {edu.institution || "Institution Name"}
+                  </h3>
 
-          <p className="text-sm text-gray-600">
-            {edu.degree ? `${edu.degree}` : ""}{" "}
-            {edu.field_study ? `, ${edu.field_study}` : ""}
-          </p>
+                  <p className="text-sm text-gray-600">
+                    {edu.degree ? `${edu.degree}` : ""}{" "}
+                    {edu.field_study ? `, ${edu.field_study}` : ""}
+                  </p>
 
-          {/* Date Range */}
-          <p className="text-xs text-gray-500">
-            {edu.start_time
-              ? new Date(edu.start_time).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })
-              : "Start"}{" "}
-            –{" "}
-            {edu.currentlyStudying
-              ? "Present"
-              : edu.end_time
-              ? new Date(edu.end_time).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })
-              : "End"}
-          </p>
+                  {/* Date Range */}
+                  <p className="text-xs text-gray-500">
+                    {edu.start_time
+                      ? new Date(edu.start_time).toLocaleDateString("en-US", {
+                        month: "short",
+                        year: "numeric",
+                      })
+                      : "Start"}{" "}
+                    –{" "}
+                    {edu.currentlyStudying
+                      ? "Present"
+                      : edu.end_time
+                        ? new Date(edu.end_time).toLocaleDateString("en-US", {
+                          month: "short",
+                          year: "numeric",
+                        })
+                        : "End"}
+                  </p>
 
-          {/* GPA or Additional Info (Optional) */}
-          {(edu.cgpa || edu.additionalInfo) && (
-            <p className="text-xs text-gray-500 mt-1">
-              {edu.cgpa ? `GPA: ${edu.cgpa}` : ""}{" "}
-              {edu.additionalInfo ? ` | ${edu.additionalInfo}` : ""}
-            </p>
+                  {/* GPA or Additional Info (Optional) */}
+                  {(edu.cgpa || edu.additionalInfo) && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {edu.cgpa ? `GPA: ${edu.cgpa}` : ""}{" "}
+                      {edu.additionalInfo ? ` | ${edu.additionalInfo}` : ""}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No education details available.</p>
           )}
         </div>
-      </div>
-    ))
-  ) : (
-    <p className="text-sm text-gray-500">No education details available.</p>
-  )}
-</div>
+
+        {/* Languages Section */}
+
+        <div className="px-6 mt-6">
+          <h2 className="text-lg font-semibold mb-4">Languages</h2>
+          {languages && languages.length > 0 ? (
+            languages.map((lang, idx) => (
+              <div key={lang.id || idx} className="flex items-start space-x-3 mb-4">
+                <div className="bg-blue-100 p-2 rounded-full mt-1">
+                  <Globe className="text-blue-600 w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium">
+                    {lang.language_name || "Language not specified"}
+                  </h3>
+                  {lang.proficiency && (
+                    <p className="text-sm text-gray-600">
+                      {lang.proficiency}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No languages listed.</p>
+          )}
+        </div>
+
+
+        {/* Skills */}
+        <div className="px-6 mt-6">
+          <h2 className="text-lg font-semibold mb-4">Skills</h2>
+          {skills && skills.length > 0 ? (
+            skills.map((skillGroup, idx) => (
+              <div key={skillGroup.id || idx} className="flex items-start space-x-3 mb-4">
+                <div className="bg-green-100 p-2 rounded-full mt-1">
+                  <Lightbulb className="text-green-600 w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-medium">
+                    {skillGroup.skill_category || "Skill Category"}
+                  </h3>
+                  {skillGroup.skill ? (
+                    <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                      {skillGroup.skill.split(",").map((s, i) => (
+                        <li key={i}>{s.trim()}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-500">No skills available.</p>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No skills listed.</p>
+          )}
+        </div>
+
+
+
 
       </div>
     </div>
