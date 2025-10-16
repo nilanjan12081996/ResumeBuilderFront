@@ -80,13 +80,13 @@ const Header = () => {
                         </Link>
                       </li>
                       <li onClick={closeNavbar}>
-                        <Link href="/" passHref>
+                        <Link href="/#about" passHref>
                           About Us
                         </Link>
                       </li>
                       <li onClick={closeNavbar}>
-                        <Link href="/" passHref>
-                          Services
+                        <Link href="/#pricing" passHref>
+                          Pricing
                         </Link>
                       </li>
                     </NavbarCollapse>
