@@ -389,7 +389,13 @@ export default function Home() {
                                     oneTime?.plan_frequency===1&&(
                                  <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                                     <div className="py-8 px-6 relative min-h-[680px]">
-                                    <Image src={sub01} alt='sub01' className='mb-6' />
+                                    <div className="flex items-center justify-between mb-6">
+                                       <Image src={sub01} alt='sub01' className='' />
+                                       <div className={`${oneTime?.id===3&&"bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
+                                          {oneTime?.id===3&&"Popular"}
+                                       </div>
+                                    </div>
+
                                     <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
                                     <div className="flex items-center gap-2 mb-8">
                                        <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
@@ -525,7 +531,14 @@ export default function Home() {
                                     oneTime?.plan_frequency===3&&(
                                  <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                                     <div className="py-8 px-6 relative min-h-[680px]">
-                                    <Image src={sub01} alt='sub01' className='mb-6' />
+
+                                    <div className="flex items-center justify-between mb-6">
+                                       <Image src={sub01} alt='sub01' className='' />
+                                       <div className={`${oneTime?.id===12&&"bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
+                                          {oneTime?.id===12&&"Popular"}
+                                       </div>
+                                    </div>
+
                                     <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
                                     <div className="flex items-center gap-2 mb-8">
                                        <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
@@ -682,7 +695,12 @@ export default function Home() {
                                     oneTime?.plan_frequency===12&&(
                                  <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                                     <div className="py-8 px-6 relative min-h-[680px]">
-                                    <Image src={sub01} alt='sub01' className='mb-6' />
+                                    <div className="flex items-center justify-between mb-6">
+                                       <Image src={sub01} alt='sub01' className='' />
+                                       <div className={`${oneTime?.id===7&&"bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
+                                          {oneTime?.id===7&&"Popular"}
+                                       </div>
+                                    </div>
                                     <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
                                     <div className="flex items-center gap-2 mb-8">
                                        <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
