@@ -1,5 +1,5 @@
 import { FileInput, Label, Modal, ModalBody, ModalHeader, Spinner, Textarea, TextInput } from "flowbite-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiImport, BiLogoLinkedinSquare } from "react-icons/bi";
 import { BsFillInfoCircleFill, BsGithub } from "react-icons/bs";
@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { checkJdAts, getGeneratedQuestions, jdBasedAtsScoreAnalyze, jdBasedResume, jdBasedResumeAchivmentInfo, jdBasedResumeBasicInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeExpInfo, jdBasedResumeLanguageInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo } from "../reducers/DashboardSlice";
 import { addCountResume, addCountResumeOrg } from "../reducers/ResumeSlice";
+import JdAtsScoreModal from "../modal/JdAtsScoreModal";
+
 
 const JdbasedModal = ({ openModalImproveexistingResume,
   setOpenModalImproveexistingResume,
@@ -21,6 +23,10 @@ const JdbasedModal = ({ openModalImproveexistingResume,
   const { loading } = useSelector((state) => state?.dash)
   const { profileData } = useSelector((state) => state?.profile)
   const dispatch = useDispatch()
+  const [showJdAtsModal, setShowJdAtsModal] = useState(false);
+  const [atsData, setAtsData] = useState(null);
+
+
   const {
     register,
     handleSubmit,
@@ -69,217 +75,236 @@ const JdbasedModal = ({ openModalImproveexistingResume,
     }
     formData.append("job_description", data?.job_description)
 
-    if(profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id===1){
-       dispatch(addCountResume({ ref_type: "jd_based_resume" })).then((res) => {
-      if (res?.payload?.status_code === 200) {
-        dispatch(jdBasedResume(formData)).then((res) => {
-          if (res?.payload?.status_code === 201) {
-            setResumeId(res?.payload?.data?.id)
+    if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
+      dispatch(addCountResume({ ref_type: "jd_based_resume" })).then((res) => {
+        if (res?.payload?.status_code === 200) {
+          dispatch(jdBasedResume(formData)).then((res) => {
+            if (res?.payload?.status_code === 201) {
+              setResumeId(res?.payload?.data?.id)
 
-            const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
-            if (rawDataExperience) {
-              localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
-            }
+              const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+              if (rawDataExperience) {
+                localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
+              }
 
-            const checkJdAtsPayload={
-              jd_resume_id: res?.payload?.data?.id,
-              raw_data: res?.payload?.raw_data
-            }
-            const questionPayload = {
-              jd_based_resume_id: res?.payload?.data?.id,
-              generated_questions: res?.payload?.questions
-            }
-            const basicInfoPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              SuggestedRole: res?.payload?.raw_data?.basic_information?.SuggestedRole,
-              CandidateFullName: res?.payload?.raw_data?.basic_information?.CandidateFullName,
-              EmailAddress: res?.payload?.raw_data?.basic_information?.EmailAddress,
-              PhoneNumber: res?.payload?.raw_data?.basic_information?.PhoneNumber,
-              ProfessionalTitle: res?.payload?.raw_data?.basic_information?.ProfessionalTitle,
-              Summary: res?.payload?.raw_data?.basic_information?.Summary
-            }
-            const educationPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.education?.Education
-            }
-            const expPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.experience?.Experience
-            }
-            const certPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.certifications?.Certifications
-            }
-            const achPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.achievements?.Achievements
-            }
-            const projectPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.projects?.Projects
-            }
+              const checkJdAtsPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                raw_data: res?.payload?.raw_data
+              }
+              const questionPayload = {
+                jd_based_resume_id: res?.payload?.data?.id,
+                generated_questions: res?.payload?.questions
+              }
+              const basicInfoPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                SuggestedRole: res?.payload?.raw_data?.basic_information?.SuggestedRole,
+                CandidateFullName: res?.payload?.raw_data?.basic_information?.CandidateFullName,
+                EmailAddress: res?.payload?.raw_data?.basic_information?.EmailAddress,
+                PhoneNumber: res?.payload?.raw_data?.basic_information?.PhoneNumber,
+                ProfessionalTitle: res?.payload?.raw_data?.basic_information?.ProfessionalTitle,
+                Summary: res?.payload?.raw_data?.basic_information?.Summary
+              }
+              const educationPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.education?.Education
+              }
+              const expPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.experience?.Experience
+              }
+              const certPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.certifications?.Certifications
+              }
+              const achPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.achievements?.Achievements
+              }
+              const projectPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.projects?.Projects
+              }
 
-            const skillsPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.skills?.Skills
-            }
-            const langPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.languages?.Languages
-            }
-            try {
-
-
-              Promise.all(
-                [
-                  dispatch(jdBasedResumeBasicInfo(basicInfoPayload)),
-                  dispatch(jdBasedResumeEducationInfo(educationPayload)),
-                  dispatch(jdBasedResumeExpInfo(expPayload))
-                    .then((res) => {
-                      if (res?.payload?.status_code === 200) {
-                        dispatch(getGeneratedQuestions(questionPayload));
-                      } else {
-                        console.log("Experience info failed");
-                      }
-                    })
-                    .catch((err) => {
-                      console.log("Error saving experience info:", err);
-                    }),
-                  dispatch(jdBasedResumeCertificateInfo(certPayload)),
-                  dispatch(jdBasedResumeAchivmentInfo(achPayload)),
-                  dispatch(jdBasedResumeProjectsInfo(projectPayload)),
-                  dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
-                  dispatch(jdBasedResumeLanguageInfo(langPayload)),
-                  dispatch(getGeneratedQuestions(questionPayload)),
-                  dispatch(checkJdAts(checkJdAtsPayload))
-
-                ]
-              )
-              //  alertContinueHandler();
-              setOpenModalCreateResumeJd(true)
-            } catch (error) {
-              console.error("Error while saving resume sections", error);
-              toast.error("Something went wrong while saving resume data");
-            }
-          }
-        })
-      }
-      else if (res?.payload?.response?.data?.status_code === 400) {
-        toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-          autoClose: false
-        })
-      }
-    })
-    }else{
-       dispatch(addCountResumeOrg({ ref_type: "jd_based_resume" })).then((res) => {
-      if (res?.payload?.status_code === 200) {
-        dispatch(jdBasedResume(formData)).then((res) => {
-          if (res?.payload?.status_code === 201) {
-            setResumeId(res?.payload?.data?.id)
-
-            const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
-            if (rawDataExperience) {
-              localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
-            }
-
-            const checkJdAtsPayload={
-              jd_resume_id: res?.payload?.data?.id,
-              raw_data: res?.payload?.raw_data
-            }
-
-            const questionPayload = {
-              jd_based_resume_id: res?.payload?.data?.id,
-              generated_questions: res?.payload?.questions
-            }
-            const basicInfoPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              SuggestedRole: res?.payload?.raw_data?.basic_information?.SuggestedRole,
-              CandidateFullName: res?.payload?.raw_data?.basic_information?.CandidateFullName,
-              EmailAddress: res?.payload?.raw_data?.basic_information?.EmailAddress,
-              PhoneNumber: res?.payload?.raw_data?.basic_information?.PhoneNumber,
-              ProfessionalTitle: res?.payload?.raw_data?.basic_information?.ProfessionalTitle,
-              Summary: res?.payload?.raw_data?.basic_information?.Summary
-            }
-            const educationPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.education?.Education
-            }
-            const expPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.experience?.Experience
-            }
-            const certPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.certifications?.Certifications
-            }
-            const achPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.achievements?.Achievements
-            }
-            const projectPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.projects?.Projects
-            }
-
-            const skillsPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.skills?.Skills
-            }
-            const langPayload = {
-              jd_resume_id: res?.payload?.data?.id,
-              data: res?.payload?.raw_data?.languages?.Languages
-            }
-            try {
+              const skillsPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.skills?.Skills
+              }
+              const langPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.languages?.Languages
+              }
+              try {
 
 
-              Promise.all(
-                [
-                  dispatch(jdBasedResumeBasicInfo(basicInfoPayload)),
-                  dispatch(jdBasedResumeEducationInfo(educationPayload)),
-                  dispatch(jdBasedResumeExpInfo(expPayload))
-                    .then((res) => {
-                      if (res?.payload?.status_code === 200) {
-                        dispatch(getGeneratedQuestions(questionPayload));
-                      } else {
-                        console.log("Experience info failed");
-                      }
-                    })
-                    .catch((err) => {
-                      console.log("Error saving experience info:", err);
-                    }),
-                  dispatch(jdBasedResumeCertificateInfo(certPayload)),
-                  dispatch(jdBasedResumeAchivmentInfo(achPayload)),
-                  dispatch(jdBasedResumeProjectsInfo(projectPayload)),
-                  dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
-                  dispatch(jdBasedResumeLanguageInfo(langPayload)),
-                  dispatch(getGeneratedQuestions(questionPayload)),
-                  dispatch(checkJdAts(checkJdAtsPayload))
+                Promise.all(
+                  [
+                    dispatch(jdBasedResumeBasicInfo(basicInfoPayload)),
+                    dispatch(jdBasedResumeEducationInfo(educationPayload)),
+                    dispatch(jdBasedResumeExpInfo(expPayload))
+                      .then((res) => {
+                        if (res?.payload?.status_code === 200) {
+                          dispatch(getGeneratedQuestions(questionPayload));
+                        } else {
+                          console.log("Experience info failed");
+                        }
+                      })
+                      .catch((err) => {
+                        console.log("Error saving experience info:", err);
+                      }),
+                    dispatch(jdBasedResumeCertificateInfo(certPayload)),
+                    dispatch(jdBasedResumeAchivmentInfo(achPayload)),
+                    dispatch(jdBasedResumeProjectsInfo(projectPayload)),
+                    dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
+                    dispatch(jdBasedResumeLanguageInfo(langPayload)),
+                    // dispatch(getGeneratedQuestions(questionPayload)),
+                    dispatch(checkJdAts(checkJdAtsPayload))
+                      .then((atsRes) => {
+                        console.log('atsRes', atsRes);
+                        if (atsRes?.payload?.status === true) {
+                          setAtsData(atsRes?.payload?.data);
+                          setShowJdAtsModal(true);
+                        } else {
+                          toast.error("Failed to fetch ATS Score");
+                        }
+                      })
 
-                ]
-              )
-              //  alertContinueHandler();
-              setOpenModalCreateResumeJd(true)
-            } catch (error) {
-              console.error("Error while saving resume sections", error);
-              toast.error("Something went wrong while saving resume data");
+
+
+                  ]
+                )
+                //  alertContinueHandler();
+                setOpenModalCreateResumeJd(true)
+              } catch (error) {
+                console.error("Error while saving resume sections", error);
+                toast.error("Something went wrong while saving resume data");
+              }
             }
-          }
-        })
-      }
-      else if (res?.payload?.response?.data?.status_code === 400) {
-        toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-          autoClose: false
-        })
-      }
-    })
+          })
+        }
+        else if (res?.payload?.response?.data?.status_code === 400) {
+          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+            autoClose: false
+          })
+        }
+      })
+    } else {
+      dispatch(addCountResumeOrg({ ref_type: "jd_based_resume" })).then((res) => {
+        if (res?.payload?.status_code === 200) {
+          dispatch(jdBasedResume(formData)).then((res) => {
+            if (res?.payload?.status_code === 201) {
+              setResumeId(res?.payload?.data?.id)
+
+              const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+              if (rawDataExperience) {
+                localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
+              }
+
+              const checkJdAtsPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                raw_data: res?.payload?.raw_data
+              }
+
+              const questionPayload = {
+                jd_based_resume_id: res?.payload?.data?.id,
+                generated_questions: res?.payload?.questions
+              }
+              const basicInfoPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                SuggestedRole: res?.payload?.raw_data?.basic_information?.SuggestedRole,
+                CandidateFullName: res?.payload?.raw_data?.basic_information?.CandidateFullName,
+                EmailAddress: res?.payload?.raw_data?.basic_information?.EmailAddress,
+                PhoneNumber: res?.payload?.raw_data?.basic_information?.PhoneNumber,
+                ProfessionalTitle: res?.payload?.raw_data?.basic_information?.ProfessionalTitle,
+                Summary: res?.payload?.raw_data?.basic_information?.Summary
+              }
+              const educationPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.education?.Education
+              }
+              const expPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.experience?.Experience
+              }
+              const certPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.certifications?.Certifications
+              }
+              const achPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.achievements?.Achievements
+              }
+              const projectPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.projects?.Projects
+              }
+
+              const skillsPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.skills?.Skills
+              }
+              const langPayload = {
+                jd_resume_id: res?.payload?.data?.id,
+                data: res?.payload?.raw_data?.languages?.Languages
+              }
+              try {
+
+
+                Promise.all(
+                  [
+                    dispatch(jdBasedResumeBasicInfo(basicInfoPayload)),
+                    dispatch(jdBasedResumeEducationInfo(educationPayload)),
+                    dispatch(jdBasedResumeExpInfo(expPayload))
+                      .then((res) => {
+                        if (res?.payload?.status_code === 200) {
+                          dispatch(getGeneratedQuestions(questionPayload));
+                        } else {
+                          console.log("Experience info failed");
+                        }
+                      })
+                      .catch((err) => {
+                        console.log("Error saving experience info:", err);
+                      }),
+                    dispatch(jdBasedResumeCertificateInfo(certPayload)),
+                    dispatch(jdBasedResumeAchivmentInfo(achPayload)),
+                    dispatch(jdBasedResumeProjectsInfo(projectPayload)),
+                    dispatch(jdBasedResumeSkillsInfo(skillsPayload)),
+                    dispatch(jdBasedResumeLanguageInfo(langPayload)),
+                    // dispatch(getGeneratedQuestions(questionPayload)),
+                    dispatch(checkJdAts(checkJdAtsPayload))
+                      .then((atsRes) => {
+                        console.log('atsRes', atsRes);
+                        if (atsRes?.payload?.status === true) {
+                          setAtsData(atsRes?.payload?.data);
+                          setShowJdAtsModal(true);
+                        } else {
+                          toast.error("Failed to fetch ATS Score");
+                        }
+                      })
+                  ]
+                )
+                //  alertContinueHandler();
+                setOpenModalCreateResumeJd(true)
+              } catch (error) {
+                console.error("Error while saving resume sections", error);
+                toast.error("Something went wrong while saving resume data");
+              }
+            }
+          })
+        }
+        else if (res?.payload?.response?.data?.status_code === 400) {
+          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+            autoClose: false
+          })
+        }
+      })
     }
-   
 
 
 
 
 
-    
+
+
 
   }
   return (
@@ -515,6 +540,13 @@ const JdbasedModal = ({ openModalImproveexistingResume,
           </form>
         </ModalBody>
       </Modal>
+      <JdAtsScoreModal
+        showJdAtsModal={showJdAtsModal}
+        setShowJdAtsModal={setShowJdAtsModal}
+        atsData={atsData}
+        setOpenModalCreateResumeJd={setOpenModalCreateResumeJd}
+      />
+
     </>
   )
 }

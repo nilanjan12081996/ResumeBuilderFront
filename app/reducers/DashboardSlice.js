@@ -478,7 +478,7 @@ export const checkJdAts = createAsyncThunk(
                 raw_data,
             });
 
-            if (response?.data?.status_code === 200) {
+            if (response?.data?.status === true) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {

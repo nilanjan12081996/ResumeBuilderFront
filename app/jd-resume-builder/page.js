@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo } from '../reducers/DashboardSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, jdBasedAtsScoreAnalyze } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -73,8 +73,11 @@ import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
+import JdAtsScoreAnalyzeModal from '../modal/JdAtsScoreAnalyzeModal';
 
 const page = () => {
+  const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
+  const [atsData, setAtsData] = useState(null)
   const { jdBasedDetailsData, jdBasedAtsScoreAnalyzeData } = useSelector((state) => state?.dash)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
@@ -90,6 +93,19 @@ const page = () => {
   }, [id])
 
   console.log("jdBasedDetailsData", jdBasedDetailsData);
+
+  const handleAnalyzeResume = async () => {
+    try {
+      const res = await dispatch(jdBasedAtsScoreAnalyze({ id })).unwrap();
+      if (res?.data) {
+        setAtsData(res.data);
+        setOpenJdAtsModal(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch ATS Score");
+    }
+  };
 
 
   const [experiences, setExperiences] = useState([
@@ -131,16 +147,16 @@ const page = () => {
   ])
 
   const [extraProjects, setExtraProjects] = useState([
-  {
-    id: Date.now(),
-    project_name: "",
-    role: "",
-    start_date: null,
-    end_date: null,
-    technology: "",
-    description: "",
-  }
-]);
+    {
+      id: Date.now(),
+      project_name: "",
+      role: "",
+      start_date: null,
+      end_date: null,
+      technology: "",
+      description: "",
+    }
+  ]);
 
 
   const {
@@ -271,7 +287,7 @@ const page = () => {
     }
   }, [jdBasedDetailsData, setPersonalPro]);
 
-// add for extra project
+  // add for extra project
   useEffect(() => {
     const extraProjData = jdBasedDetailsData?.data?.[0]?.extra_project;
 
@@ -620,7 +636,13 @@ const page = () => {
             <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
           </div>
           <div className='lg:flex items-center gap-3'>
-            <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
+            <button
+              onClick={handleAnalyzeResume}
+              className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'
+            >
+              <IoStatsChart className='text-base' />Analyze Resume
+            </button>
+            {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
             <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
             <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
@@ -650,7 +672,7 @@ const page = () => {
       </div>
 
       {/* add modal for apply job start here */}
-      <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
+      {/* <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
         <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
         <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
           <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
@@ -667,11 +689,11 @@ const page = () => {
             <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
           </div>
         </ModalBody>
-      </Modal>
+      </Modal> */}
       {/* add modal for apply job ends here */}
 
       {/* add modal for apply job start here */}
-      <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
+      {/* <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
         <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
         <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
           <div className='flex gap-4'>
@@ -695,8 +717,14 @@ const page = () => {
             </div>
           </div>
         </ModalBody>
-      </Modal>
+      </Modal> */}
       {/* add modal for apply job ends here */}
+      <JdAtsScoreAnalyzeModal
+        show={openJdAtsModal}
+        setShow={setOpenJdAtsModal}
+        atsData={atsData}
+      />
+
     </div>
   )
 }
