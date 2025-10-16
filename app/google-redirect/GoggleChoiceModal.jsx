@@ -47,7 +47,7 @@ const GoggleChoiceModal=({ choiceModal,
          <Modal
                 size="3xl"
                 show={choiceModal}
-             //   onClose={() => setOpenChoiceModal(false)}
+             onClose={() => setOpenChoiceModal(false)}
               >
                 <ModalHeader className="border-none pb-0 absolute right-3 top-0 bg-transparent">
                   &nbsp;
