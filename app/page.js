@@ -27,6 +27,11 @@ import check_point from "../app/assets/imagesource/check_point.png";
 import about_img from "../app/assets/imagesource/about_img.png";
 
 
+import Linkedin_img from "../app/assets/imagesource/Linkedin_img.png";
+import Linkedin_icon from "../app/assets/imagesource/Linkedin_icon.png";
+
+
+
 
 
 import { Checkbox, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
@@ -44,6 +49,8 @@ import { MdTipsAndUpdates } from "react-icons/md";
 import { SlCloudUpload } from "react-icons/sl";
 import { TiDocumentText } from "react-icons/ti";
 import { GrSettingsOption } from "react-icons/gr";
+
+import { LuLinkedin } from "react-icons/lu";
 
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -154,7 +161,7 @@ export default function Home() {
          {/* home banner section ends here */}
 
          {/* how it works section start here */}
-         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
+         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20" id="about">
             <div className='max-w-6xl mx-auto h-full'>
                <div>
                   <div className="lg:flex gap-20 mb-0 lg:mb-0">
@@ -213,16 +220,16 @@ export default function Home() {
                   </div>
                   <div className="lg:flex gap-20 mb-10 lg:mb-20">
                      <div className="lg:w-6/12 mb-4 lg:mb-0">
-                        <Image src={hw02} alt='hw02' className='' />
+                        <Image src={Linkedin_img} alt='Linkedin_img' className='' />
                      </div>
                      <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center">
                         <div>
                            <div className="mb-4">
-                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><TiDocumentText className="text-[#039855] text-2xl mr-1.5 rotate-10" /> ATS RESUME GENERATOR</p>
+                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><LuLinkedin className="text-[#F28938] text-2xl mr-1.5" /> IMPROVE </p>
                            </div>
-                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
+                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Quickly enhance  <span className="text-[#F28938]">your LinkedIn</span> profile with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
+                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#F28938] hover:bg-[#F28938] hover:text-white font-medium uppercase border border-[#F28938] rounded-[10px] px-5 py-3 inline-block" >IMPROVE LINKEDIN PROFILE</button>
                         </div>
                      </div>
                   </div>
@@ -239,6 +246,21 @@ export default function Home() {
                      </div>
                      <div className="lg:w-6/12">
                         <Image src={hw03} alt='hw03' className='' />
+                     </div>
+                  </div>
+                  <div className="lg:flex gap-20 mb-10 lg:mb-20">
+                     <div className="lg:w-6/12 mb-4 lg:mb-0">
+                        <Image src={hw02} alt='hw02' className='' />
+                     </div>
+                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center">
+                        <div>
+                           <div className="mb-4">
+                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><TiDocumentText className="text-[#039855] text-2xl mr-1.5 rotate-10" /> ATS RESUME GENERATOR</p>
+                           </div>
+                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
+                           <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
+                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
+                        </div>
                      </div>
                   </div>
                </div>
@@ -344,7 +366,7 @@ export default function Home() {
          {/* Testimonials section ends here */}
 
          {/* Purchase section start here */}
-         <div className="purchase_section py-8 lg:py-20 px-4 lg:px-0">
+         <div className="purchase_section py-8 lg:py-20 px-4 lg:px-0" id="pricing">
             <div className='max-w-6xl mx-auto'>
                <div className="text-center mb-10 lg:mb-10">
                   <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
