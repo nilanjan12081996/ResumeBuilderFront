@@ -24,6 +24,10 @@ import Check from "../app/assets/imagesource/Check.png";
 import hiring_icon from "../app/assets/imagesource/hiring_icon.png";
 import check_point from "../app/assets/imagesource/check_point.png";
 
+import about_img from "../app/assets/imagesource/about_img.png";
+
+
+
 
 import { Checkbox, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
 
@@ -129,10 +133,11 @@ export default function Home() {
             <div className="banner_content_area lg:absolute w-full h-full left-0 top-0">
                <div className='max-w-6xl mx-auto lg:flex justify-center items-center h-full'>
                   <div className="lg:w-6/12 px-4 pt-20 lg:pt-24">
+                     {/* <p className="text-[16px] leading-[18px] text-[#000000] font-semibold mb-4">Built by ex-MAANG recruiters. Designed for your success.</p> */}
                      <p className="text-[18px] leading-[18px] text-[#800080] uppercase font-semibold mb-2"> AI RESUME BUILDER</p>
                      <h1 className="text-2xl leading-[30px] lg:text-[60px] lg:leading-[60px] text-black font-bold mb-2 lg:mb-4">Build an ATS-Ready Resume <span>Instantly with AI</span>.</h1>
                      <p className="text-[#2A2A2A] text-sm lg:text-[18px] leading-[28px] mb-5 lg:mb-6">
-                        Create an interview-ready resume tailored to any job description in seconds
+                        Create an interview-ready resume tailored to any job description in seconds. Built by ex-MAANG recruiters. Designed for your success.
                      </p>
                      <ul>
                         <li className="text-[#2A2A2A] text-[18px] leading-[28px] float-left flex items-center mr-5 mb-3"><Image src={check_point} alt='check_point' className='mr-2' /> Create New Resume</li>
@@ -147,6 +152,41 @@ export default function Home() {
             </div>
          </div>
          {/* home banner section ends here */}
+
+         {/* how it works section start here */}
+         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
+            <div className='max-w-6xl mx-auto h-full'>
+               <div>
+                  <div className="lg:flex gap-20 mb-0 lg:mb-0">
+                     <div className="lg:w-6/12 mb-4 lg:mb-0">
+                        <Image src={about_img} alt='about_img' className='rounded-[15px]' />
+                     </div>
+                     <div className="lg:w-6/12">
+                        <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">About <span className="text-[#a536a2]">Us</span></h2>
+                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
+                           At <strong>AI Resume Builder</strong>, we believe your resume isn’t just a document — it’s your story, your first impression, 
+                           and your ticket to new opportunities. Yet most job seekers struggle to create resumes that are both <strong>ATS-friendly</strong> and <strong>eye-catching to recruiters.</strong>
+                           We built our AI-powered platform to <strong>eliminate the guesswork</strong> and give every job seeker the tools to shine. With <strong>ATS-friendly resumes, recruiter-approved 
+                           templates, and personalized AI suggestions,</strong> we help you transform a plain document into a <strong>career-winning resume</strong>.
+                        </p>
+                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
+                           But we don’t stop there. Your <strong>LinkedIn profile is your digital first impression</strong>, and we ensure it’s just as powerful. 
+                           From rewriting your professional summary to optimizing keywords for recruiters, we craft LinkedIn profiles that <strong>get you noticed, 
+                           grow your visibility, and open new opportunities</strong>.
+                        </p>
+                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
+                           Whether you’re a <strong>student chasing your first break, a professional aiming for growth, or a leader targeting global roles</strong>, 
+                           our platform adapts to your journey. In just minutes, you’ll have a <strong>resume and LinkedIn profile that are modern, impactful, and interview-ready.</strong>
+                        </p>
+                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
+                           Our mission is simple: <strong>to empower you to land the job you deserve with confidence.</strong>
+                        </p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div> 
+         {/* how it works section ends here */}
 
          {/* how it works section start here */}
         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
