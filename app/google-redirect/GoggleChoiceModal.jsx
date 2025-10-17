@@ -25,8 +25,13 @@ const GoggleChoiceModal=({ choiceModal,
                             "resumeToken",
                             JSON.stringify({ token:rok  }))
                             setChoiceModal(false)
+                             sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: 1 })
+                );
                             router.push("/dashboard");
      })
+      
   };
   const handleOrganization = (id) => {
        let user_id = JSON.parse(sessionStorage.getItem("user_id"))
@@ -38,6 +43,10 @@ const GoggleChoiceModal=({ choiceModal,
                  sessionStorage.setItem(
                             "resumeToken",
                             JSON.stringify({ token: rok }))
+                            sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: 2 })
+                );
                             setChoiceModal(false)
                             router.push("/dashboard");
      })
