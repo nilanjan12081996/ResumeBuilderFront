@@ -89,7 +89,8 @@ const JdbasedModal = ({ openModalImproveexistingResume,
 
               const checkJdAtsPayload = {
                 jd_resume_id: res?.payload?.data?.id,
-                raw_data: res?.payload?.raw_data
+                raw_data: res?.payload?.raw_data,
+                job_description: data?.job_description,
               }
               const questionPayload = {
                 jd_based_resume_id: res?.payload?.data?.id,
@@ -193,7 +194,6 @@ const JdbasedModal = ({ openModalImproveexistingResume,
           dispatch(jdBasedResume(formData)).then((res) => {
             if (res?.payload?.status_code === 201) {
               setResumeId(res?.payload?.data?.id)
-
               const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
               if (rawDataExperience) {
                 localStorage.setItem('jd_resume_raw_experience', JSON.stringify(rawDataExperience));
@@ -201,7 +201,8 @@ const JdbasedModal = ({ openModalImproveexistingResume,
 
               const checkJdAtsPayload = {
                 jd_resume_id: res?.payload?.data?.id,
-                raw_data: res?.payload?.raw_data
+                raw_data: res?.payload?.raw_data,
+                job_description: data?.job_description,
               }
 
               const questionPayload = {

@@ -471,11 +471,12 @@ export const improveExperience = createAsyncThunk(
 
 export const checkJdAts = createAsyncThunk(
     "checkJdAts",
-    async ({ jd_resume_id, raw_data }, { rejectWithValue }) => {
+    async ({ jd_resume_id, raw_data, job_description }, { rejectWithValue }) => {
         try {
             const response = await api.post("/api/js-based-resume/check-jd-ats", {
                 jd_resume_id,
                 raw_data,
+                job_description
             });
 
             if (response?.data?.status === true) {

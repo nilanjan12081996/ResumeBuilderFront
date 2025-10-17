@@ -4,6 +4,7 @@ import React from 'react';
 import { Button, Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Label, TextInput, Select } from "flowbite-react";
 import Link from 'next/link';
 import logo from '../assets/imagesource/logo.png';
+import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 import Image from 'next/image';
 
 import { useState } from "react";
@@ -55,7 +56,7 @@ const Header = () => {
                 {/* Logo area start here */}
                 <div className="mr-2 hidden lg:block">
                   <Link href="/" passHref>
-                    <Image src={logo} alt='logo' className='  ' />
+                    <Image src={headerLogo} alt='logo' className='  ' />
                   </Link>
                 </div>
                 <div className="mr-2 lg:hidden">

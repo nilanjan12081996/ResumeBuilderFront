@@ -80,9 +80,9 @@ const poppins = Poppins({
 });
 
 export default function Home() {
-  
+
    const { coins } = useSelector((state) => state?.coinData)
-   const{fetJobsOutSide}=useSelector((state)=>state?.featJob)
+   const { fetJobsOutSide } = useSelector((state) => state?.featJob)
    const dispatch = useDispatch()
    const [searchTerm, setSearchTerm] = useState("");
    const [selectedCurrency, setSelectedCurrency] = useState('USD');
@@ -91,46 +91,46 @@ export default function Home() {
    const [showDropdown, setShowDropdown] = useState(false);
    const router = useRouter();
    const [openLoginModal, setOpenLoginModal] = useState(false);
-   const [openChoiceModal,setOpenChoiceModal]=useState(false)
-   const [chooseResumeType,setChooseResumeType]=useState()
+   const [openChoiceModal, setOpenChoiceModal] = useState(false)
+   const [chooseResumeType, setChooseResumeType] = useState()
    const [openVerifyOtpModal, setOpenVerifyOtpModal] = useState(false);
    const [openPricModal, setOpenPriceModal] = useState(false)
-    const [openRegisterModal, setOpenRegisterModal] = useState(false);
-      const { plans, loading, ipData, createOrderData, error, currentSubscriptionData,plansHomeData } = useSelector(
-    (state) => state.planst
-  );
+   const [openRegisterModal, setOpenRegisterModal] = useState(false);
+   const { plans, loading, ipData, createOrderData, error, currentSubscriptionData, plansHomeData } = useSelector(
+      (state) => state.planst
+   );
 
-  useEffect(() => {
-     dispatch(getIpData()).then((res) => {
-       console.log("Ipres:", res);
-       if (res?.payload?.ip) {
-         dispatch(
-           getPlans({
-             plan_type:1,
-             ip_address: res?.payload?.ip,
-           })
-         );
-       }
-        if (res?.payload?.ip) {
-         dispatch(
-           getPlansHome({
-             plan_type:2,
-             ip_address: res?.payload?.ip,
-           })
-         );
-       }
-     });
+   useEffect(() => {
+      dispatch(getIpData()).then((res) => {
+         console.log("Ipres:", res);
+         if (res?.payload?.ip) {
+            dispatch(
+               getPlans({
+                  plan_type: 1,
+                  ip_address: res?.payload?.ip,
+               })
+            );
+         }
+         if (res?.payload?.ip) {
+            dispatch(
+               getPlansHome({
+                  plan_type: 2,
+                  ip_address: res?.payload?.ip,
+               })
+            );
+         }
+      });
    }, [dispatch]);
 
-   console.log("plans",plans);
-   console.log("plansHomeData",plansHomeData);
+   console.log("plans", plans);
+   console.log("plansHomeData", plansHomeData);
 
-   useEffect(()=>{
-      dispatch(getFeatureJobOutSide({page:1,limit:3}))
-   },[])
-   console.log("fetJobsOutSide",fetJobsOutSide);
-   
-   
+   useEffect(() => {
+      dispatch(getFeatureJobOutSide({ page: 1, limit: 3 }))
+   }, [])
+   console.log("fetJobsOutSide", fetJobsOutSide);
+
+
    return (
       <div className={`${poppins.variable} antialiased home_wrapper_arera`}>
 
@@ -171,18 +171,18 @@ export default function Home() {
                      <div className="lg:w-6/12">
                         <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">About <span className="text-[#a536a2]">Us</span></h2>
                         <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           At <strong>AI Resume Builder</strong>, we believe your resume isn’t just a document — it’s your story, your first impression, 
+                           At <strong>ResumeMile</strong>, we believe your resume isn’t just a document — it’s your story, your first impression,
                            and your ticket to new opportunities. Yet most job seekers struggle to create resumes that are both <strong>ATS-friendly</strong> and <strong>eye-catching to recruiters.</strong>
-                           We built our AI-powered platform to <strong>eliminate the guesswork</strong> and give every job seeker the tools to shine. With <strong>ATS-friendly resumes, recruiter-approved 
-                           templates, and personalized AI suggestions,</strong> we help you transform a plain document into a <strong>career-winning resume</strong>.
+                           We built our AI-powered platform to <strong>eliminate the guesswork</strong> and give every job seeker the tools to shine. With <strong>ATS-friendly resumes, recruiter-approved
+                              templates, and personalized AI suggestions,</strong> we help you transform a plain document into a <strong>career-winning resume</strong>.
                         </p>
                         <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           But we don’t stop there. Your <strong>LinkedIn profile is your digital first impression</strong>, and we ensure it’s just as powerful. 
-                           From rewriting your professional summary to optimizing keywords for recruiters, we craft LinkedIn profiles that <strong>get you noticed, 
-                           grow your visibility, and open new opportunities</strong>.
+                           But we don’t stop there. Your <strong>LinkedIn profile is your digital first impression</strong>, and we ensure it’s just as powerful.
+                           From rewriting your professional summary to optimizing keywords for recruiters, we craft LinkedIn profiles that <strong>get you noticed,
+                              grow your visibility, and open new opportunities</strong>.
                         </p>
                         <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           Whether you’re a <strong>student chasing your first break, a professional aiming for growth, or a leader targeting global roles</strong>, 
+                           Whether you’re a <strong>student chasing your first break, a professional aiming for growth, or a leader targeting global roles</strong>,
                            our platform adapts to your journey. In just minutes, you’ll have a <strong>resume and LinkedIn profile that are modern, impactful, and interview-ready.</strong>
                         </p>
                         <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
@@ -192,11 +192,11 @@ export default function Home() {
                   </div>
                </div>
             </div>
-         </div> 
+         </div>
          {/* how it works section ends here */}
 
          {/* how it works section start here */}
-        <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
+         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
             <div className='max-w-6xl mx-auto h-full'>
                <div>
                   <div className="text-center mb-10 lg:mb-28">
@@ -211,7 +211,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
+                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -229,7 +229,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Quickly enhance  <span className="text-[#F28938]">your LinkedIn</span> profile with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#F28938] hover:bg-[#F28938] hover:text-white font-medium uppercase border border-[#F28938] rounded-[10px] px-5 py-3 inline-block" >IMPROVE LINKEDIN PROFILE</button>
+                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#F28938] hover:bg-[#F28938] hover:text-white font-medium uppercase border border-[#F28938] rounded-[10px] px-5 py-3 inline-block" >IMPROVE LINKEDIN PROFILE</button>
                         </div>
                      </div>
                   </div>
@@ -241,7 +241,7 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
+                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -259,13 +259,13 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
+                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
                         </div>
                      </div>
                   </div>
                </div>
             </div>
-         </div> 
+         </div>
          {/* how it works section ends here */}
 
          {/* Resume Templates section start here */}
@@ -352,13 +352,13 @@ export default function Home() {
             <div className='max-w-6xl mx-auto'>
                <div className="lg:flex gap-12">
                   <div className="lg:w-4/12 mb-4 lg:mb-0">
-                    <p className="text-base leading-[27px] text-white uppercase mb-1">testimonials</p>
-                    <h2 className="text-2xl lg:text-[40px] lg:leading-[40px] text-white font-bold mb-2 lg:mb-4 pr-20">What people say</h2>
-                    <p className="text-sm leading-[24px] text-white">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. 
-                     Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non</p>
+                     <p className="text-base leading-[27px] text-white uppercase mb-1">testimonials</p>
+                     <h2 className="text-2xl lg:text-[40px] lg:leading-[40px] text-white font-bold mb-2 lg:mb-4 pr-20">What people say</h2>
+                     <p className="text-sm leading-[24px] text-white">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros.
+                        Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non</p>
                   </div>
                   <div className="lg:w-8/12">
-                    <Testimonial />
+                     <Testimonial />
                   </div>
                </div>
             </div>
@@ -379,58 +379,74 @@ export default function Home() {
                         <Tab>Break Through </Tab>
                         <Tab>Institution </Tab>
                      </TabList>
-            
+
                      <TabPanel>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                            {
-                              plans?.data?.map((oneTime)=>(
+                              plans?.data?.map((oneTime) => (
                                  <>
-                                 {
-                                    oneTime?.plan_frequency===1&&(
-                                 <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                    <div className="py-8 px-6 relative min-h-[680px]">
-                                    <div className="flex items-center justify-between mb-6">
-                                       <Image src={sub01} alt='sub01' className='' />
-                                       <div className={`${oneTime?.id===3&&"bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
-                                          {oneTime?.id===3&&"Popular"}
-                                       </div>
-                                    </div>
-
-                                    <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                                    <div className="flex items-center gap-2 mb-8">
-                                       <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                                          {/* <div className="pt-4">
-                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                       </div> */}
-                                    </div>
-                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                       <div>
-                                          
-                                          
-                                             {
-                                                oneTime?.PlanAccess?.map((planAccessName)=>(
-                                                   <>
-                                                   <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                   <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                                   {planAccessName?.plan_access_description}
+                                    {
+                                       oneTime?.plan_frequency === 1 && (
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative min-h-[680px]">
+                                                <div className="flex items-center justify-between mb-6">
+                                                   <Image src={sub01} alt='sub01' className='' />
+                                                   <div className={`${oneTime?.id === 3 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
+                                                      {oneTime?.id === 3 && "Most Popular"}
                                                    </div>
-                                                   </>
-                                                ))
-                                             } 
-                                       
-                                       </div>
-                                    </div>
-                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                       <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                    </div>
-                                 </div>
-                                 </div>
-                                    )
-                                 }
-                                 
-                                 
+                                                </div>
+
+                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                                {/* <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[30px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                                   </div>
+                                                </div> */}
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[25px] leading-[45px] font-medium">
+                                                      {oneTime?.planPrice?.currency}{" "}
+                                                      {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
+                                                   </p>
+
+                                                   {parseFloat(oneTime?.planPrice?.price) > 0 && (
+                                                      <div className="pt-4">
+                                                         <p className="text-[#797878] text-[14px] leading-[20px] line-through">
+                                                            ₹{(parseFloat(oneTime?.planPrice?.price) + 51).toFixed(2)}
+                                                         </p>
+                                                      </div>
+                                                   )}
+                                                </div>
+
+
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+
+
+                                                      {
+                                                         oneTime?.PlanAccess?.map((planAccessName) => (
+                                                            <>
+                                                               <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                                  <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                                                  {planAccessName?.plan_access_description}
+                                                               </div>
+                                                            </>
+                                                         ))
+                                                      }
+
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button onClick={() => setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       )
+                                    }
+
+
                                  </>
-                                  
+
                               ))
                            }
                            {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
@@ -499,12 +515,12 @@ export default function Home() {
                                  </div>
                               </div>
                            </div> */}
-                           
+
                         </div>
                      </TabPanel>
                      <TabPanel>
-                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
+
                            {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
                               <div className="py-8 px-6 relative">
                                  <Image src={sub01} alt='sub01' className='mb-6' />
@@ -524,59 +540,73 @@ export default function Home() {
                                  </div>
                               </div>
                            </div> */}
-                                      {
-                              plans?.data?.map((oneTime)=>(
+                           {
+                              plans?.data?.map((oneTime) => (
                                  <>
-                                 {
-                                    oneTime?.plan_frequency===3&&(
-                                 <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                    <div className="py-8 px-6 relative min-h-[680px]">
+                                    {
+                                       oneTime?.plan_frequency === 3 && (
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative min-h-[680px]">
 
-                                    <div className="flex items-center justify-between mb-6">
-                                       <Image src={sub01} alt='sub01' className='' />
-                                       <div className={`${oneTime?.id===12&&"bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
-                                          {oneTime?.id===12&&"Popular"}
-                                       </div>
-                                    </div>
-
-                                    <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                                    <div className="flex items-center gap-2 mb-8">
-                                       <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                                          {/* <div className="pt-4">
-                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                       </div> */}
-                                    </div>
-                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                       <div>
-                                          
-                                          
-                                             {
-                                                oneTime?.PlanAccess?.map((planAccessName)=>(
-                                                   <>
-                                                   <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                   <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                                   {planAccessName?.plan_access_description}
+                                                <div className="flex items-center justify-between mb-6">
+                                                   <Image src={sub01} alt='sub01' className='' />
+                                                   <div className={`${oneTime?.id === 12 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
+                                                      {oneTime?.id === 12 && "Most Popular"}
                                                    </div>
-                                                   </>
-                                                ))
-                                             } 
-                                       
-                                       </div>
-                                    </div>
-                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                       <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                    </div>
-                                 </div>
-                                 </div>
-                                    )
-                                 }
-                                 
-                                 
+                                                </div>
+
+                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                                {/* <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                                   </div>
+                                                </div> */}
+                                                <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
+                                                      {oneTime?.planPrice?.currency}{" "}
+                                                      {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
+                                                   </p>
+
+                                                   {parseFloat(oneTime?.planPrice?.price) > 0 && (
+                                                      <div className="pt-4">
+                                                         <p className="text-[#797878] text-[14px] leading-[20px] line-through">
+                                                            ₹{(parseFloat(oneTime?.planPrice?.price) + 51).toFixed(2)}
+                                                         </p>
+                                                      </div>
+                                                   )}
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+
+
+                                                      {
+                                                         oneTime?.PlanAccess?.map((planAccessName) => (
+                                                            <>
+                                                               <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                                  <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                                                  {planAccessName?.plan_access_description}
+                                                               </div>
+                                                            </>
+                                                         ))
+                                                      }
+
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button onClick={() => setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       )
+                                    }
+
+
                                  </>
-                                  
+
                               ))
                            }
-                        
+
                         </div>
                      </TabPanel>
                      <TabPanel>
@@ -688,57 +718,71 @@ export default function Home() {
                               </div>
                            </div> */}
 
-                                            {
-                              plansHomeData?.data?.map((oneTime)=>(
+                           {
+                              plansHomeData?.data?.map((oneTime) => (
                                  <>
-                                 {
-                                    oneTime?.plan_frequency===12&&(
-                                 <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                    <div className="py-8 px-6 relative min-h-[680px]">
-                                    <div className="flex items-center justify-between mb-6">
-                                       <Image src={sub01} alt='sub01' className='' />
-                                       <div className={`${oneTime?.id===7&&"bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
-                                          {oneTime?.id===7&&"Popular"}
-                                       </div>
-                                    </div>
-                                    <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                                    <div className="flex items-center gap-2 mb-8">
-                                       <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                                          {/* <div className="pt-4">
-                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                       </div> */}
-                                    </div>
-                                    <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                       <div>
-                                          
-                                          
-                                             {
-                                                oneTime?.PlanAccess?.map((planAccessName)=>(
-                                                   <>
-                                                   <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                   <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                                   {planAccessName?.plan_access_description}
+                                    {
+                                       oneTime?.plan_frequency === 12 && (
+                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                             <div className="py-8 px-6 relative min-h-[680px]">
+                                                <div className="flex items-center justify-between mb-6">
+                                                   <Image src={sub01} alt='sub01' className='' />
+                                                   <div className={`${oneTime?.id === 7 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
+                                                      {oneTime?.id === 7 && "Most Popular"}
                                                    </div>
-                                                   </>
-                                                ))
-                                             } 
-                                       
-                                       </div>
-                                    </div>
-                                    <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                       <button onClick={()=>setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                    </div>
-                                 </div>
-                                 </div>
-                                    )
-                                 }
-                                 
-                                 
+                                                </div>
+                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                                {/* <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
+                                                   <div className="pt-4">
+                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
+                                                   </div>
+                                                </div> */}
+                                                 <div className="flex items-center gap-2 mb-8">
+                                                   <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
+                                                      {oneTime?.planPrice?.currency}{" "}
+                                                      {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
+                                                   </p>
+
+                                                   {parseFloat(oneTime?.planPrice?.price) > 0 && (
+                                                      <div className="pt-4">
+                                                         <p className="text-[#797878] text-[14px] leading-[20px] line-through">
+                                                            ₹{(parseFloat(oneTime?.planPrice?.price) + 3000).toFixed(2)}
+                                                         </p>
+                                                      </div>
+                                                   )}
+                                                </div>
+                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
+                                                   <div>
+
+
+                                                      {
+                                                         oneTime?.PlanAccess?.map((planAccessName) => (
+                                                            <>
+                                                               <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
+                                                                  <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
+                                                                  {planAccessName?.plan_access_description}
+                                                               </div>
+                                                            </>
+                                                         ))
+                                                      }
+
+                                                   </div>
+                                                </div>
+                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
+                                                   <button onClick={() => setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       )
+                                    }
+
+
                                  </>
-                                  
+
                               ))
                            }
-                           
+
                         </div>
                      </TabPanel>
                   </Tabs>
@@ -752,32 +796,32 @@ export default function Home() {
                openLoginModal={openLoginModal}
                setOpenLoginModal={setOpenLoginModal}
                setOpenRegisterModal={setOpenRegisterModal}
-                setOpenChoiceModal={setOpenChoiceModal}
+               setOpenChoiceModal={setOpenChoiceModal}
             />
          }
 
-               {openRegisterModal &&
-              <RegistrationModal
-                openRegisterModal={openRegisterModal}
-                setOpenRegisterModal={setOpenRegisterModal}
-                openVerifyOtpModal={openVerifyOtpModal}
-                setOpenVerifyOtpModal={setOpenVerifyOtpModal}
-                setOpenLoginModal={setOpenLoginModal}
-                openPricModal={openPricModal}
-                setOpenPriceModal={setOpenPriceModal}
-                chooseResumeType={chooseResumeType}
-              />
-            }
-                {
-            openChoiceModal&&(
-              <ChoiceModal
-              openChoiceModal={openChoiceModal}
-              setOpenChoiceModal={setOpenChoiceModal}
-              setChooseResumeType={setChooseResumeType}
-              setOpenRegisterModal={setOpenRegisterModal}
-              />
+         {openRegisterModal &&
+            <RegistrationModal
+               openRegisterModal={openRegisterModal}
+               setOpenRegisterModal={setOpenRegisterModal}
+               openVerifyOtpModal={openVerifyOtpModal}
+               setOpenVerifyOtpModal={setOpenVerifyOtpModal}
+               setOpenLoginModal={setOpenLoginModal}
+               openPricModal={openPricModal}
+               setOpenPriceModal={setOpenPriceModal}
+               chooseResumeType={chooseResumeType}
+            />
+         }
+         {
+            openChoiceModal && (
+               <ChoiceModal
+                  openChoiceModal={openChoiceModal}
+                  setOpenChoiceModal={setOpenChoiceModal}
+                  setChooseResumeType={setChooseResumeType}
+                  setOpenRegisterModal={setOpenRegisterModal}
+               />
             )
-          }
+         }
       </div>
 
    );

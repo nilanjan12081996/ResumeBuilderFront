@@ -423,10 +423,16 @@ const ResuMateQuestionModal = ({
   const submittedKey = `resumate_submitted_${user_id}_${jd_based_resume_id}`;
 
   // Prevent background scroll when modal open
-  useEffect(() => {
-    document.body.style.overflow = showResuMate ? "hidden" : "auto";
-    return () => (document.body.style.overflow = "auto");
-  }, [showResuMate]);
+ useEffect(() => {
+  const preventScroll = (e) => {
+    if (modalRef.current && modalRef.current.contains(e.target)) {
+      return;
+    }
+  };
+  document.addEventListener("wheel", preventScroll, { passive: true });
+  return () => document.removeEventListener("wheel", preventScroll);
+}, []);
+
 
   // Load previous answers & submission status
   useEffect(() => {
@@ -512,7 +518,7 @@ const ResuMateQuestionModal = ({
         .unwrap()
         .then((res) => {
           localStorage.setItem(submittedKey, "true");
-          jdBasedResumeDetails(jd_based_resume_id);
+           dispatch(jdBasedResumeDetails({ jd_resume_id: jd_based_resume_id }))
         })
         .catch((err) => {
           console.error("Error submitting answers:", err);
@@ -525,7 +531,7 @@ const ResuMateQuestionModal = ({
         setAlreadySubmitted(true);
         // Replace "Thank you" message with "already submitted" for next time
         setChat([{ type: "thankyou", message: "Your answers were already submitted!" }]);
-      }, 3000);
+      }, 2500);
     }
   };
 

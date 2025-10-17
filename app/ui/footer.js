@@ -17,7 +17,7 @@ import { BiLogoLinkedin } from "react-icons/bi";
 
 import { FaFacebook } from "react-icons/fa6";
 
-import footerLogo from "../assets/imagesource/footer_logo.png";
+import footerLogo from "../assets/imagesource/ResumeMile_logo_footer.png";
 import Image from 'next/image';
 
 import { ImLocation } from "react-icons/im";
@@ -43,19 +43,23 @@ const Footer = () => {
           <div className='footer_top_container'>
             <div className='lg:w-full mb-6 lg:mb-0 text-center'>
               <Image src={footerLogo} alt='footerLogo' className='inline-block mb-8' />
-              <div className='flex lg:justify-center lg:items-center items-start'>
-                <ImLocation className='text-[#92278F] text-xl mr-1' />
-                <p className='text-black text-sm leading-[24px]'>1234 Main Street, Suite 500, Downtown District, Anytown, State, 12345, USA</p>
+              <div className="flex lg:justify-center lg:items-start items-start">
+                <ImLocation className="text-[#92278F] text-xl mr-[-18px] mt-[5px]" />
+                <p className="text-black text-sm leading-[24px] break-words whitespace-normal max-w-[400px]">
+                  T-Hub, Plot No 1/C, Sy No 83/1, Raidurgam Panmaktha, Hyderabad Knowledge City,
+                  Serilingampally, Hyderabad, Telangana 500081
+                </p>
               </div>
+
               <div className='mt-3'>
                 <ul className='flex justify-center items-center gap-4'>
-                  <li className='flex justify-center items-center'>
+                  {/* <li className='flex justify-center items-center'>
                     <MdPhone className='text-[#92278F] text-xl mr-1'/>
                     <p className='text-black text-sm leading-[24px]'>(123) 456-7890</p>
-                  </li>
+                  </li> */}
                   <li className='flex justify-center items-center'>
                     <FaEnvelope className='text-[#92278F] text-xl mr-1' />
-                    <p className='text-black text-sm leading-[24px]'>example@email.com</p>
+                    <p className='text-black text-sm leading-[24px]'>info@hiringeye.com</p>
                   </li>
                 </ul>
               </div>

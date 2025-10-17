@@ -2,6 +2,9 @@ import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSignupType } from "../reducers/AuthSlice";
+import InstittuionImg from '../assets/imagesource/Instittuion.png'
+import JobseekerImg from '../assets/imagesource/Jobseeker.png'
+import Image from "next/image";
 
 const ChoiceModal = ({
   openChoiceModal,
@@ -9,14 +12,14 @@ const ChoiceModal = ({
   setChooseResumeType,
   setOpenRegisterModal,
 }) => {
-  const{signUpTypes}=useSelector((state)=>state?.auth)
+  const { signUpTypes } = useSelector((state) => state?.auth)
   const [selectedType, setSelectedType] = useState(null);
 
-  const dispatch=useDispatch()
-  useEffect(()=>{
-dispatch(getSignupType())
-  },[])
-console.log("signUpTypes",signUpTypes);
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(getSignupType())
+  }, [])
+  console.log("signUpTypes", signUpTypes);
 
   const handleIndiVidual = (id) => {
     setSelectedType(id);
@@ -48,7 +51,7 @@ console.log("signUpTypes",signUpTypes);
               {/* Header */}
               <div className="text-center mt-0 pb-6">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Resume Type
+                  Signup Type
                 </h2>
               </div>
 
@@ -57,19 +60,19 @@ console.log("signUpTypes",signUpTypes);
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Individual Resume Card */}
                   <div
-                    className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                      selectedType == signUpTypes?.data?.[0]?.id
-                        ? "border-purple-500"
-                        : "border-gray-200 hover:border-purple-500"
-                    }`}
+                    className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${selectedType == signUpTypes?.data?.[0]?.id
+                      ? "border-purple-500"
+                      : "border-gray-200 hover:border-purple-500"
+                      }`}
                     onClick={() => handleIndiVidual(signUpTypes?.data?.[0]?.id)}
                   >
                     {/* Image */}
-                    <div className="aspect-[4/3] bg-gray-100 rounded-t-lg overflow-hidden">
-                      <img
-                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgZmlsbD0iI2Y5ZmFmYiIvPgogIDx0ZXh0IHg9IjUwJSIgeT0iNDAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2YjczODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkluZGl2aWR1YWwgUmVzdW1lPC90ZXh0PgogIDxyZWN0IHg9IjUwIiB5PSI4MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI4MCIgZmlsbD0id2hpdGUiIHJ4PSI4Ii8+CiAgPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTA1IiByPSIxNSIgZmlsbD0iI2U1ZTdlYiIvPgogIDxyZWN0IHg9IjkwIiB5PSIxMzAiIHdpZHRoPSIxMjAiIGhlaWdodD0iNCIgZmlsbD0iI2U1ZTdlYiIgcng9IjIiLz4KICA8cmVjdCB4PSIxMDAiIHk9IjE0MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIzIiBmaWxsPSIjZTVlN2ViIiByeD0iMiIvPgo8L3N2Zz4="
-                        alt="Individual Resume"
+                    <div className=" bg-gray-100 rounded-t-lg overflow-hidden">
+                      <Image
+                        src={JobseekerImg}
+                        alt="Organization Resume"
                         className="w-full h-full object-cover"
+                        priority
                       />
                     </div>
 
@@ -83,26 +86,26 @@ console.log("signUpTypes",signUpTypes);
 
                   {/* Organization Resume Card */}
                   <div
-                    className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${
-                      selectedType ==signUpTypes?.data?.[1]?.id
-                        ? "border-purple-500"
-                        : "border-gray-200 hover:border-purple-500"
-                    }`}
+                    className={`cursor-pointer rounded-lg border-2 transition-all duration-200 ${selectedType == signUpTypes?.data?.[1]?.id
+                      ? "border-purple-500"
+                      : "border-gray-200 hover:border-purple-500"
+                      }`}
                     onClick={() => handleOrganization(signUpTypes?.data?.[1]?.id)}
                   >
                     {/* Image */}
-                    <div className="aspect-[4/3] bg-gray-100 rounded-t-lg overflow-hidden">
-                      <img
-                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIyNSIgZmlsbD0iI2Y5ZmFmYiIvPgogIDx0ZXh0IHg9IjUwJSIgeT0iNDAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM2YjczODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk9yZ2FuaXphdGlvbiBSZXN1bWU8L3RleHQ+CiAgPHJlY3QgeD0iNTAiIHk9IjgwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjgwIiBmaWxsPSJ3aGl0ZSIgcng9IjgiLz4KICA8cmVjdCB4PSI3MCIgeT0iOTUiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0iI2U1ZTdlYiIgcng9IjQiLz4KICA8cmVjdCB4PSIxMjAiIHk9Ijk1IiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIGZpbGw9IiNlNWU3ZWIiIHJ4PSI0Ii8+CiAgPHJlY3QgeD0iMTcwIiB5PSI5NSIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZTVlN2ViIiByeD0iNCIvPgo8L3N2Zz4="
+                    <div className="bg-gray-100 rounded-t-lg overflow-hidden">
+                      <Image
+                        src={InstittuionImg}
                         alt="Organization Resume"
                         className="w-full h-full object-cover"
+                        priority
                       />
                     </div>
 
                     {/* Content */}
                     <div className="p-4 text-center">
                       <h3 className="text-lg font-medium text-gray-900 mb-1">
-                         {signUpTypes?.data?.[1]?.name}
+                        {signUpTypes?.data?.[1]?.name}
                       </h3>
                     </div>
                   </div>
