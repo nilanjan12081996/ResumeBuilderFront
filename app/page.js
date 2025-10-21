@@ -409,10 +409,12 @@ export default function Home() {
                                                       {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
                                                    </p>
 
-                                                   {parseFloat(oneTime?.planPrice?.price) > 0 && (
+                                                   {parseFloat(oneTime?.planPrice?.price || 0) > 0 && (
                                                       <div className="pt-4">
                                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                                                            ₹{(parseFloat(oneTime?.planPrice?.price) + 51).toFixed(2)}
+                                                            {oneTime?.planPrice?.currency === "INR"
+                                                               ? `₹${(parseFloat(oneTime?.planPrice?.price) + 51).toFixed(2)}`
+                                                               : `$${(parseFloat(oneTime?.planPrice?.price) + 0.6145).toFixed(2)}`}
                                                          </p>
                                                       </div>
                                                    )}
@@ -568,10 +570,12 @@ export default function Home() {
                                                       {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
                                                    </p>
 
-                                                   {parseFloat(oneTime?.planPrice?.price) > 0 && (
+                                                   {parseFloat(oneTime?.planPrice?.price || 0) > 0 && (
                                                       <div className="pt-4">
                                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                                                            ₹{(parseFloat(oneTime?.planPrice?.price) + 51).toFixed(2)}
+                                                            {oneTime?.planPrice?.currency === "INR"
+                                                               ? `₹${(parseFloat(oneTime?.planPrice?.price) + 51).toFixed(2)}`
+                                                               : `$${(parseFloat(oneTime?.planPrice?.price) + 0.6145).toFixed(2)}`}
                                                          </p>
                                                       </div>
                                                    )}
@@ -738,16 +742,17 @@ export default function Home() {
                                                       <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
                                                    </div>
                                                 </div> */}
-                                                 <div className="flex items-center gap-2 mb-8">
+                                                <div className="flex items-center gap-2 mb-8">
                                                    <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
                                                       {oneTime?.planPrice?.currency}{" "}
                                                       {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
                                                    </p>
-
-                                                   {parseFloat(oneTime?.planPrice?.price) > 0 && (
+                                                   {parseFloat(oneTime?.planPrice?.price || 0) > 0 && (
                                                       <div className="pt-4">
                                                          <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                                                            ₹{(parseFloat(oneTime?.planPrice?.price) + 3000).toFixed(2)}
+                                                            {oneTime?.planPrice?.currency === "INR"
+                                                               ? `₹${(parseFloat(oneTime?.planPrice?.price) + 3000).toFixed(2)}`
+                                                               : `$${(parseFloat(oneTime?.planPrice?.price) + 36.14).toFixed(2)}`}
                                                          </p>
                                                       </div>
                                                    )}
