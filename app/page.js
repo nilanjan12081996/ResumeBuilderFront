@@ -211,7 +211,9 @@ export default function Home() {
                            </div>
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
+                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">
+                              CREATE MY REUSME
+                           </button>
                         </div>
                      </div>
                      <div className="lg:w-6/12">
