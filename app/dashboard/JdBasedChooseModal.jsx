@@ -87,7 +87,7 @@ const JdBasedChooseModal=({
                     Professional Template
                   </p>
                 </li>
-                <li>
+                {/* <li>
                   <input type="radio" name="test" id="cb3" />
                   <label
                     for="cb3"
@@ -110,7 +110,7 @@ const JdBasedChooseModal=({
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
                     Modern Template
                   </p>
-                </li>
+                </li> */}
               </ul>
             </div>
             <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">

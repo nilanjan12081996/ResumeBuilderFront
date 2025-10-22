@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo } from '../reducers/DashboardSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, jdBasedAtsScoreAnalyze } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -73,8 +73,14 @@ import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
+import JdAtsScoreAnalyzeModal from '../modal/JdAtsScoreAnalyzeModal';
 
 const page = () => {
+  const [activeTabIndex, setActiveTabIndex] = useState(0); // default to Personal Info
+  const tabsRef = useRef(null); // ref to scroll into view
+
+  const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
+  const [atsData, setAtsData] = useState(null)
   const { jdBasedDetailsData, jdBasedAtsScoreAnalyzeData } = useSelector((state) => state?.dash)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
@@ -90,6 +96,19 @@ const page = () => {
   }, [id])
 
   console.log("jdBasedDetailsData", jdBasedDetailsData);
+
+  const handleAnalyzeResume = async () => {
+    try {
+      const res = await dispatch(jdBasedAtsScoreAnalyze({ id })).unwrap();
+      if (res?.data) {
+        setAtsData(res.data);
+        setOpenJdAtsModal(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch ATS Score");
+    }
+  };
 
 
   const [experiences, setExperiences] = useState([
@@ -131,16 +150,16 @@ const page = () => {
   ])
 
   const [extraProjects, setExtraProjects] = useState([
-  {
-    id: Date.now(),
-    project_name: "",
-    role: "",
-    start_date: null,
-    end_date: null,
-    technology: "",
-    description: "",
-  }
-]);
+    {
+      id: Date.now(),
+      project_name: "",
+      role: "",
+      start_date: null,
+      end_date: null,
+      technology: "",
+      description: "",
+    }
+  ]);
 
 
   const {
@@ -157,7 +176,37 @@ const page = () => {
   // },[jdBasedDetailsData,setValue])
   const formValues = watch();
 
+  // useEffect(() => {
+  //   console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
+  //   if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
+  //     const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
+  //       let skills = [];
+  //       try {
+  //         skills = JSON.parse(exp.skill_set); // string to array convert
+  //       } catch (e) {
+  //         skills = [];
+  //       }
+
+  //       return {
+  //         id: exp.id,
+  //         company_name: exp.company_name || "",
+  //         position: exp.Position || "",
+  //         location: exp.location || "",
+  //         skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
+  //         start_date: exp.start_date ? new Date(exp.start_date) : null,
+  //         end_date: exp.end_date ? new Date(exp.end_date) : null,
+  //         current_work: false,
+  //         projects: exp.projects || [
+  //           { id: Date.now(), title: "", role: "", technology: "", description: "" }
+  //         ]
+  //       };
+  //     });
+  //     setExperiences(formattedExperiences);
+  //   }
+  // }, [jdBasedDetailsData]);
+
   useEffect(() => {
+    console.log('PersonalProjectJd', jdBasedDetailsData?.data?.[0]?.project)
     console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
     if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
       const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
@@ -168,6 +217,20 @@ const page = () => {
           skills = [];
         }
 
+        // add for exp projeect 
+        const jdProjects = jdBasedDetailsData?.data?.[0]?.project;
+        const relatedProjects = jdProjects
+          .filter((proj) => proj.exp_id === exp.id)
+          .map((proj) => ({
+            id: proj.id,
+            title: proj.Project_title || "",
+            role: proj.Role || "",
+            technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
+              ? JSON.parse(proj.skill_set_use).join(", ")
+              : proj.skill_set_use || "",
+            description: proj.description || "",
+          }));
+
         return {
           id: exp.id,
           company_name: exp.company_name || "",
@@ -177,9 +240,18 @@ const page = () => {
           start_date: exp.start_date ? new Date(exp.start_date) : null,
           end_date: exp.end_date ? new Date(exp.end_date) : null,
           current_work: false,
-          projects: exp.projects || [
-            { id: Date.now(), title: "", role: "", technology: "", description: "" }
-          ]
+          projects:
+            relatedProjects.length > 0
+              ? relatedProjects
+              : [
+                {
+                  id: Date.now(),
+                  title: "",
+                  role: "",
+                  technology: "",
+                  description: "",
+                },
+              ],
         };
       });
       setExperiences(formattedExperiences);
@@ -271,7 +343,26 @@ const page = () => {
     }
   }, [jdBasedDetailsData, setPersonalPro]);
 
-// add for extra project
+  useEffect(() => {
+    if (jdBasedDetailsData?.data?.[0]?.education) {
+      const mappedEducation = jdBasedDetailsData?.data?.[0]?.education.map((edu) => ({
+        id: edu.id,
+        institution: edu.college || "",
+        location: edu.location || "",
+        degree: edu.course?.split(" in ")[0] || "",   // e.g. "Master of Science (M.Sc.)"
+        field_study: edu.course?.split(" in ")[1] || "", // e.g. "Computer Science"
+        start_time: edu.start_date || null,   // if available
+        end_time: edu.course_completed !== "1970-01-01" ? edu.course_completed : null,
+        cgpa: edu.cgpa || "",
+        additionalInfo: edu.aditional_info || "",
+        currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
+      }));
+
+      setEducationEntries(mappedEducation);
+    }
+  }, [jdBasedDetailsData]);
+
+  // add for extra project
   useEffect(() => {
     const extraProjData = jdBasedDetailsData?.data?.[0]?.extra_project;
 
@@ -533,7 +624,7 @@ const page = () => {
   //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
   // };
   return (
-    <div className='lg:flex gap-5 pb-5'>
+    <div className='lg:flex gap-5 pb-5 min-h-screen'>
 
 
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
@@ -546,9 +637,22 @@ const page = () => {
             <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
           </div>
           <div className='resume_tab_section'>
-            <Tabs>
+            <Tabs selectedIndex={activeTabIndex} onSelect={(index) => setActiveTabIndex(index)}>
               <div className='border-b border-[#E5E5E5] p-5'>
-                <div className='tab_point'>
+                <div className='tab_point relative' ref={tabsRef}>
+                  <span
+                    className="absolute -top-3 right-2 text-xs font-semibold bg-purple-600 text-white px-2 py-1 rounded-full animate-pulse cursor-pointer z-10"
+                    onClick={() => {
+                      setActiveTabIndex(2);
+                      const yOffset = 50;
+                      const element = tabsRef.current;
+                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }}
+                  >
+                    ResuMate
+                  </span>
+
                   <TabList>
                     <Tab><span><BiSolidUser /></span> Personal Info</Tab>
                     <Tab><span><HiAcademicCap /></span> Education</Tab>
@@ -620,8 +724,14 @@ const page = () => {
             <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
           </div>
           <div className='lg:flex items-center gap-3'>
-            <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
-            <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button>
+            <button
+              onClick={handleAnalyzeResume}
+              className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'
+            >
+              <IoStatsChart className='text-base' />Analyze Resume
+            </button>
+            {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
+            {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
             <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
         </div>
@@ -650,7 +760,7 @@ const page = () => {
       </div>
 
       {/* add modal for apply job start here */}
-      <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
+      {/* <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
         <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
         <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
           <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
@@ -667,11 +777,11 @@ const page = () => {
             <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
           </div>
         </ModalBody>
-      </Modal>
+      </Modal> */}
       {/* add modal for apply job ends here */}
 
       {/* add modal for apply job start here */}
-      <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
+      {/* <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
         <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
         <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
           <div className='flex gap-4'>
@@ -695,8 +805,14 @@ const page = () => {
             </div>
           </div>
         </ModalBody>
-      </Modal>
+      </Modal> */}
       {/* add modal for apply job ends here */}
+      <JdAtsScoreAnalyzeModal
+        show={openJdAtsModal}
+        setShow={setOpenJdAtsModal}
+        atsData={atsData}
+      />
+
     </div>
   )
 }

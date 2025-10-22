@@ -45,7 +45,14 @@ const page=()=>{
                             "resumeToken",
                             JSON.stringify({ token: userToken })
                         );
-                        
+                        console.log("response?.payload?.signUpType?.[0]?",response?.payload?.data?.signUpType?.[0]);
+                        console.log("response?.payload?.signUpType?.[0]?",response?.payload);
+                        console.log("response?.payload?.signUpType?.[0]?",response?.payload?.data?.signUpType);
+                        console.log("response?.payload?.signUpType?.[0]?",response?.payload?.data?.signUpType?.[0]?.id);
+                          sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id:response?.payload?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id })
+                );
                         console.log("New videoToken set:", sessionStorage.getItem("resumeToken"));
                         
                         // Wait a bit to ensure token is properly set
