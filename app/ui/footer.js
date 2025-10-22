@@ -21,6 +21,7 @@ import footerLogo from "../assets/imagesource/ResumeMile_logo_footer.png";
 import Image from 'next/image';
 
 import { ImLocation } from "react-icons/im";
+import { IoDocumentTextSharp } from "react-icons/io5";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -38,7 +39,7 @@ const Footer = () => {
   return (
     <div className='bg-[#F0E3FA]'>
 
-      <div className='footer_top lg:py-20 py-10 px-6 lg:px-0'>
+      <div className='footer_top lg:pt-20 py-10 px-6 lg:px-0'>
         <div className='max-w-6xl mx-auto'>
           <div className='footer_top_container'>
             <div className='lg:w-full mb-6 lg:mb-0 text-center'>
@@ -53,20 +54,36 @@ const Footer = () => {
 
               <div className='mt-3'>
                 <ul className='flex justify-center items-center gap-4'>
-                  {/* <li className='flex justify-center items-center'>
-                    <MdPhone className='text-[#92278F] text-xl mr-1'/>
-                    <p className='text-black text-sm leading-[24px]'>(123) 456-7890</p>
-                  </li> */}
+
                   <li className='flex justify-center items-center'>
                     <FaEnvelope className='text-[#92278F] text-xl mr-1' />
-                    <p className='text-black text-sm leading-[24px]'>info@hiringeye.com</p>
+                    <p className='text-black text-sm leading-[24px]'>info@resumemile.com</p>
+                  </li>
+                  <li>
+                    <Link className='flex justify-center items-center' href="/privacy-policy" passHref>
+                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1'/>
+                      <p className='text-black text-sm leading-[24px]'>Privacy Policy</p>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className='flex justify-center items-center' href="/cancellation-policy" passHref>
+                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1'/>
+                      <p className='text-black text-sm leading-[24px]'>Cancellation policy</p>
+                    </Link>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
+
+         <div className='border-t border-[#433c4e] pt-5 text-center mt-10'>
+             <p className='text-sm text-[#433c4e]'>© 2025 HiringEye Solutions Private Limited</p>
+          </div>
+
       </div>
+
+      
 
     </div>
   )
