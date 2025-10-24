@@ -22,6 +22,7 @@ import Image from 'next/image';
 
 import { ImLocation } from "react-icons/im";
 import { IoDocumentTextSharp } from "react-icons/io5";
+import { BiSupport } from "react-icons/bi";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -53,22 +54,28 @@ const Footer = () => {
               </div>
 
               <div className='mt-3'>
-                <ul className='flex justify-center items-center gap-4'>
+                <ul className='lg:flex justify-center items-center gap-4'>
 
-                  <li className='flex justify-center items-center'>
+                  <li className='flex justify-center items-center mb-2 lg:mb-0'>
                     <FaEnvelope className='text-[#92278F] text-xl mr-1' />
                     <p className='text-black text-sm leading-[24px]'>info@resumemile.com</p>
                   </li>
-                  <li>
-                    <Link className='flex justify-center items-center' href="/privacy-policy" passHref>
+                  <li className='mb-2 lg:mb-0'>
+                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/privacy-policy" passHref>
                       <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1'/>
-                      <p className='text-black text-sm leading-[24px]'>Privacy Policy</p>
+                      <p>Privacy Policy</p>
                     </Link>
                   </li>
-                  <li>
-                    <Link className='flex justify-center items-center' href="/cancellation-policy" passHref>
+                  <li className='mb-2 lg:mb-0'>
+                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/cancellation-policy" passHref>
                       <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1'/>
-                      <p className='text-black text-sm leading-[24px]'>Cancellation policy</p>
+                      <p>Cancellation policy</p>
+                    </Link>
+                  </li>
+                  <li className='mb-2 lg:mb-0'>
+                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/support" passHref>
+                      <BiSupport className='text-[#92278F] text-xl mr-1'/>
+                      <p>Support</p>
                     </Link>
                   </li>
                 </ul>

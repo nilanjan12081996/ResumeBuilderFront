@@ -14,7 +14,7 @@ export default function ClientLayoutWrapper({ children }) {
     const router = useRouter();
 
     // Define public routes that don't require authentication
-    const publicRoutes = ['/', '/about-us', '/contact', '/privacy-policy', '/cancellation-policy', '/pricing', '/how-it-works', '/features', '/privacy', '/faqs', '/featured-jobs', '/featured-jobs-details', '/resume-builder', '/linkedIn-rewrite', '/invite-students','/loading-page','/google-redirect'];
+    const publicRoutes = ['/', '/about-us', '/contact', '/privacy-policy', '/support', '/cancellation-policy', '/pricing', '/how-it-works', '/features', '/privacy', '/faqs', '/featured-jobs', '/featured-jobs-details', '/resume-builder', '/linkedIn-rewrite', '/invite-students','/loading-page','/google-redirect'];
     const isPublicRoute = publicRoutes.includes(pathname);
 
     // Function to check token validity

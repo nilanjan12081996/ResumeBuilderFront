@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 
 const page = () => {
   return (
      <div>
-      <div className='banner_area p-4 lg:p-0'>
+      <div className='banner_area p-0 lg:p-0'>
         {/* home banner section start here */}
         <div className="home_banner_area relative">
           <Image src={aboutBanner} alt='aboutBanner' className="hidden lg:block" />
