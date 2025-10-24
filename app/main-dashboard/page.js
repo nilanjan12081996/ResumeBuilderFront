@@ -195,7 +195,8 @@ const Page = () => {
       formData.append("resume_file", data.resume_file[0]);
     } else {
       console.error("No resume file selected");
-      alert("Please select a resume file to upload");
+      // alert("Please select a resume file to upload");
+      toast.error("Please select a resume file to upload");
       return;
     }
     data.linkedin_profile &&
