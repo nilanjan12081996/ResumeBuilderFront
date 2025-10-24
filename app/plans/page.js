@@ -357,7 +357,7 @@ console.log("ipdata",ipData)
               </div>
             )}
 
-            <div className="subscription_tab_section">
+            <div className="subscription_tab_section inner_plan">
               <Tabs>
                 <TabList>
                   {parsed?.signup_type_id == 1 && (
