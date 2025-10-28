@@ -34,12 +34,12 @@ const page = () => {
   const [amount, setAmount] = useState();
   const [currency, setCurrency] = useState();
   const [plan_id, sePlanid] = useState();
-console.log("currentSubscriptionData",currentSubscriptionData)
+  console.log("currentSubscriptionData", currentSubscriptionData)
 
   // Helper function to check if user has active subscription
   const hasActiveSubscription = () => {
     if (!currentSubscriptionData?.data?.length) return false;
-    
+
     return currentSubscriptionData.data.some(sub => {
       const endDate = new Date(sub.end_date);
       const currentDate = new Date();
@@ -50,7 +50,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
   // Helper function to get current active subscription details
   const getCurrentActiveSubscription = () => {
     if (!currentSubscriptionData?.data?.length) return null;
-    
+
     return currentSubscriptionData.data.find(sub => {
       const endDate = new Date(sub.end_date);
       const currentDate = new Date();
@@ -61,7 +61,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
   // Helper function to get the last plan for a specific frequency
   const getLastPlan = (frequency) => {
     if (!plans?.data?.length) return null;
-    
+
     const filteredPlans = plans.data.filter((pln) => pln?.plan_frequency === frequency);
     return filteredPlans.length > 0 ? filteredPlans[filteredPlans.length - 1] : null;
   };
@@ -70,38 +70,60 @@ console.log("currentSubscriptionData",currentSubscriptionData)
   const renderPlanCard = (pln) => {
     // Check if this is a free plan (price is 0 or null)
     const isFreePlan = pln?.planPrice?.price === 0 || pln?.planPrice?.price === null || pln?.planPrice?.price === undefined;
-    
+
     // Disable button if it's a free plan and user has no current subscription
     const shouldDisableButton = isFreePlan && !hasActiveSubscription();
-    
+
     return (
-    
-      <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+
+      <div
+        className={`pt-0 border rounded-[26px] bg-white ${pln?.id === 3 || pln?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
+          }`}
+      >
         <div className="py-8 px-6 relative min-h-[680px]">
-          {pln?.plan_name === "Gold" || pln?.plan_name === "Campus Plus" ? (
-            <Image
-              src={sub02}
-              alt="sub01"
-              className="mb-6"
-            />
-          ) : (
-            <Image
-              src={sub01}
-              alt="sub01"
-              className="mb-6"
-            />
-          )}
+          <div className="flex items-center justify-between mb-6">
+            {pln?.plan_name === "Gold" || pln?.plan_name === "Campus Plus" ? (
+              <Image src={sub02} alt="sub02" className="" />
+            ) : (
+              <Image src={sub01} alt="sub01" className="" />
+            )}
+            {(pln?.id === 3 || pln?.id === 12) && (
+              <div className="bg-[#a536a2] px-3 py-2 rounded-[5px] text-xs text-white">
+                Most Popular
+              </div>
+            )}
+          </div>
           <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">
             {pln?.plan_name}
           </h3>
-          <div className="flex items-center gap-2 mb-8">
+          {/* <div className="flex items-center gap-2 mb-8">
             <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">
               <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
                 {pln?.planPrice?.currency}
               </span>{" "}
               {pln?.planPrice?.price}
             </p>
+          </div> */}
+          <div className="flex items-center gap-2 mb-8">
+            <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
+              {pln?.planPrice?.currency}{" "}
+              {parseFloat(pln?.planPrice?.price || 0).toFixed(2)}
+            </p>
+
+            {parseFloat(pln?.planPrice?.price || 0) > 0 && (
+              <div className="flex flex-col items-start pt-1">
+                <p className="text-[#797878] text-[14px] leading-[20px] line-through">
+                  {pln?.planPrice?.currency === "INR"
+                    ? `₹${(parseFloat(pln?.planPrice?.price) * 1.3).toFixed(2)}`
+                    : `$${(parseFloat(pln?.planPrice?.price) * 1.3).toFixed(2)}`}
+                </p>
+                <span className="text-[#30B980] text-[12px] font-medium mt-[2px]">
+                  30% OFF
+                </span>
+              </div>
+            )}
           </div>
+
           <div className="mb-14 border-t border-[#edf0ff] pt-8">
             <div>
               {pln?.PlanAccess?.map((pAccess, accessIndex) => {
@@ -131,10 +153,9 @@ console.log("currentSubscriptionData",currentSubscriptionData)
               }
               disabled={shouldDisableButton || hasActiveSubscription()}
               className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
-                ${
-                  shouldDisableButton || hasActiveSubscription()
-                    ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
-                    : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+                ${shouldDisableButton || hasActiveSubscription()
+                  ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+                  : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
                 }`}
             >
               {shouldDisableButton ? "Current Plan" : hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
@@ -166,7 +187,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
   const handlePaymentModal = async (e, data) => {
     console.log("data", data);
     e.preventDefault();
-    
+
     // Prevent payment if user has active subscription
     if (hasActiveSubscription()) {
       toast.error("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
@@ -240,7 +261,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
       toast.error("Something went wrong. Please try again.");
     }
   };
-console.log("ipdata",ipData)
+  console.log("ipdata", ipData)
   useEffect(() => {
     dispatch(getIpData()).then((res) => {
       console.log("Ipres:", res);
@@ -270,7 +291,7 @@ console.log("ipdata",ipData)
       <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
         <div className="purchase_section py-8 lg:py-20 px-0 lg:px-0">
           <div className="max-w-6xl mx-auto">
-            <ToastContainer/>
+            <ToastContainer />
             {/* <div className="text-center mb-10 lg:mb-10">
                                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
                                  <p className="text-[#4C4B4B] text-base lg:text-[18px] leading-[30px] lg:px-32">Discover the ideal plan to fuel your business growth. Our pricing options are carefully crafted to cater to businesses.</p>
@@ -325,7 +346,7 @@ console.log("ipdata",ipData)
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Show last plan for each frequency type */}
                   {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {parsed?.signup_type_id == 1 && getLastPlan(1) && (
