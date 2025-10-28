@@ -19,31 +19,40 @@ const GoggleChoiceModal = ({ choiceModal,
   }, [])
 
   const handleIndiVidual = (id) => {
-    let user_id = JSON.parse(sessionStorage.getItem("user_id"))
-    let uid = user_id?.user_id
-    let token = JSON.parse(sessionStorage.getItem("userToken"))
-    let rok = token?.token
-    dispatch(addType({ sign_up_type_id: id, user_id: uid })).then((res) => {
-      sessionStorage.setItem(
-        "resumeToken",
-        JSON.stringify({ token: rok }))
-      setChoiceModal(false)
-      router.push("/dashboard");
-    })
+      let user_id = JSON.parse(sessionStorage.getItem("user_id"))
+        let uid = user_id?.user_id
+        let token = JSON.parse(sessionStorage.getItem("userToken"))
+        let rok = token?.token
+     dispatch(addType({sign_up_type_id:id,user_id:uid})).then((res)=>{
+                 sessionStorage.setItem(
+                            "resumeToken",
+                            JSON.stringify({ token:rok  }))
+                            setChoiceModal(false)
+                             sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: 1 })
+                );
+                            router.push("/dashboard");
+     })
+      
   };
   const handleOrganization = (id) => {
-    let user_id = JSON.parse(sessionStorage.getItem("user_id"))
-
-    let uid = user_id?.user_id
-    let token = JSON.parse(sessionStorage.getItem("userToken"))
-    let rok = token?.token
-    dispatch(addType({ sign_up_type_id: id, user_id: user_id?.uid })).then((res) => {
-      sessionStorage.setItem(
-        "resumeToken",
-        JSON.stringify({ token: rok }))
-      setChoiceModal(false)
-      router.push("/dashboard");
-    })
+       let user_id = JSON.parse(sessionStorage.getItem("user_id"))
+     
+        let uid = user_id?.user_id
+        let token = JSON.parse(sessionStorage.getItem("userToken"))
+        let rok = token?.token
+     dispatch(addType({sign_up_type_id:id,user_id:user_id?.uid})).then((res)=>{
+                 sessionStorage.setItem(
+                            "resumeToken",
+                            JSON.stringify({ token: rok }))
+                            sessionStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: 2 })
+                );
+                            setChoiceModal(false)
+                            router.push("/dashboard");
+     })
   };
   return (
     <>

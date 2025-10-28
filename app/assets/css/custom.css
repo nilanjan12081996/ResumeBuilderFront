@@ -620,6 +620,17 @@ body {
   background: #20003b;
 }
 
+.subscription_tab_section.inner_plan .react-tabs ul {
+  display: flex;
+  justify-content: space-between;
+  background: #fbfbfb;
+  border: #e1e6fe 1px solid;
+  padding: 8px;
+  border-radius: 14px;
+  margin: 0 auto 30px;
+  width: 240px;
+}
+
 .subscription_tab_section .react-tabs ul {
   display: flex;
   justify-content: space-between;
@@ -1411,7 +1422,7 @@ body {
   }
   .home_banner_area {
     padding: 0 0;
-    background: #f6e7e9;
+    background: #f6f4fe;
   }
 
   .toggle_point button svg {

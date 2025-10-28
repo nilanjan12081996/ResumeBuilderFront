@@ -91,12 +91,12 @@ const Sidebar = () => {
     setSidebarOpen(false);
   };
   // For mobile menu ends here
-  
-
-  
 
 
-  
+
+
+
+
 
   return (
     <aside
@@ -144,134 +144,126 @@ const Sidebar = () => {
 
             <ul className="mb-6 flex flex-col gap-1.5 lg:mx-4">
               <li onClick={closeNavbar}>
-                <Link href="/dashboard"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('dashboard') &&
-                    'bg-graydark dark:bg-meta-4'
+                <Link
+                  href="/dashboard"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname === '/dashboard'
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
-                  <HiHome className='text-2xl' />
+                >
+                  <HiHome className="text-2xl" />
                   Dashboard
                 </Link>
               </li>
 
-              {/* <li onClick={closeNavbar}>
-                <Link href="/main-dashboard"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('main-dashboard') &&
-                    'bg-graydark dark:bg-meta-4'
-                    }`}
-                  passHref>
-                  <HiHome className='text-2xl' />
-                  Main Dashboard
-                </Link>
-              </li> */}
-
-              {/* <li onClick={closeNavbar}>
-                <Link href="/dashboard"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('dashboard') &&
-                    'bg-graydark dark:bg-meta-4'
-                    }`}
-                  passHref>
-                  <HiHome className='text-2xl' />
-                  Dashboard
-                </Link>
-              </li> */}
-
               <li onClick={closeNavbar}>
-                <Link href="/resume-history"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-history') &&
-                    'bg-graydark dark:bg-meta-4'
+                <Link
+                  href="/resume-history"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('resume-history')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
+                  passHref
+                >
                   <HiDocumentText className='text-2xl' />
                   Resume History
                 </Link>
               </li>
+
               <li onClick={closeNavbar}>
-                <Link href="/resume-templates"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
-                    'bg-graydark dark:bg-meta-4'
+                <Link
+                  href="/resume-templates"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('resume-templates')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
+                  passHref
+                >
                   <BiSolidDashboard className='text-2xl' />
                   Resume Templates
                 </Link>
               </li>
 
               <li onClick={closeNavbar}>
-                <Link href="/plans"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
-                    'bg-graydark dark:bg-meta-4'
+                <Link
+                  href="/plans"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('plans')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
+                  passHref
+                >
                   <VscChecklist className='text-2xl' />
-                  {/* Plans */}
                   Billing
                 </Link>
               </li>
 
               <li onClick={closeNavbar}>
-                <Link href="/featured-jobs"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('featured-jobs') &&
-                    'bg-graydark dark:bg-meta-4'
+                <Link
+                  href="/featured-jobs"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('featured-jobs')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
+                  passHref
+                >
                   <BiSolidBriefcase className='text-2xl' />
                   Featured Jobs
                 </Link>
               </li>
-                    {
-                      profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id!==1&&(
-                        <>
-                         <li onClick={closeNavbar}>
-                <Link href="/invite-students"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
-                    'bg-graydark dark:bg-meta-4'
+
+              {profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id !== 1 && (
+                <li onClick={closeNavbar}>
+                  <Link
+                    href="/invite-students"
+                    className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+        ${pathname.includes('invite-students')
+                        ? 'bg-graydark text-[#a635a2]'
+                        : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
+                      }`}
+                    passHref
+                  >
+                    <HiUserAdd className='text-2xl' />
+                    Invite Students
+                  </Link>
+                </li>
+              )}
+
+              <li onClick={closeNavbar}>
+                <Link
+                  href="/profile"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('profile')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
-                  <HiUserAdd className='text-2xl' />
-                  Invite Students
-                </Link>
-              </li>
-                        </>
-                      )
-                    }
-             
-                    {/* <li onClick={closeNavbar}>
-                <Link href="/temp"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('invite-students') &&
-                    'bg-graydark dark:bg-meta-4'
-                    }`}
-                  passHref>
-                  <HiUserAdd className='text-2xl' />
-                  Check Temp
-                </Link>
-              </li> */}
-                    <li onClick={closeNavbar}>
-                <Link href="/profile"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base text-[#8C8C8C] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('profile') &&
-                    'bg-graydark dark:bg-meta-4'
-                    }`}
-                  passHref>
+                  passHref
+                >
                   <CgProfile className='text-2xl' />
                   My Profile
                 </Link>
               </li>
-          
-
-              
 
               <li onClick={closeNavbar}>
                 <button
-                onClick={handleLogout}
-                  className={`group relative flex items-center gap-2 cursor-pointer rounded-sm py-3 px-4 font-normal text-base text-[#8C8C8C] hover:[#a536a2] duration-300 ease-in-out hover:bg-graydark ${pathname.includes('resume-templates') &&
-                    'bg-graydark dark:bg-meta-4 cursor-pointer'
+                  onClick={handleLogout}
+                  className={`group relative flex items-center gap-2 cursor-pointer rounded-sm py-3 px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('logout')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
                     }`}
-                  passHref>
+                >
                   <CiLogout className='text-2xl' />
                   Logout
                 </button>
               </li>
             </ul>
+
 
           </div>
 

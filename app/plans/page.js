@@ -18,6 +18,7 @@ import sub01 from "../../app/assets/imagesource/sub01.png";
 import sub02 from "../../app/assets/imagesource/sub02.png";
 import Check from "../../app/assets/imagesource/Check.png";
 import RazorPaymentModal from "../modal/RazorPaymentModal";
+import { toast, ToastContainer } from "react-toastify";
 
 const page = () => {
   const { plans, loading, ipData, createOrderData, error, currentSubscriptionData } = useSelector(
@@ -168,7 +169,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
     
     // Prevent payment if user has active subscription
     if (hasActiveSubscription()) {
-      alert("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
+      toast.error("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
       return;
     }
     // setAmount(data?.amount);
@@ -211,7 +212,7 @@ console.log("currentSubscriptionData",currentSubscriptionData)
             try {
               const res = await dispatch(verifyOrder(userData));
               console.log("verifyOrder response:", res);
-              alert("Payment Successful");
+              toast.success("Payment Successful");
             } catch (err) {
               console.log(err);
             } finally {
@@ -232,11 +233,11 @@ console.log("currentSubscriptionData",currentSubscriptionData)
         rzp1.open();
       } else {
         console.error("Failed to create order:", result.payload);
-        alert("Failed to create order. Please try again.");
+        toast.error("Failed to create order. Please try again.");
       }
     } catch (error) {
       console.error("Error in payment process:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 console.log("ipdata",ipData)
@@ -269,6 +270,7 @@ console.log("ipdata",ipData)
       <div className="key_benefits_section pt-10 lg:pt-0 pb-10">
         <div className="purchase_section py-8 lg:py-20 px-0 lg:px-0">
           <div className="max-w-6xl mx-auto">
+            <ToastContainer/>
             {/* <div className="text-center mb-10 lg:mb-10">
                                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
                                  <p className="text-[#4C4B4B] text-base lg:text-[18px] leading-[30px] lg:px-32">Discover the ideal plan to fuel your business growth. Our pricing options are carefully crafted to cater to businesses.</p>
@@ -355,7 +357,7 @@ console.log("ipdata",ipData)
               </div>
             )}
 
-            <div className="subscription_tab_section">
+            <div className="subscription_tab_section inner_plan">
               <Tabs>
                 <TabList>
                   {parsed?.signup_type_id == 1 && (

@@ -36,11 +36,11 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
            
                         if(res?.payload?.data?.project?.length>1){
                             setOpenLoginModal(false);
-                        router.push('/main-dashboard');
+                        router.push('/dashboard');
                         }
                         else{
                              setOpenLoginModal(false);
-                        router.push('/dashboard');
+                        // router.push('/dashboard');
                         }
                         dispatch(getProfile())
                 
