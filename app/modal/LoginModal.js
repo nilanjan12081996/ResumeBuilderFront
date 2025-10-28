@@ -97,7 +97,7 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
                                             <div className="mb-1 block">
                                                 <Label htmlFor="email1">Your Email</Label>
                                             </div>
-                                            <TextInput id="email1" type="email" placeholder="name@flowbite.com"
+                                            <TextInput id="email1" type="email" placeholder="name@gmail.com"
                                                 {...register("email", {
                                                     required: "Email is required",
                                                 })}
@@ -129,7 +129,7 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
                                                 <p htmlFor="remember" className='text-[#8E8E8E] text-sm'>Remember me</p>
                                             </div>
                                             <div>
-                                                <Link className='text-[#8E8E8E] text-sm' href="" passHref>Forgot Passowrd ?</Link>
+                                                <Link className='text-[#8E8E8E] text-sm' href="" passHref>Forgot Password ?</Link>
                                             </div>
                                         </div>
                                         <Button type="submit">{loading ? "Wait..." : "Submit"}</Button>

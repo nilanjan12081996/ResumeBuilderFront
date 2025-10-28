@@ -61,20 +61,26 @@ const Footer = () => {
                     <p className='text-black text-sm leading-[24px]'>info@resumemile.com</p>
                   </li>
                   <li className='mb-2 lg:mb-0'>
+                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/terms-conditions" passHref>
+                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1' />
+                      <p>Terms & Conditions</p>
+                    </Link>
+                  </li>
+                  <li className='mb-2 lg:mb-0'>
                     <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/privacy-policy" passHref>
-                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1'/>
+                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1' />
                       <p>Privacy Policy</p>
                     </Link>
                   </li>
                   <li className='mb-2 lg:mb-0'>
                     <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/cancellation-policy" passHref>
-                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1'/>
+                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1' />
                       <p>Cancellation policy</p>
                     </Link>
                   </li>
                   <li className='mb-2 lg:mb-0'>
                     <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/support" passHref>
-                      <BiSupport className='text-[#92278F] text-xl mr-1'/>
+                      <BiSupport className='text-[#92278F] text-xl mr-1' />
                       <p>Support</p>
                     </Link>
                   </li>
@@ -84,13 +90,13 @@ const Footer = () => {
           </div>
         </div>
 
-         <div className='border-t border-[#433c4e] pt-5 text-center mt-10'>
-             <p className='text-sm text-[#433c4e]'>© 2025 HiringEye Solutions Private Limited</p>
-          </div>
+        <div className='border-t border-[#433c4e] pt-5 text-center mt-10'>
+          <p className='text-sm text-[#433c4e]'>© 2025 HiringEye Solutions Private Limited</p>
+        </div>
 
       </div>
 
-      
+
 
     </div>
   )

@@ -212,9 +212,9 @@ export default function Home() {
                            <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
                            <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
                            <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
-                           <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">
+                           {/* <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">
                               CREATE MY REUSME
-                           </button>
+                           </button> */}
                         </div>
                      </div>
                      <div className="lg:w-6/12">
@@ -390,7 +390,10 @@ export default function Home() {
                                  <>
                                     {
                                        oneTime?.plan_frequency === 1 && (
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                          <div
+                                             className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 3 ? "border-[#800080]" : "border-[#e9edff]"
+                                                }`}
+                                          >
                                              <div className="py-8 px-6 relative min-h-[680px]">
                                                 <div className="flex items-center justify-between mb-6">
                                                    <Image src={sub01} alt='sub01' className='' />
@@ -554,7 +557,10 @@ export default function Home() {
                                  <>
                                     {
                                        oneTime?.plan_frequency === 3 && (
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                          <div
+                                             className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
+                                                }`}
+                                          >
                                              <div className="py-8 px-6 relative min-h-[680px]">
 
                                                 <div className="flex items-center justify-between mb-6">
@@ -738,7 +744,10 @@ export default function Home() {
                                  <>
                                     {
                                        oneTime?.plan_frequency === 12 && (
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
+                                          <div
+                                             className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 7 ? "border-[#800080]" : "border-[#e9edff]"
+                                                }`}
+                                          >
                                              <div className="py-8 px-6 relative min-h-[680px]">
                                                 <div className="flex items-center justify-between mb-6">
                                                    <Image src={sub01} alt='sub01' className='' />

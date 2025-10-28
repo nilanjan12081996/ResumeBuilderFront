@@ -646,8 +646,8 @@ body {
   .react-tabs
   ul
   .react-tabs__tab.react-tabs__tab--selected {
-  background: #ffffff;
-  color: #1b223c;
+  background: #F0E3FA;
+  color: #800080;
   border: #e7ebff 1px solid;
   border-radius: 12px;
 }
