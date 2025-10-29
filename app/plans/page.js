@@ -74,6 +74,34 @@ const page = () => {
     // Disable button if it's a free plan and user has no current subscription
     const shouldDisableButton = isFreePlan && !hasActiveSubscription();
 
+    // Inside renderPlanCard()
+
+    const activePlan = getCurrentActiveSubscription();
+    const isActivePlan = activePlan && activePlan.Plan?.id === pln?.id;
+    const activePrice = activePlan ? parseFloat(activePlan.Plan?.planPrice?.price || 0) : 0;
+    const thisPrice = parseFloat(pln?.planPrice?.price || 0);
+
+    let buttonLabel = "Upgrade";
+    let isDisabled = false;
+
+    // Logic for plan comparison
+    if (isActivePlan) {
+      buttonLabel = "Current Plan";
+      isDisabled = true;
+    } else if (hasActiveSubscription()) {
+      if (thisPrice < activePrice) {
+        buttonLabel = "Downgrade";
+      } else if (thisPrice > activePrice) {
+        buttonLabel = "Upgrade";
+      } else {
+        buttonLabel = "Same Tier";
+        isDisabled = true;
+      }
+    } else if (!hasActiveSubscription()) {
+      buttonLabel = "Get Started";
+    }
+
+
     return (
 
       <div
@@ -93,9 +121,10 @@ const page = () => {
               </div>
             )}
           </div>
-          <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">
+          <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">
             {pln?.plan_name}
           </h3>
+          <p className="pb-6 text-[#1B223C]">{pln?.placeholder}</p>
           {/* <div className="flex items-center gap-2 mb-8">
             <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">
               <span className="text-[#1D2127] text-[15px] leading-[50px] font-medium">
@@ -141,7 +170,7 @@ const page = () => {
             </div>
           </div>
           <div className="absolute left-0 lg:bottom-[20px] bottom-[20px] w-full px-6">
-            <button
+            {/* <button
               onClick={(e) =>
                 !shouldDisableButton &&
                 !hasActiveSubscription() &&
@@ -159,7 +188,26 @@ const page = () => {
                 }`}
             >
               {shouldDisableButton ? "Current Plan" : hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
+            </button> */}
+            <button
+              onClick={(e) =>
+                !isDisabled &&
+                handlePaymentModal(e, {
+                  amount: pln?.planPrice?.price,
+                  currency: pln?.planPrice?.currency,
+                  plan_id: pln?.planPrice?.plan_id,
+                })
+              }
+              disabled={isDisabled}
+              className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
+    ${isDisabled
+                  ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+                  : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+                }`}
+            >
+              {buttonLabel}
             </button>
+
           </div>
         </div>
       </div>
@@ -234,6 +282,7 @@ const page = () => {
               const res = await dispatch(verifyOrder(userData));
               console.log("verifyOrder response:", res);
               toast.success("Payment Successful");
+              dispatch(currentSubscription(ipData?.ip));
             } catch (err) {
               console.log(err);
             } finally {

@@ -402,7 +402,8 @@ export default function Home() {
                                                    </div>
                                                 </div>
 
-                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">{oneTime?.plan_name}</h3>
+                                                <p className="text-[#1B223C] pb-6">{oneTime?.placeholder}</p>
                                                 {/* <div className="flex items-center gap-2 mb-8">
                                                    <p className="text-[#1D2127] text-[30px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
                                                    <div className="pt-4">
@@ -570,7 +571,8 @@ export default function Home() {
                                                    </div>
                                                 </div>
 
-                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
+                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">{oneTime?.plan_name}</h3>
+                                                <p className="text-[#1B223C] pb-6">{oneTime?.placeholder}</p>
                                                 {/* <div className="flex items-center gap-2 mb-8">
                                                    <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
                                                    <div className="pt-4">

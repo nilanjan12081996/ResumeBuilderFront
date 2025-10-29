@@ -58,7 +58,7 @@ const Footer = () => {
 
                   <li className='flex justify-center items-center mb-2 lg:mb-0'>
                     <FaEnvelope className='text-[#92278F] text-xl mr-1' />
-                    <p className='text-black text-sm leading-[24px]'>info@resumemile.com</p>
+                    <p className='text-black text-sm leading-[24px]'>info@resumemile.ai</p>
                   </li>
                   <li className='mb-2 lg:mb-0'>
                     <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/terms-conditions" passHref>
