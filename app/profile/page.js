@@ -218,7 +218,7 @@ const password = watch("new_pass");
                         </div>
                         
                         <div className="w-full mt-10">
-                        <p className="text-[#000000] text-[18px] pb-4">Change Paasowrd</p>
+                        <p className="text-[#000000] text-[18px] pb-4">Change Paasoword</p>
 
                         <div className="w-full lg:w-12/12">
                             <div className="mb-1 block">
@@ -238,7 +238,7 @@ const password = watch("new_pass");
                         </div>
                         <div className="w-full lg:w-12/12">
                             <div className="mb-1 block">
-                            <Label className="">New Passowrd </Label>
+                            <Label className="">New Password </Label>
                             </div>
                             <TextInput
                             id="base"
@@ -254,7 +254,7 @@ const password = watch("new_pass");
                         </div>
                         <div className="w-full lg:w-12/12">
                             <div className="mb-1 block">
-                            <Label className="">Confirm Passowrd </Label>
+                            <Label className="">Confirm Password </Label>
                             </div>
                             <TextInput
                             id="base"

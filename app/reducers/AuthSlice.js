@@ -187,42 +187,60 @@ export const detectIccid = createAsyncThunk(
 );
 
 export const googleSignIn = createAsyncThunk(
-  'auth/google-signIn',
-  async (token, { rejectWithValue }) => {
-    try {
-      const response = await serverApi.post('api/auth/google-login', token);
-      if (response?.data?.status_code === 200) {
-        console.log(response?.data,"response?.data")
-        return response.data;
-      } else {
-        // Handle the case when status code is not 200
-        return rejectWithValue(response.data.message);
-      }
-    } catch (error) {
-      let errors = errorHandler(error);
-      return rejectWithValue(errors);
+    'auth/google-signIn',
+    async (token, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.post('api/auth/google-login', token);
+            if (response?.data?.status_code === 200) {
+                console.log(response?.data, "response?.data")
+                return response.data;
+            } else {
+                // Handle the case when status code is not 200
+                return rejectWithValue(response.data.message);
+            }
+        } catch (error) {
+            let errors = errorHandler(error);
+            return rejectWithValue(errors);
+        }
     }
-  }
 );
 
 export const addType = createAsyncThunk(
-  'auth/addType',
-  async (token, { rejectWithValue }) => {
-    try {
-      const response = await serverApi.post('api/auth/add-type', token);
-      if (response?.data?.status_code === 200) {
-        console.log(response?.data,"response?.data")
-        return response.data;
-      } else {
-        // Handle the case when status code is not 200
-        return rejectWithValue(response.data.message);
-      }
-    } catch (error) {
-      let errors = errorHandler(error);
-      return rejectWithValue(errors);
+    'auth/addType',
+    async (token, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.post('api/auth/add-type', token);
+            if (response?.data?.status_code === 200) {
+                console.log(response?.data, "response?.data")
+                return response.data;
+            } else {
+                // Handle the case when status code is not 200
+                return rejectWithValue(response.data.message);
+            }
+        } catch (error) {
+            let errors = errorHandler(error);
+            return rejectWithValue(errors);
+        }
     }
-  }
 );
+
+/* ----------------------  FORGOT PASSWORD ---------------------- */
+export const forgotPassword = createAsyncThunk(
+    'forgotPassword',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.post('/api/auth/forgot-password', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response?.data?.response || 'Failed to send reset link');
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
 
 const initialState = {
     message: null,
@@ -230,11 +248,11 @@ const initialState = {
     loading: false,
     isLoggedIn: false,
     loadingIccid: false,
-    signUpTypes:[],
-    loginData:[],
-    profData:[],
+    signUpTypes: [],
+    loginData: [],
+    profData: [],
     isGoogleLoggedIn: null,
-    addTypeData:""
+    addTypeData: ""
 };
 
 const authSlice = createSlice({
@@ -277,11 +295,11 @@ const authSlice = createSlice({
                     JSON.stringify({ token: access_token })
                 );
 
-                  sessionStorage.setItem(
+                sessionStorage.setItem(
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
-                 sessionStorage.setItem(
+                sessionStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
@@ -330,22 +348,22 @@ const authSlice = createSlice({
                 state.error = false;
             })
             .addCase(loginCustomer.fulfilled, (state, { payload }) => {
-               
+
                 const { access_token, data, refresh_token } = payload;
-                console.log(data,"loginCustomer");
-                
+                console.log(data, "loginCustomer");
+
                 state.loading = false;
                 state.isLoggedIn = true;
-                localStorage.setItem('projects',JSON.stringify({projects:data?.project}))
+                localStorage.setItem('projects', JSON.stringify({ projects: data?.project }))
                 sessionStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
-                 sessionStorage.setItem(
+                sessionStorage.setItem(
                     'fullname',
                     JSON.stringify({ fullname: data?.fullname })
                 );
-                      sessionStorage.setItem(
+                sessionStorage.setItem(
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
@@ -380,15 +398,15 @@ const authSlice = createSlice({
                         ? payload.message
                         : 'Something went wrong. Try again later.';
             })
-              .addCase(registerCustomerOrg.pending, (state) => {
+            .addCase(registerCustomerOrg.pending, (state) => {
                 state.message = null;
                 state.loading = true;
                 state.error = null;
             })
             .addCase(registerCustomerOrg.fulfilled, (state, { payload }) => {
                 const { access_token, data, refresh_token } = payload;
-                console.log("payload",payload);
-                
+                console.log("payload", payload);
+
                 state.loading = false;
                 state.isLoggedIn = true;
                 state.message = payload;
@@ -402,15 +420,15 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = payload;
             })
-                .addCase(getSignupType.pending, (state) => {
+            .addCase(getSignupType.pending, (state) => {
                 state.message = null;
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getSignupType.fulfilled, (state, { payload }) => {
-              
+
                 state.loading = false;
-                state.signUpTypes=payload
+                state.signUpTypes = payload
             })
             .addCase(getSignupType.rejected, (state, { payload }) => {
 
@@ -423,53 +441,65 @@ const authSlice = createSlice({
                 state.error = null;
             })
             .addCase(getProfile.fulfilled, (state, { payload }) => {
-              
+
                 state.loading = false;
-                state.profData=payload
+                state.profData = payload
             })
             .addCase(getProfile.rejected, (state, { payload }) => {
 
                 state.loading = false;
                 state.error = payload;
             })
-                 .addCase(googleSignIn.pending,(state)=>{
-                state.loading=false
-                
+            .addCase(googleSignIn.pending, (state) => {
+                state.loading = false
+
             })
-            .addCase(googleSignIn.fulfilled,(state,{payload})=>{
-                console.log("response?.data",payload)
-                 const { access_token, data, refresh_token } = payload;
+            .addCase(googleSignIn.fulfilled, (state, { payload }) => {
+                console.log("response?.data", payload)
+                const { access_token, data, refresh_token } = payload;
                 state.loading = false;
                 state.isLoggedIn = true;
-                state.isGoogleLoggedIn=true
+                state.isGoogleLoggedIn = true
                 sessionStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
-                console.log("response?.data",access_token)
+                console.log("response?.data", access_token)
                 // sessionStorage.setItem(
                 //     'resumeToken',
                 //     JSON.stringify({ token: access_token })
                 // );
             })
-            .addCase(googleSignIn.rejected,(state,{payload})=>{
-                state.loading=false
-                state.error=payload
+            .addCase(googleSignIn.rejected, (state, { payload }) => {
+                state.loading = false
+                state.error = payload
             })
-            .addCase(addType.pending,(state)=>{
-                state.loading=true
+            .addCase(addType.pending, (state) => {
+                state.loading = true
             })
-            .addCase(addType.fulfilled,(state,{payload})=>{
-                state.loading=false
-                state.addTypeData=payload
-                state.error=false
+            .addCase(addType.fulfilled, (state, { payload }) => {
+                state.loading = false
+                state.addTypeData = payload
+                state.error = false
             })
-            .addCase(addType.rejected,(state,{payload})=>{
-                state.loading=false
-                state.error=payload
+            .addCase(addType.rejected, (state, { payload }) => {
+                state.loading = false
+                state.error = payload
             })
-            
 
+
+             .addCase(forgotPassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(forgotPassword.fulfilled, (state, { payload }) => {
+                state.loading = false;
+                state.message = payload;
+            })
+            .addCase(forgotPassword.rejected, (state, { payload }) => {
+                state.loading = false;
+                state.error = payload;
+            })
 
     },
 });

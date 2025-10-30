@@ -335,7 +335,7 @@ const Page = () => {
         <div className="main-content">
           <div className="welcome_area py-8 px-9 rounded-[10px] mb-10">
             <h3 className="text-[22px] lg:leading-[22px] leading-[30px] text-white font-semibold mb-4">
-              Welcome to Resume Builder, {profData?.data?.fullname}!
+              Welcome to ResumeMile, {profData?.data?.fullname}!
             </h3>
             <p className="text-[18px] leading-[25px] text-white font-normal mb-0 lg:pr-20">
               Create a professional resume in minutes with our easy-to-use

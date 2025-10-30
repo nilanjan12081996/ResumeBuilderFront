@@ -129,7 +129,7 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal,se
                                                 <p htmlFor="remember" className='text-[#8E8E8E] text-sm'>Remember me</p>
                                             </div>
                                             <div>
-                                                <Link className='text-[#8E8E8E] text-sm' href="" passHref>Forgot Password ?</Link>
+                                                <Link className='text-[#8E8E8E] text-sm' href="/forgot-password" passHref>Forgot Password ?</Link>
                                             </div>
                                         </div>
                                         <Button type="submit">{loading ? "Wait..." : "Submit"}</Button>

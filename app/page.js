@@ -394,7 +394,7 @@ export default function Home() {
                                              className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 3 ? "border-[#800080]" : "border-[#e9edff]"
                                                 }`}
                                           >
-                                             <div className="py-8 px-6 relative min-h-[680px]">
+                                             <div className="py-8 px-6 relative min-h-[700px]">
                                                 <div className="flex items-center justify-between mb-6">
                                                    <Image src={sub01} alt='sub01' className='' />
                                                    <div className={`${oneTime?.id === 3 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
@@ -562,7 +562,7 @@ export default function Home() {
                                              className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
                                                 }`}
                                           >
-                                             <div className="py-8 px-6 relative min-h-[680px]">
+                                             <div className="py-8 px-6 relative min-h-[700px]">
 
                                                 <div className="flex items-center justify-between mb-6">
                                                    <Image src={sub01} alt='sub01' className='' />

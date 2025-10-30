@@ -14,6 +14,7 @@ import LinkedinSlice from '../reducers/LinkedinSlice'
 import FeatureJobSlice from '../reducers/FeatureJobSlice'
 import InviteSlice from '../reducers/InviteSlice'
 import ResumeSlice from '../reducers/ResumeSlice'
+import SupportSlice from '../reducers/SupportSlice'
 
 const store = configureStore({
     reducer: {
@@ -29,7 +30,8 @@ const store = configureStore({
         linkedIn:LinkedinSlice,
         featJob:FeatureJobSlice,
         inviteStd:InviteSlice,
-        resume:ResumeSlice
+        resume:ResumeSlice,
+        support:SupportSlice,
     },
     devTools: process.env.NODE_ENV,
 });

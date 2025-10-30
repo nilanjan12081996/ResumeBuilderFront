@@ -250,6 +250,7 @@ const page = () => {
         amount: data.amount,
         currency: data.currency,
         plan_id: data.plan_id,
+        ip_address: ipData?.ip,
       };
       // Wait for the createOrder action to complete
       const result = await dispatch(createOrder(orderData));

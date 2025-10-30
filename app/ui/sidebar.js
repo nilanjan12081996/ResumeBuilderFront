@@ -32,6 +32,7 @@ import { VscChecklist } from "react-icons/vsc";
 
 import { HiUserAdd } from "react-icons/hi";
 import { CgProfile } from 'react-icons/cg';
+import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -110,7 +111,7 @@ const Sidebar = () => {
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="px-6 py-5 lg:py-6">
         <Link className='flex justify-center items-center' href="/dashboard" passHref>
-          <Image src={logoAdmin} alt="logoAdmin" className='w-6/12' />
+          <Image src={headerLogo} alt="logoAdmin" className='w-6/12' />
         </Link>
 
         <button
