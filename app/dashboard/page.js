@@ -234,7 +234,7 @@ const Page = () => {
 
     dispatch(improveResume(formData))
       .then((res) => {
-        console.log(" res ", res);
+        console.log("res?.payload?.data?.id",res?.payload?.data?.id);
         setImproveResumeId(res?.payload?.data?.id);
         const userData = {
           imp_resume_id: res?.payload?.data?.id,
@@ -245,7 +245,6 @@ const Page = () => {
             // toast.success(res?.payload?.message || "ATS score");
             console.log("ATSresponse", res);
             setATSscore(res?.payload?.data?.ats_score);
-
             setopenATSmodal(true);
           })
           .catch((err) => {
