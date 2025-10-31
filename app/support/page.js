@@ -83,7 +83,7 @@ const page = () => {
                 <div className='max-w-6xl mx-auto'>
                     <div className='mb-0 px-5 lg:px-0'>
                         <div className='lg:w-8/12 mx-auto text-center'>
-                            <h2 className="text-[#031E2D] text-[23px] lg:text-[40px] leading-[48px] font-semibold lg:pb-4">We’d Love to Hear From You</h2>
+                            <h2 className="text-[#031E2D] text-[23px] lg:text-[40px] leading-[48px] font-semibold lg:pb-4">Please raise a ticket, we will come back to you within 24hrs.</h2>
                             <p className="text-[#424242] text-sm lg:text-[16px] leading-[24px] pb-6">Whether you&apos;re exploring automation for your product, need support integrating our tools, or just want to chat about making your workflows smarter—we're here to help.</p>
                         </div>
                     </div>
@@ -188,7 +188,7 @@ const page = () => {
 
                                             </div>
                                             <Button type="submit" disabled={loading}>
-                                                {loading ? "Sending..." : "Get to Know"}
+                                                {loading ? "Sending..." : "Submit"}
                                             </Button>
 
                                             {successMsg && (

@@ -218,7 +218,7 @@ const password = watch("new_pass");
                         </div>
                         
                         <div className="w-full mt-10">
-                        <p className="text-[#000000] text-[18px] pb-4">Change Paasoword</p>
+                        <p className="text-[#000000] text-[18px] pb-4">Change Password</p>
 
                         <div className="w-full lg:w-12/12">
                             <div className="mb-1 block">

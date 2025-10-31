@@ -175,7 +175,7 @@ const Sidebar = () => {
 
               <li onClick={closeNavbar}>
                 <Link
-                  href="/resume-templates"
+                  href="/dashboard"
                   className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
       ${pathname.includes('resume-templates')
                       ? 'bg-graydark text-[#a635a2]'
@@ -184,7 +184,7 @@ const Sidebar = () => {
                   passHref
                 >
                   <BiSolidDashboard className='text-2xl' />
-                  Resume Templates
+                   Create Resume
                 </Link>
               </li>
 
@@ -203,20 +203,22 @@ const Sidebar = () => {
                 </Link>
               </li>
 
-              <li onClick={closeNavbar}>
-                <Link
-                  href="/featured-jobs"
-                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+             {profileData?.data?.signUpType?.length > 0 && (
+                <li onClick={closeNavbar}>
+                  <Link
+                    href="/featured-jobs"
+                    className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
       ${pathname.includes('featured-jobs')
-                      ? 'bg-graydark text-[#a635a2]'
-                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
-                    }`}
-                  passHref
-                >
-                  <BiSolidBriefcase className='text-2xl' />
-                  Featured Jobs
-                </Link>
-              </li>
+                        ? 'bg-graydark text-[#a635a2]'
+                        : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
+                      }`}
+                    passHref
+                  >
+                    <BiSolidBriefcase className='text-2xl' />
+                    Featured Jobs
+                  </Link>
+                </li>
+              )}
 
               {profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id !== 1 && (
                 <li onClick={closeNavbar}>

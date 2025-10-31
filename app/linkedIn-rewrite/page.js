@@ -68,6 +68,7 @@ import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { useReactToPrint } from 'react-to-print';
 
 const page = () => {
+  const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const { lkdDetails } = useSelector((state) => state?.linkedIn)
   const dispatch = useDispatch()
   const searchParams = useSearchParams();
@@ -401,7 +402,12 @@ const page = () => {
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-1'>
             <MdPreview className='text-[#800080] text-2xl' />
-            <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
+            <button
+              onClick={() => setOpenPreviewModal(true)}
+              className='text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
+            >
+              Preview
+            </button>
           </div>
           <div className='flex items-center gap-3'>
             <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
@@ -411,6 +417,28 @@ const page = () => {
           {/* <Image src={resume4} alt="resume4" className='' /> */}
           <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} languages={languages} skills={skills} />
         </div>
+        {/* Resume Preview Modal */}
+        <Modal
+          show={openPreviewModal}
+          size="6xl"
+          onClose={() => setOpenPreviewModal(false)}
+        >
+          <ModalHeader className='text-black border-0 pt-2 pr-2'>
+            Preview
+          </ModalHeader>
+          <ModalBody className='bg-white p-5 rounded-b-[4px]'>
+            <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] p-5'>
+              <LinkedInTemplate
+                data={formValues}
+                educationEntries={educationEntries}
+                experiences={experiences}
+                languages={languages}
+                skills={skills}
+              />
+            </div>
+          </ModalBody>
+        </Modal>
+
       </div>
 
     </div>

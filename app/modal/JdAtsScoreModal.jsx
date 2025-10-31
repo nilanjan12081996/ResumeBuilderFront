@@ -75,7 +75,7 @@ const JdAtsScoreModal = ({ showJdAtsModal, setShowJdAtsModal, atsData, setOpenMo
           </span>
         </div>
 
-        <p className="text-[#800080] font-medium text-lg">ATS Score</p>
+        <p className="text-[#800080] font-medium text-lg">Current Resume ATS Score</p>
 
         <button
           onClick={() => {

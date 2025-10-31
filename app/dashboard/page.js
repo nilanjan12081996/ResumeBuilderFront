@@ -313,7 +313,7 @@ const Page = () => {
   const max = 100;
   const size = 124;
   const strokeWidth = 10;
-  const label = "ATS Score";
+  const label = "Current Resume ATS Score";
   const className = "";
   const clamped = Math.max(0, Math.min(ATSscore, max));
   const radius = (size - strokeWidth) / 2;
@@ -980,7 +980,7 @@ const Page = () => {
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           {/* Header with Close */}
           <div className="flex items-center justify-between px-5 py-3 border-b">
-            <h3 className="text-base font-semibold text-gray-800">ATS Score</h3>
+            <h3 className="text-base font-semibold text-gray-800">Current Resume ATS Score</h3>
             <button
               type="button"
               onClick={() => setopenATSmodal(false)}

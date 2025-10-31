@@ -76,6 +76,7 @@ import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 import JdAtsScoreAnalyzeModal from '../modal/JdAtsScoreAnalyzeModal';
 
 const page = () => {
+  const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0); // default to Personal Info
   const tabsRef = useRef(null); // ref to scroll into view
 
@@ -720,8 +721,14 @@ const page = () => {
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-            <MdPreview className='text-[#800080] text-2xl' />
-            <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
+            <button
+              onClick={() => setOpenPreviewModal(true)}
+              className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
+            >
+              <MdPreview className='text-[#800080] text-2xl' />
+              Preview
+            </button>
+
           </div>
           <div className='lg:flex items-center gap-3'>
             <button
@@ -812,6 +819,44 @@ const page = () => {
         setShow={setOpenJdAtsModal}
         atsData={atsData}
       />
+      <Modal
+        show={openPreviewModal}
+        size="6xl"
+        onClose={() => setOpenPreviewModal(false)}
+      >
+        <ModalHeader className='text-black border-0 pt-2 pr-2'>
+          Preview
+        </ModalHeader>
+        <ModalBody className='bg-white p-5 rounded-b-[4px]'>
+          <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
+            {template == 1 && (
+              <Template1
+                data={formValues}
+                education={educationEntries}
+                experiences={experiences}
+                skills={skills}
+                languages={languages}
+                personalPro={personalPro}
+                achivments={achivments}
+                certificates={certificates}
+              />
+            )}
+            {template == 2 && (
+              <Template2
+                data={formValues}
+                education={educationEntries}
+                experiences={experiences}
+                skills={skills}
+                languages={languages}
+                personalPro={personalPro}
+                achivments={achivments}
+                certificates={certificates}
+              />
+            )}
+          </div>
+        </ModalBody>
+      </Modal>
+
 
     </div>
   )

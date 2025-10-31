@@ -85,12 +85,14 @@ const page = () => {
   const parseUserId = JSON.parse(user_id)
   const componentRef = useRef();
   const dispatch = useDispatch()
- 
+  const [openPreviewModal, setOpenPreviewModal] = useState(false);
+
+
   // useEffect(() => {
   //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
   // }, [id])
 
-  const {error, improveResumeData, loading, getUpdateResumeInfoData, atsScoreAnalyzeData } = useSelector((state) => state?.dash)
+  const { error, improveResumeData, loading, getUpdateResumeInfoData, atsScoreAnalyzeData } = useSelector((state) => state?.dash)
 
 
   // console.log("improveResumeData", improveResumeData);
@@ -113,15 +115,15 @@ const page = () => {
     formState: { errors },
   } = useForm();
 
-  useEffect(()=>{
-    dispatch(getUpdateResumeInfo({ id: id })).then((res)=>{
-     
+  useEffect(() => {
+    dispatch(getUpdateResumeInfo({ id: id })).then((res) => {
+
       // console.log("resumeid", res.payload?.data?.id);
     })
-  },[])
+  }, [])
 
 
-  useEffect(()=>{
+  useEffect(() => {
     if (getUpdateResumeInfoData?.data?.imp_basic_info) {
       const basicInfo = getUpdateResumeInfoData.data.imp_basic_info;
       setValue("full_name", basicInfo.candidate_name)
@@ -134,7 +136,7 @@ const page = () => {
       setValue("linkdin_profile", getUpdateResumeInfoData.data?.linkedin_url_link)
       setValue("goal", basicInfo.summery)
     }
-  },[getUpdateResumeInfoData, setValue])
+  }, [getUpdateResumeInfoData, setValue])
 
   // Populate education entries from getUpdateResumeInfoData
   useEffect(() => {
@@ -271,7 +273,7 @@ const page = () => {
       setAchivments([{ id: `ach-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }]);
     }
   }, [getUpdateResumeInfoData]);
-  
+
   const formValues = watch();
   console.log("formValues", formValues);
   console.log("template", template);
@@ -299,11 +301,11 @@ const page = () => {
     const max = 100;
     const circumference = 2 * Math.PI * 60; // radius = 60
     const progress = (clamped / max) * circumference;
-    
+
     // Color based on score
     let ringColor = "#ef4444"; // red
     let badgeBg = "bg-red-100 text-red-800";
-    
+
     if (clamped >= 80) {
       ringColor = "#22c55e"; // green
       badgeBg = "bg-green-100 text-green-800";
@@ -344,9 +346,8 @@ const page = () => {
                 stroke={ringColor}
                 strokeWidth={12}
                 strokeLinecap="round"
-                strokeDasharray={`${progress} ${
-                  circumference - progress
-                }`}
+                strokeDasharray={`${progress} ${circumference - progress
+                  }`}
                 transform="rotate(-90 70 70)"
               />
             </svg>
@@ -369,7 +370,7 @@ const page = () => {
       </div>
     );
   };
-  
+
   const onSubmit = async (data) => {
     console.log("data", data);
 
@@ -380,12 +381,12 @@ const page = () => {
       console.log("resumeidonsubmit", resumeid);
       console.log("getUpdateResumeInfoData", getUpdateResumeInfoData);
       console.log("getUpdateResumeInfoData?.data", getUpdateResumeInfoData?.data);
-      
+
       if (!basicInfoId) {
         console.error("Basic info ID not found");
         return;
       }
-      
+
       if (!resumeid) {
         console.error("Resume ID not found");
         return;
@@ -402,15 +403,15 @@ const page = () => {
         Summary: data.goal || ""
       };
 
-      dispatch(addCountResume({ref_type:"jd_based_resume"})).then(res=>{
-        if(res?.payload?.status_code===200){
+      dispatch(addCountResume({ ref_type: "jd_based_resume" })).then(res => {
+        if (res?.payload?.status_code === 200) {
 
-           dispatch(updateBasicInfo(basicInfoPayload));
-        }else{
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{autoClose:false})
+          dispatch(updateBasicInfo(basicInfoPayload));
+        } else {
+          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", { autoClose: false })
         }
       })
-      
+
 
       // 2. Update Experience
       const experiencePayload = experiences.map(exp => ({
@@ -431,7 +432,7 @@ const page = () => {
           Description: proj.description || ""
         }))
       }));
-      
+
       console.log("Dispatching updateExperience with resumeid:", resumeid);
       await dispatch(updateExperience({ resumeid, data: experiencePayload }));
 
@@ -445,7 +446,7 @@ const page = () => {
         GPAorGrade: edu.cgpa || "",
         AdditionalInformation: edu.additionalInfo || ""
       }));
-      
+
       await dispatch(updateEducation({ resumeid, data: educationPayload }));
 
       // 4. Update Skills
@@ -454,7 +455,7 @@ const page = () => {
         Skill_Category: sk.skill_category || "",
         Skills: sk.skill ? sk.skill.split(',').map(s => s.trim()).filter(s => s) : []
       }));
-      
+
       await dispatch(updateSkills({ resumeid, data: skillsPayload }));
 
       // 5. Update Languages
@@ -462,7 +463,7 @@ const page = () => {
         id: lang.id && lang.id.toString().includes('lang-') ? null : lang.id,
         Language: lang.language_name || ""
       }));
-      
+
       await dispatch(updateLanguage({ resumeid, data: languagePayload }));
 
       // 6. Update Extra Projects
@@ -477,7 +478,7 @@ const page = () => {
           EndDate: pPro.end_time ? convertToSubmitFormat(pPro.end_time) : ""
         }
       }));
-      
+
       await dispatch(updateExtraProject({ resumeid, data: extraProjectPayload }));
 
       // 7. Update Certifications
@@ -489,7 +490,7 @@ const page = () => {
         Certification_ID: cer.certification_id || "",
         Description: "" // Add description field if needed
       }));
-      
+
       await dispatch(updateCertification({ resumeid, data: certificationPayload }));
 
       // 8. Update Achievements
@@ -500,7 +501,7 @@ const page = () => {
         Date_Received: achiv.receive_date ? convertToSubmitFormat(achiv.receive_date) : "",
         Description: achiv.description || ""
       }));
-      
+
       await dispatch(updateAchievements({ resumeid, data: achievementsPayload }));
 
       console.log("All updates completed successfully!");
@@ -665,8 +666,13 @@ const page = () => {
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-            <MdPreview className='text-[#800080] text-2xl' />
-            <h3 className='text-[16px] text-[#151515] font-medium'>Preview</h3>
+            <button
+              onClick={() => setOpenPreviewModal(true)}
+              className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
+            >
+              <MdPreview className='text-[#800080] text-2xl' />
+              Preview
+            </button>
           </div>
           <div className='lg:flex items-center gap-3'>
             <button onClick={handleAnalyzeResume} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
@@ -677,12 +683,12 @@ const page = () => {
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
           {
-            template ==1 && (
+            template == 1 && (
               <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }
           {
-            template ==2 && (
+            template == 2 && (
               <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
             )
           }
@@ -713,9 +719,9 @@ const page = () => {
               )}
             </div>
             <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
-              <ATSScoreComponent 
-                score={atsScoreAnalyzeData?.data?.new_ats || 0} 
-                label="Resume Score" 
+              <ATSScoreComponent
+                score={atsScoreAnalyzeData?.data?.new_ats || 0}
+                label="Resume Score"
               />
             </div>
           </div>
@@ -738,9 +744,9 @@ const page = () => {
                 <Image src={resume_sections_view} alt="resume_sections_view" className='' />
               </div>
               <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[10px] bottom-[20px] p-5'>
-                <ATSScoreComponent 
-                  score={atsScoreAnalyzeData?.data?.old_ats || 0} 
-                  label="Before Score" 
+                <ATSScoreComponent
+                  score={atsScoreAnalyzeData?.data?.old_ats || 0}
+                  label="Before Score"
                 />
               </div>
             </div>
@@ -755,9 +761,9 @@ const page = () => {
                 )}
               </div>
               <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute right-[10px] bottom-[20px] p-5'>
-                <ATSScoreComponent 
-                  score={atsScoreAnalyzeData?.data?.new_ats || 0} 
-                  label="After Score" 
+                <ATSScoreComponent
+                  score={atsScoreAnalyzeData?.data?.new_ats || 0}
+                  label="After Score"
                 />
               </div>
             </div>
@@ -765,6 +771,44 @@ const page = () => {
         </ModalBody>
       </Modal>
       {/* add modal for apply job ends here */}
+      <Modal
+        show={openPreviewModal}
+        size="6xl"
+        onClose={() => setOpenPreviewModal(false)}
+      >
+        <ModalHeader className='text-black border-0 pt-2 pr-2'>
+          Resume Preview
+        </ModalHeader>
+        <ModalBody className='bg-white p-5 rounded-b-[4px]'>
+          <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
+            {template == 1 && (
+              <Template1
+                data={formValues}
+                education={educationEntries}
+                experiences={experiences}
+                skills={skills}
+                languages={languages}
+                personalPro={personalPro}
+                achivments={achivments}
+                certificates={certificates}
+              />
+            )}
+            {template == 2 && (
+              <Template2
+                data={formValues}
+                education={educationEntries}
+                experiences={experiences}
+                skills={skills}
+                languages={languages}
+                personalPro={personalPro}
+                achivments={achivments}
+                certificates={certificates}
+              />
+            )}
+          </div>
+        </ModalBody>
+      </Modal>
+
     </div>
   )
 }

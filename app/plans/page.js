@@ -108,7 +108,7 @@ const page = () => {
         className={`pt-0 border rounded-[26px] bg-white ${pln?.id === 3 || pln?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
           }`}
       >
-        <div className="py-8 px-6 relative min-h-[680px]">
+        <div className="py-8 px-6 relative min-h-[740px]">
           <div className="flex items-center justify-between mb-6">
             {pln?.plan_name === "Gold" || pln?.plan_name === "Campus Plus" ? (
               <Image src={sub02} alt="sub02" className="" />
@@ -199,9 +199,9 @@ const page = () => {
                 })
               }
               disabled={isDisabled}
-              className={`text-[14px] leading-[40px] rounded-md w-full block transition-none
+              className={`text-[14px] leading-[40px] rounded-md w-full block transition-all duration-300
     ${isDisabled
-                  ? "bg-[#f5f5f5] text-[#999] border border-[#ddd] cursor-not-allowed opacity-60"
+                  ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed" 
                   : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
                 }`}
             >
