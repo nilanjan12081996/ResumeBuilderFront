@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { saveTemplate } from "../reducers/ResumeSlice";
+import { toast } from "react-toastify";
 const ImproveResumeChooseModal=({  
     openImproveResumeChooseModal,
     setOpenImproveResumeChooseModal,
-    resumeId
+    improveResumeId
   })=>{
-    const encodedId = btoa(resumeId);
+    const encodedId = btoa(improveResumeId);
+    
     const dispatch=useDispatch()
       const user_id = sessionStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
@@ -20,6 +22,8 @@ const ImproveResumeChooseModal=({
       const handleSelect = (id) => {
     setSelectedResume(id);
   };
+  console.log("resmeid",improveResumeId);
+  
   const resumeBuilderHandler = () => {
     if (!selectedResume) {
       toast.error("Please select a resume first!");
@@ -28,7 +32,7 @@ const ImproveResumeChooseModal=({
     dispatch(saveTemplate(
       {
         templete_id:selectedResume,
-        jd_id:resumeId,
+        jd_id:improveResumeId,
         jd_type:"improve",
         user_id:parseUserId?.user_id
       }
