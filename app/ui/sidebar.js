@@ -96,7 +96,7 @@ const Sidebar = () => {
 
 
 
-
+console.log('profileData',profileData)
 
 
   return (
@@ -203,7 +203,7 @@ const Sidebar = () => {
                 </Link>
               </li>
 
-             {profileData?.data?.signUpType?.length > 0 && (
+               {profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id !== 2 && (
                 <li onClick={closeNavbar}>
                   <Link
                     href="/featured-jobs"

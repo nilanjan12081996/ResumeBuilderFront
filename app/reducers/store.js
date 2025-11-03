@@ -15,6 +15,7 @@ import FeatureJobSlice from '../reducers/FeatureJobSlice'
 import InviteSlice from '../reducers/InviteSlice'
 import ResumeSlice from '../reducers/ResumeSlice'
 import SupportSlice from '../reducers/SupportSlice'
+import CouponSlice from '../reducers/CouponSlice'
 
 const store = configureStore({
     reducer: {
@@ -32,6 +33,7 @@ const store = configureStore({
         inviteStd:InviteSlice,
         resume:ResumeSlice,
         support:SupportSlice,
+        coupon:CouponSlice,
     },
     devTools: process.env.NODE_ENV,
 });

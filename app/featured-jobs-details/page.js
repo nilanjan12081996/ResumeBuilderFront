@@ -18,6 +18,7 @@ import striptags from "striptags";
 import { convertToSubmitFormat } from "../utils/DateSubmitFormatter";
 import ApplyJobModal from "./ApplyJobModal";
 import { ToastContainer } from "react-toastify";
+import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 
 
 const page = () => {
@@ -63,7 +64,7 @@ const responsibilitiesData = parseResponsibilities(jobDetails?.data?.responsibil
                 <div className='mb-8 lg:mb-16 lg:flex items-center'>
                     <div className='lg:w-6/12 flex gap-4 items-center mb-4 lg:mb-0'>
                       <div className='border border-[#C2C2C2] rounded-[6px] w-[135px] h-[135px] flex justify-center items-center'>
-                        <Image src={small_inner_logo} alt="small_inner_logo" className='mb-0' />
+                        <Image src={headerLogo} alt="small_inner_logo" className='mb-0 p-2' />
                       </div>
                       <div>
                         <h3 className='text-black text-[22px] leading-[24px] font-semibold pb-2'>Hiring Eye</h3>

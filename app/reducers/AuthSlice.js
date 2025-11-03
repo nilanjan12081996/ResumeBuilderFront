@@ -241,6 +241,40 @@ export const forgotPassword = createAsyncThunk(
     }
 );
 
+export const resendOtpNew = createAsyncThunk(
+    'auth/resendOtpNew',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.get(`/api/auth/resend?id=${id}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response?.data?.message || 'Failed to resend OTP');
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+export const verifyOtpNew = createAsyncThunk(
+    'auth/verifyOtpNew',
+    async (payload, { rejectWithValue }) => {
+        // payload = { otp: 822312, id: 42 }
+        try {
+            const response = await serverApi.post(`/api/auth/verify-otp`, payload);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response?.data?.message || 'OTP verification failed');
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+
 
 const initialState = {
     message: null,
@@ -488,7 +522,7 @@ const authSlice = createSlice({
             })
 
 
-             .addCase(forgotPassword.pending, (state) => {
+            .addCase(forgotPassword.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
@@ -500,6 +534,43 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = payload;
             })
+
+
+            .addCase(resendOtpNew.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(resendOtpNew.fulfilled, (state, { payload }) => {
+                state.loading = false;
+                state.message = payload;
+                state.error = null;
+            })
+            .addCase(resendOtpNew.rejected, (state, { payload }) => {
+                state.loading = false;
+                state.error = payload;
+            })
+
+            .addCase(verifyOtpNew.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(verifyOtpNew.fulfilled, (state, { payload }) => {
+                const { access_token } = payload; // get token from payload
+
+                state.loading = false;
+                state.message = payload;
+                state.error = null;
+                state.isLoggedIn = true;
+
+                // Save only the access token
+                if (access_token) {
+                    sessionStorage.setItem('resumeToken', JSON.stringify({ token: access_token }));
+                }
+            })
+
+            .addCase(verifyOtpNew.rejected, (state, { payload }) => {
+                state.loading = false;
+                state.error = payload;
+            })
+
 
     },
 });
