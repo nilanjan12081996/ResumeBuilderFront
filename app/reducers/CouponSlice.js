@@ -7,7 +7,7 @@ export const applyCoupon = createAsyncThunk(
   'applyCoupon',
   async (couponData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/coupon/apply', couponData);
+      const response = await api.post('/api/coupon/apply', couponData);
       if (response?.data?.status_code === 200 || response?.data?.status_code === 201) {
         return response.data;
       } else {

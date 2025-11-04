@@ -44,6 +44,8 @@ import jd_based_resume from "../assets/imagesource/jd_based_resume.png";
 
 import resume1 from "../assets/imagesource/resume1.png";
 import resume2 from "../assets/imagesource/resume2.png";
+import resumes1 from "../assets/imagesource/resumes1.jpg";
+import resumes2 from "../assets/imagesource/resumes2.png";
 import view_full_resume from "../assets/imagesource/view_full_resume.png";
 
 import resume_sections_view from "../assets/imagesource/resume_sections_view.png";
@@ -544,7 +546,7 @@ const Page = () => {
                     for="cb1"
                     className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
                   >
-                    <Image src={resume1} alt="resume01" className="h-[400px]" />
+                    <Image src={resumes1} alt="resume01" className="h-[400px]" />
                   </label>
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center pt-1">
                     Modern Template
@@ -561,7 +563,8 @@ const Page = () => {
                     for="cb2"
                     className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
                   >
-                    <Image src={resume2} alt="resume01" className="h-[400px]" />
+                    {/* <Image src={resume2} alt="resume01" className="h-[400px]" /> */}
+                     <Image src={resumes2} alt="resume01" className="h-[400px]" />
                   </label>
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
                     Professional Template
@@ -596,14 +599,19 @@ const Page = () => {
             <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">
               {selectedResume === 1 && (
                 <Image
-                  src={resume1}
+                  src={resumes1}
                   alt="resume01"
                   className="h-[600px] w-[500px]"
                 />
               )}
               {selectedResume === 2 && (
-                <Image
-                  src={resume2}
+                // <Image
+                //   src={resume2}
+                //   alt="resume01"
+                //   className="h-[600px] w-[500px]"
+                // />
+                 <Image
+                  src={resumes2}
                   alt="resume01"
                   className="h-[600px] w-[500px]"
                 />

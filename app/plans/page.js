@@ -19,11 +19,19 @@ import sub02 from "../../app/assets/imagesource/sub02.png";
 import Check from "../../app/assets/imagesource/Check.png";
 import RazorPaymentModal from "../modal/RazorPaymentModal";
 import { toast, ToastContainer } from "react-toastify";
+import { applyCoupon, clearCouponState } from "../reducers/CouponSlice";
+import CouponModal from "../modal/CouponModal"; // we will create/use this
 
 const page = () => {
   const { plans, loading, ipData, createOrderData, error, currentSubscriptionData } = useSelector(
     (state) => state.planst
   );
+  const { appliedCoupon, loading: couponLoading, error: couponError } = useSelector(
+    (state) => state.coupon
+  );
+
+  const [openCouponModal, setOpenCouponModal] = useState(false);
+
   const { profileData } = useSelector((state) => state.profile);
   const usertypeId = sessionStorage.getItem("signup_type_id");
   const parsed = usertypeId ? JSON.parse(usertypeId) : null;
@@ -189,7 +197,7 @@ const page = () => {
             >
               {shouldDisableButton ? "Current Plan" : hasActiveSubscription() ? "Already Subscribed" : "Upgrade"}
             </button> */}
-            <button
+            {/* <button
               onClick={(e) =>
                 !isDisabled &&
                 handlePaymentModal(e, {
@@ -206,7 +214,27 @@ const page = () => {
                 }`}
             >
               {buttonLabel}
+            </button> */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                if (!isDisabled) {
+                  setAmount(pln?.planPrice?.price);
+                  setCurrency(pln?.planPrice?.currency);
+                  sePlanid(pln?.planPrice?.plan_id);
+                  setOpenCouponModal(true); // <-- open coupon modal
+                }
+              }}
+              disabled={isDisabled}
+              className={`text-[14px] leading-[40px] rounded-md w-full block transition-all duration-300
+    ${isDisabled
+                  ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed"
+                  : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
+                }`}
+            >
+              {buttonLabel}
             </button>
+
 
           </div>
         </div>
@@ -454,72 +482,7 @@ const page = () => {
                             );
                           })}
 
-                        {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹199</p>
-                                                    <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume (Premium ATS score + better rating) +1 JD match resume
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub02} alt='sub02' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹499</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹699</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 LinkedIn rewrite
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
-                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Platinum</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹649</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹949</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume  +1 LinkedIn rewrite
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div> */}
+
                       </div>
                     </TabPanel>
                     <TabPanel>
@@ -538,235 +501,7 @@ const page = () => {
                   </>
                 )}
 
-                {/* <TabPanel>
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                    <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                      <div className="py-8 px-6 relative">
-                        <Image src={sub01} alt="sub01" className="mb-6" />
-                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                          Free
-                        </h3>
-                        <div className="flex items-center gap-2 mb-8">
-                          <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                            ₹0
-                          </p>
-                        </div>
-                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                          <div>
-                            <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                              <Image
-                                src={Check}
-                                alt="Check"
-                                className="w-[14px] h-[14px] mr-2"
-                              />{" "}
-                              3 resumes (with watermark)
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute left-0 bottom-[20px] w-full px-6">
-                          <button 
-                            className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                          >
-                            Get Started
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                      <div className="py-8 px-6 relative">
-                        <Image src={sub01} alt="sub01" className="mb-6" />
-                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                          Silver
-                        </h3>
-                        <div className="flex items-center gap-2 mb-8">
-                          <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                            ₹799
-                          </p>
-                          <div className="pt-4">
-                            <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                              ₹999
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                          <div>
-                            <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                              <Image
-                                src={Check}
-                                alt="Check"
-                                className="w-[14px] h-[14px] mr-2"
-                              />{" "}
-                              8 resumes (premium ATS score) + 8 JD specific
-                              resume
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute left-0 bottom-[20px] w-full px-6">
-                          <button 
-                            className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                          >
-                            Get Started
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
-                      <div className="py-8 px-6 relative">
-                        <Image src={sub02} alt="sub02" className="mb-6" />
-                        <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">
-                          Gold
-                        </h3>
-                        <div className="flex items-center gap-2 mb-8">
-                          <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">
-                            ₹1299
-                          </p>
-                          <div className="pt-4">
-                            <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                              ₹1599
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                          <div>
-                            <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                              <Image
-                                src={Check}
-                                alt="Check"
-                                className="w-[14px] h-[14px] mr-2"
-                              />{" "}
-                              8 resumes + 2 LinkedIn rewrites
-                            </div>
-                          </div>
-                        </div>
-                        <div className="absolute left-0 bottom-[20px] w-full px-6">
-                          <button 
-                           onClick={(e) =>
-                                        handlePaymentModal(e, {
-                                          amount: pln?.planPrice?.price,
-                                          currency: pln?.planPrice?.currency,
-                                          plan_id: pln?.planPrice?.plan_id,
-                                        })
-                                      }
-                            className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer"
-                          >
-                            Get Started
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabPanel> */}
-                {/* <TabPanel>
-                                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Basic</h3>
-                                                <div className="gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹60,000</p>
-                                                   <div className="pt-0">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹90,000</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 500 resumes
-                                                      </div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹120/resume
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[10px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Pro</h3>
-                                                <div className="gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1,00,000</p>
-                                                    <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹1,50,000</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1,000 resumes
-                                                      </div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹100/resume
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub02} alt='sub02' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Plus</h3>
-                                                <div className="gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1,20,000</p>
-                                                   <div className="pt-0">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹1,70,000</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 500 resumes
-                                                      </div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 500 LinkedIn rewrites
-                                                      </div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹80/resume + LinkedIn
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Campus Elite</h3>
-                                                <div className="gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹1,70,000</p>
-                                                   <div className="pt-0">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹2,00,000</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1,000 resumes
-                                                      </div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1,000 LinkedIn rewrites
-                                                      </div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> ₹85/resume + LinkedIn
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          
-                                       </div>
-                                    </TabPanel> */}
+
                 {parsed?.signup_type_id == 2 && (
                   <>
                     <TabPanel>
@@ -781,72 +516,7 @@ const page = () => {
                             );
                           })}
 
-                        {/* <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Silver</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹199</p>
-                                                    <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume (Premium ATS score + better rating) +1 JD match resume
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white gold_card_box">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub02} alt='sub02' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Gold</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹499</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹699</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 LinkedIn rewrite
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
-                                                   <button className="bg-[#e1cbff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                          <div className="pt-0 border border-[#e9edff] rounded-[26px] bg-white">
-                                             <div className="py-8 px-6 relative">
-                                                <Image src={sub01} alt='sub01' className='mb-6' />
-                                                <h3 className="text-[28px] leading-[28px] text-[#1B223C] pb-6 font-medium">Platinum</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[40px] leading-[50px] font-medium">₹649</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹949</p>
-                                                   </div>
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-                                                      <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                         <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' /> 1 resume  +1 LinkedIn rewrite
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[-20px] w-full px-6">
-                                                   <button className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div> */}
+
                       </div>
                     </TabPanel>
                   </>
@@ -855,6 +525,19 @@ const page = () => {
             </div>
           </div>
         </div>
+        {openCouponModal && (
+          <CouponModal
+            isOpen={openCouponModal}
+            onClose={() => setOpenCouponModal(false)}
+            amount={amount}
+            currency={currency}
+            plan_id={plan_id}
+            ip={ipData?.ip}
+            onPayment={handlePaymentModal} // existing function to call Razorpay
+          />
+
+        )}
+
         {openPaymentModal && (
           <RazorPaymentModal
             openPaymentModal={openPaymentModal}
