@@ -192,6 +192,502 @@
 
 // export default CouponModal;
 
+// "use client";
+// import { useState, useEffect, useMemo } from "react";
+// import { IoClose } from "react-icons/io5";
+// import { useDispatch, useSelector } from "react-redux";
+// import { applyCoupon, clearCouponState } from "../reducers/CouponSlice";
+// import { createOrder } from "../reducers/PlanSlice";
+// import { toast } from "react-toastify";
+
+// const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
+//   const dispatch = useDispatch();
+
+//   // Redux states
+//   const { appliedCoupon, loading: couponLoading, error: couponError } = useSelector(
+//     (state) => state.coupon
+//   );
+//   const { plans, createOrderData, loading } = useSelector((state) => state.planst);
+
+//   // Local states
+//   const [coupon, setCoupon] = useState("");
+//   const [finalAmount, setFinalAmount] = useState(null);
+//   const [discountInfo, setDiscountInfo] = useState(null);
+//   const [couponMessage, setCouponMessage] = useState(null);
+
+//   // Find selected plan
+//   const selectedPlan = useMemo(() => {
+//     const arr = plans?.data;
+//     if (!arr || !Array.isArray(arr)) return null;
+//     return arr.find((p) => p?.id === plan_id) || null;
+//   }, [plans, plan_id]);
+
+//   // Base amount from plan
+//   useEffect(() => {
+//     if (selectedPlan) {
+//       const planPrice = Number(selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0);
+//       setFinalAmount(planPrice);
+//     }
+//   }, [selectedPlan]);
+
+//   console.log('selectedPlan',selectedPlan)
+//   // Apply Coupon
+//   const handleApply = () => {
+//     if (!coupon) {
+//       setCouponMessage({ type: "error", text: "Enter a coupon code" });
+//       return;
+//     }
+//     if (!finalAmount) {
+//       setCouponMessage({ type: "error", text: "Invalid plan amount" });
+//       return;
+//     }
+
+//     setCouponMessage(null);
+//     dispatch(
+//       applyCoupon({
+//         coupon_code: coupon,
+//         order_amount: finalAmount,
+//         currency,
+//       })
+//     );
+//   };
+
+//   // Coupon Response Handling
+//   useEffect(() => {
+//     if (appliedCoupon?.data) {
+//       const data = appliedCoupon.data;
+
+//       setDiscountInfo({
+//         code: data.coupon_code,
+//         type: data.coupon_type,
+//         value: data.coupon_value,
+//         discount: data.discount_amount,
+//         savings: data.savings,
+//       });
+
+//       setFinalAmount(data.final_amount);
+//       setCouponMessage({
+//         type: "success",
+//         text: appliedCoupon.message || "Coupon applied successfully",
+//       });
+
+//       dispatch(clearCouponState());
+//     }
+
+//     if (couponError) {
+//       // ✅ Extract deep message from couponError.data if available
+//       let errMsg = "Something went wrong";
+//       try {
+//         if (Array.isArray(couponError?.data) && couponError.data.length > 0) {
+//           errMsg = couponError.data[0]?.message || errMsg;
+//         } else if (couponError?.message) {
+//           errMsg = couponError.message;
+//         } else if (typeof couponError === "string") {
+//           errMsg = couponError;
+//         }
+//       } catch {
+//         errMsg = "Invalid coupon";
+//       }
+
+//       setCouponMessage({ type: "error", text: errMsg });
+//       dispatch(clearCouponState());
+//     }
+//   }, [appliedCoupon, couponError, dispatch]);
+
+//   // Handle Payment (create order)
+//   const handlePayNow = (e) => {
+//     e.preventDefault();
+//     if (!selectedPlan) return toast.error("Plan not found");
+//     if (!finalAmount) return toast.error("Invalid amount");
+
+//     dispatch(
+//       createOrder({
+//         plan_id,
+//         ip_address: ip,
+//         amount: finalAmount,
+//         currency,
+//       })
+//     ).then((res) => {
+//       if (res?.payload?.status_code === 200) {
+//         const order = res.payload;
+//         // toast.success("Order created successfully");
+
+//         onPayment(e, {
+//           amount: finalAmount,
+//           currency,
+//           plan_id,
+//           orderId: order?.orderId,
+//           key: order?.key,
+//           transaction_id: order?.transaction_id,
+//         });
+
+//         onClose();
+//       } else {
+//         toast.error(res?.payload?.message || "Failed to create order");
+//       }
+//     });
+//   };
+
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
+//       <div className="relative bg-white rounded-2xl p-6 w-[420px] shadow-2xl transition-all duration-300">
+//         {/* Close Button */}
+//         <button
+//           onClick={onClose}
+//           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+//         >
+//           <IoClose size={24} />
+//         </button>
+
+//         <h2 className="text-xl font-semibold mb-4 text-center">
+//           Complete Your Payment
+//         </h2>
+
+//         {selectedPlan ? (
+//           <>
+//             {/* Plan Summary */}
+//             <div className="mb-4 border rounded-lg p-4 bg-gray-50">
+//               <p className="text-sm text-gray-600">
+//                 Plan: <strong>{selectedPlan?.plan_name}</strong>
+//               </p>
+//               <p className="font-semibold mt-1">
+//                 Price: {currency}{" "}
+//                 {Number(selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0).toFixed(2)}
+//               </p>
+
+//               {discountInfo && (
+//                 <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-md">
+//                   <p className="text-green-700 text-sm font-medium">
+//                     Coupon Applied: <strong>{discountInfo.code}</strong>
+//                   </p>
+//                   <p className="text-green-700 text-sm">
+//                     You saved{" "}
+//                     {discountInfo.type === "fixed_amount"
+//                       ? `${currency} ${discountInfo.value}`
+//                       : `${discountInfo.value}%`}
+//                     !
+//                   </p>
+//                 </div>
+//               )}
+
+//               {finalAmount && (
+//                 <p className="mt-3 font-semibold text-green-700">
+//                   Final Payable (without GST):{" "}
+//                   <strong>
+//                     {currency} {Number(finalAmount).toFixed(2)}
+//                   </strong>
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* Coupon Field */}
+//             <div className="mb-4">
+//               <label className="text-sm font-medium text-gray-700">Have a Coupon?</label>
+//               <div className="flex mt-1 gap-2">
+//                 <input
+//                   type="text"
+//                   value={coupon}
+//                   onChange={(e) => setCoupon(e.target.value)}
+//                   placeholder="Enter code"
+//                   className="flex-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+//                 />
+//                 <button
+//                   onClick={handleApply}
+//                   className=" cursor-pointer px-4 bg-[#000] text-white rounded-lg hover:bg-[#2c2b2b] transition disabled:opacity-50"
+//                   disabled={couponLoading}
+//                 >
+//                   {couponLoading ? "..." : "Apply"}
+//                 </button>
+//               </div>
+
+//               {/* Inline message (Success/Error) */}
+//               {couponMessage?.text && typeof couponMessage.text === "string" && (
+//                 <p
+//                   className={`text-sm mt-2 ${
+//                     couponMessage.type === "error" ? "text-red-600" : "text-green-600"
+//                   }`}
+//                 >
+//                   {couponMessage.text}
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* Buttons */}
+//             <div className="flex justify-end gap-3 mt-4">
+//               <button
+//                 onClick={onClose}
+//                 className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+//               >
+//                 Cancel
+//               </button>
+//               <button
+//                 onClick={handlePayNow}
+//                 className="cursor-pointer px-4 py-2 bg-[#800080] text-white rounded-lg hover:bg-[#b670b6] transition disabled:opacity-50"
+//                 disabled={loading}
+//               >
+//                 {loading
+//                   ? "Processing..."
+//                   : `Pay Now ${currency} ${Number(finalAmount).toFixed(2)}`}
+//               </button>
+//             </div>
+//           </>
+//         ) : (
+//           <p className="text-center text-gray-500">Loading plan details...</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CouponModal;
+
+// "use client";
+// import { useState, useEffect, useMemo } from "react";
+// import { IoClose } from "react-icons/io5";
+// import { useDispatch, useSelector } from "react-redux";
+// import { applyCoupon, clearCouponState } from "../reducers/CouponSlice";
+// import { createOrder } from "../reducers/PlanSlice";
+// import { toast } from "react-toastify";
+
+// const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
+//   const dispatch = useDispatch();
+
+//   const { appliedCoupon, loading: couponLoading, error: couponError } = useSelector(
+//     (state) => state.coupon
+//   );
+//   const { plans, loading } = useSelector((state) => state.planst);
+
+//   const [coupon, setCoupon] = useState("");
+//   const [finalAmount, setFinalAmount] = useState(null);
+//   const [discountInfo, setDiscountInfo] = useState(null);
+//   const [couponMessage, setCouponMessage] = useState(null);
+//   const [gstAmount, setGstAmount] = useState(0);
+
+//   // 🔹 Selected plan
+//   const selectedPlan = useMemo(() => {
+//     const arr = plans?.data;
+//     if (!arr || !Array.isArray(arr)) return null;
+//     return arr.find((p) => p?.id === plan_id) || null;
+//   }, [plans, plan_id]);
+
+//   // 🔹 Initial base price
+//   useEffect(() => {
+//     if (selectedPlan) {
+//       const planPrice = Number(selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0);
+//       setFinalAmount(planPrice);
+//     }
+//   }, [selectedPlan]);
+
+//   // 🔹 GST calculation (display only, fixed on base price)
+//   useEffect(() => {
+//   if (!finalAmount || currency !== "INR") {
+//     setGstAmount(0);
+//     return;
+//   }
+//   const gst = (finalAmount * 18) / 100;
+//   setGstAmount(gst);
+// }, [finalAmount, currency]);
+
+//   // 🔹 Apply coupon
+//   const handleApply = () => {
+//     if (!coupon) {
+//       setCouponMessage({ type: "error", text: "Enter a coupon code" });
+//       return;
+//     }
+//     setCouponMessage(null);
+//     dispatch(
+//       applyCoupon({
+//         coupon_code: coupon,
+//         order_amount: finalAmount,
+//         currency,
+//       })
+//     );
+//   };
+
+//   // 🔹 Coupon Response
+//   useEffect(() => {
+//     if (appliedCoupon?.data) {
+//       const data = appliedCoupon.data;
+
+//       setDiscountInfo({
+//         code: data.coupon_code,
+//         type: data.coupon_type,
+//         value: data.coupon_value,
+//         discount: data.discount_amount,
+//       });
+
+//       setFinalAmount(data.final_amount);
+//       setCouponMessage({
+//         type: "success",
+//         text: appliedCoupon.message || "Coupon applied successfully",
+//       });
+
+//       dispatch(clearCouponState());
+//     }
+
+//     if (couponError) {
+//       let errMsg = "Something went wrong";
+//       try {
+//         if (Array.isArray(couponError?.data) && couponError.data.length > 0) {
+//           errMsg = couponError.data[0]?.message || errMsg;
+//         } else if (couponError?.message) {
+//           errMsg = couponError.message;
+//         } else if (typeof couponError === "string") {
+//           errMsg = couponError;
+//         }
+//       } catch {
+//         errMsg = "Invalid coupon";
+//       }
+
+//       setCouponMessage({ type: "error", text: errMsg });
+//       dispatch(clearCouponState());
+//     }
+//   }, [appliedCoupon, couponError, dispatch]);
+
+//   // 🔹 Handle Pay Now
+//   const handlePayNow = (e) => {
+//     e.preventDefault();
+//     if (!selectedPlan) return toast.error("Plan not found");
+
+//     dispatch(
+//       createOrder({
+//         plan_id,
+//         ip_address: ip,
+//         amount: finalAmount, // ✅ only send discounted base amount
+//         currency,
+//       })
+//     ).then((res) => {
+//       if (res?.payload?.status_code === 200) {
+//         const order = res.payload;
+//         onPayment(e, {
+//           amount: finalAmount,
+//           currency,
+//           plan_id,
+//           orderId: order?.orderId,
+//           key: order?.key,
+//           transaction_id: order?.transaction_id,
+//         });
+//         onClose();
+//       } else {
+//         toast.error(res?.payload?.message || "Failed to create order");
+//       }
+//     });
+//   };
+
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
+//       <div className="relative bg-white rounded-2xl p-6 w-[420px] shadow-2xl transition-all duration-300">
+//         <button
+//           onClick={onClose}
+//           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+//         >
+//           <IoClose size={24} />
+//         </button>
+
+//         <h2 className="text-xl font-semibold mb-4 text-center">
+//           Complete Your Payment
+//         </h2>
+
+//         {selectedPlan ? (
+//           <>
+//             {/* 🔹 Plan Summary */}
+//             <div className="mb-4 border rounded-lg p-4 bg-gray-50">
+//               <p className="text-sm text-gray-600">
+//                 Plan: <strong>{selectedPlan?.plan_name}</strong>
+//               </p>
+
+//               <div className="flex justify-between mt-2 text-sm">
+//                 <span>Base Price:</span>
+//                 <span>
+//                   {currency}{" "}
+//                   {Number(
+//                     selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0
+//                   ).toFixed(2)}
+//                 </span>
+//               </div>
+
+//               {discountInfo && (
+//                 <div className="flex justify-between mt-1 text-sm text-green-700">
+//                   <span>Discount ({discountInfo.code}):</span>
+//                   <span>
+//                     -{" "}
+//                     {discountInfo.type === "fixed_amount"
+//                       ? `${currency} ${discountInfo.value}`
+//                       : `${discountInfo.value}%`}
+//                   </span>
+//                 </div>
+//               )}
+
+//               {currency === "INR" && (
+//                 <div className="flex justify-between mt-1 text-sm text-gray-700">
+//                   <span>GST (18%):</span>
+//                   <span>
+//                     {currency} {gstAmount.toFixed(2)}
+//                   </span>
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* 🔹 Coupon Field */}
+//             <div className="mb-4">
+//               <label className="text-sm font-medium text-gray-700">
+//                 Have a Coupon?
+//               </label>
+//               <div className="flex mt-1 gap-2">
+//                 <input
+//                   type="text"
+//                   value={coupon}
+//                   onChange={(e) => setCoupon(e.target.value)}
+//                   placeholder="Enter code"
+//                   className="flex-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+//                 />
+//                 <button
+//                   onClick={handleApply}
+//                   className="cursor-pointer px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition disabled:opacity-50"
+//                   disabled={couponLoading}
+//                 >
+//                   {couponLoading ? "..." : "Apply"}
+//                 </button>
+//               </div>
+
+//               {couponMessage?.text && (
+//                 <p
+//                   className={`text-sm mt-2 ${
+//                     couponMessage.type === "error"
+//                       ? "text-red-600"
+//                       : "text-green-600"
+//                   }`}
+//                 >
+//                   {couponMessage.text}
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* 🔹 Pay Button */}
+//             <div className="flex justify-end mt-4">
+//               <button
+//                 onClick={handlePayNow}
+//                 className="cursor-pointer px-5 py-2 bg-[#800080] text-white rounded-lg hover:bg-[#b670b6] transition disabled:opacity-50"
+//                 disabled={loading}
+//               >
+//                 {loading ? "Processing..." : "Pay Now"}
+//               </button>
+//             </div>
+//           </>
+//         ) : (
+//           <p className="text-center text-gray-500">Loading plan details...</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CouponModal;
+
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { IoClose } from "react-icons/io5";
@@ -203,69 +699,73 @@ import { toast } from "react-toastify";
 const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
   const dispatch = useDispatch();
 
-  // Redux states
   const { appliedCoupon, loading: couponLoading, error: couponError } = useSelector(
     (state) => state.coupon
   );
-  const { plans, createOrderData, loading } = useSelector((state) => state.planst);
+  const { plans, loading } = useSelector((state) => state.planst);
 
-  // Local states
   const [coupon, setCoupon] = useState("");
-  const [finalAmount, setFinalAmount] = useState(null);
   const [discountInfo, setDiscountInfo] = useState(null);
   const [couponMessage, setCouponMessage] = useState(null);
+  const [gstAmount, setGstAmount] = useState(0);
+  const [finalAmount, setFinalAmount] = useState(0);
 
-  // Find selected plan
+  // 🔹 Selected plan
   const selectedPlan = useMemo(() => {
     const arr = plans?.data;
     if (!arr || !Array.isArray(arr)) return null;
     return arr.find((p) => p?.id === plan_id) || null;
   }, [plans, plan_id]);
 
-  // Base amount from plan
+  // 🔹 Base price setup
+  const basePrice = Number(selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0);
+
   useEffect(() => {
     if (selectedPlan) {
-      const planPrice = Number(selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0);
-      setFinalAmount(planPrice);
+      setFinalAmount(basePrice); // default base price
     }
   }, [selectedPlan]);
 
-  console.log('selectedPlan',selectedPlan)
-  // Apply Coupon
+  // 🔹 Apply coupon
   const handleApply = () => {
     if (!coupon) {
       setCouponMessage({ type: "error", text: "Enter a coupon code" });
       return;
     }
-    if (!finalAmount) {
-      setCouponMessage({ type: "error", text: "Invalid plan amount" });
-      return;
-    }
 
     setCouponMessage(null);
+
     dispatch(
       applyCoupon({
         coupon_code: coupon,
-        order_amount: finalAmount,
+        order_amount: basePrice,
         currency,
       })
     );
   };
 
-  // Coupon Response Handling
+  // 🔹 Coupon Response
   useEffect(() => {
     if (appliedCoupon?.data) {
       const data = appliedCoupon.data;
 
+      const discountValue = Number(data?.coupon_value || 0);
+      const discountType = data?.coupon_type; // fixed_amount / percentage
+      let discountedPrice = basePrice;
+
+      if (discountType === "percentage") {
+        discountedPrice = basePrice - (basePrice * discountValue) / 100;
+      } else if (discountType === "fixed_amount") {
+        discountedPrice = basePrice - discountValue;
+      }
+
       setDiscountInfo({
         code: data.coupon_code,
-        type: data.coupon_type,
-        value: data.coupon_value,
-        discount: data.discount_amount,
-        savings: data.savings,
+        type: discountType,
+        value: discountValue,
       });
 
-      setFinalAmount(data.final_amount);
+      setFinalAmount(discountedPrice);
       setCouponMessage({
         type: "success",
         text: appliedCoupon.message || "Coupon applied successfully",
@@ -275,7 +775,6 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
     }
 
     if (couponError) {
-      // ✅ Extract deep message from couponError.data if available
       let errMsg = "Something went wrong";
       try {
         if (Array.isArray(couponError?.data) && couponError.data.length > 0) {
@@ -294,24 +793,31 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
     }
   }, [appliedCoupon, couponError, dispatch]);
 
-  // Handle Payment (create order)
+  // 🔹 GST calculation (display only — not added to payment)
+  useEffect(() => {
+    if (currency === "INR") {
+      const gst = (basePrice * 18) / 100;
+      setGstAmount(gst);
+    } else {
+      setGstAmount(0);
+    }
+  }, [basePrice, currency]);
+
+  // 🔹 Handle Pay Now (send discounted amount only)
   const handlePayNow = (e) => {
     e.preventDefault();
     if (!selectedPlan) return toast.error("Plan not found");
-    if (!finalAmount) return toast.error("Invalid amount");
 
     dispatch(
       createOrder({
         plan_id,
         ip_address: ip,
-        amount: finalAmount,
+        amount: finalAmount, // ✅ only discounted amount (no GST)
         currency,
       })
     ).then((res) => {
       if (res?.payload?.status_code === 200) {
         const order = res.payload;
-        toast.success("Order created successfully");
-
         onPayment(e, {
           amount: finalAmount,
           currency,
@@ -320,7 +826,6 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
           key: order?.key,
           transaction_id: order?.transaction_id,
         });
-
         onClose();
       } else {
         toast.error(res?.payload?.message || "Failed to create order");
@@ -333,7 +838,6 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
       <div className="relative bg-white rounded-2xl p-6 w-[420px] shadow-2xl transition-all duration-300">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
@@ -347,44 +851,47 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
 
         {selectedPlan ? (
           <>
-            {/* Plan Summary */}
+            {/* 🔹 Plan Summary */}
             <div className="mb-4 border rounded-lg p-4 bg-gray-50">
               <p className="text-sm text-gray-600">
                 Plan: <strong>{selectedPlan?.plan_name}</strong>
               </p>
-              <p className="font-semibold mt-1">
-                Price: {currency}{" "}
-                {Number(selectedPlan?.planPrice?.price ?? selectedPlan?.price ?? 0).toFixed(2)}
-              </p>
+
+              <div className="flex justify-between mt-2 text-sm">
+                <span>Base Price:</span>
+                <span>
+                  {currency} {basePrice.toFixed(2)}
+                </span>
+              </div>
 
               {discountInfo && (
-                <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-green-700 text-sm font-medium">
-                    Coupon Applied: <strong>{discountInfo.code}</strong>
-                  </p>
-                  <p className="text-green-700 text-sm">
-                    You saved{" "}
+                <div className="flex justify-between mt-1 text-sm text-green-700">
+                  <span>Discount ({discountInfo.code}):</span>
+                  <span>
+                    -{" "}
                     {discountInfo.type === "fixed_amount"
                       ? `${currency} ${discountInfo.value}`
                       : `${discountInfo.value}%`}
-                    !
-                  </p>
+                  </span>
                 </div>
               )}
 
-              {finalAmount && (
-                <p className="mt-3 font-semibold text-green-700">
-                  Final Payable (without GST):{" "}
-                  <strong>
-                    {currency} {Number(finalAmount).toFixed(2)}
-                  </strong>
-                </p>
+              {/* GST just for display */}
+              {currency === "INR" && (
+                <div className="flex justify-between mt-1 text-sm text-gray-700">
+                  <span>GST (18%):</span>
+                  <span>
+                    {currency} {gstAmount.toFixed(2)}
+                  </span>
+                </div>
               )}
             </div>
 
-            {/* Coupon Field */}
+            {/* 🔹 Coupon Field */}
             <div className="mb-4">
-              <label className="text-sm font-medium text-gray-700">Have a Coupon?</label>
+              <label className="text-sm font-medium text-gray-700">
+                Have a Coupon?
+              </label>
               <div className="flex mt-1 gap-2">
                 <input
                   type="text"
@@ -395,18 +902,19 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
                 />
                 <button
                   onClick={handleApply}
-                  className=" cursor-pointer px-4 bg-[#000] text-white rounded-lg hover:bg-[#2c2b2b] transition disabled:opacity-50"
+                  className="cursor-pointer px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition disabled:opacity-50"
                   disabled={couponLoading}
                 >
                   {couponLoading ? "..." : "Apply"}
                 </button>
               </div>
 
-              {/* Inline message (Success/Error) */}
-              {couponMessage?.text && typeof couponMessage.text === "string" && (
+              {couponMessage?.text && (
                 <p
                   className={`text-sm mt-2 ${
-                    couponMessage.type === "error" ? "text-red-600" : "text-green-600"
+                    couponMessage.type === "error"
+                      ? "text-red-600"
+                      : "text-green-600"
                   }`}
                 >
                   {couponMessage.text}
@@ -414,22 +922,14 @@ const CouponModal = ({ isOpen, onClose, currency, plan_id, ip, onPayment }) => {
               )}
             </div>
 
-            {/* Buttons */}
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-              >
-                Cancel
-              </button>
+            {/* 🔹 Pay Button */}
+            <div className="flex justify-end mt-4">
               <button
                 onClick={handlePayNow}
-                className="cursor-pointer px-4 py-2 bg-[#800080] text-white rounded-lg hover:bg-[#b670b6] transition disabled:opacity-50"
+                className="cursor-pointer px-5 py-2 bg-[#800080] text-white rounded-lg hover:bg-[#b670b6] transition disabled:opacity-50"
                 disabled={loading}
               >
-                {loading
-                  ? "Processing..."
-                  : `Pay Now ${currency} ${Number(finalAmount).toFixed(2)}`}
+                {loading ? "Processing..." : "Pay Now"}
               </button>
             </div>
           </>
