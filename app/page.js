@@ -357,8 +357,7 @@ export default function Home() {
                   <div className="lg:w-4/12 mb-4 lg:mb-0">
                      <p className="text-base leading-[27px] text-white uppercase mb-1">testimonials</p>
                      <h2 className="text-2xl lg:text-[40px] lg:leading-[40px] text-white font-bold mb-2 lg:mb-4 pr-20">What people say</h2>
-                     <p className="text-sm leading-[24px] text-white">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros.
-                        Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non</p>
+                     <p className="text-sm leading-[24px] text-white">Real stories from real users who turned ordinary resumes into extraordinary opportunities. With ResumeMile, thousands have unlocked career growth and achieved the jobs they truly deserve.</p>
                   </div>
                   <div className="lg:w-8/12">
                      <Testimonial />
