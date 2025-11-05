@@ -93,6 +93,22 @@ const page = () => {
     let isDisabled = false;
 
     // Logic for plan comparison
+    // if (isActivePlan) {
+    //   buttonLabel = "Current Plan";
+    //   isDisabled = true;
+    // } else if (hasActiveSubscription()) {
+    //   if (thisPrice < activePrice) {
+    //     buttonLabel = "Downgrade";
+    //   } else if (thisPrice > activePrice) {
+    //     buttonLabel = "Upgrade";
+    //   } else {
+    //     buttonLabel = "Same Tier";
+    //     isDisabled = true;
+    //   }
+    // } else if (!hasActiveSubscription()) {
+    //   buttonLabel = "Get Started";
+    // }
+
     if (isActivePlan) {
       buttonLabel = "Current Plan";
       isDisabled = true;
@@ -108,6 +124,7 @@ const page = () => {
     } else if (!hasActiveSubscription()) {
       buttonLabel = "Get Started";
     }
+
 
 
     return (
@@ -265,10 +282,43 @@ const page = () => {
     e.preventDefault();
 
     // Prevent payment if user has active subscription
+    // if (hasActiveSubscription()) {
+    //   toast.error("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
+    //   return;
+    // }
+
+    // Prevent payment only for same-tier plans
     if (hasActiveSubscription()) {
-      toast.error("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
-      return;
+      const activePlan = getCurrentActiveSubscription();
+      const activePrice = parseFloat(activePlan?.Plan?.planPrice?.price || 0);
+      const newPrice = parseFloat(data?.amount || 0);
+
+      // Same plan check
+      if (activePlan?.Plan?.id === data?.plan_id) {
+        toast.error("You are already on this plan.");
+        return;
+      }
+
+      // Downgrade check (block)
+      if (newPrice < activePrice) {
+        toast.error("You cannot downgrade while your current subscription is active.");
+        return;
+      }
+
+      // Same tier check
+      if (newPrice === activePrice) {
+        toast.error("You are already on the same tier plan.");
+        return;
+      }
+
+      // Allow upgrade
+      if (newPrice > activePrice) {
+        console.log("Proceeding with upgrade");
+      }
     }
+
+
+
     // setAmount(data?.amount);
     // setCurrency(data?.currency);
     // sePlanid(data?.plan_id);

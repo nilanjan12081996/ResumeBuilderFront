@@ -591,6 +591,7 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
       {/* ===================  ResuMate Button =================== */}
       <div className="relative">
         <button
+          id="resumate-section"
           ref={buttonRef}
           type="button"
           className="bg-[#92278F] border border-[#92278F] hover:bg-[#fff] hover:text-[#92278F] rounded-[25px] text-[15px] text-[#fff] font-medium cursor-pointer px-6 py-2 mt-4 flex items-center gap-2 shadow-lg"

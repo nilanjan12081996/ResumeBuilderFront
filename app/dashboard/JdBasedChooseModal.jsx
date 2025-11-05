@@ -1,7 +1,7 @@
 import { Modal, ModalBody, ModalHeader } from "flowbite-react"
 import Image from "next/image"
-import resume1 from "../assets/imagesource/resume1.png";
-import resume2 from "../assets/imagesource/resume2.png";
+import resume1 from "../assets/imagesource/resum1.png";
+import resume2 from "../assets/imagesource/resum2.png";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";

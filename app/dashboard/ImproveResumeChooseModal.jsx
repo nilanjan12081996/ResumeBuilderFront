@@ -1,7 +1,7 @@
 import { Modal, ModalBody, ModalHeader } from "flowbite-react"
 import Image from "next/image"
-import resume1 from "../assets/imagesource/resume1.png";
-import resume2 from "../assets/imagesource/resume2.png";
+import resume1 from "../assets/imagesource/resum1.png";
+import resume2 from "../assets/imagesource/resum1.png";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -91,7 +91,7 @@ const ImproveResumeChooseModal=({
                     Professional Template
                   </p>
                 </li>
-                <li>
+                {/* <li>
                   <input type="radio" name="test" id="cb3" />
                   <label
                     for="cb3"
@@ -102,8 +102,8 @@ const ImproveResumeChooseModal=({
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
                     Technical Template
                   </p>
-                </li>
-                <li>
+                </li> */}
+                {/* <li>
                   <input type="radio" name="test" id="cb4" />
                   <label
                     for="cb4"
@@ -114,7 +114,7 @@ const ImproveResumeChooseModal=({
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
                     Modern Template
                   </p>
-                </li>
+                </li> */}
               </ul>
             </div>
             <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">
