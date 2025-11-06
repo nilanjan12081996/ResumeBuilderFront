@@ -75,7 +75,7 @@ const Testimonial = () => {
                 <div className='bg-white rounded-xl p-6 shadow-lg text-left'>
                     <div className='flex justify-between items-center mb-5'>
                         <div className='flex gap-2 items-center justify-center'>
-                            <div><Image src={testi_face2} alt='testi_face' className='w-[63px] h-[63px]' /></div>
+                            <div><Image src={testi_face3} alt='testi_face' className='w-[63px] h-[63px]' /></div>
                             <div>
                                 <p className='text-[24px] leading-[30px] text-[#071537] font-bold mb-1'>Arjun Mehta</p>
                                 <Image src={rating_icon} alt='rating_icon' className='' />
@@ -91,7 +91,7 @@ const Testimonial = () => {
                 <div className='bg-white rounded-xl p-6 shadow-lg text-left'>
                     <div className='flex justify-between items-center mb-5'>
                         <div className='flex gap-2 items-center justify-center'>
-                            <div><Image src={testi_face3} alt='testi_face' className='w-[63px] h-[63px]' /></div>
+                            <div><Image src={testi_face2} alt='testi_face' className='w-[63px] h-[63px]' /></div>
                             <div>
                                 <p className='text-[24px] leading-[30px] text-[#071537] font-bold mb-1'>Anjali Das</p>
                                 <Image src={rating_icon} alt='rating_icon' className='' />
