@@ -26,6 +26,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     const [showOtpScreen, setShowOtpScreen] = useState(false);
     const [otpId, setOtpId] = useState(null);  // store user id from register API
     const [otp, setOtp] = useState("");
+    const [otpError, setOtpError] = useState("");
 
 
     const {
@@ -90,26 +91,28 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
 
     // --- OTP submit ---
     const handleVerifyOtp = () => {
+        if (!otp || otp.trim().length === 0) {
+            setOtpError("Please enter the OTP");
+            return;
+        }
         dispatch(verifyOtpNew({ id: otpId, otp })).then((res) => {
             if (res?.payload?.status_code === 200) {
-                toast.success("OTP verified successfully!");
                 setOpenRegisterModal(false);
                 dispatch(getProfile())
                 router.push("/plans");
             } else {
-                toast.error(res?.payload?.message || "Failed to verify OTP");
+                // console.log('res',res)
+                setOtpError("Invalid OTP. Please try again.");
             }
         });
     };
 
     // --- Resend OTP ---
     const handleResendOtp = () => {
-        dispatch(resendOtpNew(otpId)).then(() => {
-            toast.success("OTP resent successfully!");
-        });
+        dispatch(resendOtpNew(otpId));
     };
 
-        // --- OTP Resend Button Component ---
+    // --- OTP Resend Button Component ---
     const ResendOtpButton = ({ handleResendOtp, setOtp }) => {
         const [timer, setTimer] = useState(30);
         const [canResend, setCanResend] = useState(false);
@@ -136,16 +139,15 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
             <button
                 onClick={onResendClick}
                 disabled={!canResend}
-                className={`font-medium p-2 rounded-lg transition-colors ${
-                    canResend ? "text-blue-600 hover:text-blue-800" : "text-gray-400 cursor-not-allowed"
-                }`}
+                className={`font-medium p-2 rounded-lg transition-colors ${canResend ? "text-blue-600 hover:text-blue-800" : "text-gray-400 cursor-not-allowed"
+                    }`}
             >
                 {canResend ? "Resend OTP" : `Resend in ${timer}s`}
             </button>
         );
     };
 
-    
+
 
 
 
@@ -324,25 +326,40 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                     </>
                                 ) : (
                                     // --- OTP screen ---
-                                    <div className="p-10 flex flex-col items-center bg-white rounded-xl shadow-lg w-full max-w-md mx-auto">
-                                        <h2 className="text-2xl font-semibold mb-6 text-gray-800">Enter OTP</h2>
+                                    <div className="p-8 flex flex-col items-center bg-white rounded-2xl shadow-lg w-full max-w-md mx-auto text-center">
+                                        <h2 className="text-3xl font-semibold mb-3 text-gray-900">Verify Your Email</h2>
+                                        <p className="text-gray-600 mb-6 text-sm">
+                                            We’ve sent a 6-digit verification code to your email:
+                                            <br />
+                                            <span className="font-medium text-blue-600">{watch("email")}</span>
+                                        </p>
 
                                         <input
                                             type="text"
                                             placeholder="Enter OTP"
                                             value={otp}
                                             onChange={(e) => setOtp(e.target.value)}
-                                            className="border border-gray-300 rounded-lg p-3 mb-4 w-full text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                            className="border border-gray-300 rounded-xl p-3 mb-4 w-64 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         />
+
+                                        {otpError && (
+                                            <p className="text-red-500 text-sm my-2">{otpError}</p>
+                                        )}
 
                                         <button
                                             onClick={handleVerifyOtp}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium p-3 w-full rounded-lg mb-3 transition-colors"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl w-full transition-colors"
                                         >
                                             Verify OTP
                                         </button>
 
-                                        <ResendOtpButton handleResendOtp={handleResendOtp} setOtp={setOtp} />
+                                        <div className="mt-4">
+                                            <ResendOtpButton handleResendOtp={handleResendOtp} setOtp={setOtp} />
+                                        </div>
+
+                                        <p className="text-gray-500 text-sm mt-4">
+                                            Didn’t receive the code? You can resend it once the timer ends.
+                                        </p>
                                     </div>
                                 )}
                             </div>

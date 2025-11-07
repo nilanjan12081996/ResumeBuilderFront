@@ -236,14 +236,14 @@ export const forgotPassword = createAsyncThunk(
                 return rejectWithValue(response?.data?.response || 'Failed to send reset link');
             }
         } catch (err) {
-            return rejectWithValue(err);
+            return rejectWithValue(err.response?.data);
         }
     }
 );
 
 export const resendOtpNew = createAsyncThunk(
     'auth/resendOtpNew',
-    async (id, { rejectWithValue }) => {
+    async ({ id }, { rejectWithValue }) => {
         try {
             const response = await serverApi.get(`/api/auth/resend?id=${id}`);
             if (response?.data?.status_code === 200) {
@@ -401,10 +401,10 @@ const authSlice = createSlice({
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
-                sessionStorage.setItem(
-                    'resumeToken',
-                    JSON.stringify({ token: access_token })
-                );
+                // sessionStorage.setItem(
+                //     'resumeToken',
+                //     JSON.stringify({ token: access_token })
+                // );
             })
             .addCase(loginCustomer.rejected, (state, { payload }) => {
                 state.loading = false;

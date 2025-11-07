@@ -2,16 +2,24 @@
 
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPassword } from "../reducers/AuthSlice"; 
+import { forgotPassword } from "../reducers/AuthSlice";
 import Image from "next/image";
 import logo from '../assets/imagesource/logo.png';
 import { useEffect, useState } from "react";
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
+import Link from "next/link";
+import LoginModal from "../modal/LoginModal";
+import RegistrationModal from "../modal/RegistrationModal";
+import ChoiceModal from '../modal/ChoiceModal';
 
 export default function ForgotPasswordPage() {
   const dispatch = useDispatch();
   const { loading, message, error } = useSelector((state) => state.auth);
   const [submitted, setSubmitted] = useState(false);
+  const [openLoginModal, setOpenLoginModal] = useState(false);
+  const [openRegisterModal, setOpenRegisterModal] = useState(false);
+  const [openChoiceModal,setOpenChoiceModal]=useState(false)
+  const [chooseResumeType,setChooseResumeType]=useState()
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -23,6 +31,7 @@ export default function ForgotPasswordPage() {
   useEffect(() => {
     if (error) setSubmitted(false);
   }, [error]);
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#bebebe] px-4">
@@ -48,9 +57,8 @@ export default function ForgotPasswordPage() {
               type="email"
               placeholder="you@example.com"
               {...register("email", { required: "Email is required" })}
-              className={`w-full rounded-lg border ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              } px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1a73e8]`}
+              className={`w-full rounded-lg border ${errors.email ? "border-red-500" : "border-gray-300"
+                } px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1a73e8]`}
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
@@ -62,29 +70,53 @@ export default function ForgotPasswordPage() {
             disabled={loading}
             className="cursor-pointer w-full bg-[#1a73e8] text-white py-3 rounded-lg font-medium hover:bg-[#1559b0] transition-all duration-200 disabled:opacity-70"
           >
-            {loading ? "Sending..." : "Request reset link"}
+            {loading ? "Sending..." : "Send New Password"}
           </button>
 
           {/* success message*/}
-          {submitted && !loading && !error && (
-            <div className="text-center text-green-600 font-medium mt-4">
-              A reset link has been sent to your email.
+          {submitted && !loading && !error && message && (
+            <div className="text-center text-green-600 text-sm mt-4">
+              {typeof message === "string" ? message : message?.message}
             </div>
           )}
+
 
           {error && (
-            <div className="text-center text-red-600 font-medium mt-4">
-              Failed to send reset link. Try again later.
+            <div className="text-center text-red-600 text-sm mt-4">
+              {error?.message || "Something went wrong"}
             </div>
           )}
 
+
           <div className="mt-6 text-center">
-            <a href="/login" className="text-[#1a73e8] font-medium hover:underline">
+            <button onClick={() => setOpenLoginModal(true)} className="text-[#1a73e8] font-medium hover:underline"> Back to Login</button>
+            {/* <a href="/login" className="text-[#1a73e8] font-medium hover:underline">
               Back to Login
-            </a>
+            </a> */}
           </div>
         </form>
       </div>
+      <>
+        {openLoginModal &&
+          <LoginModal
+            openLoginModal={openLoginModal}
+            setOpenLoginModal={setOpenLoginModal}
+            setOpenRegisterModal={setOpenRegisterModal}
+          />
+        }
+      </>
+
+      <>
+        {openRegisterModal &&
+          <RegistrationModal
+            openRegisterModal={openRegisterModal}
+            setOpenRegisterModal={setOpenRegisterModal}
+            setChooseResumeType={setChooseResumeType}
+            chooseResumeType={chooseResumeType}
+          />
+        }
+
+      </>
     </div>
   );
 }
