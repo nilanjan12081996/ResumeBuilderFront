@@ -16,6 +16,7 @@ import InviteSlice from '../reducers/InviteSlice'
 import ResumeSlice from '../reducers/ResumeSlice'
 import SupportSlice from '../reducers/SupportSlice'
 import CouponSlice from '../reducers/CouponSlice'
+import TransactionsSlice from '../reducers/TransactionsSlice'
 
 const store = configureStore({
     reducer: {
@@ -26,14 +27,15 @@ const store = configureStore({
         coinData: CoinSlice,
         profile: ProfileSlice,
         his: SearchHistroySlice,
-       dash:DashboardSlice,
-        resHist:ResumeHistorySlice,
-        linkedIn:LinkedinSlice,
-        featJob:FeatureJobSlice,
-        inviteStd:InviteSlice,
-        resume:ResumeSlice,
-        support:SupportSlice,
-        coupon:CouponSlice,
+        dash: DashboardSlice,
+        resHist: ResumeHistorySlice,
+        linkedIn: LinkedinSlice,
+        featJob: FeatureJobSlice,
+        inviteStd: InviteSlice,
+        resume: ResumeSlice,
+        support: SupportSlice,
+        coupon: CouponSlice,
+        Transactions: TransactionsSlice,
     },
     devTools: process.env.NODE_ENV,
 });

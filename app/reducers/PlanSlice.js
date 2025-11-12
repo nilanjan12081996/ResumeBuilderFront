@@ -188,6 +188,65 @@ export const currentSubscription = createAsyncThunk(
   }
 );
 
+export const cancelSubscription = createAsyncThunk(
+  "cancelSubscription",
+  async ({ ip_address }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/api/payment/cancel-subscription", {
+        ip_address,
+      });
+
+      if (response?.data?.status === true) {
+        return response.data;
+      } else {
+        if (response?.data?.errors) {
+          return rejectWithValue(response.data.errors);
+        } else {
+          return rejectWithValue("Something went wrong.");
+        }
+      }
+    } catch (err) {
+      if (err.response?.data) {
+        return rejectWithValue(err.response.data);
+      } else if (err.message) {
+        return rejectWithValue(err.message);
+      } else {
+        return rejectWithValue("Failed to cancel subscription");
+      }
+    }
+  }
+);
+
+// upgradePlanOrder
+export const upgradePlanOrder = createAsyncThunk(
+  "upgradePlanOrder",
+  async (user_input, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/api/payment/upgrade-create-order", user_input);
+
+      if (response?.data?.status_code === 201 || response?.data?.status === true) {
+        return response.data;
+      } else {
+        if (response?.data?.errors) {
+          return rejectWithValue(response.data.errors);
+        } else {
+          return rejectWithValue("Something went wrong.");
+        }
+      }
+    } catch (err) {
+      if (err.response?.data) {
+        return rejectWithValue(err.response.data);
+      } else if (err.message) {
+        return rejectWithValue(err.message);
+      } else {
+        return rejectWithValue("Failed to create upgrade order");
+      }
+    }
+  }
+);
+
+
+
 const initialState = {
   plans: [],
   error: false,
@@ -198,7 +257,7 @@ const initialState = {
   createOrderData: {},
   verifyOrderData: {},
   currentSubscriptionData: {},
-  plansHomeData:{}
+  plansHomeData: {}
 };
 
 const PlanSlice = createSlice({
@@ -218,9 +277,9 @@ const PlanSlice = createSlice({
       .addCase(getPlans.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload;
-       
+
       })
-       .addCase(createSubscriptions.pending, (state) => {
+      .addCase(createSubscriptions.pending, (state) => {
         state.loading = true;
       })
       .addCase(createSubscriptions.fulfilled, (state, { payload }) => {
@@ -232,7 +291,7 @@ const PlanSlice = createSlice({
         state.error = payload;
         state.loading = false;
       })
-       .addCase(completeSubscriptions.pending, (state) => {
+      .addCase(completeSubscriptions.pending, (state) => {
         state.loading = true;
       })
       .addCase(completeSubscriptions.fulfilled, (state, { payload }) => {
@@ -244,7 +303,7 @@ const PlanSlice = createSlice({
         state.error = payload;
         state.loading = false;
       })
-       .addCase(getIpData.pending, (state) => {
+      .addCase(getIpData.pending, (state) => {
         state.loading = true;
       })
       .addCase(getIpData.fulfilled, (state, { payload }) => {
@@ -256,7 +315,7 @@ const PlanSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
-       .addCase(createOrder.pending, (state) => {
+      .addCase(createOrder.pending, (state) => {
         state.loading = true;
       })
       .addCase(createOrder.fulfilled, (state, { payload }) => {
@@ -268,7 +327,7 @@ const PlanSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
-       .addCase(verifyOrder.pending, (state) => {
+      .addCase(verifyOrder.pending, (state) => {
         state.loading = true;
       })
       .addCase(verifyOrder.fulfilled, (state, { payload }) => {
@@ -280,7 +339,7 @@ const PlanSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
-       .addCase(currentSubscription.pending, (state) => {
+      .addCase(currentSubscription.pending, (state) => {
         state.loading = true;
       })
       .addCase(currentSubscription.fulfilled, (state, { payload }) => {
@@ -292,19 +351,46 @@ const PlanSlice = createSlice({
         state.loading = false;
         state.error = payload;
       })
-      .addCase(getPlansHome.pending,(state)=>{
-        state.loading=true
+      .addCase(getPlansHome.pending, (state) => {
+        state.loading = true
       })
-      .addCase(getPlansHome.fulfilled,(state,{payload})=>{
-        state.loading=false
-        state.plansHomeData=payload
-        state.error=false
+      .addCase(getPlansHome.fulfilled, (state, { payload }) => {
+        state.loading = false
+        state.plansHomeData = payload
+        state.error = false
       })
-      .addCase(getPlansHome.rejected,(state,{payload})=>{
-        state.loading=false
-        state.error=payload
+      .addCase(getPlansHome.rejected, (state, { payload }) => {
+        state.loading = false
+        state.error = payload
       })
-      ;
+
+      .addCase(cancelSubscription.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(cancelSubscription.fulfilled, (state, { payload }) => {
+        state.loading = false;
+        state.currentSubscriptionData = payload;
+        state.error = false;
+      })
+      .addCase(cancelSubscription.rejected, (state, { payload }) => {
+        state.loading = false;
+        state.error = payload;
+      })
+
+      .addCase(upgradePlanOrder.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(upgradePlanOrder.fulfilled, (state, { payload }) => {
+        state.loading = false;
+        state.createOrderData = payload;
+        state.error = false;
+      })
+      .addCase(upgradePlanOrder.rejected, (state, { payload }) => {
+        state.loading = false;
+        state.error = payload;
+      })
+
+
   },
 });
 export default PlanSlice.reducer;

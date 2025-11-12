@@ -33,6 +33,7 @@ import { VscChecklist } from "react-icons/vsc";
 import { HiUserAdd } from "react-icons/hi";
 import { CgProfile } from 'react-icons/cg';
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
+import { GrTransaction } from 'react-icons/gr';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -249,6 +250,21 @@ console.log('profileData',profileData)
                 >
                   <CgProfile className='text-2xl' />
                   My Profile
+                </Link>
+              </li>
+
+               <li onClick={closeNavbar}>
+                <Link
+                  href="/transactions"
+                  className={`group relative flex items-center gap-2 rounded-sm py-3 px-2 lg:px-4 font-normal text-base duration-300 ease-in-out 
+      ${pathname.includes('profile')
+                      ? 'bg-graydark text-[#a635a2]'
+                      : 'text-[#8C8C8C] hover:bg-graydark hover:text-white'
+                    }`}
+                  passHref
+                >
+                  <GrTransaction  className="text-2xl" />
+                  Transactions
                 </Link>
               </li>
 

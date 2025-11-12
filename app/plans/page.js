@@ -8,6 +8,7 @@ import {
   currentSubscription,
   getIpData,
   getPlans,
+  upgradePlanOrder,
   verifyOrder,
 } from "../reducers/PlanSlice";
 import PaymentModal from "../modal/PaymentModal";
@@ -277,118 +278,258 @@ const page = () => {
       }));
   })();
 
+  // const handlePaymentModal = async (e, data) => {
+  //   console.log("data", data);
+  //   e.preventDefault();
+
+  //   // Prevent payment if user has active subscription
+  //   // if (hasActiveSubscription()) {
+  //   //   toast.error("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
+  //   //   return;
+  //   // }
+
+  //   // Prevent payment only for same-tier plans
+  //   if (hasActiveSubscription()) {
+  //     const activePlan = getCurrentActiveSubscription();
+  //     const activePrice = parseFloat(activePlan?.Plan?.planPrice?.price || 0);
+  //     const newPrice = parseFloat(data?.amount || 0);
+
+  //     // Same plan check
+  //     if (activePlan?.Plan?.id === data?.plan_id) {
+  //       toast.error("You are already on this plan.");
+  //       return;
+  //     }
+
+  //     // Downgrade check (block)
+  //     if (newPrice < activePrice) {
+  //       toast.error("You cannot downgrade while your current subscription is active. If you cancel your subscription, you will be able to downgrade.");
+  //       return;
+  //     }
+
+  //     // Same tier check
+  //     if (newPrice === activePrice) {
+  //       toast.error("You are already on the same tier plan.");
+  //       return;
+  //     }
+
+  //     // Allow upgrade
+  //     if (newPrice > activePrice) {
+  //       console.log("Proceeding with upgrade");
+  //     }
+  //   }
+
+
+
+  //   // setAmount(data?.amount);
+  //   // setCurrency(data?.currency);
+  //   // sePlanid(data?.plan_id);
+
+  //   try {
+  //     const orderData = {
+  //       amount: data.amount,
+  //       currency: data.currency,
+  //       plan_id: data.plan_id,
+  //       ip_address: ipData?.ip,
+  //     };
+  //     // Wait for the createOrder action to complete
+  //     const result = await dispatch(createOrder(orderData));
+
+  //     if (createOrder.fulfilled.match(result)) {
+  //       console.log("Order created successfully:", result.payload);
+
+  //       // Load Razorpay script
+  //       await loadRazorpayScript();
+
+  //       // Use the actual order data from the API response
+  //       const orderResponse = result.payload;
+
+  //       console.log("profileData", profileData);
+  //       var options = {
+  //         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  //         amount: data.amount,
+  //         currency: data.currency,
+  //         name: "Resume Builder",
+  //         description: `Plan ${data.plan_id}`,
+  //         order_id: orderResponse.orderId,
+  //         handler: async function (response) {
+  //           const userData = {
+  //             orderId: response.razorpay_order_id,
+  //             razorpayPaymentId: response.razorpay_payment_id,
+  //             razorpaySignature: response.razorpay_signature,
+  //             transaction_id: orderResponse.transaction_id,
+  //           };
+  //           try {
+  //             const res = await dispatch(verifyOrder(userData));
+  //             console.log("verifyOrder response:", res);
+  //             toast.success("Payment Successful");
+  //             dispatch(currentSubscription(ipData?.ip));
+  //           } catch (err) {
+  //             console.log(err);
+  //           } finally {
+  //           }
+  //         },
+  //         prefill: {
+  //           name: "User",
+  //           email: "user@example.com",
+  //           contact: "9999999999",
+  //         },
+  //         theme: {
+  //           color: "#3399cc",
+  //         },
+  //       };
+
+  //       console.log("Razorpay options:", options);
+  //       var rzp1 = new window.Razorpay(options);
+  //       rzp1.open();
+  //     } else {
+  //       console.error("Failed to create order:", result.payload);
+  //       toast.error("Failed to create order. Please try again.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error in payment process:", error);
+  //     toast.error("Something went wrong. Please try again.");
+  //   }
+  // };
   const handlePaymentModal = async (e, data) => {
-    console.log("data", data);
-    e.preventDefault();
+  e.preventDefault();
+  console.log("data", data);
 
-    // Prevent payment if user has active subscription
-    // if (hasActiveSubscription()) {
-    //   toast.error("You already have an active subscription. Please wait for it to expire before purchasing a new plan.");
-    //   return;
-    // }
+  const activePlan = getCurrentActiveSubscription();
+  const activePrice = parseFloat(activePlan?.Plan?.planPrice?.price || 0);
+  const newPrice = parseFloat(data?.amount || 0);
 
-    // Prevent payment only for same-tier plans
-    if (hasActiveSubscription()) {
-      const activePlan = getCurrentActiveSubscription();
-      const activePrice = parseFloat(activePlan?.Plan?.planPrice?.price || 0);
-      const newPrice = parseFloat(data?.amount || 0);
+  const isUpgrade = newPrice > activePrice;
+  const isDowngrade = newPrice < activePrice;
+  const isSamePlan = activePlan?.Plan?.id === data?.plan_id;
 
-      // Same plan check
-      if (activePlan?.Plan?.id === data?.plan_id) {
-        toast.error("You are already on this plan.");
-        return;
-      }
-
-      // Downgrade check (block)
-      if (newPrice < activePrice) {
-        toast.error("You cannot downgrade while your current subscription is active.");
-        return;
-      }
-
-      // Same tier check
-      if (newPrice === activePrice) {
-        toast.error("You are already on the same tier plan.");
-        return;
-      }
-
-      // Allow upgrade
-      if (newPrice > activePrice) {
-        console.log("Proceeding with upgrade");
-      }
+  // If user already has a subscription
+  if (hasActiveSubscription()) {
+    if (isSamePlan) {
+      toast.error("You are already on this plan.");
+      return;
     }
 
+    if (isDowngrade) {
+      toast.error("You already have an active plan. Please cancel your current subscription before downgrading..");
+      return;
+    }
 
+    if (isUpgrade) {
+      try {
+        console.log("Proceeding with upgrade...");
 
-    // setAmount(data?.amount);
-    // setCurrency(data?.currency);
-    // sePlanid(data?.plan_id);
-
-    try {
-      const orderData = {
-        amount: data.amount,
-        currency: data.currency,
-        plan_id: data.plan_id,
-        ip_address: ipData?.ip,
-      };
-      // Wait for the createOrder action to complete
-      const result = await dispatch(createOrder(orderData));
-
-      if (createOrder.fulfilled.match(result)) {
-        console.log("Order created successfully:", result.payload);
-
-        // Load Razorpay script
-        await loadRazorpayScript();
-
-        // Use the actual order data from the API response
-        const orderResponse = result.payload;
-
-        console.log("profileData", profileData);
-        var options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        const upgradeData = {
           amount: data.amount,
           currency: data.currency,
-          name: "Resume Builder",
-          description: `Plan ${data.plan_id}`,
-          order_id: orderResponse.orderId,
-          handler: async function (response) {
-            const userData = {
-              orderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-              transaction_id: orderResponse.transaction_id,
-            };
-            try {
-              const res = await dispatch(verifyOrder(userData));
-              console.log("verifyOrder response:", res);
-              toast.success("Payment Successful");
-              dispatch(currentSubscription(ipData?.ip));
-            } catch (err) {
-              console.log(err);
-            } finally {
-            }
-          },
-          prefill: {
-            name: "User",
-            email: "user@example.com",
-            contact: "9999999999",
-          },
-          theme: {
-            color: "#3399cc",
-          },
+          current_plan_id: activePlan?.Plan?.id,
+          new_plan_id: data.plan_id,
+          ip_address: ipData?.ip,
         };
 
-        console.log("Razorpay options:", options);
-        var rzp1 = new window.Razorpay(options);
-        rzp1.open();
-      } else {
-        console.error("Failed to create order:", result.payload);
-        toast.error("Failed to create order. Please try again.");
+        // 🔥 Call upgrade API (instead of createOrder)
+        const upgradeRes = await dispatch(upgradePlanOrder(upgradeData));
+
+        if (upgradePlanOrder.fulfilled.match(upgradeRes)) {
+          console.log("Upgrade order created successfully:", upgradeRes.payload);
+          await loadRazorpayScript();
+
+          const orderResponse = upgradeRes.payload;
+
+          const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+            amount: data.amount,
+            currency: data.currency,
+            name: "Resume Builder",
+            description: `Plan ${data.plan_id}`,
+            order_id: orderResponse.orderId,
+            handler: async function (response) {
+              const userData = {
+                orderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+                transaction_id: orderResponse.transaction_id,
+              };
+
+              try {
+                await dispatch(verifyOrder(userData));
+                toast.success("Plan Upgraded Successfully!");
+                dispatch(currentSubscription(ipData?.ip));
+              } catch (err) {
+                console.error("Upgrade verify failed:", err);
+                toast.error("Upgrade verification failed.");
+              }
+            },
+            theme: { color: "#3399cc" },
+          };
+
+          new window.Razorpay(options).open();
+        } else {
+          toast.error("Failed to create upgrade order.");
+        }
+      } catch (error) {
+        console.error("Upgrade error:", error);
+        toast.error("Something went wrong during upgrade.");
       }
-    } catch (error) {
-      console.error("Error in payment process:", error);
-      toast.error("Something went wrong. Please try again.");
+      return;
     }
-  };
+
+    // Same-tier plan
+    if (newPrice === activePrice) {
+      toast.error("You are already on the same tier plan.");
+      return;
+    }
+  }
+
+  // ✅ If user has no active subscription (normal first purchase)
+  try {
+    const orderData = {
+      amount: data.amount,
+      currency: data.currency,
+      plan_id: data.plan_id,
+      ip_address: ipData?.ip,
+    };
+
+    const result = await dispatch(createOrder(orderData));
+
+    if (createOrder.fulfilled.match(result)) {
+      await loadRazorpayScript();
+      const orderResponse = result.payload;
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Resume Builder",
+        description: `Plan ${data.plan_id}`,
+        order_id: orderResponse.orderId,
+        handler: async function (response) {
+          const userData = {
+            orderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+            transaction_id: orderResponse.transaction_id,
+          };
+          try {
+            await dispatch(verifyOrder(userData));
+            toast.success("Payment Successful");
+            dispatch(currentSubscription(ipData?.ip));
+          } catch (err) {
+            console.error(err);
+          }
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      new window.Razorpay(options).open();
+    } else {
+      toast.error("Failed to create order. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error in payment process:", error);
+    toast.error("Something went wrong. Please try again.");
+  }
+};
+
   console.log("ipdata", ipData)
   useEffect(() => {
     dispatch(getIpData()).then((res) => {
@@ -583,7 +724,7 @@ const page = () => {
             currency={currency}
             plan_id={plan_id}
             ip={ipData?.ip}
-            onPayment={handlePaymentModal} // existing function to call Razorpay
+            onPayment={handlePaymentModal} 
           />
 
         )}
