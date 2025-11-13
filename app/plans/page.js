@@ -440,7 +440,7 @@ const page = () => {
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
             amount: data.amount,
             currency: data.currency,
-            name: "Resume Builder",
+            name: "ResumeMile",
             description: `Plan ${data.plan_id}`,
             order_id: orderResponse.orderId,
             handler: async function (response) {
@@ -500,7 +500,7 @@ const page = () => {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
-        name: "Resume Builder",
+        name: "ResumeMile",
         description: `Plan ${data.plan_id}`,
         order_id: orderResponse.orderId,
         handler: async function (response) {
