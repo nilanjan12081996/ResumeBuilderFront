@@ -428,6 +428,7 @@ const page = () => {
 
         // 🔥 Call upgrade API (instead of createOrder)
         const upgradeRes = await dispatch(upgradePlanOrder(upgradeData));
+        console.log("upgradeRes:", upgradeRes);
 
         if (upgradePlanOrder.fulfilled.match(upgradeRes)) {
           console.log("Upgrade order created successfully:", upgradeRes.payload);
