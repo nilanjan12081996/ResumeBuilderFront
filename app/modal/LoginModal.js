@@ -27,6 +27,10 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
     const [otpId, setOtpId] = useState(null);
     const [userEmail, setUserEmail] = useState("");
     const [otpError, setOtpError] = useState("");
+    const [otpSuccess, setOtpSuccess] = useState("");
+    const [isVerifying, setIsVerifying] = useState(false);
+
+
 
 
     const {
@@ -131,14 +135,24 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
             setOtpError("Please enter the OTP");
             return;
         }
+        setIsVerifying(true);
         dispatch(verifyOtpNew({ id: otpId, otp })).then((res) => {
+            setIsVerifying(false);
             if (res?.payload?.status_code === 200) {
                 const accessToken = res?.payload?.access_token;
+
+                setOtpError("");
+                setOtpSuccess("OTP Verified Successfully!");
 
                 if (accessToken) {
                     sessionStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));
                     router.push("/dashboard");
                     dispatch(getProfile());
+
+                    setTimeout(() => {
+                        router.push("/dashboard");
+                        setOpenLoginModal(false);
+                    }, 5000);
                 }
             } else {
                 // console.log('res',res)
@@ -283,12 +297,20 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
                                             <p className="text-red-500 text-sm my-2">{otpError}</p>
                                         )}
 
+                                        {otpSuccess && (
+                                            <p className="text-green-600 text-sm mt-2 font-medium">{otpSuccess}</p>
+                                        )}
+
+
                                         <button
                                             onClick={handleVerifyOtp}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl w-full"
+                                            disabled={isVerifying}
+                                            className={`${isVerifying ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                                                } text-white font-medium py-3 px-6 rounded-xl w-full transition`}
                                         >
-                                            Verify OTP
+                                            {isVerifying ? "Verifying OTP..." : "Verify OTP"}
                                         </button>
+
 
                                         <div className="my-4">
                                             <ResendOtpButton handleResendOtp={resendOtpNew} setOtp={setOtp} />

@@ -17,6 +17,8 @@ import { RiGoogleFill } from "react-icons/ri";
 import Link from 'next/link';
 import { useGoogleLogin } from "@react-oauth/google";
 
+
+
 const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVerifyOtpModal, setOpenLoginModal, openPricModal, setOpenPriceModal, chooseResumeType }) => {
     const dispatch = useDispatch();
     const router = useRouter();
@@ -27,6 +29,8 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     const [otpId, setOtpId] = useState(null);  // store user id from register API
     const [otp, setOtp] = useState("");
     const [otpError, setOtpError] = useState("");
+    const [otpSuccess, setOtpSuccess] = useState("");
+    const [isVerifying, setIsVerifying] = useState(false);
 
 
     const {
@@ -90,22 +94,47 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     }
 
     // --- OTP submit ---
+    // const handleVerifyOtp = () => {
+    //     if (!otp || otp.trim().length === 0) {
+    //         setOtpError("Please enter the OTP");
+    //         return;
+    //     }
+    //     dispatch(verifyOtpNew({ id: otpId, otp })).then((res) => {
+    //         if (res?.payload?.status_code === 200) {
+    //             setOpenRegisterModal(false);
+    //             dispatch(getProfile())
+    //             router.push("/plans");
+    //         } else {
+    //             // console.log('res',res)
+    //             setOtpError("Invalid OTP. Please try again.");
+    //         }
+    //     });
+    // };
+
     const handleVerifyOtp = () => {
         if (!otp || otp.trim().length === 0) {
             setOtpError("Please enter the OTP");
             return;
         }
+        setIsVerifying(true);
         dispatch(verifyOtpNew({ id: otpId, otp })).then((res) => {
+            setIsVerifying(false);
             if (res?.payload?.status_code === 200) {
-                setOpenRegisterModal(false);
-                dispatch(getProfile())
-                router.push("/plans");
+                setOtpError(""); // clear previous error
+                setOtpSuccess("OTP Verified Successfully!");
+
+                // Wait 3 seconds before redirect
+                setTimeout(() => {
+                    setOpenRegisterModal(false);
+                    dispatch(getProfile());
+                    router.push("/plans");
+                }, 5000);
             } else {
-                // console.log('res',res)
                 setOtpError("Invalid OTP. Please try again.");
             }
         });
     };
+
 
     // --- Resend OTP ---
     const handleResendOtp = () => {
@@ -346,11 +375,17 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                             <p className="text-red-500 text-sm my-2">{otpError}</p>
                                         )}
 
+                                        {otpSuccess && (
+                                            <p className="text-green-600 text-sm mt-2 font-medium">{otpSuccess}</p>
+                                        )}
+
                                         <button
                                             onClick={handleVerifyOtp}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl w-full transition-colors"
+                                            disabled={isVerifying}
+                                            className={`${isVerifying ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                                                } text-white font-medium py-3 px-6 rounded-xl w-full transition`}
                                         >
-                                            Verify OTP
+                                            {isVerifying ? "Verifying OTP..." : "Verify OTP"}
                                         </button>
 
                                         <div className="mt-4">
