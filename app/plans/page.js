@@ -426,7 +426,7 @@ const page = () => {
           ip_address: ipData?.ip,
         };
 
-        // 🔥 Call upgrade API (instead of createOrder)
+        // Call upgrade API (instead of createOrder)
         const upgradeRes = await dispatch(upgradePlanOrder(upgradeData));
         console.log("upgradeRes:", upgradeRes);
 
@@ -481,7 +481,7 @@ const page = () => {
     }
   }
 
-  // ✅ If user has no active subscription (normal first purchase)
+  // If user has no active subscription (normal first purchase)
   try {
     const orderData = {
       amount: data.amount,
