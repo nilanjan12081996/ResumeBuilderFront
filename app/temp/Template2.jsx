@@ -136,11 +136,11 @@ const dispatch=useDispatch()
       <div className="max-w-4xl mx-auto bg-white shadow-xl">
         {/* Header */}
         <div className=" text-black px-6 py-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-center text-[#2f6aeb]">{data?.full_name||"Kabilan S"}</h1>
-          <p className="text-sm font-semibold text-[#2f6aeb] mb-4 text-center">{data?.title ||"Developer"}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-center text-[#2f6aeb]">{data?.full_name||""}</h1>
+          <p className="text-sm font-semibold text-[#2f6aeb] mb-4 text-center">{data?.title ||""}</p>
           <div className="text-xs sm:text-sm leading-relaxed text-center">
-            <p className="mb-1">{data?.email||"kabilan2000kumar10@gmail.com"} • {data?.phone||"+91 8248458554"} • {data?.location||"Trichy TN"}</p>
-            <p>{data?.github_profile||"github.com/GitHub"} •{data?.linkdin_profile||"Linkedin"} • {data?.personal_web||"website"}</p>
+            <p className="mb-1">{data?.email||""} • {data?.phone||""} • {data?.location||""}</p>
+            <p>{data?.github_profile||""} •{data?.linkdin_profile||""} • {data?.personal_web||""}</p>
           </div>
         </div>
 
@@ -150,7 +150,7 @@ const dispatch=useDispatch()
             <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Summary</h2>
             <div className="border-b border-blue-700 mb-3"></div>
             <p className="text-sm leading-relaxed text-gray-800">
-                {data?.goal||"Full Stack Developer with hands-on experience in building scalable, responsive web applications using React.js, Rest.js, Node.js, Express, and MongoDB. Experienced with modern development, Agile frameworks and modern version and testing practices. Proficient in creating user-friendly interfaces and robust backend systems. Strong problem-solving and solid teamwork skills"}
+                {data?.goal||""}
               
             </p>
           </section>
@@ -194,21 +194,21 @@ const dispatch=useDispatch()
           {/* Left Side: Degree + Institution */}
           <div className="flex-1">
             
-              <p className="font-semibold text-gray-900">{entry.degree||"B.Tech"}</p>
+              <p className="font-semibold text-gray-900">{entry.degree||""}</p>
            
             
-              <p className="text-sm text-gray-700">{entry.institution||"Bharathidasan College of Engineering"}</p>
+              <p className="text-sm text-gray-700">{entry.institution||""}</p>
            
             
               <p className="text-xs text-gray-600 italic">
-                {entry.field_study||"Computer Sc"}
+                {entry.field_study||""}
               </p>
           
           
-              <p className="text-xs text-gray-500">{entry.additionalInfo ||"Additional Info"}</p>
+              <p className="text-xs text-gray-500">{entry.additionalInfo ||""}</p>
        
           
-              <p className="text-xs text-gray-600">GPA: {entry.gpa||"7.5"}</p>
+              <p className="text-xs text-gray-600">GPA: {entry.gpa||""}</p>
            
           </div>
 
@@ -299,24 +299,24 @@ const dispatch=useDispatch()
         {/* Header with Position & Dates */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1">
           <h3 className="font-semibold text-gray-900">
-            {exp.position || "Job Title"}
+            {exp.position || ""}
           </h3>
           <p className="text-sm text-gray-600 mt-1 sm:mt-0">
              {exp.start_date
     ? convertToSubmitFormat(exp.start_date)
-    : "2022"}{" "}
+    : ""}{" "}
   –{" "}
   {exp.current_work
     ? "Present"
     : exp.end_date
     ?convertToSubmitFormat(exp.end_date)
-    : "2023"}
+    : ""}
           </p>
         </div>
 
         {/* Company + Location */}
         <p className="text-sm text-gray-700 mb-1">
-          {exp.company_name || "Company Name"}{" "}
+          {exp.company_name || ""}{" "}
           {exp.location ? `– ${exp.location}` : ""}
         </p>
 
@@ -333,9 +333,9 @@ const dispatch=useDispatch()
             {exp.projects.map((proj) => (
               <li key={proj.id}>
                 <span className="font-medium">
-                  {proj.title || "Project Title"}
+                  {proj.title || ""}
                 </span>{" "}
-                – {proj.role || "Role"}
+                – {proj.role || ""}
                 {proj.technology && (
                   <span className="text-gray-600">
                     {" "}
@@ -344,7 +344,7 @@ const dispatch=useDispatch()
                 )}
                 <p className="text-gray-700 text-xs ml-4">
                   {proj.description ||
-                    "Worked on project tasks and responsibilities here."}
+                    ""}
                 </p>
               </li>
             ))}
@@ -418,8 +418,8 @@ const dispatch=useDispatch()
                 {
                 languages.map((lang) => (
                     <li key={lang.id}>
-                    • {lang.language_name || "Unnamed Language"} -{" "}
-                    {lang.proficiency || "Not specified"}
+                    • {lang.language_name || ""} -{" "}
+                    {lang.proficiency || ""}
                     </li>
                 ))
              }
@@ -442,10 +442,10 @@ const dispatch=useDispatch()
                         personalPro.map((project) => (
                             <div key={project.id} className="mb-4">
                             <h3 className="text-md font-semibold text-gray-900">
-                                {project.project_title || "Untitled Project"}
+                                {project.project_title || ""}
                             </h3>
                             <p className="text-sm text-gray-700 italic mb-1">
-                                {project.role || "Your Role"}{" "}
+                                {project.role || ""}{" "}
                                 {project.start_time && project.end_time
                                 ? `(${convertToSubmitFormat(project.start_time)} - ${convertToSubmitFormat(project.end_time)})`
                                 : ""}
@@ -487,15 +487,15 @@ const dispatch=useDispatch()
             certificates.map((cert) => (
                 <div key={cert.id} className="mb-2">
                 <h3 className="text-md font-semibold text-gray-900">
-                    {cert.certification_name || "Untitled Certification"}
+                    {cert.certification_name || ""}
                 </h3>
                 <p className="text-sm text-gray-700">
-                    {cert.issuing_organization || "Issuing Organization"}
+                    {cert.issuing_organization || ""}
                 </p>
                 <p className="text-sm text-gray-600">
                     {cert.obtained_date
                     ? `Obtained: ${convertToSubmitFormat(cert.obtained_date)}`
-                    : "Date not specified"}
+                    : ""}
                 </p>
                 {cert.certification_id && (
                     <p className="text-sm text-gray-500">
@@ -520,12 +520,12 @@ const dispatch=useDispatch()
         <div key={ach.id} className="mb-3">
           {/* Title */}
           <h3 className="text-md font-semibold text-gray-900">
-            {ach.achievement_title || "Untitled Achievement"}
+            {ach.achievement_title || ""}
           </h3>
 
           {/* Organization & Date */}
           <p className="text-sm text-gray-700">
-            {ach.organization || "Organization not specified"}
+            {ach.organization || ""}
             {ach.receive_date && (
               <span className="ml-2 text-gray-500">
                 ({convertToSubmitFormat(ach.receive_date)})

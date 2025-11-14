@@ -134,18 +134,18 @@ const dispatch=useDispatch()
         {/* Sidebar: Left */}
         <div className="w-2/5 bg-[#eff2fc] p-6 rounded-xl flex flex-col justify-start">
           {/* Profile Name */}
-          <h2 className="text-xl font-semibold text-[#4b56ab] mb-4">{data?.full_name ||"Kabilan S"}</h2>
-           <p className="text-sm font-semibold text-[#4b56ab] mb-4">{data?.title ||"Developer"}</p>
+          <h2 className="text-xl font-semibold text-[#4b56ab] mb-4">{data?.full_name ||""}</h2>
+           <p className="text-sm font-semibold text-[#4b56ab] mb-4">{data?.title ||""}</p>
           
           {/* Contact */}
           <div className="mb-6">
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">CONTACT</h3>
-            <p className="text-xs mb-1 break-all">{data?.email||"kabilansivaavan123@gmail.com"}</p>
-            <p className="text-xs mb-1">{data?.phone||"+91 6369476404"}</p>
-            <p className="text-xs mb-1">{data?.location||"Trichy, TN"}</p>
-            <a href="#" className="text-xs text-[#4b56ab] underline break-all">{data?.github_profile||"GitHub"}</a>
-            <a href="#" className="text-xs text-[#4b56ab] underline break-all">{data?.linkdin_profile||"Linkedin"}</a>
-            <a href="#" className="text-xs text-[#4b56ab] underline">{data?.personal_web||"website"}</a>
+            <p className="text-xs mb-1 break-all">{data?.email||""}</p>
+            <p className="text-xs mb-1">{data?.phone||""}</p>
+            <p className="text-xs mb-1">{data?.location||""}</p>
+            <a href="#" className="text-xs text-[#4b56ab] underline break-all">{data?.github_profile||""}</a>
+            <a href="#" className="text-xs text-[#4b56ab] underline break-all">{data?.linkdin_profile||""}</a>
+            <a href="#" className="text-xs text-[#4b56ab] underline">{data?.personal_web||""}</a>
           </div>
           
           {/* Skills */}
@@ -260,7 +260,7 @@ const dispatch=useDispatch()
           <div className="mb-4">
             <h3 className="text-sm font-bold text-[#7076b4] mb-3">PROFESSIONAL SUMMARY</h3>
             <p className="text-xs text-gray-700">
-              {data?.goal||"Full Stack Developer with hands-on experience in building scalable, responsive web applications using React.js, Next.js, Node.js, Express, and MongoDB. Passionate about creating user-friendly solutions with robust backend integrations and secure RESTful APIs. Successfully delivered multiple client and student projects with a focus on best practices, responsiveness, and code maintainability."}
+              {data?.goal||""}
               
             </p>
           </div>
@@ -274,12 +274,12 @@ const dispatch=useDispatch()
 
       {/* Position / Role */}
       <p className="font-semibold text-xs">
-        {exp.position || "Software Developer Intern"}
+        {exp.position || ""}
       </p>
 
       {/* Company + Location */}
       <p className="text-xs text-[#6471af]">
-        {exp.company_name || "StartupFlint"} – {exp.location || "Kolkata"}
+        {exp.company_name || ""} – {exp.location || ""}
       </p>
 
       {/* Duration */}
@@ -287,13 +287,13 @@ const dispatch=useDispatch()
         {/* {exp.start_date || "2022"} – {exp.current_work ? "Present" : (exp.end_date || "2023")} */}
           {exp.start_date
     ? convertToSubmitFormat(exp.start_date)
-    : "2022"}{" "}
+    : ""}{" "}
   –{" "}
   {exp.current_work
     ? "Present"
     : exp.end_date
     ? convertToSubmitFormat(exp.end_date)
-    : "2023"}
+    : ""}
       </p>
 
       {/* Skillset */}
@@ -302,9 +302,11 @@ const dispatch=useDispatch()
           <span className="font-medium">Skills:</span> {exp.skill}
         </p>
       ) : (
-        <p className="text-[11px] text-gray-400 italic mb-1">
-          Skills: React, Node.js, MongoDB
-        </p>
+        // <p className="text-[11px] text-gray-400 italic mb-1">
+        //   Skills: React, Node.js, MongoDB
+        // </p>
+        <>
+        </>
       )}
 
       {/* Projects */}
@@ -314,7 +316,7 @@ const dispatch=useDispatch()
             <div key={proj.id} className="mb-2">
               {/* Project Title & Role */}
               <p className="text-xs font-semibold">
-                {proj.title || `Project ${i + 1}`}{" "}
+                {proj.title || ``}{" "}
                 {proj.role && (
                   <span className="font-normal text-gray-500">
                     – {proj.role}
@@ -332,15 +334,17 @@ const dispatch=useDispatch()
               {/* Description */}
               <p className="text-xs text-gray-700 break-all">
                 {proj.description ||
-                  "Worked on implementing features, fixing bugs, and collaborating with team members to deliver the project successfully."}
+                  ""}
               </p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-gray-700">
-          Worked on multiple projects improving efficiency and user experience.
-        </p>
+        // <p className="text-xs text-gray-700">
+        //   Worked on multiple projects improving efficiency and user experience.
+        // </p>
+        <>
+        </>
       )}
     </div>
   ))}
@@ -360,7 +364,7 @@ const dispatch=useDispatch()
         {/* Degree + Field of Study + Date */}
         <div className="flex justify-between text-xs">
           <div>
-            {entry.degree}{entry.field_study ? `, ${entry.field_study}` : "B.Tech, Computer Science"}
+            {entry.degree}{entry.field_study ? `, ${entry.field_study}` : ""}
           </div>
           <div className="text-[#6471af] text-[10px]">
             {/* {entry.start_time
@@ -389,12 +393,12 @@ const dispatch=useDispatch()
         </div>
 
         {/* Institution / School */}
-        <span className="text-xs mb-1 block">{entry.institution||"Saranathan College of Engineering"}-{entry.location||"Kolkata"}</span>
+        <span className="text-xs mb-1 block">{entry.institution||""}-{entry.location||""}</span>
 
         {/* GPA or Extra Info (optional) */}
         {(entry.gpa || entry.additionalInfo) && (
           <span className="text-[11px] text-gray-600 block">
-            {entry.gpa ? `GPA: ${entry.gpa}` : "7.8"}
+            {entry.gpa ? `GPA: ${entry.gpa}` : ""}
             {entry.gpa && entry.additionalInfo ? " • " : ""}
             {entry.additionalInfo}
           </span>
@@ -416,7 +420,7 @@ const dispatch=useDispatch()
       {personalPro.map((proj) => (
         <li key={proj.id}>
           {/* Project Title */}
-          <span className="font-semibold">{proj.project_title || "Untitled Project"}</span>
+          <span className="font-semibold">{proj.project_title || ""}</span>
 
           {/* Role */}
           {proj.role && (
@@ -428,7 +432,7 @@ const dispatch=useDispatch()
           {/* Date Range */}
           {(proj?.start_time || proj?.end_time) && (
             <div className="text-[11px] text-gray-500">
-              {convertToSubmitFormat(proj?.start_time) || "Start"} – {convertToSubmitFormat(proj?.end_time) || "Present"}
+              {convertToSubmitFormat(proj?.start_time) || ""} – {convertToSubmitFormat(proj?.end_time) || "Present"}
             </div>
           )}
 
