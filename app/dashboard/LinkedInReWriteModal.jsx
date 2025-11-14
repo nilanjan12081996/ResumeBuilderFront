@@ -46,6 +46,8 @@ const LinkedInReWriteModal=({
             if(profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id===1)
             {
                 dispatch(addCountResume({ref_type:"linkedin_resume"})).then((res)=>{
+                  console.log("res",res);
+                  
                if(res?.payload?.status_code===200){
                     dispatch(linkedInPdf(formData)).then((res)=>{
                 console.log(res,"res");
@@ -80,7 +82,7 @@ const LinkedInReWriteModal=({
             })
                }
                 else if(res?.payload?.response?.data?.status_code===400){
-                       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{
+                       toast.error(res?.payload?.response?.data?.message,{
                          autoClose:false
                        })
                      }
@@ -122,7 +124,7 @@ const LinkedInReWriteModal=({
             })
                }
                 else if(res?.payload?.response?.data?.status_code===400){
-                       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!",{
+                       toast.error(res?.payload?.response?.data?.message,{
                          autoClose:false
                        })
                      }

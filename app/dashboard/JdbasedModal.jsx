@@ -183,7 +183,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
           })
         }
         else if (res?.payload?.response?.data?.status_code === 400) {
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+          toast.error(res?.payload?.response?.data?.message, {
             autoClose: false
           })
         }
@@ -293,7 +293,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
           })
         }
         else if (res?.payload?.response?.data?.status_code === 400) {
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+          toast.error(res?.payload?.response?.data?.message, {
             autoClose: false
           })
         }

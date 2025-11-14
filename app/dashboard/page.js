@@ -266,9 +266,9 @@ const Page = () => {
       dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
         if (res?.payload?.status_code === 200) {
           handleResumeImprove(data);
-        } else {
+        } else if(res?.payload?.response?.data?.status_code === 400) {
           // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+          toast.error(res?.payload?.response?.data?.message, {
             autoClose: false,
           });
         }
@@ -277,9 +277,9 @@ const Page = () => {
       dispatch(addCountResumeOrg({ ref_type: "improve_resume" })).then((res) => {
         if (res?.payload?.status_code === 200) {
           handleResumeImprove(data);
-        } else {
+        } else if(res?.payload?.response?.data?.status_code === 400) {
           // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+          toast.error(res?.payload?.response?.data?.message, {
             autoClose: false,
           });
         }
