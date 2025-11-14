@@ -24,7 +24,8 @@ export default function ForgotPasswordPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = (data) => {
-    dispatch(forgotPassword(data));
+     const payload = { ...data, app_id: 1 };
+    dispatch(forgotPassword(payload));
     setSubmitted(true);
   };
 
