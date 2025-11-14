@@ -14,8 +14,10 @@ import { toast } from "react-toastify";
 
 const ApplyJobModal=({openJobApplyModal,
           setOpenJobApplyModal,id})=>{
-             const{rHistory,loading}=useSelector((state)=>state?.resHist)
+             const{rHistory}=useSelector((state)=>state?.resHist)
+             const{loading}=useSelector((state)=>state?.featJob)
   const dispatch=useDispatch()
+    const [selectedFile, setSelectedFile] = useState(null);
     const [totalPage, setTotalPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -32,6 +34,7 @@ const ApplyJobModal=({openJobApplyModal,
       
     };
 
+
   dispatch(getResumeHistory(payload)).then((res)=>{
     console.log(res,"histRes");
     const total=res?.payload?.pagination?.total_pages
@@ -43,15 +46,30 @@ const ApplyJobModal=({openJobApplyModal,
     setCurrentPage(page);
   };
 
-  const handleApplyJobs=(resumeId,type)=>{
-    dispatch(applyJobs({
-        job_id:id,
-        resume_id:resumeId,
-        ref_table:type
-    })).then((res)=>{
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleApplyJobs=()=>{
+
+    if (!selectedFile) {
+      toast.error("Please select a resume file");
+      return;
+    }
+     const formData = new FormData();
+    formData.append("job_id", id);
+    formData.append("pdf", selectedFile); 
+
+    dispatch(applyJobs(formData)).then((res)=>{
         console.log("resJob",res);
         if(res?.payload?.status_code===201){
+          setSelectedFile(null);
             toast.success(res?.payload?.message)
+            setOpenJobApplyModal(false);
         }
         else{
             toast.error("Something went wrong")
@@ -61,9 +79,9 @@ const ApplyJobModal=({openJobApplyModal,
 
     return(
         <>
-         <Modal size="7xl" className="apply_modal_area" show={openJobApplyModal} onClose={() => setOpenJobApplyModal(false)}>   
+         <Modal size="xl" className="apply_modal_area" show={openJobApplyModal} onClose={() => setOpenJobApplyModal(false)}>   
                 <ModalHeader className='bg-white text-black modal_header'>
-                   Select Resume
+                   Upload Resume
                 </ModalHeader>
                 <ModalBody className='bg-white p-0 rounded-b-[4px]'>
                     {/* <div className="lg:flex gap-5 p-5">
@@ -123,56 +141,42 @@ const ApplyJobModal=({openJobApplyModal,
 
                      <div className='border bg-white border-[#D5D5D5] rounded-[10px]'>
                             <div className='lg:px-8 px-4 py-8'>
-                               <p className='text-[#151515] text-[20px] leading-[20px] lg:mb-4'>Your Resumes ({rHistory?.statistics?.total_resume})</p>
+                               
                             </div>
                             <div className='lg:px-8 px-4 py-0'>
-                              {
-                                rHistory?.data?.map((hist)=>(
-                                  <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
-                                  <div className='lg:flex gap-3 items-center'>
-                                    <div className='bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center mb-2 lg:mb-0'>
-                                      <CgFileDocument className='text-[#ffffff] text-2xl' />
-                                    </div>
+                              
+                               
+                                  <div className='lg:flex gap-2 items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
+                                  <div className='lg:flex gap-1 items-center'>
+                                 
                                     <div className='mb-2 lg:mb-0'>
-                                      <h3 className='text-[#151515] text-base font-medium mb-1'>{hist?.resume_name}</h3>
-                                      <div className='lg:flex items-center'>
-                                        {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: Modern</p> */}
-                                        {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>{Math.floor(
-                        (new Date() - new Date(convertToSubmitFormat(hist?.created_at))) / (1000 * 60 * 60 * 24)
-                      )}{" "} Days ago</p> */}
-                    
-                                          <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>
-                                          {(() => {
-                                            const days = Math.floor(
-                                              (new Date() - new Date(convertToSubmitFormat(hist?.created_at))) /
-                                              (1000 * 60 * 60 * 24)
-                                            );
-                                            return days === 0 ? "Today" : `${days} Days ago`;
-                                          })()}
-                                        </p>
-                    
-                                        {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>257 KB</p>
-                                        <p className='text-[#7D7D7D] text-[13px] pr-8'>After analysis ATS Score: 80/100</p> */}
-                                      </div>
+                                      
+                                    <FileInput 
+                                    onChange={handleFileChange}
+                                    accept=".pdf,.doc,.docx"
+                                    
+                                    />
+                                     {/* {selectedFile && (
+                      <p className="text-sm text-gray-600 mt-2">
+                        Selected: {selectedFile.name}
+                      </p>
+                    )} */}
                                     </div>
                                   </div>
-                                  <div className='flex items-center gap-4 lg:gap-8'>
-                    <button onClick={()=>handleApplyJobs(hist?.id,hist?.resume_type)} className={`text-[15px] bg-[#ae2991] text-white rounded-3xl px-5 py-2 cursor-pointer`}>
+                                  <div className='flex items-center gap-4 lg:gap-4'>
+                    <button onClick={()=>handleApplyJobs()} className={`text-[15px] bg-[#ae2991] text-white rounded-3xl px-5 py-2 cursor-pointer`}>
                       {loading?"Waiting..":"Apply"}  
 
                     </button>
-                                   
-                                
-                    
-                              
                                   </div>
                               </div>
                     
-                                ))
-                              }
+                              
+
+
                               
                             </div>
-                            {
+                            {/* {
                             
                               
                               rHistory?.pagination?.total_pages>1&&(
@@ -189,7 +193,7 @@ const ApplyJobModal=({openJobApplyModal,
                                     </div>
                               )
                               
-                            }
+                            } */}
                                  
                           </div>
                 </ModalBody>
