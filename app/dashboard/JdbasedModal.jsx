@@ -524,7 +524,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
                 //onClick={() => alertContinueHandler(true)}
                 className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
               >
-                Choose Template
+               Continue
               </button>
             </div>
           </form>
