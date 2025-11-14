@@ -226,10 +226,19 @@ const page = () => {
             id: proj.id,
             title: proj.Project_title || "",
             role: proj.Role || "",
-            technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
-              ? JSON.parse(proj.skill_set_use).join(", ")
-              : proj.skill_set_use || "",
-            description: proj.description || "",
+            // technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
+            //   ? JSON.parse(proj.skill_set_use).join(", ")
+            //   : proj.skill_set_use || "",
+            // description: proj.description || "",
+               technology: (() => {
+      if (!proj.skill_set_use) return "";
+      try {
+        const parsed = JSON.parse(proj.skill_set_use);
+        return Array.isArray(parsed) ? parsed.join(", ") : proj.skill_set_use;
+      } catch (e) {
+        return proj.skill_set_use;
+      }
+    })(),
           }));
 
         return {
@@ -279,7 +288,7 @@ const page = () => {
         setLanguages(
           existingLanguages.map((lang, index) => ({
             id: Date.now() + index,
-            language_name: lang.language_name || "",
+            language_name: lang.language || "",
             proficiency: lang.proficiency || "",
           }))
         );

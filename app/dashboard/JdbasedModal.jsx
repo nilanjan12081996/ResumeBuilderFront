@@ -54,7 +54,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
       return;
     }
     {
-      data?.linkedin_profile_file && (
+      (data?.linkedin_profile_file && data?.linkedin_profile_file[0])&& (
         formData.append("linkedin_profile_file", data?.linkedin_profile_file[0])
       )
     }
@@ -168,9 +168,6 @@ const JdbasedModal = ({ openModalImproveexistingResume,
                           toast.error("Failed to fetch ATS Score");
                         }
                       })
-
-
-
                   ]
                 )
                 //  alertContinueHandler();
@@ -299,14 +296,6 @@ const JdbasedModal = ({ openModalImproveexistingResume,
         }
       })
     }
-
-
-
-
-
-
-
-
   }
   return (
     <>
@@ -357,7 +346,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
 
                     <div className="w-full resume_form_box mb-3">
                       <Label className="mb-2 block" htmlFor="file-upload">
-                        LinkedIn Profile PDF
+                        LinkedIn Profile PDF (if any)
                       </Label>
                       {/* <div className="field_box flex items-center">
                                 <div className="p-3">
