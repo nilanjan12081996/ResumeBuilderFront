@@ -387,6 +387,7 @@ const WorkExp = ({experiences, setExperiences}) => {
       updateExperienceField(exp.id, "end_date", date);
     }
   }}
+  disabled={exp.current_work}
                     />
                   </div>
                 </div>

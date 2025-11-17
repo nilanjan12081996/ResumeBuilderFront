@@ -273,7 +273,7 @@ const Education = ({educationEntries,setEducationEntries}) => {
                 <div className=''>
                   <div className='w-full resume_form_box mb-3'>
                     <div className="mb-1 block">
-                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                      <Label htmlFor={`date-${entry.id}`}>Start Date</Label>
                     </div>
                     <div className='field_box_date'>
                       <Datepicker 
@@ -286,13 +286,14 @@ const Education = ({educationEntries,setEducationEntries}) => {
 
                         <div className='w-full resume_form_box mb-3'>
                     <div className="mb-1 block">
-                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                      <Label htmlFor={`date-${entry.id}`}>End Date</Label>
                     </div>
                     <div className='field_box_date'>
                       <Datepicker 
                         id={`date-${entry.id}`}
                         value={entry.end_time}
                         onChange={(date) => updateEducationField(entry.id, 'end_time', date)}
+                        disabled={entry.currentlyStudying}
                       />
                     </div>
                   </div>

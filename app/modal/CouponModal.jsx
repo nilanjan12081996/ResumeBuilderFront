@@ -100,10 +100,13 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
             <span>Base Payable:</span>
             <span>{currency} {Number(amount).toFixed(2)}</span>
           </div>
+         {currency === "INR" && (
           <div className="flex justify-between">
-            <span>GST (18%):</span>
+           <span>GST (18%):</span>
             <span>{currency} {gstAmount.toFixed(2)}</span>
-          </div>
+            </div>
+            )}
+
           {discountAmount > 0 && (
             <div className="flex justify-between text-green-700">
               <span>Discount ({couponCode.toUpperCase()}):</span>
@@ -112,7 +115,7 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
           )}
           {currentPlanPrice > 0 && (
             <div className="mt-2 flex items-center gap-2">
-              <input type="checkbox" id="confirmCancel" checked={confirmCancel} onChange={(e) => setConfirmCancel(e.target.checked)} className="w-4 h-4"/>
+              <input type="checkbox" id="confirmCancel" checked={confirmCancel} onChange={(e) => setConfirmCancel(e.target.checked)} className="w-8 h-8"/>
               <label htmlFor="confirmCancel" className="text-sm text-gray-700">I want to cancel my current plan and switch to this plan</label>
             </div>
           )}

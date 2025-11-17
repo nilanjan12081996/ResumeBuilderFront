@@ -181,6 +181,7 @@ import { getIpData, currentSubscription, cancelSubscription } from '../reducers/
 
 import userFace from "../assets/imagesource/user_face.png";
 import logoAdmin from "../assets/imagesource/logo_admin.png";
+import { toast } from 'react-toastify';
 
 const Insideheader = () => {
   const pathname = usePathname();
@@ -235,10 +236,23 @@ const Insideheader = () => {
   const confirmCancel = async () => {
     if (!ipData?.ip) return;
 
-    await dispatch(cancelSubscription({ ip_address: ipData.ip }));
-    dispatch(currentSubscription(ipData.ip)); // refresh subscription data
-    setShowCancelModal(false);
+    const res = await dispatch(cancelSubscription({ ip_address: ipData.ip }));
+
+    const result = res?.payload;
+
+    console.log("result", result);
+
+    if (result?.status === true) {
+      toast.success("Your Subscription is successfully Cancelled");
+
+      setShowCancelModal(false);
+
+      dispatch(currentSubscription(ipData.ip));
+    } else {
+      toast.error(result?.message || "Failed to cancel subscription");
+    }
   };
+
 
   return (
     <div className='bg-[#ffffff] rounded-[0px] py-4 px-6 mb-6 border-l border-[#f3f4f6]'>
@@ -314,7 +328,7 @@ const Insideheader = () => {
       </div>
 
       {/* Cancel Subscription Modal */}
-       {showCancelModal && (
+      {showCancelModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white p-6 rounded-xl w-96 text-center">
             <h2 className="text-lg font-semibold mb-4">Cancel Subscription</h2>

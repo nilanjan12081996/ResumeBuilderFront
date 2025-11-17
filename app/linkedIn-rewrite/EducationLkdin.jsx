@@ -301,6 +301,7 @@ useEffect(() => {
                         id={`date-${entry.id}`}
                         value={entry.end_time}
                         onChange={(date) => updateEducationField(entry.id, 'end_time', date)}
+                        disabled={entry.currentlyStudying}
                       />
                     </div>
                   </div>

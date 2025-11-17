@@ -88,10 +88,8 @@ const Page = () => {
       return;
     }
 
-    const payable =
-      hasActiveSubscription() && thisPrice > activePrice
-        ? Number((thisPrice - activePrice).toFixed(2))
-        : Number(thisPrice.toFixed(2));
+    const payable = Number(thisPrice.toFixed(2));
+
 
     setCouponModalData({
       amount: payable,
@@ -209,9 +207,8 @@ const Page = () => {
     return (
       <div
         key={pln?.id}
-        className={`pt-0 border rounded-[26px] bg-white ${
-          pln?.id === 3 || pln?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
-        }`}
+        className={`pt-0 border rounded-[26px] bg-white ${pln?.id === 3 || pln?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
+          }`}
       >
         <div className="py-8 px-6 relative min-h-[740px]">
           <div className="flex items-center justify-between mb-6">
@@ -259,11 +256,10 @@ const Page = () => {
             <button
               onClick={(e) => handlePlanClick(e, pln)}
               disabled={btnState.disabled}
-              className={`text-[14px] leading-[40px] rounded-md w-full block transition-all duration-300 ${
-                btnState.disabled
+              className={`text-[14px] leading-[40px] rounded-md w-full block transition-all duration-300 ${btnState.disabled
                   ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed"
                   : "bg-white text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-white"
-              }`}
+                }`}
             >
               {btnState.label}
             </button>
@@ -294,14 +290,17 @@ const Page = () => {
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <h3 className="text-sm font-medium text-green-800">You have an active subscription</h3>
+                      <h3 className="text-sm font-medium text-green-800">
+                        You have an active subscription                     </h3>
                       <div className="mt-2 text-sm text-green-700">
                         <p>
-                          <strong>Plan:</strong> {getCurrentActiveSubscription().Plan?.plan_name}
+                          <strong>Plan:</strong> {getCurrentActiveSubscription().Plan?.plan_name}                        
+                        </p>                        
+                        <p>
+                          <strong>Valid until:</strong> {new Date(getCurrentActiveSubscription().end_date).toLocaleDateString()}
                         </p>
                         <p>
-                          <strong>Valid until:</strong>{" "}
-                          {new Date(getCurrentActiveSubscription().end_date).toLocaleDateString()}
+                          <strong>Features:</strong> {getCurrentActiveSubscription().Plan?.PlanAccess?.map(access => access.plan_access_description).join(', ')}
                         </p>
                       </div>
                     </div>

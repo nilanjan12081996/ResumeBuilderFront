@@ -229,11 +229,28 @@ export const forgotPassword = createAsyncThunk(
     'forgotPassword',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await serverApi.post('/api/auth/forgot-password', userInput);
+            const response = await serverApi.post('/api/auth/forget-pw-via-link-send', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
                 return rejectWithValue(response?.data?.response || 'Failed to send reset link');
+            }
+        } catch (err) {
+            return rejectWithValue(err.response?.data);
+        }
+    }
+);
+
+export const resetPassword = createAsyncThunk(
+    "resetPassword",
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await serverApi.post("/api/auth/reset-password", userInput);
+
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                return rejectWithValue(response.data.response);
             }
         } catch (err) {
             return rejectWithValue(err.response?.data);
@@ -569,6 +586,22 @@ const authSlice = createSlice({
             .addCase(verifyOtpNew.rejected, (state, { payload }) => {
                 state.loading = false;
                 state.error = payload;
+            })
+
+            // RESET PASSWORD
+            .addCase(resetPassword.pending, (state) => {
+                state.loading = true;
+                state.message = null;
+                state.error = null;
+            })
+            .addCase(resetPassword.fulfilled, (state, { payload }) => {
+                state.loading = false;
+                state.error = null;
+                state.message = payload?.message || "Password reset successful";
+            })
+            .addCase(resetPassword.rejected, (state, { payload }) => {
+                state.loading = false;
+                state.error = payload?.message || "Something went wrong";
             })
 
 

@@ -42,8 +42,8 @@ import Create_Resume_plus from "../assets/imagesource/Create_Resume_plus.png";
 import Improve_existing_resume_icon from "../assets/imagesource/Improve_existing_resume_icon.png";
 import jd_based_resume from "../assets/imagesource/jd_based_resume.png";
 
-import resume1 from "../assets/imagesource/resum1.png";
-import resume2 from "../assets/imagesource/resum2.png";
+import resume1 from "../assets/imagesource/resum2.png";
+import resume2 from "../assets/imagesource/resum1.png";
 
 import view_full_resume from "../assets/imagesource/view_full_resume.png";
 
@@ -268,7 +268,7 @@ const Page = () => {
           handleResumeImprove(data);
         } else if(res?.payload?.response?.data?.status_code === 400) {
           // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error(res?.payload?.response?.data?.message, {
+          toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message, {
             autoClose: false,
           });
         }
@@ -279,7 +279,7 @@ const Page = () => {
           handleResumeImprove(data);
         } else if(res?.payload?.response?.data?.status_code === 400) {
           // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error(res?.payload?.response?.data?.message, {
+          toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message, {
             autoClose: false,
           });
         }

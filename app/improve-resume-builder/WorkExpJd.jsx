@@ -425,6 +425,7 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
                           updateExperienceField(exp.id, "end_date", date);
                         }
                       }}
+                      disabled={exp.current_work}
                     />
                   </div>
                 </div>
@@ -438,7 +439,7 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
               onChange={(e) =>
                 updateExperienceField(exp.id, "current_work", e.target.checked)
               } />
-            <Label htmlFor="age">Currently studying here</Label>
+            <Label htmlFor="age">Currently Working here</Label>
           </div>
 
           {/* Projects Section */}

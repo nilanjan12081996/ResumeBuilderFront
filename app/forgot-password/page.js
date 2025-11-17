@@ -1,45 +1,49 @@
+
 'use client';
 
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { forgotPassword } from "../reducers/AuthSlice";
 import Image from "next/image";
-import logo from '../assets/imagesource/logo.png';
+import logo from '../assets/imagesource/ResumeMile_Logo.png';
 import { useEffect, useState } from "react";
-import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 import Link from "next/link";
-import LoginModal from "../modal/LoginModal";
-import RegistrationModal from "../modal/RegistrationModal";
-import ChoiceModal from '../modal/ChoiceModal';
 
 export default function ForgotPasswordPage() {
   const dispatch = useDispatch();
   const { loading, message, error } = useSelector((state) => state.auth);
   const [submitted, setSubmitted] = useState(false);
-  const [openLoginModal, setOpenLoginModal] = useState(false);
-  const [openRegisterModal, setOpenRegisterModal] = useState(false);
-  const [openChoiceModal,setOpenChoiceModal]=useState(false)
-  const [chooseResumeType,setChooseResumeType]=useState()
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+
+
   const onSubmit = (data) => {
-     const payload = { ...data, app_id: 1 };
+    const baseUrl = `${window.location.origin}`;
+
+    const payload = {
+      email: data.email,
+      base_url: baseUrl,
+      appID: 1,
+    };
+
     dispatch(forgotPassword(payload));
     setSubmitted(true);
   };
+
+
 
   useEffect(() => {
     if (error) setSubmitted(false);
   }, [error]);
 
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#bebebe] px-4">
       {/* Logo */}
-      <div className="mb-8">
-        <Image src={headerLogo} alt="Logo" width={180} height={40} />
-      </div>
+      <Link href="/" className="mb-8 inline-block">
+        <Image src={logo} alt="Logo" width={180} height={40} />
+      </Link>
+
 
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-semibold text-center text-[#112e51] mb-3">
@@ -69,11 +73,13 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="cursor-pointer w-full bg-[#1a73e8] text-white py-3 rounded-lg font-medium hover:bg-[#1559b0] transition-all duration-200 disabled:opacity-70"
+            className="cursor-pointer w-full bg-[#800080] text-white py-3 rounded-lg font-medium hover:bg-[#a471a4] transition-all duration-200 disabled:opacity-70"
           >
-            {loading ? "Sending..." : "Send New Password"}
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
 
+
+          {/* success message*/}
           {/* success message*/}
           {submitted && !loading && !error && message && (
             <div className="text-center text-green-600 text-sm mt-4">
@@ -88,36 +94,13 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-
           <div className="mt-6 text-center">
-            <button onClick={() => setOpenLoginModal(true)} className="text-[#1a73e8] font-medium hover:underline"> Back to Login</button>
-            {/* <a href="/login" className="text-[#1a73e8] font-medium hover:underline">
+            <a href="/login" className="text-[#1a73e8] font-medium hover:underline">
               Back to Login
-            </a> */}
+            </a>
           </div>
         </form>
       </div>
-      <>
-        {openLoginModal &&
-          <LoginModal
-            openLoginModal={openLoginModal}
-            setOpenLoginModal={setOpenLoginModal}
-            setOpenRegisterModal={setOpenRegisterModal}
-          />
-        }
-      </>
-
-      <>
-        {openRegisterModal &&
-          <RegistrationModal
-            openRegisterModal={openRegisterModal}
-            setOpenRegisterModal={setOpenRegisterModal}
-            setChooseResumeType={setChooseResumeType}
-            chooseResumeType={chooseResumeType}
-          />
-        }
-
-      </>
     </div>
   );
 }

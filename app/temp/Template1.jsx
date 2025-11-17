@@ -21,7 +21,7 @@ const dispatch=useDispatch()
   
   return (
     
-      <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex items-center justify-center">
+      <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex items-center justify-center ">
         {/* <style jsx>{`
         @media print {
  
@@ -130,7 +130,7 @@ const dispatch=useDispatch()
             currentSubscriptionData?.data?.length===0&&('Hiring Eye')
           }   
         </div>
-      <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px]">
+      <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px] h-screen overflow-y-auto">
         {/* Sidebar: Left */}
         <div className="w-2/5 bg-[#eff2fc] p-6 rounded-xl flex flex-col justify-start">
           {/* Profile Name */}

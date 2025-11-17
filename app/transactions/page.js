@@ -54,7 +54,7 @@ export default function TransactionsPage() {
             <thead className="bg-[#F0E3FA]">
               <tr>
                 <th className="p-3 border border-[#92278F] text-left">Plan Name</th>
-                <th className="p-3 border border-[#92278F]">Price (Excl. GST)</th>
+                <th className="p-3 border border-[#92278F]">Price</th>
                 <th className="p-3 border border-[#92278F]">GST</th>
                 <th className="p-3 border border-[#92278F]">Total Payment</th>
                 <th className="p-3 border border-[#92278F]">Start Date</th>
@@ -64,25 +64,52 @@ export default function TransactionsPage() {
             </thead>
             <tbody>
               {items.map((txn) => {
+                const isIndian = txn.currency === "INR";
+
                 const priceExclGst = parseFloat(txn.amount || 0);
                 const totalPayment = parseFloat(txn.total_amount || 0);
+
+                const currencySymbol = isIndian ? "₹" : "$";
 
                 return (
                   <tr
                     key={txn.id}
                     className="hover:bg-[#f9f0ff] transition-colors duration-200 text-[#380438]"
                   >
-                    <td className="border border-[#92278F] p-3 font-medium">{txn.plan_detail.plan_name}</td>
-                    <td className="border border-[#92278F] p-3">₹ {priceExclGst.toFixed(2)}</td>
-                    <td className="border border-[#92278F] p-3">₹ {txn.gst_amount}</td>
-                    <td className="border border-[#92278F] p-3 font-semibold">₹ {totalPayment.toFixed(2)}</td>
-                    <td className="border border-[#92278F] p-3">{new Date(txn.created_at).toLocaleDateString()}</td>
-                    <td className="border border-[#92278F] p-3">{new Date(txn.expiry).toLocaleDateString()}</td>
-                    <td className="border border-[#92278F] p-3">{renderStatusBadge(txn.payment_status)}</td>
+                    <td className="border border-[#92278F] p-3 font-medium">
+                      {txn.plan_detail.plan_name}
+                    </td>
+
+                    {/* Price without GST */}
+                    <td className="border border-[#92278F] p-3">
+                      {currencySymbol} {priceExclGst.toFixed(2)}
+                    </td>
+
+                    {/* GST only if Indian */}
+                    <td className="border border-[#92278F] p-3">
+                      {isIndian ? `${currencySymbol} ${txn.gst_amount}` : ""}
+                    </td>
+
+                    {/* Total Payment */}
+                    <td className="border border-[#92278F] p-3 font-semibold">
+                      {currencySymbol} {totalPayment.toFixed(2)}
+                    </td>
+
+                    <td className="border border-[#92278F] p-3">
+                      {new Date(txn.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="border border-[#92278F] p-3">
+                      {new Date(txn.expiry).toLocaleDateString()}
+                    </td>
+
+                    <td className="border border-[#92278F] p-3">
+                      {renderStatusBadge(txn.payment_status)}
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
+
           </table>
         </div>
       )}

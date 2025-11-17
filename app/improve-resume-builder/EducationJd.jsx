@@ -184,7 +184,7 @@ const EducationJd = ({educationEntries,setEducationEntries,getUpdateResumeInfoDa
                 <div className=''>
                   <div className='w-full resume_form_box mb-3'>
                     <div className="mb-1 block">
-                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                      <Label htmlFor={`date-${entry.id}`}>Start Date</Label>
                     </div>
                     <div className='field_box_date'>
                       <Datepicker 
@@ -197,13 +197,14 @@ const EducationJd = ({educationEntries,setEducationEntries,getUpdateResumeInfoDa
 
                         <div className='w-full resume_form_box mb-3'>
                     <div className="mb-1 block">
-                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                      <Label htmlFor={`date-${entry.id}`}>End Date</Label>
                     </div>
                     <div className='field_box_date'>
                       <Datepicker 
                         id={`date-${entry.id}`}
                         value={entry.end_time && !isNaN(entry.end_time.getTime()) ? entry.end_time : null}
                         onChange={(date) => updateEducationField(entry.id, 'end_time', date)}
+                        disabled={entry.currentlyStudying}
                       />
                     </div>
                   </div>

@@ -772,14 +772,14 @@ const page = () => {
           }
 
         </div>
-        <div className='flex items-center justify-between mb-0'>
+        {/* <div className='flex items-center justify-between mb-0'>
           <div className='flex items-center gap-1'>
             <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
           </div>
           <div className='flex items-center gap-3'>
             <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* add modal for apply job start here */}

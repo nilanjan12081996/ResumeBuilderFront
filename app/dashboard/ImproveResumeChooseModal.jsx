@@ -1,6 +1,6 @@
 import { Modal, ModalBody, ModalHeader } from "flowbite-react"
 import Image from "next/image"
-import resume1 from "../assets/imagesource/resum1.png";
+import resume1 from "../assets/imagesource/resum2.png";
 import resume2 from "../assets/imagesource/resum1.png";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -128,7 +128,7 @@ const ImproveResumeChooseModal=({
               {selectedResume === 2 && (
                 <Image
                   src={resume2}
-                  alt="resume01"
+                  alt="resume02"
                   className="h-[600px] w-[500px]"
                 />
               )}

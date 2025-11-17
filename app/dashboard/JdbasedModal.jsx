@@ -180,7 +180,7 @@ const JdbasedModal = ({ openModalImproveexistingResume,
           })
         }
         else if (res?.payload?.response?.data?.status_code === 400) {
-          toast.error(res?.payload?.response?.data?.message, {
+          toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message, {
             autoClose: false
           })
         }

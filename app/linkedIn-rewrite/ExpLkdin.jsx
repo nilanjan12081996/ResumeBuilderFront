@@ -259,7 +259,7 @@ const ExpLkdin=({lkdDetails, experiences, setExperiences})=>{
               handleChange(exp.id, "current_work", e.target.checked)
             }
           />
-          <Label htmlFor="age">Currently studying here</Label>
+          <Label htmlFor="age">Currently Working here</Label>
         </div>
 
         {/* Additional Info */}

@@ -259,7 +259,7 @@ const WorkExpEdit = ({setValue, singleResumeInfo, experiences, setExperiences}) 
     onChange={(e) =>
       updateExperienceField(exp.id, "current_work", e.target.checked)
     } />
-            <Label htmlFor="age">Currently studying here</Label>
+            <Label htmlFor="age">Currently working here</Label>
           </div>
 
           {/* Projects Section */}
