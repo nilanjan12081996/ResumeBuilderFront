@@ -113,6 +113,12 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
             <span>Base Payable:</span>
             <span>{currency} {Number(amount).toFixed(2)}</span>
           </div>
+          {discountAmount > 0 && (
+          <div className="flex justify-between text-green-700">
+            <span>Base Payable (after discount):</span>
+            <span>{currency} {finalAmount.toFixed(2)}</span>
+          </div>
+        )}
          {currency === "INR" && (
           <div className="flex justify-between">
            <span>GST (18%):</span>
