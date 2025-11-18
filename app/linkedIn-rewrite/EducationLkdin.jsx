@@ -281,7 +281,7 @@ useEffect(() => {
                 <div className=''>
                   <div className='w-full resume_form_box mb-3'>
                     <div className="mb-1 block">
-                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                      <Label htmlFor={`date-${entry.id}`}>Start Date</Label>
                     </div>
                     <div className='field_box_date'>
                       <Datepicker 
@@ -294,7 +294,7 @@ useEffect(() => {
 
                         <div className='w-full resume_form_box mb-3'>
                     <div className="mb-1 block">
-                      <Label htmlFor={`date-${entry.id}`}>Date</Label>
+                      <Label htmlFor={`date-${entry.id}`}>End Date</Label>
                     </div>
                     <div className='field_box_date'>
                       <Datepicker 

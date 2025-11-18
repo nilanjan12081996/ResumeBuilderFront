@@ -55,6 +55,7 @@ export default function TransactionsPage() {
               <tr>
                 <th className="p-3 border border-[#92278F] text-left">Plan Name</th>
                 <th className="p-3 border border-[#92278F]">Price</th>
+                <th className="p-3 border border-[#92278F]">Discount Price</th>
                 <th className="p-3 border border-[#92278F]">GST</th>
                 <th className="p-3 border border-[#92278F]">Total Payment</th>
                 <th className="p-3 border border-[#92278F]">Start Date</th>
@@ -66,7 +67,7 @@ export default function TransactionsPage() {
               {items.map((txn) => {
                 const isIndian = txn.currency === "INR";
 
-                const priceExclGst = parseFloat(txn.amount || 0);
+              const priceExclGst = parseFloat(txn.original_amount ?? txn.amount ?? 0);
                 const totalPayment = parseFloat(txn.total_amount || 0);
 
                 const currencySymbol = isIndian ? "₹" : "$";
@@ -84,6 +85,11 @@ export default function TransactionsPage() {
                     <td className="border border-[#92278F] p-3">
                       {currencySymbol} {priceExclGst.toFixed(2)}
                     </td>
+
+                    <td className="border border-[#92278F] p-3">
+                      {txn.discount_amount ? `${currencySymbol} ${Number(txn.discount_amount).toFixed(2)}` : "-"}
+                    </td>
+
 
                     {/* GST only if Indian */}
                     <td className="border border-[#92278F] p-3">

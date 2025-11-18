@@ -15,6 +15,8 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
   const [finalAmount, setFinalAmount] = useState(Number(amount || 0));
   const [gstAmount, setGstAmount] = useState(0);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const[couponData,setCouponData]=useState()
+
 
   useEffect(() => {
     dispatch(currentSubscription(ip));
@@ -42,6 +44,7 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
     ).then((res) => {
       if (res?.payload?.status_code === 200 && res.payload?.data) {
         const data = res.payload.data;
+        setCouponData(res.payload.data)
         let discount = 0;
         if (data.coupon_type === "percentage") discount = (amount * Number(data.coupon_value)) / 100;
         else if (data.coupon_type === "fixed_amount") discount = Number(data.coupon_value);
@@ -69,18 +72,28 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
     if (currentPlanPrice > 0 && !confirmCancel) {
       return toast.error("Please confirm that you want to cancel your current plan.");
     }
-
+   console.log('appliedCoupon',couponData)
     const paymentData = {
       amount: Number(finalAmount.toFixed(2)),
       currency,
       plan_id,
       planPrice,
       cancelCurrentPlan: confirmCancel,
+
+       ...(discountAmount > 0 && {
+    coupon_code: couponCode,
+    coupon_id: couponData?.coupon_id,
+    original_amount: Number(amount),
+    discount_amount: Number(discountAmount.toFixed(2)),
+    final_amount: Number(finalAmount.toFixed(2)),
+    
+  })
     };
 
     onPayment(e, paymentData);
     onClose();
   };
+
 
   if (!isOpen) return null;
 

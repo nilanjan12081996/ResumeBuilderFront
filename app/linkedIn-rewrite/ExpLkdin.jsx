@@ -243,6 +243,7 @@ const ExpLkdin=({lkdDetails, experiences, setExperiences})=>{
                         onSelectedDateChanged={(date) =>
                             handleChange(exp.id, "end_date", date ? date.toISOString() : null)
                         }
+                         disabled={exp.current_work}
                     />
                 </div>
               </div>

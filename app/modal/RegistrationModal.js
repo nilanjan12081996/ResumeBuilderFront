@@ -16,6 +16,7 @@ import { getSearchHistory } from "../reducers/SearchHistroySlice";
 import { RiGoogleFill } from "react-icons/ri";
 import Link from 'next/link';
 import { useGoogleLogin } from "@react-oauth/google";
+import { getIpData } from "../reducers/PlanSlice";
 
 
 
@@ -51,6 +52,10 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
         setOpenPriceModal(true)
         setOpenRegisterModal(false);
     }
+    const { ipData } = useSelector((state) => state.planst);
+    useEffect(() => {
+        dispatch(getIpData());
+    }, [dispatch]);
     const onSubmit = (data) => {
         const payload1 = {
             app: 1,
@@ -61,6 +66,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
             password: data?.password,
             ...(chooseResumeType == 2 && { organization_name: data?.organization_name }),
             confirm_password: data?.confirm_password,
+            ip_address: ipData?.ip,
 
         }
 

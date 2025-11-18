@@ -110,12 +110,12 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
           .print-watermark {
             display: block;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 80px;
+            bottom: 20px;
+            right: 20px;
+            // transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 25px;
             font-weight: bold;
-            color: rgba(0, 0, 0, 0.08);
+            color: rgba(0, 0, 0, 0.20);
             text-transform: uppercase;
             letter-spacing: 4px;
             z-index: 9999;
@@ -129,7 +129,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
         <div className="print-watermark">
 
           {
-            currentSubscriptionData?.data?.length === 0 && ('Hiring Eye')
+            currentSubscriptionData?.data?.length === 0 && ('Powered By Hiring Eye')
           }
 
         </div>

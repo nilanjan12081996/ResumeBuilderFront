@@ -110,12 +110,12 @@ const dispatch=useDispatch()
           .print-watermark {
             display: block;
             position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 80px;
+            bottom: 20px;
+            right: 20px;
+            // transform: translate(-50%, -50%);
+            font-size: 25px;
             font-weight: bold;
-            color: rgba(0, 0, 0, 0.08);
+            color: rgba(0, 0, 0, 0.20);
             text-transform: uppercase;
             letter-spacing: 4px;
             z-index: 9999;
@@ -127,7 +127,7 @@ const dispatch=useDispatch()
       `}</style>
           <div className="print-watermark">
           {
-            currentSubscriptionData?.data?.length===0&&('Hiring Eye')
+            currentSubscriptionData?.data?.length===0&&('Powered By Hiring Eye')
           }   
         </div>
       <div className="bg-white rounded-xl shadow-lg p-6 flex w-[800px] h-screen overflow-y-auto">

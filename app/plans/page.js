@@ -143,6 +143,11 @@ const Page = () => {
         currency: data.currency,
         plan_id: data.plan_id,
         ip_address: ip,
+        coupon_code: data.coupon_code,
+        coupon_id: data.coupon_id,
+        original_amount: data.original_amount,
+        discount_amount: data.discount_amount,
+        final_amount: data.final_amount,
       };
 
       const result = await dispatch(createOrder(orderData));
@@ -257,8 +262,8 @@ const Page = () => {
               onClick={(e) => handlePlanClick(e, pln)}
               disabled={btnState.disabled}
               className={`text-[14px] leading-[40px] rounded-md w-full block transition-all duration-300 ${btnState.disabled
-                  ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed"
-                  : "bg-white text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-white"
+                ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed"
+                : "bg-white text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-white"
                 }`}
             >
               {btnState.label}
@@ -294,8 +299,8 @@ const Page = () => {
                         You have an active subscription                     </h3>
                       <div className="mt-2 text-sm text-green-700">
                         <p>
-                          <strong>Plan:</strong> {getCurrentActiveSubscription().Plan?.plan_name}                        
-                        </p>                        
+                          <strong>Plan:</strong> {getCurrentActiveSubscription().Plan?.plan_name}
+                        </p>
                         <p>
                           <strong>Valid until:</strong> {new Date(getCurrentActiveSubscription().end_date).toLocaleDateString()}
                         </p>
@@ -372,7 +377,7 @@ const Page = () => {
 
 export default Page;
 
-// 2nd option 
+// 2nd option
 
 // "use client";
 // import React, { useEffect, useState } from "react";
@@ -1115,7 +1120,7 @@ export default Page;
 //               disabled={isDisabled}
 //               className={`text-[14px] leading-[40px] rounded-md w-full block transition-all duration-300
 //     ${isDisabled
-//                   ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed" 
+//                   ? "bg-green-100 text-green-700 border border-green-300 cursor-not-allowed"
 //                   : "bg-[#ffffff] text-[#1B223C] border border-[#1B223C] hover:bg-[#1B223C] hover:text-[#ffffff] cursor-pointer"
 //                 }`}
 //             >
@@ -1613,7 +1618,7 @@ export default Page;
 //             currency={currency}
 //             plan_id={plan_id}
 //             ip={ipData?.ip}
-//             onPayment={handlePaymentModal} 
+//             onPayment={handlePaymentModal}
 //           />
 
 //         )}

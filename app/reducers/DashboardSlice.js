@@ -515,6 +515,26 @@ export const jdBasedAtsScoreAnalyze = createAsyncThunk(
     }
 );
 
+export const impBasedAtsScoreAnalyze = createAsyncThunk(
+    'impBasedAtsScoreAnalyze',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/improve-resume/get-ats-score-analyze?imp_resume_id=${id}`);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
 
 
 const initialState = {
@@ -546,6 +566,7 @@ const initialState = {
     improveExperienceData: {},
     checkJdAtsData: {},
     jdBasedAtsScoreAnalyzeData: {},
+    impBasedAtsScoreAnalyzeData:{}
 }
 
 const DashboardSlice = createSlice(
@@ -899,6 +920,20 @@ const DashboardSlice = createSlice(
                     state.loading = false;
                     state.error = payload;
                 })
+
+                .addCase(impBasedAtsScoreAnalyze.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(impBasedAtsScoreAnalyze.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.impBasedAtsScoreAnalyzeData = payload;
+                })
+                .addCase(impBasedAtsScoreAnalyze.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
 
         }
     }

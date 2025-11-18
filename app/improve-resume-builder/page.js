@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, updateBasicInfo, updateExperience, updateEducation, updateSkills, updateLanguage, updateExtraProject, updateCertification, updateAchievements, getUpdateResumeInfo, atsScoreAnalyze } from '../reducers/DashboardSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, updateBasicInfo, updateExperience, updateEducation, updateSkills, updateLanguage, updateExtraProject, updateCertification, updateAchievements, getUpdateResumeInfo, atsScoreAnalyze, impBasedAtsScoreAnalyze } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -70,6 +70,7 @@ import PersonalProjectJd from './PersonalProjectJd';
 import CertificatesJd from './CertificatesJd';
 import AchivmentsJd from './AchivmentsJd';
 import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
+import ImpAtsScoreAnalyzeModal from '../modal/ImpAtsScoreAnalyzeModal';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
@@ -105,6 +106,8 @@ const page = () => {
   const [certificates, setCertificates] = useState([]);
   const [achivments, setAchivments] = useState([]);
   const [educationEntries, setEducationEntries] = useState([]);
+  const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
+  const [atsData, setAtsData] = useState(null)
   // const [resumeid, setResumeid] = useState();
 
   const {
@@ -287,11 +290,24 @@ const page = () => {
   console.log("atsScoreAnalyzeData", atsScoreAnalyzeData);
 
   // Function to handle ATS score analysis
+  // const handleAnalyzeResume = async () => {
+  //   const resumeid = getUpdateResumeInfoData?.data?.id;
+  //   if (resumeid) {
+  //     await dispatch(atsScoreAnalyze({ id: resumeid }));
+  //     setOpenModalAnalyzeResume(true);
+  //   }
+  // };
+
   const handleAnalyzeResume = async () => {
-    const resumeid = getUpdateResumeInfoData?.data?.id;
-    if (resumeid) {
-      await dispatch(atsScoreAnalyze({ id: resumeid }));
-      setOpenModalAnalyzeResume(true);
+    try {
+      const res = await dispatch(impBasedAtsScoreAnalyze({ id })).unwrap();
+      if (res?.data) {
+        setAtsData(res.data);
+        setOpenJdAtsModal(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch ATS Score");
     }
   };
 
@@ -675,7 +691,13 @@ const page = () => {
             </button>
           </div>
           <div className='lg:flex items-center gap-3'>
-            <button onClick={handleAnalyzeResume} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button>
+            <button
+              onClick={handleAnalyzeResume}
+              className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'
+            >
+              <IoStatsChart className='text-base' />Analyze Resume
+            </button>
+            {/* <button onClick={handleAnalyzeResume} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
             {/* <button onClick={() => console.log('Download DOCX clicked')} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
             <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
@@ -703,6 +725,12 @@ const page = () => {
           </div>
         </div> */}
       </div>
+
+      <ImpAtsScoreAnalyzeModal
+        show={openJdAtsModal}
+        setShow={setOpenJdAtsModal}
+        atsData={atsData}
+      />
 
       {/* add modal for apply job start here */}
       <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
