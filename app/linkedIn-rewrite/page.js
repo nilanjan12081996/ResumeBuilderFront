@@ -61,7 +61,7 @@ import SkillsLkdin from './SkillsLkdin';
 import CoursesLkdin from './CoursesLkdin';
 import AwardLkdin from './AwardLkdin';
 import { useDispatch, useSelector } from 'react-redux';
-import { linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo } from '../reducers/LinkedinSlice';
+import { linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInEnhance, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo } from '../reducers/LinkedinSlice';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
@@ -108,6 +108,10 @@ const page = () => {
     }
   }, [lkdDetails])
 
+  const [educationEntries, setEducationEntries] = useState([
+    { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
+  ])
+
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.education_info) {
       const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
@@ -135,7 +139,7 @@ const page = () => {
           end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
             ? new Date(edu.course_completed)
             : null,
-          cgpa: edu.cgpa || "",
+          cgpa: edu.cgpa || null,
           additionalInfo: edu.aditional_info || "",
           currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
         };
@@ -148,9 +152,7 @@ const page = () => {
 
 
 
-  const [educationEntries, setEducationEntries] = useState([
-    { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
-  ])
+
 
   const [experiences, setExperiences] = useState([
     {
@@ -226,11 +228,11 @@ const page = () => {
             location: edu.location,
             field_study: edu.field_study,
             degree_name: edu.degree,
-            duration:{
-               start_date: convertToSubmitFormat(edu.start_time),
+            duration: {
+              start_date: convertToSubmitFormat(edu.start_time),
               end_date: convertToSubmitFormat(edu.end_time),
             },
-           
+
             cgpa: edu.cgpa,
             additional_information: edu.additionalInfo,
           }))
@@ -273,18 +275,20 @@ const page = () => {
           skill_info: skills.map(sk => ({
             skill_category: sk.skill_category,
             position: "test",
-            skill: sk.skill.split(',').map(t => t.trim())
+            skills: sk.skill.split(',').map(t => t.trim())
+            // skill: sk.skill.split(',').map(t => t.trim())
           }))
         };
         console.log("Skills Payload:", skillPayload);
         dispatch(linkedInSkillInfo(skillPayload));
 
+        console.log('languages', languages)
         // Language Info
         const langPayload = {
           lkdin_resume_id,
           language_info: languages.map((lang) => ({
             language_name: lang.language_name,
-            proficiency_level: lang.proficiency_level,
+            proficiency_level: lang.proficiency,
           })),
         };
         console.log("Language Payload:", langPayload);
@@ -334,6 +338,38 @@ const page = () => {
       console.log('PDF generated successfully!');
     },
   });
+
+
+  const handleEnhanceLinkedInPDF = async () => {
+    try {
+      const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
+
+      if (!lkdin_resume_id) {
+        alert("Resume ID not found!");
+        return;
+      }
+
+      const payload = {
+        lkdin_resume_id,
+        linkedin_text: lkdDetails?.data?.[0]
+      };
+
+      const resultAction = await dispatch(linkedInEnhance(payload));
+
+      if (linkedInEnhance.fulfilled.match(resultAction)) {
+        alert("PDF enhancement started successfully!");
+        console.log("Enhance result:", resultAction.payload);
+      }
+      else {
+        alert(resultAction.payload || "Something went wrong");
+        console.error("Enhance Error:", resultAction.payload);
+      }
+
+    } catch (error) {
+      console.error("Enhance PDF Error:", error);
+      alert("Server error occurred");
+    }
+  };
 
 
   return (
@@ -412,6 +448,13 @@ const page = () => {
               Preview
             </button>
           </div>
+          <button
+            onClick={handleEnhanceLinkedInPDF}
+            className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'
+          >
+            Enhance LinkedIn
+          </button>
+
           <div className='flex items-center gap-3'>
             <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
