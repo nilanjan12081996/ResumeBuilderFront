@@ -245,7 +245,7 @@ const Page = () => {
           .then((res) => {
             // toast.success(res?.payload?.message || "ATS score");
             console.log("ATSresponse", res);
-            setATSscore(res?.payload?.data?.ats_score);
+            setATSscore(res?.payload?.data?.old_ats);
             setopenATSmodal(true);
           })
           .catch((err) => {

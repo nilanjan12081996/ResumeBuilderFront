@@ -165,16 +165,20 @@
 // export default WorkExp;
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Checkbox, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
 import { BiCodeAlt, BiSolidBriefcase, BiSolidBuilding } from "react-icons/bi";
 import { BsFillPlusCircleFill } from "react-icons/bs";
 import { FaTags } from "react-icons/fa";
 import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
+import ResuMateQuestionModal from "../modal/ResuMateQuestionModal";
+
 
 const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => {
 
+  const [showResuMate, setShowResuMate] = useState(false);
+  const buttonRef = useRef(null);
  useEffect(() => {
   console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
   if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
@@ -276,6 +280,15 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
       }
     ]);
   };
+
+
+  // add for resumate 
+  const imp_resume_id = getUpdateResumeInfoData?.data?.[0]?.imp_basic_info?.[0]?.imp_resume_id;
+  // const jd_questions = jdBasedDetailsData?.data?.[0]?.JdBaseResumeQuestion;
+  const user_id = getUpdateResumeInfoData?.data?.[0]?.id;
+
+  // console.log("jd_questions", jd_questions)
+
   return (
     <>
       {experiences.map((exp, expIndex) => (
@@ -559,6 +572,29 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
           ))}
         </div>
       ))}
+       {/* ===================  ResuMate Button =================== */}
+      <div className="relative">
+        <button
+          id="resumate-section"
+          ref={buttonRef}
+          type="button"
+          className="bg-[#92278F] border border-[#92278F] hover:bg-[#fff] hover:text-[#92278F] rounded-[25px] text-[15px] text-[#fff] font-medium cursor-pointer px-6 py-2 mt-4 flex items-center gap-2 shadow-lg"
+          onClick={() => setShowResuMate(true)}
+        >
+          ResuMate
+        </button>
+
+        <ResuMateQuestionModal
+          showResuMate={showResuMate}
+          setShowResuMate={setShowResuMate}
+          buttonRef={buttonRef}
+          jd_based_resume_id={imp_resume_id}
+          // jd_questions={jd_questions}
+          experiences={experiences}
+          user_id={user_id}
+        />
+      </div>
+
     </>
   );
 };

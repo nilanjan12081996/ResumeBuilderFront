@@ -7,6 +7,7 @@ import { HiAcademicCap } from "react-icons/hi2"
 import { MdDelete } from "react-icons/md"
 
 const EducationLkdin=({lkdDetails, setValue,register,educationEntries,setEducationEntries})=>{
+  console.log('lkdDetails',lkdDetails)
      const addEducation = () => {
     setEducationEntries([...educationEntries,  {id:Date.now(),institution:"",location:"",field_study:"",degree:"",start_time:null,end_time:null,cgpa:""}]);
   };
@@ -22,42 +23,42 @@ const EducationLkdin=({lkdDetails, setValue,register,educationEntries,setEducati
       )
     );
   };
-useEffect(() => {
-  if (lkdDetails?.data?.[0]?.education_info) {
-    const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
-      // Try to separate field and degree if possible
-      let degree = "";
-      let field_study = "";
-      if (edu.course) {
-        // Look for parentheses (common LinkedIn format)
-        const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
-        if (match) {
-          field_study = match[1].trim();  // "Computer Science"
-          degree = match[2].trim();       // "Bachelor of Science - BS"
-        } else {
-          degree = edu.course; // fallback if no parentheses
-        }
-      }
+// useEffect(() => {
+//   if (lkdDetails?.data?.[0]?.education_info) {
+//     const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
+//       // Try to separate field and degree if possible
+//       let degree = "";
+//       let field_study = "";
+//       if (edu.course) {
+//         // Look for parentheses (common LinkedIn format)
+//         const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
+//         if (match) {
+//           field_study = match[1].trim();  // "Computer Science"
+//           degree = match[2].trim();       // "Bachelor of Science - BS"
+//         } else {
+//           degree = edu.course; // fallback if no parentheses
+//         }
+//       }
 
-      return {
-        id: edu.id,
-        institution: edu.college || "",
-        location: edu.location || "",
-        degree,
-        field_study,
-        start_time: edu.course_start ? new Date(edu.course_start) : null,
-        end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
-          ? new Date(edu.course_completed)
-          : null,
-        cgpa: edu.cgpa || "",
-        additionalInfo: edu.aditional_info || "",
-        currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
-      };
-    });
+//       return {
+//         id: edu.id,
+//         institution: edu.college || "",
+//         location: edu.location || "",
+//         degree,
+//         field_study,
+//         start_time: edu.course_start ? new Date(edu.course_start) : null,
+//         end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
+//           ? new Date(edu.course_completed)
+//           : null,
+//         cgpa: edu.cgpa || "",
+//         additionalInfo: edu.aditional_info || "",
+//         currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
+//       };
+//     });
 
-    setEducationEntries(mappedEducation);
-  }
-}, [lkdDetails]);
+//     setEducationEntries(mappedEducation);
+//   }
+// }, [lkdDetails]);
 
     return(
         <>

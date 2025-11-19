@@ -189,7 +189,7 @@ const LinkedInReWriteModal=({
                       </div>
                        {errors.file?.type === "required" && (
                   <p className="text-red-700 text-sm" role="alert">
-                    Please upload LinkenIn Pdf
+                    Please upload LinkedIn Pdf
                   </p>
                 )}
                     </div>

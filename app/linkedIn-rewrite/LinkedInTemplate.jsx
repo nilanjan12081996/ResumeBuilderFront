@@ -84,7 +84,7 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
         {/* Header Section */}
         {/* <div className="bg-gray-200 h-28"></div> */}
         <div className="px-6 mt-10">
-          <h1 className="text-2xl font-semibold">{data?.candidate_name || "Manisha Sharma"}</h1>
+          <h1 className="text-2xl font-semibold">{data?.full_name || "Manisha Sharma"}</h1>
           <p className="text-gray-600 mt-1">
             {data?.summary || "Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
 
@@ -263,7 +263,8 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                   {/* GPA or Additional Info (Optional) */}
                   {(edu.cgpa || edu.additionalInfo) && (
                     <p className="text-xs text-gray-500 mt-1">
-                      {edu.cgpa ? `GPA: ${edu.cgpa}` : ""}{" "}
+                      {/* {edu.cgpa ? `GPA: ${edu.cgpa}` : ""}{" "} */}
+                      {edu.cgpa ? `GPA: ${parseInt(edu.cgpa)}` : ""}
                       {edu.additionalInfo ? ` | ${edu.additionalInfo}` : ""}
                     </p>
                   )}

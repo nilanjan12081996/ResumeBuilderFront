@@ -615,6 +615,24 @@ const page = () => {
             <Tabs>
               <div className='border-b border-[#E5E5E5] p-5'>
                 <div className='tab_point'>
+                  <span
+                    className="absolute -top-3 right-2 text-xs font-semibold bg-purple-600 text-white px-2 py-1 rounded-full animate-pulse cursor-pointer z-10"
+                    onClick={() => {
+                      setActiveTabIndex(2);
+                      setTimeout(() => {
+                        const section = document.getElementById("resumate-section");
+                        if (section) {
+                          section.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                        }
+                      }, 150);
+                    }}
+                  >
+                    ResuMate
+                  </span>
+
                   <TabList>
                     <Tab><span><BiSolidUser /></span> Personal Info</Tab>
                     <Tab><span><HiAcademicCap /></span> Education</Tab>

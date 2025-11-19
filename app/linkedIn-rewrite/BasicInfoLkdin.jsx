@@ -7,10 +7,12 @@ const BasicInfoLkdin=({lkdDetails,setValue, register})=>{
     console.log("lkdDetails",lkdDetails?.data?.[0]?.basic_info);
     
     useEffect(()=>{
-        setValue("candidate_name",lkdDetails?.data?.[0]?.basic_info?.[0]?.candidate_name)
+        setValue("full_name",lkdDetails?.data?.[0]?.basic_info?.[0]?.candidate_name)
         setValue("location",lkdDetails?.data?.[0]?.basic_info?.[0]?.location)
+        setValue("about",lkdDetails?.data?.[0]?.basic_info?.[0]?.summary)
         setValue("summary",lkdDetails?.data?.[0]?.basic_info?.[0]?.summary)
         setValue("description",lkdDetails?.data?.[0]?.basic_info?.[0]?.description)
+        setValue("current_company", lkdDetails?.data?.[0]?.basic_info?.[0]?.current_company || "");
     },[lkdDetails])
     return(
         <>
@@ -52,7 +54,7 @@ const BasicInfoLkdin=({lkdDetails,setValue, register})=>{
                                 <div className='p-3'>
                                     <BiSolidUser className='text-[#928F8F]' />
                                 </div>
-                                <TextInput {...register("candidate_name")} id="base" type="text" sizing="md" placeholder='Manisha Sharma' />
+                                <TextInput {...register("full_name")} id="base" type="text" sizing="md" placeholder='Manisha Sharma' />
                                 </div>
                             </div>
                             <div className='lg:w-6/12 resume_form_box'>
@@ -73,7 +75,7 @@ const BasicInfoLkdin=({lkdDetails,setValue, register})=>{
                             <Label htmlFor="base">Description <span>*</span></Label>
                             </div>
                             <div className='flex items-center'>
-                            <Textarea {...register("summary")} id="comment" placeholder="Trichy, TN" required rows={3} />
+                            <Textarea {...register("about")} id="comment" placeholder="Trichy, TN" required rows={3} />
                             </div>
                         </div>
 

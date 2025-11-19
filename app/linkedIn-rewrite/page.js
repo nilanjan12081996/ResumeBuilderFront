@@ -205,7 +205,7 @@ const page = () => {
 
 
     const basicInfoPayload = {
-      ...data.basicInfo,
+      ...data,
       lkdin_resume_id,
       basicinfo_id: lkdDetails?.data?.[0]?.basic_info?.[0]?.id || null
     };
@@ -222,14 +222,17 @@ const page = () => {
           lkdin_resume_id,
           education_info: educationEntries.map((edu) => ({
             id: edu?.id || null,
-            institution: edu.institution,
+            name_of_the_institution: edu.institution,
             location: edu.location,
             field_study: edu.field_study,
-            degree: edu.degree,
-            start_time: convertToSubmitFormat(edu.start_time),
-            end_time: convertToSubmitFormat(edu.end_time),
-            cgpa: edu.gpa,
-            information: edu.additionalInfo,
+            degree_name: edu.degree,
+            duration:{
+               start_date: convertToSubmitFormat(edu.start_time),
+              end_date: convertToSubmitFormat(edu.end_time),
+            },
+           
+            cgpa: edu.cgpa,
+            additional_information: edu.additionalInfo,
           }))
         };
 
