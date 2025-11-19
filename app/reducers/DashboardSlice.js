@@ -535,6 +535,40 @@ export const impBasedAtsScoreAnalyze = createAsyncThunk(
     }
 );
 
+/* ============ IMP RESUME (new chat APIs) ============ */
+
+// Add questions (IMP)
+export const addImpQuestions = createAsyncThunk(
+    'improveResume/addImpQuestions',
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await api.post('/api/improve-resume/add-questions', payload);
+            if (res?.data?.status === true || res?.data?.status_code === 200 || res?.data?.status_code === 201) {
+                return res.data;
+            }
+            return rejectWithValue(res?.data?.errors || 'Something went wrong.');
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || 'Network error');
+        }
+    }
+);
+
+// Improve experience (IMP)
+export const improveImpExperience = createAsyncThunk(
+    'improveResume/improveImpExperience',
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await api.post('/api/improve-resume/improve-experience', payload);
+            if (res?.data?.status === true || res?.data?.status_code === 200 || res?.data?.status_code === 201) {
+                return res.data;
+            }
+            return rejectWithValue(res?.data?.errors || 'Something went wrong.');
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || 'Network error');
+        }
+    }
+);
+
 
 
 const initialState = {
@@ -566,7 +600,10 @@ const initialState = {
     improveExperienceData: {},
     checkJdAtsData: {},
     jdBasedAtsScoreAnalyzeData: {},
-    impBasedAtsScoreAnalyzeData:{}
+    impBasedAtsScoreAnalyzeData: {},
+    // IMP chat
+    addImpQuestionsData: {},
+    improveImpExperienceData: {},
 }
 
 const DashboardSlice = createSlice(
@@ -933,6 +970,34 @@ const DashboardSlice = createSlice(
                     state.loading = false;
                     state.error = payload;
                 })
+
+
+                .addCase(addImpQuestions.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(addImpQuestions.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.addImpQuestionsData = payload;
+                })
+                .addCase(addImpQuestions.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+                .addCase(improveImpExperience.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(improveImpExperience.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.improveImpExperienceData = payload;
+                })
+                .addCase(improveImpExperience.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
 
 
         }
