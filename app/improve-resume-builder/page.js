@@ -89,6 +89,7 @@ const page = () => {
   const componentRef = useRef();
   const dispatch = useDispatch()
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
 
   // useEffect(() => {
@@ -615,7 +616,7 @@ const page = () => {
             <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
           </div>
           <div className='resume_tab_section'>
-            <Tabs>
+            <Tabs selectedIndex={activeTabIndex} onSelect={(index) => setActiveTabIndex(index)}>
               <div className='border-b border-[#E5E5E5] p-5'>
                 <div className='tab_point relative'>
                   <span
@@ -623,7 +624,7 @@ const page = () => {
                     onClick={() => {
                       setActiveTabIndex(2);
                       setTimeout(() => {
-                        const section = document.getElementById("resumate-section");
+                        const section = document.getElementById("resumate-section2");
                         if (section) {
                           section.scrollIntoView({
                             behavior: "smooth",

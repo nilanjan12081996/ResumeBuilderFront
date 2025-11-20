@@ -238,7 +238,7 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
 
                   <p className="text-sm text-gray-600">
                     {edu.degree ? `${edu.degree}` : ""}{" "}
-                    {edu.field_study ? `, ${edu.field_study}` : ""}
+                    {edu.field_of_study ? `, ${edu.field_study}` : ""}
                   </p>
 
                   {/* Date Range */}

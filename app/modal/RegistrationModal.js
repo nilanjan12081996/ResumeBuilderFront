@@ -20,7 +20,11 @@ import { getIpData } from "../reducers/PlanSlice";
 
 
 
+
 const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVerifyOtpModal, setOpenLoginModal, openPricModal, setOpenPriceModal, chooseResumeType }) => {
+
+    console.log("chooseResumeType", chooseResumeType);
+
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading } = useSelector((state) => state?.auth);
@@ -57,6 +61,9 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
         dispatch(getIpData());
     }, [dispatch]);
     const onSubmit = (data) => {
+        if (!chooseResumeType) {
+            return; 
+        }
         const payload1 = {
             app: 1,
             sign_up_type: chooseResumeType,

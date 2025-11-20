@@ -233,7 +233,7 @@ const page = () => {
             id: edu?.id || null,
             name_of_the_institution: edu.institution,
             location: edu.location,
-            field_study: edu.field_study,
+            field_of_study: edu.field_study,
             degree_name: edu.degree,
             duration: {
               start_date: convertToSubmitFormat(edu.start_time),
@@ -257,8 +257,13 @@ const page = () => {
             position: exp.position,
             location: exp.location,
             skill: exp.skill.split(",").map((s) => s.trim()),
-            start_date: convertToSubmitFormat(exp.start_date),
-            end_date: convertToSubmitFormat(exp.end_date),
+            job_type: exp.job_type || "",
+            // start_date: convertToSubmitFormat(exp.start_date),
+            // end_date: convertToSubmitFormat(exp.end_date),
+            duration: {
+              start_date: exp.start_date,   
+              end_date: exp.end_date,      
+            },
             current_work: exp.current_work ? 1 : 0,
             projects:
               exp.projects?.map((proj) => ({
@@ -347,78 +352,78 @@ const page = () => {
   });
 
 
-const handleEnhanceLinkedInPDF = async () => {
-  try {
-    setEnhancing(true);
-    const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
-    console.log('lkdin_resume_id',lkdin_resume_id)
+  const handleEnhanceLinkedInPDF = async () => {
+    try {
+      setEnhancing(true);
+      const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
+      console.log('lkdin_resume_id', lkdin_resume_id)
 
-    if (!lkdin_resume_id) {
+      if (!lkdin_resume_id) {
+        setEnhancing(false);
+        return;
+      }
+
+      const payload = {
+        lkdin_resume_id,
+        linkedin_text: lkdDetails?.data?.[0],
+      };
+
+      const resultAction = await dispatch(linkedInEnhance(payload));
+
+      if (linkedInEnhance.fulfilled.match(resultAction)) {
+        dispatch(linkedInUsageInfo(id));
+        toast.success("Linkedin Rewrite Enhance successfully!");
+        console.log("Enhance result:", resultAction.payload);
+
+        const rewriteData = resultAction?.payload?.data;
+        console.log('rewriteData', rewriteData)
+
+        // ALL DISPATCHES NOW WORK ✔
+        dispatch(
+          linkedInBasicInfo({
+            lkdin_resume_id,
+            ...rewriteData?.personal_info,
+          })
+        );
+
+        dispatch(
+          linkedInExpInfo({
+            lkdin_resume_id,
+            experience_info: rewriteData?.experience_info,
+          })
+        );
+
+        dispatch(
+          linkedInEduInfo({
+            lkdin_resume_id,
+            education_info: rewriteData?.education_info,
+          })
+        );
+
+        dispatch(
+          linkedInSkillInfo({
+            lkdin_resume_id,
+            skill_info: rewriteData?.skill_info,
+          })
+        );
+
+        dispatch(
+          linkedInLangInfo({
+            lkdin_resume_id,
+            language_info: rewriteData?.language_info,
+          })
+
+        )
+        dispatch(linkedgetDetails({ lkdin_resume_id }))
+      } else {
+        console.error("Enhance Error:", resultAction.payload);
+      }
+    } catch (error) {
+      console.error("Enhance PDF Error:", error);
+    } finally {
       setEnhancing(false);
-      return;
     }
-
-    const payload = {
-      lkdin_resume_id,
-      linkedin_text: lkdDetails?.data?.[0],
-    };
-
-    const resultAction = await dispatch(linkedInEnhance(payload));
-
-    if (linkedInEnhance.fulfilled.match(resultAction)) {
-      dispatch(linkedInUsageInfo(id));
-      toast.success("Linkedin Rewrite Enhance successfully!");
-      console.log("Enhance result:", resultAction.payload);
-
-    const rewriteData = resultAction?.payload?.data;
-      console.log('rewriteData',rewriteData)
-
-      // ALL DISPATCHES NOW WORK ✔
-      dispatch(
-        linkedInBasicInfo({
-          lkdin_resume_id,
-          ...rewriteData?.personal_info,
-        })
-      );
-
-      dispatch(
-        linkedInExpInfo({
-          lkdin_resume_id,
-          experience_info: rewriteData?.experience_info,
-        })
-      );
-
-      dispatch(
-        linkedInEduInfo({
-          lkdin_resume_id,
-          education_info: rewriteData?.education_info,
-        })
-      );
-
-      dispatch(
-        linkedInSkillInfo({
-          lkdin_resume_id,
-          skill_info: rewriteData?.skill_info,
-        })
-      );
-
-      dispatch(
-        linkedInLangInfo({
-          lkdin_resume_id,
-          language_info: rewriteData?.language_info,
-        })
-       
-      )
-       dispatch(linkedgetDetails({ lkdin_resume_id }))
-    } else {
-      console.error("Enhance Error:", resultAction.payload);
-    }
-  } catch (error) {
-    console.error("Enhance PDF Error:", error);
-  } finally {
-    setEnhancing(false);
-  }
-};
+  };
 
 
   // useEffect(() => {
