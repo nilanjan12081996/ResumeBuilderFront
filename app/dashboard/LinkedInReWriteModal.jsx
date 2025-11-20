@@ -82,7 +82,7 @@ const LinkedInReWriteModal=({
             })
                }
                 else if(res?.payload?.response?.data?.status_code===400){
-                       toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message,{
+                       toast.error(res?.payload?.response?.data?.message,{
                          autoClose:false
                        })
                      }
@@ -124,7 +124,7 @@ const LinkedInReWriteModal=({
             })
                }
                 else if(res?.payload?.response?.data?.status_code===400){
-                       toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message,{
+                       toast.error(res?.payload?.response?.data?.message,{
                          autoClose:false
                        })
                      }

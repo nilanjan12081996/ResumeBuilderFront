@@ -69,7 +69,7 @@ import { BiLogoLinkedin } from "react-icons/bi";
 import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
-import { checkATS, improveResume } from "../reducers/DashboardSlice";
+import { addImpQuestions, checkATS, improveResume } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
@@ -235,12 +235,21 @@ const Page = () => {
 
     dispatch(improveResume(formData))
       .then((res) => {
-        console.log("res?.payload?.data?.id",res?.payload?.data?.id);
+        console.log("res?.payload?.data?.id", res?.payload?.data?.id);
         setImproveResumeId(res?.payload?.data?.id);
         const userData = {
           imp_resume_id: res?.payload?.data?.id,
           raw_data: res?.payload?.raw_data,
         };
+        const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+        if (rawDataExperience) {
+          localStorage.setItem('imp_resume_raw_experience', JSON.stringify(rawDataExperience));
+        }
+        const questionPayload = {
+          imp_resume_id: res?.payload?.data?.id,
+          generated_questions: res?.payload?.questions
+        }
+
         dispatch(checkATS(userData))
           .then((res) => {
             // toast.success(res?.payload?.message || "ATS score");
@@ -251,6 +260,15 @@ const Page = () => {
           .catch((err) => {
             console.log("err", err);
           });
+        // add questions 
+        dispatch(addImpQuestions(questionPayload))
+          .then((res) => {
+            console.log("addImpQuestions", res);
+          })
+          .catch((err) => {
+            console.log("err", err);
+          });
+
       })
       .catch((err) => {
         console.log("err", err);
@@ -262,30 +280,30 @@ const Page = () => {
   };
 
   const onSubmit = (data) => {
-    if(profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id===1){
+    if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
       dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
         if (res?.payload?.status_code === 200) {
           handleResumeImprove(data);
-        } else if(res?.payload?.response?.data?.status_code === 400) {
+        } else if (res?.payload?.response?.data?.status_code === 400) {
           // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message, {
+          toast.error(res?.payload?.response?.data?.message, {
             autoClose: false,
           });
         }
       });
-    }else{
+    } else {
       dispatch(addCountResumeOrg({ ref_type: "improve_resume" })).then((res) => {
         if (res?.payload?.status_code === 200) {
           handleResumeImprove(data);
-        } else if(res?.payload?.response?.data?.status_code === 400) {
+        } else if (res?.payload?.response?.data?.status_code === 400) {
           // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error("Your current plan doesn't have access" || res?.payload?.response?.data?.message, {
+          toast.error(res?.payload?.response?.data?.message, {
             autoClose: false,
           });
         }
       });
     }
-   
+
   };
 
   useEffect(() => {
@@ -442,22 +460,20 @@ const Page = () => {
                           resume.resume_type === "scratch_resume"
                             ? `/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
                             : resume.resume_type === "linkedin_resume"
-                            ? `/linkedIn-rewrite?id=${btoa(
+                              ? `/linkedIn-rewrite?id=${btoa(
                                 resume.id.toString()
                               )}`
-                            : resume.resume_type === "jd_based_resume"
-                            ? `/jd-resume-builder?id=${btoa(
-                                resume.id.toString()
-                              )}&template=${
-                                resume?.template_detail?.[0]?.templete_id
-                              }`
-                            : resume.resume_type === "improve_resume"
-                            ? `/improve-resume-builder?id=${btoa(
-                                resume.id.toString()
-                              )}&template=${
-                                resume?.template_detail?.[0]?.templete_id
-                              }`
-                            : ""
+                              : resume.resume_type === "jd_based_resume"
+                                ? `/jd-resume-builder?id=${btoa(
+                                  resume.id.toString()
+                                )}&template=${resume?.template_detail?.[0]?.templete_id
+                                }`
+                                : resume.resume_type === "improve_resume"
+                                  ? `/improve-resume-builder?id=${btoa(
+                                    resume.id.toString()
+                                  )}&template=${resume?.template_detail?.[0]?.templete_id
+                                  }`
+                                  : ""
                         }
                         className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
                       >
@@ -563,7 +579,7 @@ const Page = () => {
                     className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
                   >
                     {/* <Image src={resume2} alt="resume01" className="h-[400px]" /> */}
-                     <Image src={resume2} alt="resume01" className="h-[400px]" />
+                    <Image src={resume2} alt="resume01" className="h-[400px]" />
                   </label>
                   <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
                     Professional Template
@@ -609,7 +625,7 @@ const Page = () => {
                 //   alt="resume01"
                 //   className="h-[600px] w-[500px]"
                 // />
-                 <Image
+                <Image
                   src={resume2}
                   alt="resume01"
                   className="h-[600px] w-[500px]"
@@ -1029,9 +1045,8 @@ const Page = () => {
                       stroke={ringColor}
                       strokeWidth={12}
                       strokeLinecap="round"
-                      strokeDasharray={`${progress} ${
-                        circumference - progress
-                      }`}
+                      strokeDasharray={`${progress} ${circumference - progress
+                        }`}
                       transform="rotate(-90 70 70)"
                     />
                   </svg>

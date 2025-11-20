@@ -80,13 +80,13 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
         }
         {/* Hiring Eye */}
       </div>
-      <div className="w-full max-w-2xl rounded-xl shadow-md overflow-y-auto h-screen bg-white">
+      <div className="w-full max-w-2xl rounded-xl shadow-md bg-white">
         {/* Header Section */}
         {/* <div className="bg-gray-200 h-28"></div> */}
         <div className="px-6 mt-10">
           <h1 className="text-2xl font-semibold">{data?.full_name || "Manisha Sharma"}</h1>
           <p className="text-gray-600 mt-1">
-            {data?.summary || "Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
+            {data?.about || "Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
 
           </p>
           <p className="text-sm text-gray-500 mt-2">

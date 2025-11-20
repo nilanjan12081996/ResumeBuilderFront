@@ -347,39 +347,79 @@ const page = () => {
   });
 
 
-  const handleEnhanceLinkedInPDF = async () => {
-    try {
-      setEnhancing(true);
-      const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
+const handleEnhanceLinkedInPDF = async () => {
+  try {
+    setEnhancing(true);
+    const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
+    console.log('lkdin_resume_id',lkdin_resume_id)
 
-      if (!lkdin_resume_id) {
-        setEnhancing(false);
-        return;
-      }
-
-      const payload = {
-        lkdin_resume_id,
-        linkedin_text: lkdDetails?.data?.[0]
-      };
-
-      const resultAction = await dispatch(linkedInEnhance(payload));
-
-      if (linkedInEnhance.fulfilled.match(resultAction)) {
-        dispatch(linkedInUsageInfo(id));
-        toast.success("Linkedin Rewrite Enhance successfully!")
-        console.log("Enhance result:", resultAction.payload);
-      }
-      else {
-        console.error("Enhance Error:", resultAction.payload);
-      }
-
-    } catch (error) {
-      console.error("Enhance PDF Error:", error);
-    }
-    finally {
+    if (!lkdin_resume_id) {
       setEnhancing(false);
+      return;
     }
-  };
+
+    const payload = {
+      lkdin_resume_id,
+      linkedin_text: lkdDetails?.data?.[0],
+    };
+
+    const resultAction = await dispatch(linkedInEnhance(payload));
+
+    if (linkedInEnhance.fulfilled.match(resultAction)) {
+      dispatch(linkedInUsageInfo(id));
+      toast.success("Linkedin Rewrite Enhance successfully!");
+      console.log("Enhance result:", resultAction.payload);
+
+    const rewriteData = resultAction?.payload?.data;
+      console.log('rewriteData',rewriteData)
+
+      // ALL DISPATCHES NOW WORK ✔
+      dispatch(
+        linkedInBasicInfo({
+          lkdin_resume_id,
+          ...rewriteData?.personal_info,
+        })
+      );
+
+      dispatch(
+        linkedInExpInfo({
+          lkdin_resume_id,
+          experience_info: rewriteData?.experience_info,
+        })
+      );
+
+      dispatch(
+        linkedInEduInfo({
+          lkdin_resume_id,
+          education_info: rewriteData?.education_info,
+        })
+      );
+
+      dispatch(
+        linkedInSkillInfo({
+          lkdin_resume_id,
+          skill_info: rewriteData?.skill_info,
+        })
+      );
+
+      dispatch(
+        linkedInLangInfo({
+          lkdin_resume_id,
+          language_info: rewriteData?.language_info,
+        })
+       
+      )
+       dispatch(linkedgetDetails({ lkdin_resume_id }))
+    } else {
+      console.error("Enhance Error:", resultAction.payload);
+    }
+  } catch (error) {
+    console.error("Enhance PDF Error:", error);
+  } finally {
+    setEnhancing(false);
+  }
+};
+
 
   // useEffect(() => {
   //   if (id) {
@@ -393,7 +433,7 @@ const page = () => {
   const remaining =
     typeof maxLimit === "number" && typeof used === "number"
       ? maxLimit - used
-      : "";
+      : 5;
 
 
 

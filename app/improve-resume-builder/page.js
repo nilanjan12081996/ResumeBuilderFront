@@ -71,6 +71,8 @@ import CertificatesJd from './CertificatesJd';
 import AchivmentsJd from './AchivmentsJd';
 import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 import ImpAtsScoreAnalyzeModal from '../modal/ImpAtsScoreAnalyzeModal';
+import { addCountResume } from '../reducers/ResumeSlice';
+import { toast, ToastContainer } from 'react-toastify';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
@@ -419,11 +421,12 @@ const page = () => {
         Summary: data.goal || ""
       };
 
-      dispatch(addCountResume({ ref_type: "jd_based_resume" })).then(res => {
+      dispatch(addCountResume({ ref_type: "improve_resume" })).then(res => {
         if (res?.payload?.status_code === 200) {
 
           dispatch(updateBasicInfo(basicInfoPayload));
         } else {
+          console.log("hiii")
           toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", { autoClose: false })
         }
       })
@@ -600,7 +603,7 @@ const page = () => {
   // };
   return (
     <div className='lg:flex gap-5 pb-5'>
-
+      <ToastContainer />
 
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>

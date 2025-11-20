@@ -8,7 +8,7 @@ const JdAtsScoreModal = ({ showJdAtsModal, setShowJdAtsModal, atsData, setOpenMo
   useEffect(() => {
     if (showJdAtsModal) {
       let start = 0;
-      const end = atsData?.ats_score ?? 0;
+      const end = atsData?.old_ats ?? 0;
       const duration = 1000; // animation duration in ms
       const increment = end / (duration / 16); // ~60fps
       const animate = () => {

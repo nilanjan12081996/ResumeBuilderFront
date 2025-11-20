@@ -246,8 +246,9 @@ const Insideheader = () => {
       toast.success("Your Subscription is successfully Cancelled");
 
       setShowCancelModal(false);
-
       dispatch(currentSubscription(ipData.ip));
+      router.push("/dashboard");
+
     } else {
       toast.error(result?.message || "Failed to cancel subscription");
     }

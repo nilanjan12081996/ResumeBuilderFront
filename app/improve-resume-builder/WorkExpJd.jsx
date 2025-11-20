@@ -173,49 +173,51 @@ import { FaTags } from "react-icons/fa";
 import { FaDiagramProject, FaLocationDot } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 import ResuMateQuestionModal from "../modal/ResuMateQuestionModal";
+import ResuMateImpQuestionModal from "../modal/ResuMateImpQuestionModal";
 
 
 const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => {
 
   const [showResuMate, setShowResuMate] = useState(false);
   const buttonRef = useRef(null);
- useEffect(() => {
-  console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
-  if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
-    const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
-      return {
-        id: exp.id,
-        company_name: exp.company_name || "",
-        position: exp.Position || "",
-        location: exp.location || "",
-        skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
-        start_date: exp.start_date ? (() => {
-          try {
-            const date = new Date(exp.start_date);
-            return isNaN(date.getTime()) ? null : date;
-          } catch (e) {
-            console.error('Error parsing start date:', exp.start_date, e);
-            return null;
-          }
-        })() : null,
-        end_date: exp.end_date ? (() => {
-          try {
-            const date = new Date(exp.end_date);
-            return isNaN(date.getTime()) ? null : date;
-          } catch (e) {
-            console.error('Error parsing end date:', exp.end_date, e);
-            return null;
-          }
-        })() : null,
-        current_work: !exp.end_date,
-        projects: [
-          { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
-        ]
-      };
-    });
-    setExperiences(formattedExperiences);
-  }
-}, [getUpdateResumeInfoData]);
+  console.log('getUpdateResumeInfoData', getUpdateResumeInfoData)
+  useEffect(() => {
+    console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
+    if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
+      const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
+        return {
+          id: exp.id,
+          company_name: exp.company_name || "",
+          position: exp.Position || "",
+          location: exp.location || "",
+          skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
+          start_date: exp.start_date ? (() => {
+            try {
+              const date = new Date(exp.start_date);
+              return isNaN(date.getTime()) ? null : date;
+            } catch (e) {
+              console.error('Error parsing start date:', exp.start_date, e);
+              return null;
+            }
+          })() : null,
+          end_date: exp.end_date ? (() => {
+            try {
+              const date = new Date(exp.end_date);
+              return isNaN(date.getTime()) ? null : date;
+            } catch (e) {
+              console.error('Error parsing end date:', exp.end_date, e);
+              return null;
+            }
+          })() : null,
+          current_work: !exp.end_date,
+          projects: [
+            { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
+          ]
+        };
+      });
+      setExperiences(formattedExperiences);
+    }
+  }, [getUpdateResumeInfoData]);
 
 
 
@@ -283,11 +285,11 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
 
 
   // add for resumate 
-  const imp_resume_id = getUpdateResumeInfoData?.data?.[0]?.imp_basic_info?.[0]?.imp_resume_id;
-  // const jd_questions = jdBasedDetailsData?.data?.[0]?.JdBaseResumeQuestion;
-  const user_id = getUpdateResumeInfoData?.data?.[0]?.id;
+ const imp_resume_id = getUpdateResumeInfoData?.data?.imp_basic_info?.imp_resume_id;
+  const imp_questions = getUpdateResumeInfoData?.data?.ImpResumeQuestion;
+  const user_id = getUpdateResumeInfoData?.data?.id;
+  console.log('user_id', imp_resume_id)
 
-  // console.log("jd_questions", jd_questions)
 
   return (
     <>
@@ -572,7 +574,7 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
           ))}
         </div>
       ))}
-       {/* ===================  ResuMate Button =================== */}
+      {/* ===================  ResuMate Button =================== */}
       <div className="relative">
         <button
           id="resumate-section"
@@ -584,12 +586,12 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
           ResuMate
         </button>
 
-        <ResuMateQuestionModal
+        <ResuMateImpQuestionModal
           showResuMate={showResuMate}
           setShowResuMate={setShowResuMate}
           buttonRef={buttonRef}
-          jd_based_resume_id={imp_resume_id}
-          // jd_questions={jd_questions}
+          imp_resume_id={imp_resume_id}
+          imp_questions={imp_questions}
           experiences={experiences}
           user_id={user_id}
         />
