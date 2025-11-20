@@ -162,6 +162,27 @@ export const linkedInEnhance = createAsyncThunk(
     }
 );
 
+export const linkedInUsageInfo = createAsyncThunk(
+    'linkedInUsageInfo',
+    async (cvId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/linkedin-rewrite/linkedin-rewrite-usages-info?cvId=${cvId}`);
+
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
 
 
 const initialState = {
@@ -174,7 +195,8 @@ const initialState = {
     lkdSkillInfo: {},
     lkdlangInfo: {},
     lkdDetails: {},
-    lkdEnhance: {}
+    lkdEnhance: {},
+    lkdUsageInfo: {},
 
 }
 
@@ -279,12 +301,26 @@ const LinkedinSlice = createSlice(
                 .addCase(linkedInEnhance.fulfilled, (state, { payload }) => {
                     state.loading = false;
                     state.error = false;
-                    state.lkdEnhance = payload;   
+                    state.lkdEnhance = payload;
                 })
                 .addCase(linkedInEnhance.rejected, (state, { payload }) => {
                     state.loading = false;
                     state.error = payload;
                 })
+
+                .addCase(linkedInUsageInfo.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(linkedInUsageInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.lkdUsageInfo = payload;
+                })
+                .addCase(linkedInUsageInfo.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
 
 
 

@@ -61,15 +61,19 @@ import SkillsLkdin from './SkillsLkdin';
 import CoursesLkdin from './CoursesLkdin';
 import AwardLkdin from './AwardLkdin';
 import { useDispatch, useSelector } from 'react-redux';
-import { linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInEnhance, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo } from '../reducers/LinkedinSlice';
+import { linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInEnhance, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo, linkedInUsageInfo } from '../reducers/LinkedinSlice';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { useReactToPrint } from 'react-to-print';
+import { toast } from 'react-toastify';
 
 const page = () => {
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const { lkdDetails } = useSelector((state) => state?.linkedIn)
+  const { lkdDetails, lkdUsageInfo } = useSelector((state) => state?.linkedIn)
+  const [enhancing, setEnhancing] = useState(false);
+
+
   const dispatch = useDispatch()
   const searchParams = useSearchParams();
   const id = atob(searchParams.get("id"))
@@ -77,6 +81,7 @@ const page = () => {
   const componentRef = useRef();
   useEffect(() => {
     dispatch(linkedgetDetails({ lkdin_resume_id: id }))
+    dispatch(linkedInUsageInfo(id));
   }, [id])
   const {
     register,
@@ -87,6 +92,8 @@ const page = () => {
   } = useForm();
 
   const formValues = watch();
+  console.log('remaining', lkdUsageInfo)
+
 
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.experience_info) {
@@ -342,10 +349,11 @@ const page = () => {
 
   const handleEnhanceLinkedInPDF = async () => {
     try {
+      setEnhancing(true);
       const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
 
       if (!lkdin_resume_id) {
-        alert("Resume ID not found!");
+        setEnhancing(false);
         return;
       }
 
@@ -357,19 +365,36 @@ const page = () => {
       const resultAction = await dispatch(linkedInEnhance(payload));
 
       if (linkedInEnhance.fulfilled.match(resultAction)) {
-        alert("PDF enhancement started successfully!");
+        dispatch(linkedInUsageInfo(id));
+        toast.success("Linkedin Rewrite Enhance successfully!")
         console.log("Enhance result:", resultAction.payload);
       }
       else {
-        alert(resultAction.payload || "Something went wrong");
         console.error("Enhance Error:", resultAction.payload);
       }
 
     } catch (error) {
       console.error("Enhance PDF Error:", error);
-      alert("Server error occurred");
+    }
+    finally {
+      setEnhancing(false);
     }
   };
+
+  // useEffect(() => {
+  //   if (id) {
+  //     dispatch(linkedInUsageInfo(id));
+  //   }
+  // }, [id]);
+
+  const maxLimit = lkdUsageInfo?.data?.enhance_limit?.max_limit;
+  const used = lkdUsageInfo?.data?.usage_limit;
+
+  const remaining =
+    typeof maxLimit === "number" && typeof used === "number"
+      ? maxLimit - used
+      : "";
+
 
 
   return (
@@ -450,9 +475,41 @@ const page = () => {
           </div>
           <button
             onClick={handleEnhanceLinkedInPDF}
-            className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'
+            disabled={enhancing}
+            className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-white hover:text-[#92278F] font-medium cursor-pointer px-4 gap-1.5 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
           >
-            Enhance LinkedIn
+            {enhancing ? (
+              <>
+                <svg
+                  className="animate-spin h-4 w-4 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                Enhancing...
+              </>
+            ) : (
+              <>
+                Enhance LinkedIn
+                <span className='ml-2 bg-white text-[#800080] rounded-full w-[25px] h-[25px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
+                  {remaining}
+                </span>
+              </>
+            )}
           </button>
 
           <div className='flex items-center gap-3'>
