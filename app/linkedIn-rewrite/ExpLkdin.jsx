@@ -19,8 +19,8 @@ const ExpLkdin = ({ lkdDetails, experiences, setExperiences }) => {
           location: exp.location || "",
           skill: exp.skill_set || "",
           job_type: exp.job_type || "",
-          start_date: exp.start_date || null,
-          end_date: exp.end_date || null,
+          start_date: exp.duration?.start_date || null,
+          end_date: exp.duration?.end_date || null,
           current_work: exp.end_date === null, // mark current if no end_date
           job_description: exp.job_description || "",
         }

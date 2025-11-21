@@ -121,6 +121,7 @@ const page = () => {
 
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.education_info) {
+      console.log('lkdDetails',lkdDetails)
       const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
         // Try to separate field and degree if possible
         let degree = "";
@@ -248,6 +249,7 @@ const page = () => {
         console.log("Education Payload:", eduPayload);
         dispatch(linkedInEduInfo(eduPayload));
 
+
         // Experience Info
         const expPayload = {
           lkdin_resume_id,
@@ -256,10 +258,9 @@ const page = () => {
             company_name: exp.company_name,
             position: exp.position,
             location: exp.location,
-            skill: exp.skill.split(",").map((s) => s.trim()),
+           skill_set: exp.skill?.split(",").map((s) => s.trim()),
+            additional_information: exp.job_description || "",
             job_type: exp.job_type || "",
-            // start_date: convertToSubmitFormat(exp.start_date),
-            // end_date: convertToSubmitFormat(exp.end_date),
             duration: {
               start_date: exp.start_date,   
               end_date: exp.end_date,      
