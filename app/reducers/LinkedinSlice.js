@@ -183,6 +183,55 @@ export const linkedInUsageInfo = createAsyncThunk(
     }
 );
 
+export const checkLinkedinAtsScore = createAsyncThunk(
+    "checkLinkedinAtsScore",
+    async ({ linkedin_resume_id, raw_data }, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/api/linkedin-rewrite/check-ats-score", {
+                linkedin_resume_id,
+                raw_data
+            });
+
+            if (response?.data?.status === true) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+
+export const getLinkedinAtsScoreAnalyze = createAsyncThunk(
+    "getLinkedinAtsScoreAnalyze",
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const response = await api.get(
+                `/api/linkedin-rewrite/get-ats-score-analyze?linkedin_resume_id=${id}`
+            );
+
+            if (response?.data?.status_code === 200 || response?.data?.status === true) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+
 
 
 const initialState = {
@@ -197,6 +246,8 @@ const initialState = {
     lkdDetails: {},
     lkdEnhance: {},
     lkdUsageInfo: {},
+    lkdCheckAtsScore: {},
+    lkdAtsScoreAnalyze: {},
 
 }
 
@@ -317,6 +368,33 @@ const LinkedinSlice = createSlice(
                     state.lkdUsageInfo = payload;
                 })
                 .addCase(linkedInUsageInfo.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+                // ---------- LINKEDIN ATS ----------
+                .addCase(checkLinkedinAtsScore.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(checkLinkedinAtsScore.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.lkdCheckAtsScore = payload;
+                })
+                .addCase(checkLinkedinAtsScore.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+                .addCase(getLinkedinAtsScoreAnalyze.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(getLinkedinAtsScoreAnalyze.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.lkdAtsScoreAnalyze = payload;
+                })
+                .addCase(getLinkedinAtsScoreAnalyze.rejected, (state, { payload }) => {
                     state.loading = false;
                     state.error = payload;
                 })

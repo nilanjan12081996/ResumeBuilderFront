@@ -61,18 +61,20 @@ import SkillsLkdin from './SkillsLkdin';
 import CoursesLkdin from './CoursesLkdin';
 import AwardLkdin from './AwardLkdin';
 import { useDispatch, useSelector } from 'react-redux';
-import { linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInEnhance, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo, linkedInUsageInfo } from '../reducers/LinkedinSlice';
+import { getLinkedinAtsScoreAnalyze, linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInEnhance, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo, linkedInUsageInfo } from '../reducers/LinkedinSlice';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { useReactToPrint } from 'react-to-print';
 import { toast } from 'react-toastify';
+import LinkdinAtsScoreAnalyzeModal from '../modal/LinkdinAtsScoreAnalyzeModal';
 
 const page = () => {
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const { lkdDetails, lkdUsageInfo } = useSelector((state) => state?.linkedIn)
   const [enhancing, setEnhancing] = useState(false);
-
+  const [openLinkdinAtsModal, setOpenLinkdinAtsModal] = useState(false);
+  const [atsData, setAtsData] = useState(null)
 
   const dispatch = useDispatch()
   const searchParams = useSearchParams();
@@ -92,7 +94,21 @@ const page = () => {
   } = useForm();
 
   const formValues = watch();
-  console.log('remaining', lkdUsageInfo)
+  // console.log('remaining', lkdUsageInfo)
+
+  const handleAnalyzeResume = async () => {
+    try {
+      const res = await dispatch(getLinkedinAtsScoreAnalyze({ id })).unwrap();
+      if (res?.data) {
+        setAtsData(res.data);
+        setOpenLinkdinAtsModal(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch ATS Score");
+    }
+  };
+
 
 
   useEffect(() => {
@@ -121,7 +137,7 @@ const page = () => {
 
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.education_info) {
-      console.log('lkdDetails',lkdDetails)
+      console.log('lkdDetails', lkdDetails)
       const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
         // Try to separate field and degree if possible
         let degree = "";
@@ -258,12 +274,12 @@ const page = () => {
             company_name: exp.company_name,
             position: exp.position,
             location: exp.location,
-           skill_set: exp.skill?.split(",").map((s) => s.trim()),
+            skill_set: exp.skill?.split(",").map((s) => s.trim()),
             additional_information: exp.job_description || "",
             job_type: exp.job_type || "",
             duration: {
-              start_date: exp.start_date,   
-              end_date: exp.end_date,      
+              start_date: exp.start_date,
+              end_date: exp.end_date,
             },
             current_work: exp.current_work ? 1 : 0,
             projects:
@@ -448,12 +464,57 @@ const page = () => {
 
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
-            <div className='flex items-center gap-1'>
-              <HiClipboardList className='text-[#800080] text-2xl' />
-              <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+          <div className='border-b border-[#E5E5E5] p-5'>
+            <div className=' flex items-center justify-between'>
+              <div className='flex items-center gap-1'>
+                <HiClipboardList className='text-[#800080] text-2xl' />
+                <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+              </div>
+              <div className='flex items-center gap-1'>
+                <button
+                  onClick={handleEnhanceLinkedInPDF}
+                  disabled={enhancing}
+                  className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
+                >
+                  {enhancing ? (
+                    <>
+                      <svg
+                        className="animate-spin h-4 w-4 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        ></path>
+                      </svg>
+                      Enhancing...
+                    </>
+                  ) : (
+                    <>
+                      Enhance LinkedIn
+                      <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
+                        {remaining}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
             </div>
-            <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
+            <p className="text-[11px] text-gray-600 mt-1 text-center">
+              Enhancing attempts remaining: <span className="font-semibold text-[#800080]">{remaining}</span>
+            </p>
           </div>
           <div className='resume_tab_section'>
             <Tabs>
@@ -519,53 +580,54 @@ const page = () => {
               Preview
             </button>
           </div>
-          <button
-            onClick={handleEnhanceLinkedInPDF}
-            disabled={enhancing}
-            className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-white hover:text-[#92278F] font-medium cursor-pointer px-4 gap-1.5 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
-          >
-            {enhancing ? (
-              <>
-                <svg
-                  className="animate-spin h-4 w-4 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
-                </svg>
-                Enhancing...
-              </>
-            ) : (
-              <>
-                Enhance LinkedIn
-                <span className='ml-2 bg-white text-[#800080] rounded-full w-[25px] h-[25px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
-                  {remaining}
-                </span>
-              </>
-            )}
-          </button>
+
+          <div className='flex items-center gap-1'>
+            <button
+              onClick={handleAnalyzeResume}
+              className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'
+            >
+              <IoStatsChart className='text-base' />check linkedIn score
+            </button>
+          </div>
 
           <div className='flex items-center gap-3'>
-            <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
+            {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
+            <div className="relative group inline-block">
+              <button
+                onClick={remaining === 5 ? null : handlePrint}
+                className={`
+      rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
+      ${remaining === 5
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
+                  }
+    `}
+              >
+                <IoMdDownload className="text-[18px]" /> Download PDF
+              </button>
+
+              {/* Tooltip */}
+              {remaining === 5 && (
+                <div className="
+      absolute left-1/2 -translate-x-1/2 top-[110%]
+      bg-black text-white text-[11px] px-2 py-1 rounded opacity-0 
+      group-hover:opacity-100 transition-all whitespace-nowrap
+    ">
+                  Enhance your resume first
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume4} alt="resume4" className='' /> */}
           <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} languages={languages} skills={skills} />
         </div>
+        <LinkdinAtsScoreAnalyzeModal
+          show={openLinkdinAtsModal}
+          setShow={setOpenLinkdinAtsModal}
+          atsData={atsData}
+        />
         {/* Resume Preview Modal */}
         <Modal
           show={openPreviewModal}

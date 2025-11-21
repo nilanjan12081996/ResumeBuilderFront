@@ -262,12 +262,12 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
                                             }
                                             {/* <p className="text-center mt-2 flex justify-center items-center">Already Have an account? <button className="sign_up_btn" onClick={handleSignup}>Sign Up</button> </p> */}
                                         </form>
-                                        <div className="mt-4 text-center continue_width">
+                                        {/* <div className="mt-4 text-center continue_width">
                                             <p className="text-[#525252] text-[14px] leading-[20px]">Or Continue With</p>
                                         </div>
                                         <div className="mt-4 flex justify-center items-center">
                                             <button onClick={() => { googleLogin() }} className="google_btn"><RiGoogleFill className="text-[18px] mr-1" /> Google</button>
-                                        </div>
+                                        </div> */}
                                         <div className="mt-6 text-center">
                                             <p className="text-[#615D5D] text-[14px] leading-[20px] font-normal">Don’t have an account? <Link onClick={() => handleSignup(true)} className="text-[#000000] hover:text-[#615D5D] font-medium" href="/" passHref>Sign Up</Link></p>
                                         </div>

@@ -406,8 +406,8 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
                 </div>
               </div>
 
-              <div className="lg:flex gap-4 mb-3">
-                <div className="lg:w-6/12 resume_form_box mb-2 lg:mb-0">
+              <div className="flex flex-col gap-4 mb-3">
+                <div className="resume_form_box mb-2 lg:mb-0">
                   <div className="mb-1 block">
                     <Label htmlFor="base">
                       Start Date <span>*</span>
@@ -425,7 +425,7 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
                     />
                   </div>
                 </div>
-                <div className="lg:w-6/12 resume_form_box">
+                <div className="resume_form_box">
                   <div className="mb-1 block">
                     <Label htmlFor="base">
                       End Date <span>*</span>
