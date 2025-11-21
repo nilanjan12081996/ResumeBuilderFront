@@ -200,10 +200,10 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
             id: proj.id,
             title: proj.Project_title || "",
             role: proj.Role || "",
-            technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
-              ? JSON.parse(proj.skill_set_use).join(", ")
-              : proj.skill_set_use || "",
-            description: proj.description || "",
+            technology: Array.isArray(JSON.parse(proj?.skill_set_use || "[]"))
+              ? JSON.parse(proj?.skill_set_use)?.join(", ")
+              : proj?.skill_set_use || "",
+            description: proj?.description || "",
           }));
 
         return {
