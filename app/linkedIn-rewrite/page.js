@@ -234,7 +234,7 @@ const page = () => {
             id: edu?.id || null,
             name_of_the_institution: edu.institution,
             location: edu.location,
-            field_of_study: edu.field_study,
+            field_study: edu.field_study,
             degree_name: edu.degree,
             duration: {
               start_date: convertToSubmitFormat(edu.start_time),
