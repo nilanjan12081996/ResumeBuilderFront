@@ -206,15 +206,25 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
             description: proj?.description || "",
           }));
 
+        // Convert start_date or GraduationYear safely
+        const parseDate = (value) => {
+          if (!value || value === "Present") return null;
+          const d = new Date(value);
+          return isNaN(d.getTime()) ? null : d;
+        };
+
+
         return {
           id: exp.id,
           company_name: exp.company_name || "",
           position: exp.Position || "",
           location: exp.location || "",
           skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
-          start_date: exp.start_date ? new Date(exp.start_date) : null,
-          end_date: exp.end_date ? new Date(exp.end_date) : null,
-          current_work: false,
+          // start_date: exp.start_date ? new Date(exp.start_date) : null,
+          // end_date: exp.end_date ? new Date(exp.end_date) : null,
+          start_date: parseDate(exp.start_date),
+          end_date: parseDate(exp.course_completed) || parseDate(exp.GraduationYear),
+          current_work: exp.end_date === "Present",
           projects:
             relatedProjects.length > 0
               ? relatedProjects

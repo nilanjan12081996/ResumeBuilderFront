@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, updateBasicInfo, updateExperience, updateEducation, updateSkills, updateLanguage, updateExtraProject, updateCertification, updateAchievements, getUpdateResumeInfo, atsScoreAnalyze, impBasedAtsScoreAnalyze } from '../reducers/DashboardSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, updateBasicInfo, updateExperience, updateEducation, updateSkills, updateLanguage, updateExtraProject, updateCertification, updateAchievements, getUpdateResumeInfo, atsScoreAnalyze, impBasedAtsScoreAnalyze, getImpEnhance, impEnhanceUsageInfo } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -96,7 +96,7 @@ const page = () => {
   //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
   // }, [id])
 
-  const { error, improveResumeData, loading, getUpdateResumeInfoData, atsScoreAnalyzeData } = useSelector((state) => state?.dash)
+  const { error, improveResumeData, loading, getUpdateResumeInfoData, atsScoreAnalyzeData, impEnUsageInfo } = useSelector((state) => state?.dash)
 
 
   // console.log("improveResumeData", improveResumeData);
@@ -111,6 +111,7 @@ const page = () => {
   const [educationEntries, setEducationEntries] = useState([]);
   const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
   const [atsData, setAtsData] = useState(null)
+  const [enhancing, setEnhancing] = useState(false);
   // const [resumeid, setResumeid] = useState();
 
   const {
@@ -122,10 +123,12 @@ const page = () => {
   } = useForm();
 
   useEffect(() => {
-    dispatch(getUpdateResumeInfo({ id: id })).then((res) => {
+    dispatch(getUpdateResumeInfo({ id: id }))
+    dispatch(impEnhanceUsageInfo(id))
+      .then((res) => {
 
-      // console.log("resumeid", res.payload?.data?.id);
-    })
+        // console.log("resumeid", res.payload?.data?.id);
+      })
   }, [])
 
 
@@ -481,7 +484,8 @@ const page = () => {
       // 5. Update Languages
       const languagePayload = languages.map(lang => ({
         id: lang.id && lang.id.toString().includes('lang-') ? null : lang.id,
-        Language: lang.language_name || ""
+        Language: lang.language_name || "",
+        proficiency: lang.proficiency || "",
       }));
 
       await dispatch(updateLanguage({ resumeid, data: languagePayload }));
@@ -602,6 +606,115 @@ const page = () => {
 
   //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
   // };
+
+  const handleEnhancePDF = async () => {
+    try {
+      setEnhancing(true);
+
+      const imp_resume_id = getUpdateResumeInfoData?.data?.imp_basic_info?.imp_resume_id;
+
+      console.log("imp_resume_id", imp_resume_id);
+
+      if (!imp_resume_id) {
+        setEnhancing(false);
+        return;
+      }
+
+      const payload = {
+        imp_resume_id: imp_resume_id,
+        imp_resume_text: getUpdateResumeInfoData?.data,
+      };
+
+      const resultAction = await dispatch(getImpEnhance(payload));
+
+      if (getImpEnhance.fulfilled.match(resultAction)) {
+        dispatch(impEnhanceUsageInfo(id));
+
+        const rewriteData = resultAction?.payload?.data;
+        console.log("rewriteData", rewriteData);
+
+        // -------------------------
+        // FIXED PAYLOAD MAPPING
+        // -------------------------
+
+        const basicPayload = {
+          basic_info_id: getUpdateResumeInfoData?.data?.imp_basic_info?.id,
+          ...rewriteData?.basic_information,
+        };
+
+
+        const expPayload = {
+          imp_resume_id,
+          data: rewriteData?.experience?.Experience || [],
+        };
+
+        const eduPayload = {
+          imp_resume_id,
+          data: rewriteData?.education?.Education || [],
+        };
+
+        const skillPayload = {
+          imp_resume_id,
+          data: rewriteData?.skills?.Skills || [],
+        };
+
+        const langPayload = {
+          imp_resume_id,
+          data: rewriteData?.languages?.Languages || [],
+        };
+
+        const certPayload = {
+          imp_resume_id,
+          data: rewriteData?.certifications?.Certifications || [],
+        };
+
+        const achPayload = {
+          imp_resume_id,
+          data: rewriteData?.achievements?.Achievements || [],
+        };
+
+        const projectPayload = {
+          imp_resume_id,
+          data: rewriteData?.projects?.Projects || [],
+        };
+
+        // -------------------------
+        // DISPATCH ALL
+        // -------------------------
+
+        await Promise.all([
+          dispatch(updateBasicInfo(basicPayload)),
+          dispatch(updateExperience({ resumeid: imp_resume_id, data: expPayload.data })),
+          dispatch(updateEducation({ resumeid: imp_resume_id, data: eduPayload.data })),
+          dispatch(updateSkills({ resumeid: imp_resume_id, data: skillPayload.data })),
+          dispatch(updateLanguage({ resumeid: imp_resume_id, data: langPayload.data })),
+          dispatch(updateCertification({ resumeid: imp_resume_id, data: certPayload.data })),
+          dispatch(updateAchievements({ resumeid: imp_resume_id, data: achPayload.data })),
+          dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectPayload.data }))
+        ]);
+
+        await dispatch(getUpdateResumeInfo({ id }));
+      }
+      else {
+        console.error("IMP Enhance Error:", resultAction.payload);
+      }
+    } catch (error) {
+      console.error("Enhance PDF Error:", error);
+    } finally {
+      setEnhancing(false);
+    }
+  };
+
+
+  const maxLimit = impEnUsageInfo?.data?.enhance_limit?.max_limit;
+  const used = impEnUsageInfo?.data?.usage_limit;
+
+  const remaining =
+    typeof maxLimit === "number" && typeof used === "number"
+      ? maxLimit - used
+      : 5;
+
+
   return (
     <div className='lg:flex gap-5 pb-5'>
       <ToastContainer />
@@ -612,6 +725,46 @@ const page = () => {
             <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
               <HiClipboardList className='text-[#800080] text-2xl' />
               <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+            </div>
+            <div className='flex items-center gap-1'>
+              <button
+                onClick={handleEnhancePDF}
+                disabled={enhancing}
+                className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
+              >
+                {enhancing ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                    Enhancing...
+                  </>
+                ) : (
+                  <>
+                    Enhance
+                    <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
+                      {remaining}
+                    </span>
+                  </>
+                )}
+              </button>
             </div>
             <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
           </div>
@@ -721,7 +874,32 @@ const page = () => {
             </button>
             {/* <button onClick={handleAnalyzeResume} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
             {/* <button onClick={() => console.log('Download DOCX clicked')} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-            <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
+            {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
+            <div className="relative group inline-block">
+              <button
+                onClick={remaining === 5 ? null : handlePrint}
+                className={`
+                              rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
+                              ${remaining === 5
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
+                  }
+                            `}
+              >
+                <IoMdDownload className="text-[18px]" /> Download PDF
+              </button>
+
+              {/* Tooltip */}
+              {remaining === 5 && (
+                <div className="
+                              absolute left-1/2 -translate-x-1/2 top-[110%]
+                              bg-black text-white text-[11px] px-2 py-1 rounded opacity-0 
+                              group-hover:opacity-100 transition-all whitespace-nowrap
+                            ">
+                  Enhance your resume first
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>

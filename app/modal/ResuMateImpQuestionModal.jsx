@@ -41,17 +41,35 @@ const ResuMateImpQuestionModal = ({
 
 
   // Load previous answers & submission status
+  // useEffect(() => {
+  //   const submitted = localStorage.getItem(submittedKey);
+  //   if (submitted) {
+  //     setAlreadySubmitted(true);
+  //     setChat([{ type: "thankyou", message: "Your answers were already submitted!" }]);
+  //   } else if (imp_questions.length > 0) {
+  //     // Initialize first question if not already submitted
+  //     setChat([{ type: "question", message: imp_questions[0].question, company: imp_questions[0].company_name }]);
+  //     setCurrentQuestionIndex(0);
+  //   }
+  // }, [imp_questions, submittedKey]);
+
   useEffect(() => {
-    const submitted = localStorage.getItem(submittedKey);
-    if (submitted) {
-      setAlreadySubmitted(true);
-      setChat([{ type: "thankyou", message: "Your answers were already submitted!" }]);
-    } else if (imp_questions.length > 0) {
-      // Initialize first question if not already submitted
-      setChat([{ type: "question", message: imp_questions[0].question, company: imp_questions[0].company_name }]);
-      setCurrentQuestionIndex(0);
-    }
-  }, [imp_questions, submittedKey]);
+  const submitted = localStorage.getItem(submittedKey);
+
+  if (submitted) {
+    setAlreadySubmitted(true);
+    setChat([{ type: "thankyou", message: "Your answers were already submitted!" }]);
+    return;
+  }
+  if (imp_questions.length > 0 && chat.length === 0) {
+    setChat([
+      { type: "question", message: imp_questions[0].question, company: imp_questions[0].company_name }
+    ]);
+    setCurrentQuestionIndex(0);
+  }
+}, [imp_questions, submittedKey]);
+
+
 
   // Auto-scroll chat container
   useEffect(() => {
@@ -99,7 +117,7 @@ const ResuMateImpQuestionModal = ({
       setTimeout(() => {
         setChat((prev) => [
           ...prev,
-          { type: "question", message: imp_questions[nextIndex].question, company: jd_questions[nextIndex].company_name },
+          { type: "question", message: imp_questions[nextIndex].question, company: imp_questions[nextIndex].company_name },
         ]);
         setCurrentQuestionIndex(nextIndex);
       }, 500);

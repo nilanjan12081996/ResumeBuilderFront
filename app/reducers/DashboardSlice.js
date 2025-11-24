@@ -569,6 +569,90 @@ export const improveImpExperience = createAsyncThunk(
     }
 );
 
+export const getJdEnhance = createAsyncThunk(
+    "getJdEnhance",
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/js-based-resume/jd-based-rewrite-text', userInput);
+
+            if (response?.data?.status_code === 201 || response?.data?.status_code === 200) {
+                return response.data;
+            } else if (response?.data?.errors) {
+                return rejectWithValue(response.data.errors);
+            } else {
+                return rejectWithValue("Something went wrong.");
+            }
+
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
+export const jdEnhanceUsageInfo = createAsyncThunk(
+    'jdEnhanceUsageInfo',
+    async (cvId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/js-based-resume/jd-based-rewrite-usages-info?cvId=${cvId}`);
+
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+export const getImpEnhance = createAsyncThunk(
+    "getImpEnhance",
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/improve-resume/imp-rewrite-text', userInput);
+
+            if (response?.data?.status_code === 201 || response?.data?.status_code === 200) {
+                return response.data;
+            } else if (response?.data?.errors) {
+                return rejectWithValue(response.data.errors);
+            } else {
+                return rejectWithValue("Something went wrong.");
+            }
+
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
+export const impEnhanceUsageInfo = createAsyncThunk(
+    'impEnhanceUsageInfo',
+    async (cvId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/api/improve-resume/imp-rewrite-usages-info?cvId=${cvId}`);
+
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue("Something went wrong.");
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+);
+
+
+
 
 
 const initialState = {
@@ -604,6 +688,12 @@ const initialState = {
     // IMP chat
     addImpQuestionsData: {},
     improveImpExperienceData: {},
+
+    jdEnhance: {},
+    jdEnUsageInfo: {},
+
+    impEnhance: {},
+    impEnUsageInfo: {},
 }
 
 const DashboardSlice = createSlice(
@@ -998,6 +1088,62 @@ const DashboardSlice = createSlice(
                     state.error = payload;
                 })
 
+                // ---------- JD ENHANCE ----------
+                .addCase(getJdEnhance.pending, (state) => {
+                    state.loading = true;
+                    state.error = false;
+                })
+                .addCase(getJdEnhance.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.jdEnhance = payload;
+                })
+                .addCase(getJdEnhance.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+                .addCase(jdEnhanceUsageInfo.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(jdEnhanceUsageInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.jdEnUsageInfo = payload;
+                })
+                .addCase(jdEnhanceUsageInfo.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+
+                 // ---------- IMP ENHANCE ----------
+                .addCase(getImpEnhance.pending, (state) => {
+                    state.loading = true;
+                    state.error = false;
+                })
+                .addCase(getImpEnhance.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.impEnhance = payload;
+                })
+                .addCase(getImpEnhance.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
+
+                .addCase(impEnhanceUsageInfo.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(impEnhanceUsageInfo.fulfilled, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = false;
+                    state.impEnUsageInfo = payload;
+                })
+                .addCase(impEnhanceUsageInfo.rejected, (state, { payload }) => {
+                    state.loading = false;
+                    state.error = payload;
+                })
 
 
         }

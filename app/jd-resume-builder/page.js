@@ -54,7 +54,7 @@ import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox,
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, jdBasedAtsScoreAnalyze } from '../reducers/DashboardSlice';
+import { jdBasedResumeAchivmentInfo, jdBasedResumeCertificateInfo, jdBasedResumeEducationInfo, jdBasedResumeLanguageInfo, jdBasedResumeBasicInfo, jdBasedResumeProjectsInfo, jdBasedResumeSkillsInfo, jdBasedResumeExpInfo, jdBasedAtsScoreAnalyze, jdEnhanceUsageInfo, getJdEnhance } from '../reducers/DashboardSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
@@ -79,10 +79,10 @@ const page = () => {
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0); // default to Personal Info
   const tabsRef = useRef(null); // ref to scroll into view
-
+  const [enhancing, setEnhancing] = useState(false);
   const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
   const [atsData, setAtsData] = useState(null)
-  const { jdBasedDetailsData, jdBasedAtsScoreAnalyzeData } = useSelector((state) => state?.dash)
+  const { jdBasedDetailsData, jdBasedAtsScoreAnalyzeData, jdEnUsageInfo } = useSelector((state) => state?.dash)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
@@ -94,6 +94,7 @@ const page = () => {
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
+    dispatch(jdEnhanceUsageInfo(id));
   }, [id])
 
   console.log("jdBasedDetailsData", jdBasedDetailsData);
@@ -206,6 +207,68 @@ const page = () => {
   //   }
   // }, [jdBasedDetailsData]);
 
+  // useEffect(() => {
+  //   console.log('PersonalProjectJd', jdBasedDetailsData?.data?.[0]?.project)
+  //   console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
+  //   if (jdBasedDetailsData?.data?.[0]?.experience?.length > 0) {
+  //     const formattedExperiences = jdBasedDetailsData.data[0].experience.map(exp => {
+  //       let skills = [];
+  //       try {
+  //         skills = JSON.parse(exp.skill_set); // string to array convert
+  //       } catch (e) {
+  //         skills = [];
+  //       }
+
+  //       // add for exp projeect 
+  //       const jdProjects = jdBasedDetailsData?.data?.[0]?.project;
+  //       const relatedProjects = jdProjects
+  //         .filter((proj) => proj.exp_id === exp.id)
+  //         .map((proj) => ({
+  //           id: proj.id,
+  //           title: proj.Project_title || "",
+  //           role: proj.Role || "",
+  //           // technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
+  //           //   ? JSON.parse(proj.skill_set_use).join(", ")
+  //           //   : proj.skill_set_use || "",
+  //           // description: proj.description || "",
+  //              technology: (() => {
+  //     if (!proj.skill_set_use) return "";
+  //     try {
+  //       const parsed = JSON.parse(proj.skill_set_use);
+  //       return Array.isArray(parsed) ? parsed.join(", ") : proj.skill_set_use;
+  //     } catch (e) {
+  //       return proj.skill_set_use;
+  //     }
+  //   })(),
+  //         }));
+
+  //       return {
+  //         id: exp.id,
+  //         company_name: exp.company_name || "",
+  //         position: exp.Position || "",
+  //         location: exp.location || "",
+  //         skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
+  //         start_date: exp.start_date ? new Date(exp.start_date) : null,
+  //         end_date: exp.end_date ? new Date(exp.end_date) : null,
+  //         current_work: false,
+  //         projects:
+  //           relatedProjects.length > 0
+  //             ? relatedProjects
+  //             : [
+  //               {
+  //                 id: Date.now(),
+  //                 title: "",
+  //                 role: "",
+  //                 technology: "",
+  //                 description: "",
+  //               },
+  //             ],
+  //       };
+  //     });
+  //     setExperiences(formattedExperiences);
+  //   }
+  // }, [jdBasedDetailsData]);
+
   useEffect(() => {
     console.log('PersonalProjectJd', jdBasedDetailsData?.data?.[0]?.project)
     console.log('jdBasedDetailsDataExp', jdBasedDetailsData?.data?.[0]?.experience);
@@ -226,20 +289,19 @@ const page = () => {
             id: proj.id,
             title: proj.Project_title || "",
             role: proj.Role || "",
-            // technology: Array.isArray(JSON.parse(proj.skill_set_use || "[]"))
-            //   ? JSON.parse(proj.skill_set_use).join(", ")
-            //   : proj.skill_set_use || "",
-            // description: proj.description || "",
-               technology: (() => {
-      if (!proj.skill_set_use) return "";
-      try {
-        const parsed = JSON.parse(proj.skill_set_use);
-        return Array.isArray(parsed) ? parsed.join(", ") : proj.skill_set_use;
-      } catch (e) {
-        return proj.skill_set_use;
-      }
-    })(),
+            technology: Array.isArray(JSON.parse(proj?.skill_set_use || "[]"))
+              ? JSON.parse(proj?.skill_set_use)?.join(", ")
+              : proj?.skill_set_use || "",
+            description: proj?.description || "",
           }));
+
+        // Convert start_date or GraduationYear safely
+        const parseDate = (value) => {
+          if (!value || value === "Present") return null;
+          const d = new Date(value);
+          return isNaN(d.getTime()) ? null : d;
+        };
+
 
         return {
           id: exp.id,
@@ -247,9 +309,11 @@ const page = () => {
           position: exp.Position || "",
           location: exp.location || "",
           skill: Array.isArray(skills) ? skills.join(",") : exp.skill_set || "",
-          start_date: exp.start_date ? new Date(exp.start_date) : null,
-          end_date: exp.end_date ? new Date(exp.end_date) : null,
-          current_work: false,
+          // start_date: exp.start_date ? new Date(exp.start_date) : null,
+          // end_date: exp.end_date ? new Date(exp.end_date) : null,
+          start_date: parseDate(exp.start_date),
+          end_date: parseDate(exp.course_completed) || parseDate(exp.GraduationYear),
+          current_work: exp.end_date === "Present",
           projects:
             relatedProjects.length > 0
               ? relatedProjects
@@ -355,22 +419,39 @@ const page = () => {
 
   useEffect(() => {
     if (jdBasedDetailsData?.data?.[0]?.education) {
-      const mappedEducation = jdBasedDetailsData?.data?.[0]?.education.map((edu) => ({
-        id: edu.id,
-        institution: edu.college || "",
-        location: edu.location || "",
-        degree: edu.course?.split(" in ")[0] || "",   // e.g. "Master of Science (M.Sc.)"
-        field_study: edu.course?.split(" in ")[1] || "", // e.g. "Computer Science"
-        start_time: edu.start_date || null,   // if available
-        end_time: edu.course_completed !== "1970-01-01" ? edu.course_completed : null,
-        cgpa: edu.cgpa || "",
-        additionalInfo: edu.aditional_info || "",
-        currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
-      }));
+      const mappedEducation = jdBasedDetailsData.data[0].education.map((edu) => {
+
+        // Convert start_date or GraduationYear safely
+        const parseDate = (value) => {
+          if (!value) return null;
+          const d = new Date(value);
+          return isNaN(d.getTime()) ? null : d;
+        };
+
+        return {
+          id: edu.id,
+          institution: edu.college || edu.CollegeUniversity || "",
+          location: edu.location || edu.Location || "",
+          degree: edu.course?.split(" in ")[0] || edu.CourseDegree?.split(" – ")[0] || "",
+          field_study: edu.course?.split(" in ")[1] || edu.CourseDegree?.split(" – ")[1] || "",
+
+          start_time: parseDate(edu.start_date),
+          end_time: parseDate(edu.course_completed) || parseDate(edu.GraduationYear),
+
+          cgpa: edu.cgpa || edu.GPAorGrade || "",
+          additionalInfo: edu.aditional_info || edu.AdditionalInformation || "",
+
+          currentlyStudying:
+            !edu.course_completed ||
+            edu.course_completed === "1970-01-01" ||
+            edu.GraduationYear === "Present",
+        };
+      });
 
       setEducationEntries(mappedEducation);
     }
   }, [jdBasedDetailsData]);
+
 
   // add for extra project
   useEffect(() => {
@@ -633,6 +714,114 @@ const page = () => {
 
   //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
   // };
+
+  const handleEnhancePDF = async () => {
+    try {
+      setEnhancing(true);
+
+      const jd_resume_id =
+        jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.jd_resume_id;
+
+      if (!jd_resume_id) {
+        setEnhancing(false);
+        return;
+      }
+
+      const payload = {
+        jd_based_resume_id: jd_resume_id,
+        jd_based_text: jdBasedDetailsData?.data?.[0],
+        job_description: jdBasedDetailsData?.data?.[0]?.job_description,
+      };
+
+      const resultAction = await dispatch(getJdEnhance(payload));
+
+      if (getJdEnhance.fulfilled.match(resultAction)) {
+        dispatch(jdEnhanceUsageInfo(id));
+
+        const rewriteData = resultAction?.payload?.data;
+        console.log("rewriteData", rewriteData);
+
+        // -------------------------
+        // FIXED PAYLOAD FORMAT HERE 
+        // -------------------------
+
+        const basicPayload = {
+          jd_resume_id,
+          ...rewriteData?.personal_info,
+        };
+
+        const expPayload = {
+          jd_resume_id,
+          data: rewriteData?.experience_info || [],  // MUST be array
+        };
+
+        const eduPayload = {
+          jd_resume_id,
+          data: rewriteData?.education_info || [],
+        };
+
+        const skillPayload = {
+          jd_resume_id,
+          data: rewriteData?.skill_info || [],
+        };
+
+        const langPayload = {
+          jd_resume_id,
+          data: rewriteData?.language_info || [],
+        };
+
+        const certPayload = {
+          jd_resume_id,
+          data: rewriteData?.certificate_info || [],
+        };
+
+        const achPayload = {
+          jd_resume_id,
+          data: rewriteData?.achievement_info || [],
+        };
+
+        const projectPayload = {
+          jd_resume_id,
+          data: rewriteData?.project_info || [],
+        };
+
+        // -------------------------
+        // SEND ALL UPDATED SECTIONS
+        // -------------------------
+
+        await Promise.all([
+          dispatch(jdBasedResumeBasicInfo(basicPayload)),
+          dispatch(jdBasedResumeEducationInfo(eduPayload)),
+          dispatch(jdBasedResumeExpInfo(expPayload)),
+          dispatch(jdBasedResumeSkillsInfo(skillPayload)),
+          dispatch(jdBasedResumeLanguageInfo(langPayload)),
+          dispatch(jdBasedResumeCertificateInfo(certPayload)),
+          dispatch(jdBasedResumeAchivmentInfo(achPayload)),
+          dispatch(jdBasedResumeProjectsInfo(projectPayload)),
+        ]);
+
+        dispatch(jdBasedResumeDetails({ jd_resume_id })); // REFRESH DATA
+      } else {
+        console.error("JD Enhance Error:", resultAction.payload);
+      }
+    } catch (error) {
+      console.error("Enhance PDF Error:", error);
+    } finally {
+      setEnhancing(false);
+    }
+  };
+
+
+
+  const maxLimit = jdEnUsageInfo?.data?.enhance_limit?.max_limit;
+  const used = jdEnUsageInfo?.data?.usage_limit;
+
+  const remaining =
+    typeof maxLimit === "number" && typeof used === "number"
+      ? maxLimit - used
+      : 5;
+
+
   return (
     <div className='lg:flex gap-5 pb-5 min-h-screen'>
 
@@ -643,6 +832,46 @@ const page = () => {
             <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
               <HiClipboardList className='text-[#800080] text-2xl' />
               <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+            </div>
+            <div className='flex items-center gap-1'>
+              <button
+                onClick={handleEnhancePDF}
+                disabled={enhancing}
+                className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
+              >
+                {enhancing ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                    Enhancing...
+                  </>
+                ) : (
+                  <>
+                    Enhance
+                    <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
+                      {remaining}
+                    </span>
+                  </>
+                )}
+              </button>
             </div>
             <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
           </div>
@@ -755,7 +984,32 @@ const page = () => {
             </button>
             {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
             {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-            <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button>
+            {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
+            <div className="relative group inline-block">
+              <button
+                onClick={remaining === 5 ? null : handlePrint}
+                className={`
+                  rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
+                  ${remaining === 5
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
+                  }
+                `}
+              >
+                <IoMdDownload className="text-[18px]" /> Download PDF
+              </button>
+
+              {/* Tooltip */}
+              {remaining === 5 && (
+                <div className="
+                  absolute left-1/2 -translate-x-1/2 top-[110%]
+                  bg-black text-white text-[11px] px-2 py-1 rounded opacity-0 
+                  group-hover:opacity-100 transition-all whitespace-nowrap
+                ">
+                  Enhance your resume first
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
