@@ -828,52 +828,57 @@ const page = () => {
 
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
-            <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
-              <HiClipboardList className='text-[#800080] text-2xl' />
-              <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+          <div className='border-b border-[#E5E5E5] p-5'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
+                <HiClipboardList className='text-[#800080] text-2xl' />
+                <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+              </div>
+              <div className='flex items-center gap-1'>
+                <button
+                  onClick={handleEnhancePDF}
+                  disabled={enhancing}
+                  className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
+                >
+                  {enhancing ? (
+                    <>
+                      <svg
+                        className="animate-spin h-4 w-4 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        ></path>
+                      </svg>
+                      Enhancing...
+                    </>
+                  ) : (
+                    <>
+                      Enhance
+                      <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
+                        {remaining}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
             </div>
-            <div className='flex items-center gap-1'>
-              <button
-                onClick={handleEnhancePDF}
-                disabled={enhancing}
-                className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
-              >
-                {enhancing ? (
-                  <>
-                    <svg
-                      className="animate-spin h-4 w-4 mr-2 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      ></path>
-                    </svg>
-                    Enhancing...
-                  </>
-                ) : (
-                  <>
-                    Enhance
-                    <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
-                      {remaining}
-                    </span>
-                  </>
-                )}
-              </button>
-            </div>
-            <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
+            <p className="text-[11px] text-gray-600 mt-1 text-center">
+              Enhancing attempts remaining: <span className="font-semibold text-[#800080]">{remaining}</span>
+            </p>
           </div>
           <div className='resume_tab_section'>
             <Tabs selectedIndex={activeTabIndex} onSelect={(index) => setActiveTabIndex(index)}>
