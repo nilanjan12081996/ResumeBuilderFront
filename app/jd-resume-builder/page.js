@@ -654,24 +654,26 @@ const page = () => {
       margin: 0.5in;
     }
 
-    body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      margin: 0;
+   html, body {
+      font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* Disable browser default headers and footers */
-    @page {
-      margin: 0;
-    }
+  @page {
+  margin: 0.5in !important;
+}
+@page :header {
+  display: none !important;
+}
+@page :footer {
+  display: none !important;
+}
 
-    /* Hide default header/footer added by Chrome/Edge/WPS */
-    @page :header {
-      display: none;
-    }
-    @page :footer {
-      display: none;
-    }
+   
   `,
     onBeforeGetContent: () => {
       // Optional: You can do something before printing starts
@@ -1017,19 +1019,21 @@ const page = () => {
             </div>
           </div>
         </div>
-        <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-          {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-          {
-            template == 1 && (
-              <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-            )
-          }
-          {
-            template == 2 && (
-              <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-            )
-          }
+        <div className='h-screen overflow-y-scroll'>
+          <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+            {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
+            {
+              template == 1 && (
+                <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+              )
+            }
+            {
+              template == 2 && (
+                <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+              )
+            }
 
+          </div>
         </div>
         {/* <div className='flex items-center justify-between mb-0'>
           <div className='flex items-center gap-1'>

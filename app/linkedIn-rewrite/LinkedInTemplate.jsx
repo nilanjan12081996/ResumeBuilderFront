@@ -159,10 +159,15 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                   <h3 className="font-medium">
                     {exp.position || "Position not specified"}
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  {/* <p className="text-sm text-gray-600">
                     {exp.company_name || "Company name not available"}{" "}
                     {exp.job_type ? `· ${exp.job_type}` : ""}
+                  </p> */}
+                  <p className="text-sm text-gray-600">
+                    {exp.company_name || "Company name not available"}
+                    {exp.job_type && exp.job_type !== "Undefined" && ` · ${exp.job_type}`}
                   </p>
+
                   <p className="text-xs text-gray-500">
                     {exp.start_date
                       ? new Date(exp.start_date).toLocaleDateString("en-US", {
@@ -188,11 +193,19 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                   )}
 
                   {exp.skill && (
-                    <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                    // <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                    //   {exp.skill.split(",").map((skillItem, i) => (
+                    //     <li key={i}>{skillItem.trim()}</li>
+                    //   ))}
+                    // </ul>
+                    <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 flex flex-wrap gap-x-4 gap-y-1">
                       {exp.skill.split(",").map((skillItem, i) => (
-                        <li key={i}>{skillItem.trim()}</li>
+                        <li key={i} className="list-disc ml-4">
+                          {skillItem.trim()}
+                        </li>
                       ))}
                     </ul>
+
                   )}
                 </div>
               </div>
@@ -365,11 +378,19 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                     </h3>
 
                     {hasSkills && (
-                      <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                      // <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                      //   {skillGroup.skill.split(",").map((s, i) => (
+                      //     <li key={i}>{s.trim()}</li>
+                      //   ))}
+                      // </ul>
+                      <ul className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-700">
                         {skillGroup.skill.split(",").map((s, i) => (
-                          <li key={i}>{s.trim()}</li>
+                          <li key={i} className="list-disc ml-4">
+                            {s.trim()}
+                          </li>
                         ))}
                       </ul>
+
                     )}
                   </div>
                 </div>

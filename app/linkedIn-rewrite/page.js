@@ -473,8 +473,10 @@ const page = () => {
           linkedInBasicInfo({
             lkdin_resume_id,
             ...rewriteData?.personal_info,
+            basicinfo_id: lkdDetails?.data?.[0]?.basic_info?.[0]?.id || null
           })
         );
+
 
         dispatch(
           linkedInExpInfo({
@@ -694,7 +696,9 @@ const page = () => {
         </div>
         <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
           {/* <Image src={resume4} alt="resume4" className='' /> */}
-          <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} languages={languages} skills={skills} />
+          <div className='h-screen overflow-y-auto'>
+            <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} languages={languages} skills={skills} />
+          </div>
         </div>
         <LinkdinAtsScoreAnalyzeModal
           show={openLinkdinAtsModal}

@@ -82,7 +82,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
 
 
   return (
-    <div className="h-screen overflow-y-auto">
+    <div>
       <div ref={ref} className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8 ">
         {/* <style jsx>{`
         @media print {
@@ -251,79 +251,77 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               </div>
             </div>
           </section> */}
-            {education.length > 0 && (
-              <section className="mb-6">
-                <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
-                <div className="border-b border-blue-700 mb-3"></div>
+            <section className="mb-6">
+              <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
+              <div className="border-b border-blue-700 mb-3"></div>
 
-                <div className="space-y-4">
-                  {
-                    education.map((entry, index) => (
-                      <div
-                        key={entry.id || index}
-                        className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
-                      >
-                        {/* Left Side: Degree + Institution */}
-                        <div className="flex-1">
+              <div className="space-y-4">
+                {
+                  education.map((entry, index) => (
+                    <div
+                      key={entry.id || index}
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
+                    >
+                      {/* Left Side: Degree + Institution */}
+                      <div className="flex-1">
 
-                          <p className="font-semibold text-gray-900">{entry.degree || ""}</p>
-
-
-                          <p className="text-sm text-gray-700">{entry.institution || ""}</p>
+                        <p className="font-semibold text-gray-900">{entry.degree || ""}</p>
 
 
-                          <p className="text-xs text-gray-600 italic">
-                            {entry.field_study || ""}
+                        <p className="text-sm text-gray-700">{entry.institution || ""}</p>
+
+
+                        <p className="text-xs text-gray-600 italic">
+                          {entry.field_study || ""}
+                        </p>
+
+
+                        <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
+
+
+                        {entry.gpa && (
+                          <p className="text-xs text-gray-600">
+                            GPA: {entry.gpa}
                           </p>
+                        )}
 
 
-                          <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
+                      </div>
 
-
-                          {entry.gpa && (
-                            <p className="text-xs text-gray-600">
-                              GPA: {entry.gpa}
-                            </p>
-                          )}
-
-
-                        </div>
-
-                        {/* Right Side: Dates + Location */}
-                        <div className="mt-1 sm:mt-0 sm:ml-4 text-right">
-                          {(entry.start_time || entry.end_time) && (
-                            <p className="text-sm text-gray-600">
-                              {entry.start_time
-                                ?
-                                // new Date(entry.start_time).toLocaleDateString("en-US", {
-                                //     month: "short",
-                                //     year: "numeric",
-                                //   })
-                                convertToSubmitFormat(entry.start_time)
-                                : ""}
-                              {entry.end_time
-                                ? ` - 
+                      {/* Right Side: Dates + Location */}
+                      <div className="mt-1 sm:mt-0 sm:ml-4 text-right">
+                        {(entry.start_time || entry.end_time) && (
+                          <p className="text-sm text-gray-600">
+                            {entry.start_time
+                              ?
+                              // new Date(entry.start_time).toLocaleDateString("en-US", {
+                              //     month: "short",
+                              //     year: "numeric",
+                              //   })
+                              convertToSubmitFormat(entry.start_time)
+                              : ""}
+                            {entry.end_time
+                              ? ` - 
                 
                     ${convertToSubmitFormat(entry.end_time)}
                     
                     `
-                                : entry.currentlyStudying
-                                  ? " - Present"
-                                  : ""}
-                            </p>
-                          )}
-                          {entry.location && (
-                            <p className="text-sm text-gray-600">{entry.location}</p>
-                          )}
-                        </div>
+                              : entry.currentlyStudying
+                                ? " - Present"
+                                : ""}
+                          </p>
+                        )}
+                        {entry.location && (
+                          <p className="text-sm text-gray-600">{entry.location}</p>
+                        )}
                       </div>
-                    ))
+                    </div>
+                  ))
 
 
-                  }
-                </div>
-              </section>
-            )}
+                }
+              </div>
+            </section>
 
 
             {/* Professional Experience */}
@@ -399,11 +397,21 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                     </p>
 
                     {/* Skill Set */}
+                    {/* {exp.skill && (
+                      <p className="text-xs text-gray-500 italic mb-2">
+                        Skills: {exp.skill} 
+                      </p>
+                    )} */}
                     {exp.skill && (
                       <p className="text-xs text-gray-500 italic mb-2">
-                        Skills: {exp.skill}
+                        Skills:&nbsp;
+                        {exp.skill
+                          .split(",")
+                          .map(s => s.trim())
+                          .join(", ")}
                       </p>
                     )}
+
 
                     {/* Projects */}
                     {exp.projects && exp.projects.length > 0 && (
