@@ -110,6 +110,11 @@ const page = () => {
   };
 
 
+  const parseDate = (value) => {
+    if (!value || value === "Present") return null;
+    const parsed = new Date(value);
+    return isNaN(parsed) ? null : parsed.toISOString();
+  };
 
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.experience_info) {
@@ -121,9 +126,12 @@ const page = () => {
           location: exp.location || "",
           skill: exp.skill_set || "",
           job_type: exp.job_type || "",
-          start_date: exp.start_date || null,
-          end_date: exp.end_date || null,
-          current_work: exp.end_date === null, // mark current if no end_date
+          // start_date: exp.start_date || null,
+          // end_date: exp.end_date || null,
+          // current_work: exp.end_date === null, // mark current if no end_date
+          start_date: parseDate(exp.start_date),
+          end_date: parseDate(exp.end_date),
+          current_work: exp.end_date === "Present",
           job_description: exp.job_description || "",
         }
       ))
@@ -135,21 +143,73 @@ const page = () => {
     { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
   ])
 
+  // useEffect(() => {
+  //   if (lkdDetails?.data?.[0]?.education_info) {
+  //     console.log('lkdDetails', lkdDetails)
+  //     const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
+  //       // Try to separate field and degree if possible
+  //       let degree = "";
+  //       let field_study = "";
+  //       if (edu.course) {
+  //         // Look for parentheses (common LinkedIn format)
+  //         const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
+  //         if (match) {
+  //           field_study = match[1].trim();  // "Computer Science"
+  //           degree = match[2].trim();       // "Bachelor of Science - BS"
+  //         } else {
+  //           degree = edu.course; // fallback if no parentheses
+  //         }
+  //       }
+
+  //       return {
+  //         id: edu.id,
+  //         institution: edu.college || "",
+  //         location: edu.location || "",
+  //         degree,
+  //         field_study,
+  //         start_time: edu.course_start ? new Date(edu.course_start) : null,
+  //         end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
+  //           ? new Date(edu.course_completed)
+  //           : null,
+  //         cgpa: edu.cgpa || null,
+  //         additionalInfo: edu.aditional_info || "",
+  //         currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
+  //       };
+  //     });
+
+  //     setEducationEntries(mappedEducation);
+  //   }
+  // }, [lkdDetails]);
+
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.education_info) {
-      console.log('lkdDetails', lkdDetails)
-      const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
-        // Try to separate field and degree if possible
+      console.log('lkdDetails', lkdDetails);
+
+      const mappedEducation = lkdDetails.data[0].education_info.map((edu) => {
         let degree = "";
         let field_study = "";
+
         if (edu.course) {
-          // Look for parentheses (common LinkedIn format)
+          // Match patterns like "undefined (React js developer)"
           const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
+
           if (match) {
-            field_study = match[1].trim();  // "Computer Science"
-            degree = match[2].trim();       // "Bachelor of Science - BS"
+            let field = match[1].trim(); // "undefined"
+            let deg = match[2].trim();   // "React js developer"
+
+            // If field == undefined → only degree
+            if (field.toLowerCase() === "undefined" || field === "") {
+              field_study = "";
+              degree = deg;
+            } else {
+              field_study = field;
+              degree = deg;
+            }
           } else {
-            degree = edu.course; // fallback if no parentheses
+            // If no parentheses → treat whole as degree (unless undefined)
+            if (edu.course.toLowerCase() !== "undefined") {
+              degree = edu.course.trim();
+            }
           }
         }
 
@@ -160,18 +220,25 @@ const page = () => {
           degree,
           field_study,
           start_time: edu.course_start ? new Date(edu.course_start) : null,
-          end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
-            ? new Date(edu.course_completed)
-            : null,
+          end_time:
+            edu.course_completed &&
+              edu.course_completed !== "1970-01-01" &&
+              edu.course_completed !== "Present"
+              ? new Date(edu.course_completed)
+              : null,
           cgpa: edu.cgpa || null,
           additionalInfo: edu.aditional_info || "",
-          currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
+          currentlyStudying:
+            !edu.course_completed ||
+            edu.course_completed === "1970-01-01" ||
+            edu.course_completed === "Present",
         };
       });
 
       setEducationEntries(mappedEducation);
     }
   }, [lkdDetails]);
+
 
 
 
@@ -334,24 +401,30 @@ const page = () => {
       margin: 0.5in;
     }
 
-    body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      margin: 0;
+    // body {
+    //   -webkit-print-color-adjust: exact;
+    //   print-color-adjust: exact;
+    //   margin: 0;
+    // }
+
+     html, body {
+      font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* Disable browser default headers and footers */
     @page {
-      margin: 0;
-    }
-
-    /* Hide default header/footer added by Chrome/Edge/WPS */
-    @page :header {
-      display: none;
-    }
-    @page :footer {
-      display: none;
-    }
+  margin: 0.5in;
+}
+@page :header {
+  display: none !important;
+}
+@page :footer {
+  display: none !important;
+}
   `,
     onBeforeGetContent: () => {
       // Optional: You can do something before printing starts

@@ -148,54 +148,100 @@ const page = () => {
   }, [getUpdateResumeInfoData, setValue])
 
   // Populate education entries from getUpdateResumeInfoData
-  useEffect(() => {
-    if (getUpdateResumeInfoData?.data?.imp_education_info && getUpdateResumeInfoData.data.imp_education_info.length > 0) {
-      const educationData = getUpdateResumeInfoData.data.imp_education_info.map(edu => ({
-        id: edu.id,
-        institution: edu.college,
-        location: edu.location,
-        field_study: edu.course,
-        degree: edu.course,
-        start_time: null, // Not available in new data structure
-        end_time: edu.course_completed ? new Date(edu.course_completed) : null,
-        cgpa: edu.cgpa,
-        additionalInfo: edu.aditional_info
-      }));
-      setEducationEntries(educationData);
-    } else if (getUpdateResumeInfoData && educationEntries.length === 0) {
-      // Add empty entry if no data and no existing entries
-      setEducationEntries([{ id: `edu-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }]);
-    }
-  }, [getUpdateResumeInfoData]);
+    useEffect(() => {
+  if (getUpdateResumeInfoData?.data?.imp_education_info) {
+    const mappedEducation = getUpdateResumeInfoData?.data?.imp_education_info.map((edu) => ({
+      id: edu.id,
+      institution: edu.college || "",
+      location: edu.location || "",
+      degree: edu.course || "",
+      field_study: edu.course || "",
+      start_time: null,   // Not available in the new structure
+      end_time: edu.course_completed ? (() => {
+        try {
+          const date = new Date(edu.course_completed);
+          return isNaN(date.getTime()) ? null : date;
+        } catch (e) {
+          console.error('Error parsing course completion date:', edu.course_completed, e);
+          return null;
+        }
+      })() : null,
+      cgpa: edu.cgpa || "",
+      additionalInfo: edu.aditional_info || "",
+      currentlyStudying: false,
+    }));
+
+    setEducationEntries(mappedEducation);
+  }
+}, [getUpdateResumeInfoData]);
 
   // Populate experience entries from getUpdateResumeInfoData
+  // useEffect(() => {
+  //   if (getUpdateResumeInfoData?.data?.imp_experience_info && getUpdateResumeInfoData.data.imp_experience_info.length > 0) {
+  //     const experienceData = getUpdateResumeInfoData.data.imp_experience_info.map(exp => ({
+  //       id: exp.id,
+  //       company_name: exp.company_name,
+  //       position: exp.Position,
+  //       location: exp.location,
+  //       skill: exp.skill_set ? exp.skill_set.join(", ") : "",
+  //       start_date: exp.start_date ? new Date(exp.start_date) : null,
+  //       end_date: exp.end_date ? new Date(exp.end_date) : null,
+  //       current_work: !exp.end_date,
+  //       projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
+  //     }));
+  //     setExperiences(experienceData);
+  //   } else if (getUpdateResumeInfoData && experiences.length === 0) {
+  //     // Add empty entry if no data and no existing entries
+  //     setExperiences([{
+  //       id: `exp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  //       company_name: "",
+  //       position: "",
+  //       location: "",
+  //       skill: "",
+  //       start_date: null,
+  //       end_date: null,
+  //       current_work: false,
+  //       projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
+  //     }]);
+  //   }
+  // }, [getUpdateResumeInfoData]);
+
   useEffect(() => {
-    if (getUpdateResumeInfoData?.data?.imp_experience_info && getUpdateResumeInfoData.data.imp_experience_info.length > 0) {
-      const experienceData = getUpdateResumeInfoData.data.imp_experience_info.map(exp => ({
-        id: exp.id,
-        company_name: exp.company_name,
-        position: exp.Position,
-        location: exp.location,
-        skill: exp.skill_set ? exp.skill_set.join(", ") : "",
-        start_date: exp.start_date ? new Date(exp.start_date) : null,
-        end_date: exp.end_date ? new Date(exp.end_date) : null,
-        current_work: !exp.end_date,
-        projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
-      }));
-      setExperiences(experienceData);
-    } else if (getUpdateResumeInfoData && experiences.length === 0) {
-      // Add empty entry if no data and no existing entries
-      setExperiences([{
-        id: `exp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        company_name: "",
-        position: "",
-        location: "",
-        skill: "",
-        start_date: null,
-        end_date: null,
-        current_work: false,
-        projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
-      }]);
+    console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
+    if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
+      const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
+        const isCurrent = exp.end_date === "Present" || !exp.end_date;
+        return {
+          id: exp.id,
+          company_name: exp.company_name || "",
+          position: exp.Position || "",
+          location: exp.location || "",
+          skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
+          start_date: exp.start_date ? (() => {
+            try {
+              const date = new Date(exp.start_date);
+              return isNaN(date.getTime()) ? null : date;
+            } catch (e) {
+              console.error('Error parsing start date:', exp.start_date, e);
+              return null;
+            }
+          })() : null,
+          end_date: exp.end_date ? (() => {
+            try {
+              const date = new Date(exp.end_date);
+              return isNaN(date.getTime()) ? null : date;
+            } catch (e) {
+              console.error('Error parsing end date:', exp.end_date, e);
+              return null;
+            }
+          })() : null,
+          current_work: isCurrent,
+          projects: [
+            { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
+          ]
+        };
+      });
+      setExperiences(formattedExperiences);
     }
   }, [getUpdateResumeInfoData]);
 
@@ -546,24 +592,25 @@ const page = () => {
       margin: 0.5in;
     }
 
-    body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      margin: 0;
+    html, body {
+      font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* Disable browser default headers and footers */
-    @page {
-      margin: 0;
-    }
+  @page {
+  margin: 0.5in !important;
+}
+@page :header {
+  display: none !important;
+}
+@page :footer {
+  display: none !important;
+}
 
-    /* Hide default header/footer added by Chrome/Edge/WPS */
-    @page :header {
-      display: none;
-    }
-    @page :footer {
-      display: none;
-    }
   `,
     onBeforeGetContent: () => {
       // Optional: You can do something before printing starts

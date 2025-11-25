@@ -175,7 +175,7 @@ const LinkedInReWriteModal = ({
         size="4xl"
         className="apply_modal_area"
         show={openModalLinkedInRewrite}
-        // onClose={() => setOpenModalCreateResumeJd(false)}
+        onClose={() => setOpenModalLinkedInRewrite(false)}
       >
         <ModalHeader className="bg-white text-black modal_header">
           <div className="flex items-center gap-1">

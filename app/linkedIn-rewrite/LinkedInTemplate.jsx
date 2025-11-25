@@ -305,7 +305,7 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
 
 
         {/* Skills */}
-        <div className="px-6 mt-6">
+        {/* <div className="px-6 mt-6">
           <h2 className="text-lg font-semibold mb-4">Skills</h2>
           {skills && skills.length > 0 ? (
             skills.map((skillGroup, idx) => (
@@ -317,6 +317,14 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                   <h3 className="font-medium">
                     {skillGroup.skill_category || "Skill Category"}
                   </h3>
+                  {skillGroup.skill && (
+                    <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                      {skillGroup.skill.split(",").map((s, i) => (
+                        <li key={i}>{s.trim()}</li>
+                      ))}
+                    </ul>
+                  )}
+
                   {skillGroup.skill ? (
                     <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
                       {skillGroup.skill.split(",").map((s, i) => (
@@ -332,7 +340,43 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
           ) : (
             <p className="text-sm text-gray-500">No skills listed.</p>
           )}
+        </div> */}
+        <div className="px-6 mt-6">
+          <h2 className="text-lg font-semibold mb-4">Skills</h2>
+
+          {skills && skills.length > 0 &&
+            skills.map((skillGroup, idx) => {
+              const hasSkills =
+                skillGroup.skill && skillGroup.skill.trim().length > 0;
+
+              return (
+                <div
+                  key={skillGroup.id || idx}
+                  className={`flex space-x-3 mb-4 ${hasSkills ? "items-start" : "items-center"
+                    }`}
+                >
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <Lightbulb className="text-green-600 w-5 h-5" />
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium">
+                      {skillGroup.skill_category || "Skill Category"}
+                    </h3>
+
+                    {hasSkills && (
+                      <ul className="list-disc ml-5 mt-2 text-sm text-gray-700 space-y-1">
+                        {skillGroup.skill.split(",").map((s, i) => (
+                          <li key={i}>{s.trim()}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
         </div>
+
 
 
 

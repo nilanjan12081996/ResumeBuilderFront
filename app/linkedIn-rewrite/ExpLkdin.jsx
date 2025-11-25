@@ -8,6 +8,13 @@ import { MdDelete, MdOutlineWorkOutline } from "react-icons/md"
 
 const ExpLkdin = ({ lkdDetails, experiences, setExperiences }) => {
 
+
+  const parseDate = (value) => {
+    if (!value || value === "Present") return null;
+    const parsed = new Date(value);
+    return isNaN(parsed) ? null : parsed.toISOString();
+  };
+
   useEffect(() => {
     console.log("lkdDetails?.data?.[0]?.experience_info", lkdDetails?.data?.[0]?.experience_info)
     if (lkdDetails?.data?.[0]?.experience_info) {
@@ -19,9 +26,12 @@ const ExpLkdin = ({ lkdDetails, experiences, setExperiences }) => {
           location: exp.location || "",
           skill: exp.skill_set || "",
           job_type: exp.job_type || "",
-          start_date: exp.duration?.start_date || null,
-          end_date: exp.duration?.end_date || null,
-          current_work: exp.end_date === null, // mark current if no end_date
+          // start_date: exp.duration?.start_date || null,
+          // end_date: exp.duration?.end_date || null,
+          // current_work: exp.end_date === null, // mark current if no end_date
+          start_date: parseDate(exp.start_date),
+          end_date: parseDate(exp.end_date),
+          current_work: exp.end_date === "Present",
           job_description: exp.job_description || "",
         }
       ))
@@ -214,7 +224,7 @@ const ExpLkdin = ({ lkdDetails, experiences, setExperiences }) => {
               </div>
 
               {/* Dates */}
-             <div className="flex flex-col gap-4 mb-3">
+              <div className="flex flex-col gap-4 mb-3">
                 <div className="resume_form_box mb-2 lg:mb-0">
                   <div className="mb-1 block">
                     <Label htmlFor="base">
@@ -236,13 +246,10 @@ const ExpLkdin = ({ lkdDetails, experiences, setExperiences }) => {
                     <Datepicker
                       value={exp.start_date ? new Date(exp.start_date) : null}
                       onChange={(date) => {
-                        handleChange(
-                          exp.id,
-                          "start_date",
-                          date ? formatMonthYear(date) : null
-                        );
+                        handleChange(exp.id, "start_date", date ? date.toISOString() : null);
                       }}
                     />
+
 
                   </div>
                 </div>
@@ -260,14 +267,11 @@ const ExpLkdin = ({ lkdDetails, experiences, setExperiences }) => {
                     <Datepicker
                       value={exp.end_date ? new Date(exp.end_date) : null}
                       onChange={(date) => {
-                        handleChange(
-                          exp.id,
-                          "end_date",
-                          date ? formatMonthYear(date) : null
-                        );
+                        handleChange(exp.id, "end_date", date ? date.toISOString() : null);
                       }}
                       disabled={exp.current_work}
                     />
+
 
 
                   </div>

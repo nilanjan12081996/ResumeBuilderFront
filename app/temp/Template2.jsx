@@ -3,7 +3,7 @@ import { convertToSubmitFormat } from "../utils/DateSubmitFormatter"
 import { useDispatch, useSelector } from "react-redux";
 import { currentSubscription, getIpData } from "../reducers/PlanSlice";
 
-const Template2 = forwardRef(({ data, education, experiences, skills, languages, personalPro, achivments, certificates }, ref) => {
+const Template2 = forwardRef(({ data, education, experiences, skills, languages, personalPro, achivments, certificates, getUpdateResumeInfoData }, ref) => {
 
   const { ipData, createOrderData, error, currentSubscriptionData } = useSelector(
     (state) => state.planst
@@ -16,11 +16,74 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
       }
     })
   }, [])
-  console.log("currentSubscriptionData", currentSubscriptionData);
+  console.log("certificates", certificates);
+
+
+  // const validEducation = (education || []).filter(e =>
+  //   e.institution?.trim() ||
+  //   e.degree?.trim() ||
+  //   e.field_study?.trim() ||
+  //   e.start_time ||
+  //   e.end_time ||
+  //   e.location?.trim() ||
+  //   e.cgpa?.trim() ||
+  //   e.additionalInfo?.trim()
+  // );
+
+  // const validExperiences = (experiences || []).filter(ex =>
+  //   ex.company_name?.trim() ||
+  //   ex.position?.trim() ||
+  //   ex.location?.trim() ||
+  //   ex.start_date ||
+  //   ex.end_date ||
+  //   ex.current_work ||
+  //   ex.skill?.trim() ||
+  //   (ex.projects && ex.projects.length > 0)
+  // );
+
+  // const validSkills = (skills || []).filter(s =>
+  //   s.skill_category?.trim() ||
+  //   s.skill?.trim()
+  // );
+
+  // const validLanguages = (languages || []).filter(l =>
+  //   l.language_name?.trim() ||
+  //   l.proficiency?.trim()
+  // );
+
+  // const validPersonalProjects = (personalPro || []).filter(p =>
+  //   p.project_title?.trim() ||
+  //   p.role?.trim() ||
+  //   p.description?.trim() ||
+  //   p.start_time ||
+  //   p.end_time ||
+  //   p.project_url?.trim() ||
+  //   p.skill?.trim()
+  // );
+
+  //  const validCertificates = (certificates || []).filter(c =>
+  //   c.certification_name?.trim() ||
+  //   c.issuing_organization?.trim() ||
+  //   c.obtained_date ||
+  //   c.certification_id
+  // );
+
+
+  const validAchievements = (achivments || []).filter(a =>
+    a.achievement_title?.trim() ||
+    a.organization?.trim() ||
+    a.receive_date ||
+    a.description?.trim()
+  );
+
+
+
+
+
 
   return (
-    <>
-      <div ref={ref} className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8">
+    <div className="h-screen overflow-y-auto">
+      <div ref={ref} className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8 sm:px-6 lg:px-8 ">
         {/* <style jsx>{`
         @media print {
         .print-watermark {
@@ -133,7 +196,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
           }
 
         </div>
-        <div className="max-w-4xl mx-auto bg-white shadow-xl h-screen overflow-y-auto">
+        <div className="max-w-4xl mx-auto bg-white shadow-xl">
           {/* Header */}
           <div className=" text-black px-6 py-8">
             <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-center text-[#2f6aeb]">{data?.full_name || ""}</h1>
@@ -188,73 +251,79 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               </div>
             </div>
           </section> */}
+            {education.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
+                <div className="space-y-4">
+                  {
+                    education.map((entry, index) => (
+                      <div
+                        key={entry.id || index}
+                        className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
+                      >
+                        {/* Left Side: Degree + Institution */}
+                        <div className="flex-1">
 
-              <div className="space-y-4">
-                {
-                  education.map((entry, index) => (
-                    <div
-                      key={entry.id || index}
-                      className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
-                    >
-                      {/* Left Side: Degree + Institution */}
-                      <div className="flex-1">
-
-                        <p className="font-semibold text-gray-900">{entry.degree || ""}</p>
-
-
-                        <p className="text-sm text-gray-700">{entry.institution || ""}</p>
+                          <p className="font-semibold text-gray-900">{entry.degree || ""}</p>
 
 
-                        <p className="text-xs text-gray-600 italic">
-                          {entry.field_study || ""}
-                        </p>
+                          <p className="text-sm text-gray-700">{entry.institution || ""}</p>
 
 
-                        <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
+                          <p className="text-xs text-gray-600 italic">
+                            {entry.field_study || ""}
+                          </p>
 
 
-                        <p className="text-xs text-gray-600">GPA: {entry.gpa || ""}</p>
+                          <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
 
-                      </div>
 
-                      {/* Right Side: Dates + Location */}
-                      <div className="mt-1 sm:mt-0 sm:ml-4 text-right">
-                        {(entry.start_time || entry.end_time) && (
-                          <p className="text-sm text-gray-600">
-                            {entry.start_time
-                              ?
-                              // new Date(entry.start_time).toLocaleDateString("en-US", {
-                              //     month: "short",
-                              //     year: "numeric",
-                              //   })
-                              convertToSubmitFormat(entry.start_time)
-                              : ""}
-                            {entry.end_time
-                              ? ` - 
+                          {entry.gpa && (
+                            <p className="text-xs text-gray-600">
+                              GPA: {entry.gpa}
+                            </p>
+                          )}
+
+
+                        </div>
+
+                        {/* Right Side: Dates + Location */}
+                        <div className="mt-1 sm:mt-0 sm:ml-4 text-right">
+                          {(entry.start_time || entry.end_time) && (
+                            <p className="text-sm text-gray-600">
+                              {entry.start_time
+                                ?
+                                // new Date(entry.start_time).toLocaleDateString("en-US", {
+                                //     month: "short",
+                                //     year: "numeric",
+                                //   })
+                                convertToSubmitFormat(entry.start_time)
+                                : ""}
+                              {entry.end_time
+                                ? ` - 
                 
                     ${convertToSubmitFormat(entry.end_time)}
                     
                     `
-                              : entry.currentlyStudying
-                                ? " - Present"
-                                : ""}
-                          </p>
-                        )}
-                        {entry.location && (
-                          <p className="text-sm text-gray-600">{entry.location}</p>
-                        )}
+                                : entry.currentlyStudying
+                                  ? " - Present"
+                                  : ""}
+                            </p>
+                          )}
+                          {entry.location && (
+                            <p className="text-sm text-gray-600">{entry.location}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))
 
 
-                }
-              </div>
-            </section>
+                  }
+                </div>
+              </section>
+            )}
 
 
             {/* Professional Experience */}
@@ -344,7 +413,9 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                             <span className="font-medium">
                               {proj.title || ""}
                             </span>{" "}
-                            – {proj.role || ""}
+                            {proj.role && (
+                              <>{" "}– {proj.role}</>
+                            )}
                             {proj.technology && (
                               <span className="text-gray-600">
                                 {" "}
@@ -436,7 +507,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                   {languages.map((lang) => {
                     const parts = [lang.language_name, lang.proficiency].filter(Boolean);
 
-                    if (parts.length === 0) return null; 
+                    if (parts.length === 0) return null;
                     return (
                       <li key={lang.id}>
                         • {parts.join(' - ')}
@@ -569,11 +640,10 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
 
 
 
-
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 })
 export default Template2
