@@ -436,52 +436,58 @@ const Page = () => {
             </h3>
             <div className="lg:flex gap-4 pb-8 lg:pb-0">
               <div className="lg:w-8/12">
-                {recentResume?.map((resume) => (
-                  <div
-                    key={resume.id}
-                    className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4"
-                  >
-                    <div className="flex gap-3 items-center">
-                      <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                        <CgFileDocument className="text-white text-2xl" />
+                {recentResume?.length === 0 ? (
+                  <div className="bg-white text-[#7D7D7D]">
+                    No recent resumes found.
+                  </div>
+                ) : (
+                  recentResume?.map((resume) => (
+                    <div
+                      key={resume.id}
+                      className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4"
+                    >
+                      <div className="flex gap-3 items-center">
+                        <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
+                          <CgFileDocument className="text-white text-2xl" />
+                        </div>
+                        <div>
+                          <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
+                            {resume.resume_name}
+                          </h3>
+                          <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                            Created on {formatDate(resume.created_at)}
+                          </p>
+                        </div>
                       </div>
                       <div>
-                        <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                          {resume.resume_name}
-                        </h3>
-                        <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                          Created on {formatDate(resume.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <Link
-                        href={
-                          resume.resume_type === "scratch_resume"
-                            ? `/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
-                            : resume.resume_type === "linkedin_resume"
-                              ? `/linkedIn-rewrite?id=${btoa(
-                                resume.id.toString()
-                              )}`
-                              : resume.resume_type === "jd_based_resume"
-                                ? `/jd-resume-builder?id=${btoa(
+                        <Link
+                          href={
+                            resume.resume_type === "scratch_resume"
+                              ? `/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
+                              : resume.resume_type === "linkedin_resume"
+                                ? `/linkedIn-rewrite?id=${btoa(
                                   resume.id.toString()
-                                )}&template=${resume?.template_detail?.[0]?.templete_id
-                                }`
-                                : resume.resume_type === "improve_resume"
-                                  ? `/improve-resume-builder?id=${btoa(
+                                )}`
+                                : resume.resume_type === "jd_based_resume"
+                                  ? `/jd-resume-builder?id=${btoa(
                                     resume.id.toString()
                                   )}&template=${resume?.template_detail?.[0]?.templete_id
                                   }`
-                                  : ""
-                        }
-                        className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
-                      >
-                        <BiEdit />
-                      </Link>
+                                  : resume.resume_type === "improve_resume"
+                                    ? `/improve-resume-builder?id=${btoa(
+                                      resume.id.toString()
+                                    )}&template=${resume?.template_detail?.[0]?.templete_id
+                                    }`
+                                    : ""
+                          }
+                          className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
+                        >
+                          <BiEdit />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+              )}
               </div>
 
               <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">

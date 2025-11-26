@@ -729,16 +729,15 @@ const page = () => {
         // DISPATCH ALL
         // -------------------------
 
-        await Promise.all([
-          dispatch(updateBasicInfo(basicPayload)),
-          dispatch(updateExperience({ resumeid: imp_resume_id, data: expPayload.data })),
-          dispatch(updateEducation({ resumeid: imp_resume_id, data: eduPayload.data })),
-          dispatch(updateSkills({ resumeid: imp_resume_id, data: skillPayload.data })),
-          dispatch(updateLanguage({ resumeid: imp_resume_id, data: langPayload.data })),
-          dispatch(updateCertification({ resumeid: imp_resume_id, data: certPayload.data })),
-          dispatch(updateAchievements({ resumeid: imp_resume_id, data: achPayload.data })),
-          dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectPayload.data }))
-        ]);
+        await dispatch(updateBasicInfo(basicPayload));
+        await dispatch(updateExperience({ resumeid: imp_resume_id, data: expPayload.data }));
+        await dispatch(updateEducation({ resumeid: imp_resume_id, data: eduPayload.data }));
+        await dispatch(updateSkills({ resumeid: imp_resume_id, data: skillPayload.data }));
+        await dispatch(updateLanguage({ resumeid: imp_resume_id, data: langPayload.data }));
+        await dispatch(updateCertification({ resumeid: imp_resume_id, data: certPayload.data }));
+        await dispatch(updateAchievements({ resumeid: imp_resume_id, data: achPayload.data }));
+        await dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectPayload.data }));
+
 
         await dispatch(getUpdateResumeInfo({ id }));
       }

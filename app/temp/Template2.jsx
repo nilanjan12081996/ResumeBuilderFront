@@ -69,12 +69,42 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
   // );
 
 
-  const validAchievements = (achivments || []).filter(a =>
-    a.achievement_title?.trim() ||
-    a.organization?.trim() ||
-    a.receive_date ||
-    a.description?.trim()
-  );
+  // const validAchievements = (achivments || []).filter(a =>
+  //   a.achievement_title?.trim() ||
+  //   a.organization?.trim() ||
+  //   a.receive_date ||
+  //   a.description?.trim()
+  // );
+
+  function formatSmartDate(dateInput) {
+    if (!dateInput) return "";
+
+    // Convert to Date object properly
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (isNaN(date)) return "";
+
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const year = date.getFullYear();
+
+    // Detect original string format (only if user sent a string)
+    const original = typeof dateInput === "string" ? dateInput : "";
+
+    const hasDay =
+      original.includes("-") && original.split("-")[2]?.length === 2 ||
+      original.includes("/") && original.split("/")[0]?.length === 2;
+
+    // CASE 1 → User never selected a day (Month-Year only)
+    // CASE 2 → Parser defaults day = 1 when only month/year
+    if (!hasDay || day === 1) {
+      return `${month} ${year}`;
+    }
+
+    // CASE 3 → Full date
+    return `${day} ${month} ${year}`;
+  }
+
+
 
 
 
@@ -298,12 +328,12 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                               //     month: "short",
                               //     year: "numeric",
                               //   })
-                              convertToSubmitFormat(entry.start_time)
+                              formatSmartDate(entry.start_time)
                               : ""}
                             {entry.end_time
                               ? ` - 
                 
-                    ${convertToSubmitFormat(entry.end_time)}
+                    ${formatSmartDate(entry.end_time)}
                     
                     `
                               : entry.currentlyStudying
@@ -379,13 +409,13 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                       </h3>
                       <p className="text-sm text-gray-600 mt-1 sm:mt-0">
                         {exp.start_date
-                          ? convertToSubmitFormat(exp.start_date)
+                          ? formatSmartDate(exp.start_date)
                           : ""}{" "}
                         –{" "}
                         {exp.current_work
                           ? "Present"
                           : exp.end_date
-                            ? convertToSubmitFormat(exp.end_date)
+                            ? formatSmartDate(exp.end_date)
                             : ""}
                       </p>
                     </div>

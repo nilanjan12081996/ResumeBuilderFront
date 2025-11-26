@@ -6,6 +6,8 @@ import { FaTrophy } from "react-icons/fa"
 import { MdDelete } from "react-icons/md"
 
 const AchivmentsJd = ({ jdBasedDetailsData, achivments, setAchivments }) => {
+
+
   useEffect(() => {
     if (
       jdBasedDetailsData?.data?.length > 0 &&
@@ -21,9 +23,16 @@ const AchivmentsJd = ({ jdBasedDetailsData, achivments, setAchivments }) => {
           id: ach.id || Date.now() + index,
           achievement_title: ach.achivement_name || "",
           organization: ach.achivement_organization_name || "",
+          // receive_date: ach.achivement_date
+          //   ? new Date(ach.achivement_date)
+          //   : null,
           receive_date: ach.achivement_date
-            ? new Date(ach.achivement_date)
+            ? (() => {
+              const d = new Date(ach.achivement_date);
+              return isNaN(d.getTime()) ? null : d;
+            })()
             : null,
+
           description: ach.description || "",
         })
       );
@@ -57,6 +66,8 @@ const AchivmentsJd = ({ jdBasedDetailsData, achivments, setAchivments }) => {
       )
     );
   };
+
+
   return (
     <>
       <div className='tab_wrap'>

@@ -312,7 +312,10 @@ const page = () => {
           // start_date: exp.start_date ? new Date(exp.start_date) : null,
           // end_date: exp.end_date ? new Date(exp.end_date) : null,
           start_date: parseDate(exp.start_date),
-          end_date: parseDate(exp.course_completed) || parseDate(exp.GraduationYear),
+          end_date:
+            exp.end_date === "Present"
+              ? null
+              : parseDate(exp.end_date),
           current_work: exp.end_date === "Present",
           projects:
             relatedProjects.length > 0
@@ -362,6 +365,7 @@ const page = () => {
     }
   }, [jdBasedDetailsData]);
 
+
   useEffect(() => {
     if (
       jdBasedDetailsData?.data?.length > 0 &&
@@ -378,8 +382,12 @@ const page = () => {
           achievement_title: ach.achivement_name || "",
           organization: ach.achivement_organization_name || "",
           receive_date: ach.achivement_date
-            ? new Date(ach.achivement_date)
+            ? (() => {
+              const d = new Date(ach.achivement_date);
+              return isNaN(d.getTime()) ? null : d;
+            })()
             : null,
+
           description: ach.description || "",
         })
       );
@@ -547,14 +555,20 @@ const page = () => {
             company_name: exp.company_name,
             position: exp.position,
             location: exp.location,
-            skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
+            skill: typeof exp.skill === "string"
+              ? exp.skill.split(",").map(s => s.trim())
+              : [],
+
             start_date: convertToSubmitFormat(exp.start_date),
             end_date: convertToSubmitFormat(exp.end_date),
             current_work: exp.current_work ? 1 : 0,
             projects: exp.projects.map(proj => ({
               title: proj.title,
               role: proj.role,
-              technology: proj.technology.split(",").map(t => t.trim()),
+              technology: proj?.technology
+                ? proj.technology.split(",").map(t => t.trim())
+                : [],
+
               description: proj.description
             }))
           }))
@@ -651,7 +665,7 @@ const page = () => {
     pageStyle: `
     @page {
       size: A4;
-      margin: 0.5in;
+      margin: 0.5in 0 0.5in 0 !important;
     }
 
    html, body {
@@ -662,18 +676,18 @@ const page = () => {
       margin: 0 !important;
       padding: 0 !important;
     }
+    
+    h3{
+      font-family:  Segoe UI !important;
+    }
 
-  @page {
-  margin: 0.5in !important;
-}
-@page :header {
-  display: none !important;
-}
-@page :footer {
-  display: none !important;
-}
+  @page :header {
+    display: none !important;
+  }
+  @page :footer {
+    display: none !important;
+  }
 
-   
   `,
     onBeforeGetContent: () => {
       // Optional: You can do something before printing starts

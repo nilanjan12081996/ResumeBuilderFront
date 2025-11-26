@@ -223,8 +223,14 @@ const WorkExpJd = ({ jdBasedDetailsData, experiences, setExperiences }) => {
           // start_date: exp.start_date ? new Date(exp.start_date) : null,
           // end_date: exp.end_date ? new Date(exp.end_date) : null,
           start_date: parseDate(exp.start_date),
-          end_date: parseDate(exp.course_completed) || parseDate(exp.GraduationYear),
+
+          end_date:
+            exp.end_date === "Present"
+              ? null
+              : parseDate(exp.end_date),
+
           current_work: exp.end_date === "Present",
+
           projects:
             relatedProjects.length > 0
               ? relatedProjects
