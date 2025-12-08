@@ -16,65 +16,70 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
       }
     })
   }, [])
-  console.log("certificates", certificates);
+  console.log("datas", data);
 
 
-  // const validEducation = (education || []).filter(e =>
-  //   e.institution?.trim() ||
-  //   e.degree?.trim() ||
-  //   e.field_study?.trim() ||
-  //   e.start_time ||
-  //   e.end_time ||
-  //   e.location?.trim() ||
-  //   e.cgpa?.trim() ||
-  //   e.additionalInfo?.trim()
-  // );
+  const validData = Object.values(data).some(
+    v => typeof v === "string" ? v.trim() !== "" : !!v
+  );
 
-  // const validExperiences = (experiences || []).filter(ex =>
-  //   ex.company_name?.trim() ||
-  //   ex.position?.trim() ||
-  //   ex.location?.trim() ||
-  //   ex.start_date ||
-  //   ex.end_date ||
-  //   ex.current_work ||
-  //   ex.skill?.trim() ||
-  //   (ex.projects && ex.projects.length > 0)
-  // );
+  const validEducation = (education || []).filter(e =>
+    e.institution?.trim() ||
+    e.degree?.trim() ||
+    e.field_study?.trim() ||
+    e.start_time ||
+    e.end_time ||
+    e.location?.trim() ||
+    e.cgpa?.trim() ||
+    e.additionalInfo?.trim()
+  );
 
-  // const validSkills = (skills || []).filter(s =>
-  //   s.skill_category?.trim() ||
-  //   s.skill?.trim()
-  // );
+  const validExperiences = (experiences || []).filter(ex =>
+    ex.company_name?.trim() ||
+    ex.position?.trim() ||
+    ex.location?.trim() ||
+    ex.start_date ||
+    ex.end_date ||
+    ex.skill?.trim()
+    // (ex.projects && ex.projects.length > 0)
+  );
 
-  // const validLanguages = (languages || []).filter(l =>
-  //   l.language_name?.trim() ||
-  //   l.proficiency?.trim()
-  // );
+  console.log('validExperiences', validExperiences)
 
-  // const validPersonalProjects = (personalPro || []).filter(p =>
-  //   p.project_title?.trim() ||
-  //   p.role?.trim() ||
-  //   p.description?.trim() ||
-  //   p.start_time ||
-  //   p.end_time ||
-  //   p.project_url?.trim() ||
-  //   p.skill?.trim()
-  // );
+  const validSkills = (skills || []).filter(s =>
+    s.skill_category?.trim() ||
+    s.skill?.trim()
+  );
 
-  //  const validCertificates = (certificates || []).filter(c =>
-  //   c.certification_name?.trim() ||
-  //   c.issuing_organization?.trim() ||
-  //   c.obtained_date ||
-  //   c.certification_id
-  // );
+  const validLanguages = (languages || []).filter(l =>
+    l.language_name?.trim() ||
+    l.proficiency?.trim()
+  );
+
+  const validPersonalProjects = (personalPro || []).filter(p =>
+    p.project_title?.trim() ||
+    p.role?.trim() ||
+    p.description?.trim() ||
+    p.start_time ||
+    p.end_time ||
+    p.project_url?.trim() ||
+    p.skill?.trim()
+  );
+
+  const validCertificates = (certificates || []).filter(c =>
+    c.certification_name?.trim() ||
+    c.issuing_organization?.trim() ||
+    c.obtained_date ||
+    c.certification_id
+  );
 
 
-  // const validAchievements = (achivments || []).filter(a =>
-  //   a.achievement_title?.trim() ||
-  //   a.organization?.trim() ||
-  //   a.receive_date ||
-  //   a.description?.trim()
-  // );
+  const validAchievements = (achivments || []).filter(a =>
+    a.achievement_title?.trim() ||
+    a.organization?.trim() ||
+    a.receive_date ||
+    a.description?.trim()
+  );
 
   function formatSmartDate(dateInput) {
     if (!dateInput) return "";
@@ -228,7 +233,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
         </div>
         <div className="max-w-4xl mx-auto bg-white shadow-xl">
           {/* Header */}
-          <div className=" text-black px-6 py-8">
+          <div className=" text-black">
             <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-center text-[#2f6aeb]">{data?.full_name || ""}</h1>
             <p className="text-sm font-semibold text-[#2f6aeb] mb-4 text-center">{data?.title || ""}</p>
             {/* <div className="text-xs sm:text-sm leading-relaxed text-center">
@@ -248,15 +253,16 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
 
           <div className="px-6 py-6">
             {/* Professional Summary */}
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Summary</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
-              <p className="text-sm leading-relaxed text-gray-800">
-                {data?.goal || ""}
+            {validData && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Summary</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
+                <p className="text-sm leading-relaxed text-gray-800">
+                  {data?.goal || ""}
 
-              </p>
-            </section>
-
+                </p>
+              </section>
+            )}
             {/* Education */}
             {/* <section className="mb-6">
             <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
@@ -281,77 +287,79 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               </div>
             </div>
           </section> */}
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
+            {validEducation.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
 
-              <div className="space-y-4">
-                {
-                  education.map((entry, index) => (
-                    <div
-                      key={entry.id || index}
-                      className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
-                    >
-                      {/* Left Side: Degree + Institution */}
-                      <div className="flex-1">
+                <div className="space-y-4">
+                  {
+                    education.map((entry, index) => (
+                      <div
+                        key={entry.id || index}
+                        className="flex flex-col sm:flex-row sm:justify-between sm:items-start"
+                      >
+                        {/* Left Side: Degree + Institution */}
+                        <div className="flex-1">
 
-                        <p className="font-semibold text-gray-900">{entry.degree || ""}</p>
-
-
-                        <p className="text-sm text-gray-700">{entry.institution || ""}</p>
+                          <p className="font-semibold text-gray-900">{entry.degree || ""}</p>
 
 
-                        <p className="text-xs text-gray-600 italic">
-                          {entry.field_study || ""}
-                        </p>
+                          <p className="text-sm text-gray-700">{entry.institution || ""}</p>
 
 
-                        <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
-
-
-                        {entry.gpa && (
-                          <p className="text-xs text-gray-600">
-                            GPA: {entry.gpa}
+                          <p className="text-xs text-gray-600 italic">
+                            {entry.field_study || ""}
                           </p>
-                        )}
 
 
-                      </div>
+                          <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
 
-                      {/* Right Side: Dates + Location */}
-                      <div className="mt-1 sm:mt-0 sm:ml-4 text-right">
-                        {(entry.start_time || entry.end_time) && (
-                          <p className="text-sm text-gray-600">
-                            {entry.start_time
-                              ?
-                              // new Date(entry.start_time).toLocaleDateString("en-US", {
-                              //     month: "short",
-                              //     year: "numeric",
-                              //   })
-                              formatSmartDate(entry.start_time)
-                              : ""}
-                            {entry.end_time
-                              ? ` - 
+
+                          {entry.gpa && (
+                            <p className="text-xs text-gray-600">
+                              GPA: {entry.gpa}
+                            </p>
+                          )}
+
+
+                        </div>
+
+                        {/* Right Side: Dates + Location */}
+                        <div className="mt-1 sm:mt-0 sm:ml-4 text-right">
+                          {(entry.start_time || entry.end_time) && (
+                            <p className="text-sm text-gray-600">
+                              {entry.start_time
+                                ?
+                                // new Date(entry.start_time).toLocaleDateString("en-US", {
+                                //     month: "short",
+                                //     year: "numeric",
+                                //   })
+                                formatSmartDate(entry.start_time)
+                                : ""}
+                              {entry.end_time
+                                ? ` - 
                 
                     ${formatSmartDate(entry.end_time)}
                     
                     `
-                              : entry.currentlyStudying
-                                ? " - Present"
-                                : ""}
-                          </p>
-                        )}
-                        {entry.location && (
-                          <p className="text-sm text-gray-600">{entry.location}</p>
-                        )}
+                                : entry.currentlyStudying
+                                  ? " - Present"
+                                  : ""}
+                            </p>
+                          )}
+                          {entry.location && (
+                            <p className="text-sm text-gray-600">{entry.location}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))
 
 
-                }
-              </div>
-            </section>
+                  }
+                </div>
+              </section>
+            )}
 
 
             {/* Professional Experience */}
@@ -394,20 +402,20 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               </ul>
             </div>
           </section> */}
+            {validExperiences.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Experience</h2>
+                <div className="border-b border-blue-700 mb-4"></div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Experience</h2>
-              <div className="border-b border-blue-700 mb-4"></div>
-
-              {
-                experiences.map((exp) => (
-                  <div key={exp.id} className="mb-5">
-                    {/* Header with Position & Dates */}
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1">
-                      <h3 className="font-semibold text-gray-900">
-                        {exp.position || ""}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1 sm:mt-0">
+                {
+                  experiences.map((exp) => (
+                    <div key={exp.id} className="mb-5">
+                      {/* Header with Position & Dates */}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1">
+                        <h3 className="font-semibold text-gray-900">
+                          {exp.position || ""}
+                        </h3>
+                        {/* <p className="text-sm text-gray-600 mt-1 sm:mt-0">
                         {exp.start_date
                           ? formatSmartDate(exp.start_date)
                           : ""}{" "}
@@ -417,60 +425,74 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                           : exp.end_date
                             ? formatSmartDate(exp.end_date)
                             : ""}
+                      </p> */}
+                        <p className="text-sm text-gray-600 mt-1 sm:mt-0">
+                          {exp.start_date ? formatSmartDate(exp.start_date) : ""}
+
+                          {/* Show dash only if at least one date exists */}
+                          {(exp.start_date || exp.end_date || exp.current_work) && " – "}
+
+                          {exp.current_work
+                            ? "Present"
+                            : exp.end_date
+                              ? formatSmartDate(exp.end_date)
+                              : ""}
+                        </p>
+
+                      </div>
+
+                      {/* Company + Location */}
+                      <p className="text-sm text-gray-700 mb-1">
+                        {exp.company_name || ""}{" "}
+                        {exp.location ? `– ${exp.location}` : ""}
                       </p>
-                    </div>
 
-                    {/* Company + Location */}
-                    <p className="text-sm text-gray-700 mb-1">
-                      {exp.company_name || ""}{" "}
-                      {exp.location ? `– ${exp.location}` : ""}
-                    </p>
-
-                    {/* Skill Set */}
-                    {/* {exp.skill && (
+                      {/* Skill Set */}
+                      {/* {exp.skill && (
                       <p className="text-xs text-gray-500 italic mb-2">
                         Skills: {exp.skill} 
                       </p>
                     )} */}
-                    {exp.skill && (
-                      <p className="text-xs text-gray-500 italic mb-2">
-                        Skills:&nbsp;
-                        {exp.skill
-                          .split(",")
-                          .map(s => s.trim())
-                          .join(", ")}
-                      </p>
-                    )}
+                      {exp.skill && (
+                        <p className="text-xs text-gray-500 italic mb-2">
+                          Skills:&nbsp;
+                          {exp.skill
+                            .split(",")
+                            .map(s => s.trim())
+                            .join(", ")}
+                        </p>
+                      )}
 
 
-                    {/* Projects */}
-                    {exp.projects && exp.projects.length > 0 && (
-                      <ul className="text-sm text-gray-800 space-y-1">
-                        {exp.projects.map((proj) => (
-                          <li key={proj.id}>
-                            <span className="font-medium">
-                              {proj.title || ""}
-                            </span>{" "}
-                            {proj.role && (
-                              <>{" "}– {proj.role}</>
-                            )}
-                            {proj.technology && (
-                              <span className="text-gray-600">
-                                {" "}
-                                | Tech: {proj.technology}
-                              </span>
-                            )}
-                            <p className="text-gray-700 text-xs ml-4">
-                              {proj.description ||
-                                ""}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-            </section>
+                      {/* Projects */}
+                      {exp.projects && exp.projects.length > 0 && (
+                        <ul className="text-sm text-gray-800 space-y-1">
+                          {exp.projects.map((proj) => (
+                            <li key={proj.id}>
+                              <span className="font-medium">
+                                {proj.title || ""}
+                              </span>{" "}
+                              {proj.role && (
+                                <>{" "}– {proj.role}</>
+                              )}
+                              {/* {proj.technology && (
+                                <span className="text-gray-600">
+                                  {" "}
+                                  | Tech: {proj.technology}
+                                </span>
+                              )} */}
+                              <p className="text-gray-700 text-xs ml-4">
+                                {proj.description ||
+                                  ""}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+              </section>
+            )}
 
 
 
@@ -486,38 +508,39 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               <p><span className="font-semibold">REST API, CRUD Operations, Responsive Design, State Management (React Context API)</span></p>
             </div>
           </section> */}
+            {validSkills.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Skills</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Skills</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
-
-              {/* If skills are available from form, show them; else fallback to defaults */}
-              {skills && skills.length > 0 ? (
-                <div className="text-sm text-gray-800 space-y-2">
-                  {skills.map((sk) => (
-                    <p key={sk.id}>
-                      {sk.skill_category && (
-                        <span className="font-semibold">{sk.skill_category}:</span>
-                      )}{" "}
-                      {sk.skill || "Add your skills here"}
+                {/* If skills are available from form, show them; else fallback to defaults */}
+                {skills && skills.length > 0 ? (
+                  <div className="text-sm text-gray-800 space-y-2">
+                    {skills.map((sk) => (
+                      <p key={sk.id}>
+                        {sk.skill_category && (
+                          <span className="font-semibold">{sk.skill_category}:</span>
+                        )}{" "}
+                        {sk.skill || ""}
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  // Default static values
+                  <div className="text-sm text-gray-800 space-y-2">
+                    <p>
+                      <span className="font-semibold">JavaScript (ES6+):</span> Java, C++, SQL
                     </p>
-                  ))}
-                </div>
-              ) : (
-                // Default static values
-                <div className="text-sm text-gray-800 space-y-2">
-                  <p>
-                    <span className="font-semibold">JavaScript (ES6+):</span> Java, C++, SQL
-                  </p>
-                  <p>
-                    <span className="font-semibold">React.js, Express.js, MongoDB:</span> Git, GitHub, Postman, Vercel, Netlify
-                  </p>
-                  <p>
-                    <span className="font-semibold">REST API, CRUD Operations, Responsive Design, State Management (React Context API)</span>
-                  </p>
-                </div>
-              )}
-            </section>
+                    <p>
+                      <span className="font-semibold">React.js, Express.js, MongoDB:</span> Git, GitHub, Postman, Vercel, Netlify
+                    </p>
+                    <p>
+                      <span className="font-semibold">REST API, CRUD Operations, Responsive Design, State Management (React Context API)</span>
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
 
 
             {/* Languages */}
@@ -529,11 +552,12 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               <li>• English - Native / Speech Intermediate</li>
             </ul>
           </section> */}
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Languages</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
-              <ul className="text-sm text-gray-800 space-y-1">
-                {/* {
+            {validLanguages.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Languages</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
+                <ul className="text-sm text-gray-800 space-y-1">
+                  {/* {
                   languages.map((lang) => (
                     <li key={lang.id}>
                       • {lang.language_name || ""} -{" "}
@@ -541,21 +565,22 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                     </li>
                   ))
                 } */}
-                <ul className="text-sm text-gray-800 space-y-1">
-                  {languages.map((lang) => {
-                    const parts = [lang.language_name, lang.proficiency].filter(Boolean);
+                  <ul className="text-sm text-gray-800 space-y-1">
+                    {languages.map((lang) => {
+                      const parts = [lang.language_name, lang.proficiency].filter(Boolean);
 
-                    if (parts.length === 0) return null;
-                    return (
-                      <li key={lang.id}>
-                        • {parts.join(' - ')}
-                      </li>
-                    );
-                  })}
+                      if (parts.length === 0) return null;
+                      return (
+                        <li key={lang.id}>
+                          • {parts.join(' - ')}
+                        </li>
+                      );
+                    })}
+                  </ul>
+
                 </ul>
-
-              </ul>
-            </section>
+              </section>
+            )}
 
 
             {/* Projects */}
@@ -563,119 +588,124 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
             <h2 className="text-lg font-bold text-blue-700 mb-2">Projects</h2>
             <div className="border-b border-blue-700 mb-3"></div>
           </section> */}
+            {validPersonalProjects.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Projects</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
 
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Projects</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
-
-              <div className="space-y-4">
-                {personalPro.length > 0 ? (
-                  personalPro.map((project) => (
-                    <div key={project.id} className="mb-4">
-                      <h3 className="text-md font-semibold text-gray-900">
-                        {project.project_title || ""}
-                      </h3>
-                      <p className="text-sm text-gray-700 italic mb-1">
-                        {project.role || ""}{" "}
-                        {project.start_time && project.end_time
-                          ? `(${convertToSubmitFormat(project.start_time)} - ${convertToSubmitFormat(project.end_time)})`
-                          : ""}
-                      </p>
-                      {project.project_url && (
-                        <p className="text-sm text-blue-600 mb-1">
-                          <a
-                            href={project.project_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {project.project_url}
-                          </a>
+                <div className="space-y-4">
+                  {personalPro.length > 0 ? (
+                    personalPro.map((project) => (
+                      <div key={project.id} className="mb-4">
+                        <h3 className="text-md font-semibold text-gray-900">
+                          {project.project_title || ""}
+                        </h3>
+                        <p className="text-sm text-gray-700 italic mb-1">
+                          {project.role || ""}{" "}
+                          {project.start_time && project.end_time
+                            ? `(${convertToSubmitFormat(project.start_time)} - ${convertToSubmitFormat(project.end_time)})`
+                            : ""}
                         </p>
-                      )}
-                      {project.skill && (
-                        <p className="text-sm text-gray-800 mb-1">
-                          <span className="font-semibold">Technologies: </span>
-                          {project.skill}
-                        </p>
-                      )}
-                      {project.description && (
-                        <p className="text-sm text-gray-700">{project.description}</p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="italic text-gray-500">No projects added</p>
-                )}
-              </div>
-            </section>
-
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Certifications</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
-
-              <div className="space-y-3">
-                {certificates.length > 0 ? (
-                  certificates.map((cert) => (
-                    <div key={cert.id} className="mb-2">
-                      <h3 className="text-md font-semibold text-gray-900">
-                        {cert.certification_name || ""}
-                      </h3>
-                      <p className="text-sm text-gray-700">
-                        {cert.issuing_organization || ""}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {cert.obtained_date
-                          ? `Obtained: ${convertToSubmitFormat(cert.obtained_date)}`
-                          : ""}
-                      </p>
-                      {cert.certification_id && (
-                        <p className="text-sm text-gray-500">
-                          <span className="font-semibold">ID: </span>
-                          {cert.certification_id}
-                        </p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="italic text-gray-500">No certifications added</p>
-                )}
-              </div>
-            </section>
-            <section className="mb-6">
-              <h2 className="text-lg font-bold text-blue-700 mb-2">Achievements</h2>
-              <div className="border-b border-blue-700 mb-3"></div>
-
-              <div className="space-y-3">
-                {achivments.length > 0 ? (
-                  achivments.map((ach) => (
-                    <div key={ach.id} className="mb-3">
-                      {/* Title */}
-                      <h3 className="text-md font-semibold text-gray-900">
-                        {ach.achievement_title || ""}
-                      </h3>
-
-                      {/* Organization & Date */}
-                      <p className="text-sm text-gray-700">
-                        {ach.organization || ""}
-                        {ach.receive_date && (
-                          <span className="ml-2 text-gray-500">
-                            ({convertToSubmitFormat(ach.receive_date)})
-                          </span>
+                        {project.project_url && (
+                          <p className="text-sm text-blue-600 mb-1">
+                            <a
+                              href={project.project_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {project.project_url}
+                            </a>
+                          </p>
                         )}
-                      </p>
+                        {project.skill && (
+                          <p className="text-sm text-gray-800 mb-1">
+                            <span className="font-semibold">Technologies: </span>
+                            {project.skill}
+                          </p>
+                        )}
+                        {project.description && (
+                          <p className="text-sm text-gray-700">{project.description}</p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="italic text-gray-500">No projects added</p>
+                  )}
+                </div>
+              </section>
+            )}
 
-                      {/* Description */}
-                      {ach.description && (
-                        <p className="text-sm text-gray-600">{ach.description}</p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="italic text-gray-500">No achievements added</p>
-                )}
-              </div>
-            </section>
+            {validCertificates.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Certifications</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
 
+                <div className="space-y-3">
+                  {certificates.length > 0 ? (
+                    certificates.map((cert) => (
+                      <div key={cert.id} className="mb-2">
+                        <h3 className="text-md font-semibold text-gray-900">
+                          {cert.certification_name || ""}
+                        </h3>
+                        <p className="text-sm text-gray-700">
+                          {cert.issuing_organization || ""}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {cert.obtained_date
+                            ? `Obtained: ${convertToSubmitFormat(cert.obtained_date)}`
+                            : ""}
+                        </p>
+                        {cert.certification_id && (
+                          <p className="text-sm text-gray-500">
+                            <span className="font-semibold">ID: </span>
+                            {cert.certification_id}
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="italic text-gray-500">No certifications added</p>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {validAchievements.length > 0 && (
+              <section className="mb-6">
+                <h2 className="text-lg font-bold text-blue-700 mb-2">Achievements</h2>
+                <div className="border-b border-blue-700 mb-3"></div>
+
+                <div className="space-y-3">
+                  {achivments.length > 0 ? (
+                    achivments.map((ach) => (
+                      <div key={ach.id} className="mb-3">
+                        {/* Title */}
+                        <h3 className="text-md font-semibold text-gray-900">
+                          {ach.achievement_title || ""}
+                        </h3>
+
+                        {/* Organization & Date */}
+                        <p className="text-sm text-gray-700">
+                          {ach.organization || ""}
+                          {ach.receive_date && (
+                            <span className="ml-2 text-gray-500">
+                              ({convertToSubmitFormat(ach.receive_date)})
+                            </span>
+                          )}
+                        </p>
+
+                        {/* Description */}
+                        {ach.description && (
+                          <p className="text-sm text-gray-600">{ach.description}</p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="italic text-gray-500">No achievements added</p>
+                  )}
+                </div>
+              </section>
+            )}
 
 
           </div>

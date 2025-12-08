@@ -392,21 +392,62 @@ const page = () => {
   }, [getUpdateResumeInfoData]);
 
   // Populate achievements from getUpdateResumeInfoData
-  useEffect(() => {
-    if (getUpdateResumeInfoData?.data?.imp_achievement_info && getUpdateResumeInfoData.data.imp_achievement_info.length > 0) {
-      const achievementData = getUpdateResumeInfoData.data.imp_achievement_info.map(ach => ({
-        id: ach.id,
-        achievement_title: ach.achivement_name,
-        organization: ach.achivement_organization_name,
-        receive_date: ach.achivement_date ? new Date(ach.achivement_date) : null,
-        description: ach.description
-      }));
-      setAchivments(achievementData);
-    } else if (getUpdateResumeInfoData && achivments.length === 0) {
-      // Add empty entry if no data and no existing entries
-      setAchivments([{ id: `ach-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }]);
+  // useEffect(() => {
+  //   if (getUpdateResumeInfoData?.data?.imp_achievement_info && getUpdateResumeInfoData.data.imp_achievement_info.length > 0) {
+  //     const achievementData = getUpdateResumeInfoData.data.imp_achievement_info.map(ach => ({
+  //       id: ach.id,
+  //       achievement_title: ach.achivement_name,
+  //       organization: ach.achivement_organization_name,
+  //       receive_date: ach.achivement_date ? new Date(ach.achivement_date) : null,
+  //       description: ach.description
+  //     }));
+  //     setAchivments(achievementData);
+  //   } else if (getUpdateResumeInfoData && achivments.length === 0) {
+  //     // Add empty entry if no data and no existing entries
+  //     setAchivments([{ id: `ach-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }]);
+  //   }
+  // }, [getUpdateResumeInfoData]);
+
+   useEffect(() => {
+    if (
+      getUpdateResumeInfoData?.data?.imp_achievement_info?.length > 0
+    ) {
+      console.log(
+        "AchivmentsJd",
+        getUpdateResumeInfoData.data.imp_achievement_info
+      );
+
+      const achievements = getUpdateResumeInfoData.data.imp_achievement_info.map(
+        (ach, index) => ({
+          id: ach.id,
+          achievement_title: ach.achivement_name || "",
+          organization: ach.achivement_organization_name || "",
+          receive_date: ach.achivement_date ? (() => {
+            try {
+              const date = new Date(ach.achivement_date);
+              return isNaN(date.getTime()) ? null : date;
+            } catch (e) {
+              console.error('Error parsing achievement date:', ach.achivement_date, e);
+              return null;
+            }
+          })() : null,
+          description: ach.description || "",
+        })
+      );
+
+      setAchivments(achievements);
+    } else {
+      setAchivments([
+        {
+          id: `ach-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          achievement_title: "",
+          organization: "",
+          receive_date: null,
+          description: "",
+        },
+      ]);
     }
-  }, [getUpdateResumeInfoData]);
+  }, [getUpdateResumeInfoData, setAchivments]);
 
   const formValues = watch();
   console.log("formValues", formValues);
@@ -668,7 +709,7 @@ const page = () => {
     pageStyle: `
     @page {
       size: A4;
-      margin: 0.5in;
+      margin: 0.5in 0;
     }
 
     html, body {
@@ -679,10 +720,6 @@ const page = () => {
       margin: 0 !important;
       padding: 0 !important;
     }
-
-  @page {
-  margin: 0.5in !important;
-}
 @page :header {
   display: none !important;
 }
@@ -1032,8 +1069,8 @@ const page = () => {
             </div>
           </div>
         </div>
-        <div className='h-screen overflow-y-scroll'>
-          <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+        <div className='h-screen overflow-y-scroll border border-[#E5E5E5] rounded-[8px]'>
+          <div ref={componentRef} className=''>
             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
             {
               template == 1 && (

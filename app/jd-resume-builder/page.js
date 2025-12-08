@@ -665,7 +665,7 @@ const page = () => {
     pageStyle: `
     @page {
       size: A4;
-      margin: 0.5in 0 0.5in 0 !important;
+       margin: 0.5in 0;
     }
 
    html, body {
@@ -1033,8 +1033,8 @@ const page = () => {
             </div>
           </div>
         </div>
-        <div className='h-screen overflow-y-scroll'>
-          <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+        <div className='h-screen overflow-y-scroll border border-[#E5E5E5] rounded-[8px]'>
+          <div ref={componentRef} className=''>
             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
             {
               template == 1 && (

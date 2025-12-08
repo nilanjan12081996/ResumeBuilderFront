@@ -181,40 +181,118 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
   const [showResuMate, setShowResuMate] = useState(false);
   const buttonRef = useRef(null);
   console.log('getUpdateResumeInfoData', getUpdateResumeInfoData)
-  useEffect(() => {
-    console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
-    if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
-      const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
+  // useEffect(() => {
+  //   console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
+  //   if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
+  //     const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
+  //       return {
+  //         id: exp.id,
+  //         company_name: exp.company_name || "",
+  //         position: exp.Position || "",
+  //         location: exp.location || "",
+  //         skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
+  //         start_date: exp.start_date ? (() => {
+  //           try {
+  //             const date = new Date(exp.start_date);
+  //             return isNaN(date.getTime()) ? null : date;
+  //           } catch (e) {
+  //             console.error('Error parsing start date:', exp.start_date, e);
+  //             return null;
+  //           }
+  //         })() : null,
+  //         end_date: exp.end_date ? (() => {
+  //           try {
+  //             const date = new Date(exp.end_date);
+  //             return isNaN(date.getTime()) ? null : date;
+  //           } catch (e) {
+  //             console.error('Error parsing end date:', exp.end_date, e);
+  //             return null;
+  //           }
+  //         })() : null,
+  //         current_work: !exp.end_date,
+  //         projects: [
+  //           { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
+  //         ]
+  //       };
+  //     });
+  //     setExperiences(formattedExperiences);
+  //   }
+  // }, [getUpdateResumeInfoData]);
+
+    useEffect(() => {
+    const experiencesData = getUpdateResumeInfoData?.data?.imp_experience_info;
+    const projectsData = getUpdateResumeInfoData?.data?.imp_project_info;
+  
+    console.log(
+      "getUpdateResumeInfoDataExp",
+      experiencesData
+    );
+  
+    if (Array.isArray(experiencesData) && experiencesData.length > 0) {
+      const formattedExperiences = experiencesData.map((exp) => {
+        const isCurrent = exp.end_date === "Present" || !exp.end_date;
+  
+        // 🔥 Filter projects that belong to this experience
+        const relatedProjects = Array.isArray(projectsData)
+          ? projectsData
+              .filter((proj) => proj.exp_id === exp.id)
+              .map((proj) => ({
+                id: proj.id,
+                title: proj.Project_title || "",
+                role: proj.Role || "",
+                technology: Array.isArray(proj.skill_set_use)
+                  ? proj.skill_set_use.join(", ")
+                  : "",
+                description: proj.description || "",
+              }))
+          : [];
+  
         return {
           id: exp.id,
           company_name: exp.company_name || "",
           position: exp.Position || "",
           location: exp.location || "",
           skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
-          start_date: exp.start_date ? (() => {
-            try {
-              const date = new Date(exp.start_date);
-              return isNaN(date.getTime()) ? null : date;
-            } catch (e) {
-              console.error('Error parsing start date:', exp.start_date, e);
-              return null;
-            }
-          })() : null,
-          end_date: exp.end_date ? (() => {
-            try {
-              const date = new Date(exp.end_date);
-              return isNaN(date.getTime()) ? null : date;
-            } catch (e) {
-              console.error('Error parsing end date:', exp.end_date, e);
-              return null;
-            }
-          })() : null,
-          current_work: !exp.end_date,
-          projects: [
-            { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
-          ]
+          start_date: exp.start_date
+            ? (() => {
+                try {
+                  const date = new Date(exp.start_date);
+                  return isNaN(date.getTime()) ? null : date;
+                } catch {
+                  return null;
+                }
+              })()
+            : null,
+          end_date: exp.end_date
+            ? (() => {
+                try {
+                  const date = new Date(exp.end_date);
+                  return isNaN(date.getTime()) ? null : date;
+                } catch {
+                  return null;
+                }
+              })()
+            : null,
+          current_work: isCurrent,
+  
+          // 🔥 Inject related projects here
+          projects:
+            relatedProjects.length > 0
+              ? relatedProjects
+              : [
+                  {
+                    id: `proj-default-${Date.now()}-${Math.random()
+                      .toString(36)
+                      .substr(2, 9)}`,
+                    title: "",
+                    role: "",
+                    technology: "",
+                    description: "",
+                  },
+                ],
         };
       });
+  
       setExperiences(formattedExperiences);
     }
   }, [getUpdateResumeInfoData]);
@@ -528,7 +606,7 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
                     </div>
                   </div>
 
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <div className="w-full resume_form_box">
                       <div className="mb-1 block">
                         <Label htmlFor={`proj-tech-${proj.id}`}>Technologies Used</Label>
@@ -549,7 +627,7 @@ const WorkExpJd = ({ getUpdateResumeInfoData, experiences, setExperiences }) => 
                         />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="w-full resume_form_box mb-3">
                     <div className="mb-1 block">
