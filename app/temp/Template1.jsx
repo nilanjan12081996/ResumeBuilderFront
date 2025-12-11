@@ -111,7 +111,7 @@ const Template1 = forwardRef(({ data, education, experiences, skills, languages,
 
   return (
     <div>
-      <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex items-center justify-center ">
+      <div ref={ref} className="min-h-screen bg-[#f6f8fa] flex justify-center ">
         {/* <style jsx>{`
         @media print {
  
@@ -432,11 +432,11 @@ const Template1 = forwardRef(({ data, education, experiences, skills, languages,
                             </p>
 
                             {/* Technologies */}
-                            {proj.technology && (
+                            {/* {proj.technology && (
                               <p className="text-[11px] text-[#6471af] mb-1">
                                 Tech: {proj.technology}
                               </p>
-                            )}
+                            )} */}
 
                             {/* Description */}
                             <p className="text-xs text-gray-700 break-all">

@@ -19,9 +19,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
   console.log("datas", data);
 
 
-  const validData = Object.values(data).some(
-    v => typeof v === "string" ? v.trim() !== "" : !!v
-  );
+  const validGoal = data.goal?.trim() !== "";
 
   const validEducation = (education || []).filter(e =>
     e.institution?.trim() ||
@@ -253,7 +251,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
 
           <div className="px-6 py-6">
             {/* Professional Summary */}
-            {validData && (
+            {validGoal && (
               <section className="mb-6">
                 <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Summary</h2>
                 <div className="border-b border-blue-700 mb-3"></div>
