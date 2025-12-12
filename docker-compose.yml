@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: resumemileai
+    ports:
+      - "3989:3989" 
+    restart: unless-stopped
