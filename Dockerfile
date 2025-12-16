@@ -1,4 +1,3 @@
-# Dockerfile
 FROM node:20-alpine AS base
 
 # Install dependencies only when needed
@@ -6,7 +5,6 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
 COPY package.json package-lock.json* ./
 RUN npm ci
 
@@ -16,10 +14,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js application
+# Increase Node memory limit
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+
 RUN npm run build
 
-# Production image, copy all the files and run next
+# Production image
 FROM base AS runner
 WORKDIR /app
 
@@ -34,8 +34,8 @@ COPY --from=builder /app/.next/static ./.next/static
 
 USER nextjs
 
-# Expose port 3989
 EXPOSE 3989
+ENV PORT=3989
+ENV HOSTNAME="0.0.0.0"
 
-# Start Next.js on port 3989 (hardcoded, not from env)
-CMD ["node", "server.js", "-p", "3989"]
+CMD ["node", "server.js"]
