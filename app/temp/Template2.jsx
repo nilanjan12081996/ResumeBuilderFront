@@ -314,9 +314,9 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                           <p className="text-xs text-gray-500">{entry.additionalInfo || ""}</p>
 
 
-                          {entry.gpa && (
+                          {entry.cgpa && (
                             <p className="text-xs text-gray-600">
-                              GPA: {entry.gpa}
+                              GPA: {entry.cgpa}
                             </p>
                           )}
 

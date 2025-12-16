@@ -486,7 +486,7 @@ const Template1 = forwardRef(({ data, education, experiences, skills, languages,
                             //   })
                             formatSmartDate(entry.start_time)
                             : ""}
-                          {" – "}
+                          {(entry.start_time || entry.end_time || entry.currentlyStudying) && " – "}
                           {entry.currentlyStudying
                             ? "Present"
                             : entry.end_time
@@ -504,10 +504,10 @@ const Template1 = forwardRef(({ data, education, experiences, skills, languages,
                       <span className="text-xs mb-1 block">{entry.institution || ""}-{entry.location || ""}</span>
 
                       {/* GPA or Extra Info (optional) */}
-                      {(entry.gpa || entry.additionalInfo) && (
+                      {(entry.cgpa || entry.additionalInfo) && (
                         <span className="text-[11px] text-gray-600 block">
-                          {entry.gpa ? `GPA: ${entry.gpa}` : ""}
-                          {entry.gpa && entry.additionalInfo ? " • " : ""}
+                          {entry.cgpa ? `GPA: ${entry.cgpa}` : ""}
+                          {entry.cgpa && entry.additionalInfo ? " • " : ""}
                           {entry.additionalInfo}
                         </span>
                       )}

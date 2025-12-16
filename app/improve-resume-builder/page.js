@@ -246,21 +246,21 @@ const page = () => {
   // }, [getUpdateResumeInfoData]);
 
   useEffect(() => {
-  const experiencesData = getUpdateResumeInfoData?.data?.imp_experience_info;
-  const projectsData = getUpdateResumeInfoData?.data?.imp_project_info;
+    const experiencesData = getUpdateResumeInfoData?.data?.imp_experience_info;
+    const projectsData = getUpdateResumeInfoData?.data?.imp_project_info;
 
-  console.log(
-    "getUpdateResumeInfoDataExp",
-    experiencesData
-  );
+    console.log(
+      "getUpdateResumeInfoDataExp",
+      experiencesData
+    );
 
-  if (Array.isArray(experiencesData) && experiencesData.length > 0) {
-    const formattedExperiences = experiencesData.map((exp) => {
-      const isCurrent = exp.end_date === "Present" || !exp.end_date;
+    if (Array.isArray(experiencesData) && experiencesData.length > 0) {
+      const formattedExperiences = experiencesData.map((exp) => {
+        const isCurrent = exp.end_date === "Present" || !exp.end_date;
 
-      // 🔥 Filter projects that belong to this experience
-      const relatedProjects = Array.isArray(projectsData)
-        ? projectsData
+        // 🔥 Filter projects that belong to this experience
+        const relatedProjects = Array.isArray(projectsData)
+          ? projectsData
             .filter((proj) => proj.exp_id === exp.id)
             .map((proj) => ({
               id: proj.id,
@@ -271,16 +271,16 @@ const page = () => {
                 : "",
               description: proj.description || "",
             }))
-        : [];
+          : [];
 
-      return {
-        id: exp.id,
-        company_name: exp.company_name || "",
-        position: exp.Position || "",
-        location: exp.location || "",
-        skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
-        start_date: exp.start_date
-          ? (() => {
+        return {
+          id: exp.id,
+          company_name: exp.company_name || "",
+          position: exp.Position || "",
+          location: exp.location || "",
+          skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
+          start_date: exp.start_date
+            ? (() => {
               try {
                 const date = new Date(exp.start_date);
                 return isNaN(date.getTime()) ? null : date;
@@ -288,9 +288,9 @@ const page = () => {
                 return null;
               }
             })()
-          : null,
-        end_date: exp.end_date
-          ? (() => {
+            : null,
+          end_date: exp.end_date
+            ? (() => {
               try {
                 const date = new Date(exp.end_date);
                 return isNaN(date.getTime()) ? null : date;
@@ -298,14 +298,14 @@ const page = () => {
                 return null;
               }
             })()
-          : null,
-        current_work: isCurrent,
+            : null,
+          current_work: isCurrent,
 
-        // 🔥 Inject related projects here
-        projects:
-          relatedProjects.length > 0
-            ? relatedProjects
-            : [
+          // 🔥 Inject related projects here
+          projects:
+            relatedProjects.length > 0
+              ? relatedProjects
+              : [
                 {
                   id: `proj-default-${Date.now()}-${Math.random()
                     .toString(36)
@@ -316,12 +316,12 @@ const page = () => {
                   description: "",
                 },
               ],
-      };
-    });
+        };
+      });
 
-    setExperiences(formattedExperiences);
-  }
-}, [getUpdateResumeInfoData]);
+      setExperiences(formattedExperiences);
+    }
+  }, [getUpdateResumeInfoData]);
 
 
   // Populate skills from getUpdateResumeInfoData
@@ -408,7 +408,7 @@ const page = () => {
   //   }
   // }, [getUpdateResumeInfoData]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (
       getUpdateResumeInfoData?.data?.imp_achievement_info?.length > 0
     ) {
@@ -603,24 +603,52 @@ const page = () => {
 
 
       // 2. Update Experience
+      // const experiencePayload = experiences.map(exp => ({
+      //   id: exp.id && exp.id.toString().includes('exp-') ? null : exp.id, // Only keep numeric IDs
+      //   CompanyName: exp.company_name || "",
+      //   Position: exp.position || "",
+      //   Duration: {
+      //     StartDate: exp.start_date ? convertToSubmitFormat(exp.start_date) : "",
+      //     EndDate: exp.current_work ? "Present" : (exp.end_date ? convertToSubmitFormat(exp.end_date) : "")
+      //   },
+      //   Location: exp.location || "",
+      //   SkillSet: exp.skill ? exp.skill.split(",").map(s => s.trim()).filter(s => s) : [],
+      //   Projects: exp.projects.map(proj => ({
+      //     id: proj.id && proj.id.toString().includes('proj-') ? null : proj.id,
+      //     Project_title: proj.title || "",
+      //     Role: proj.role || "",
+      //     technologies_used: proj.technology ? proj.technology.split(",").map(t => t.trim()).filter(t => t) : [],
+      //     Description: proj.description || ""
+      //   }))
+      // }));
+
       const experiencePayload = experiences.map(exp => ({
-        id: exp.id && exp.id.toString().includes('exp-') ? null : exp.id, // Only keep numeric IDs
-        CompanyName: exp.company_name || "",
-        Position: exp.position || "",
+        id: exp.id && exp.id.toString().includes("exp-") ? null : exp.id,
+        CompanyName: exp.company_name || null,
+        Position: exp.position || null,
         Duration: {
-          StartDate: exp.start_date ? convertToSubmitFormat(exp.start_date) : "",
-          EndDate: exp.current_work ? "Present" : (exp.end_date ? convertToSubmitFormat(exp.end_date) : "")
+          StartDate: exp.start_date ? convertToSubmitFormat(exp.start_date) : null,
+          EndDate: exp.current_work
+            ? "Present"
+            : (exp.end_date ? convertToSubmitFormat(exp.end_date) : null)
         },
-        Location: exp.location || "",
-        SkillSet: exp.skill ? exp.skill.split(",").map(s => s.trim()).filter(s => s) : [],
-        Projects: exp.projects.map(proj => ({
-          id: proj.id && proj.id.toString().includes('proj-') ? null : proj.id,
-          Project_title: proj.title || "",
-          Role: proj.role || "",
-          technologies_used: proj.technology ? proj.technology.split(",").map(t => t.trim()).filter(t => t) : [],
-          Description: proj.description || ""
-        }))
+        Location: exp.location || null,
+        SkillSet: exp.skill
+          ? exp.skill.split(",").map(s => s.trim()).filter(Boolean)
+          : [],
+        Projects: Array.isArray(exp.projects)
+          ? exp.projects.map(proj => ({
+            id: proj.id && proj.id.toString().includes("proj-") ? null : proj.id,
+            Project_title: proj.title || null,
+            Role: proj.role || null,
+            // technologies_used: proj.technology
+            //   ? proj.technology.split(",").map(t => t.trim()).filter(Boolean)
+            //   : [],
+            Description: proj.description || null
+          }))
+          : []
       }));
+
 
       console.log("Dispatching updateExperience with resumeid:", resumeid);
       await dispatch(updateExperience({ resumeid, data: experiencePayload }));
@@ -632,7 +660,11 @@ const page = () => {
         Location: edu.location || "",
         CourseDegree: edu.degree || "",
         GraduationYear: edu.end_time ? new Date(edu.end_time).getFullYear().toString() : "",
-        GPAorGrade: edu.cgpa || "",
+        GPAorGrade:
+          edu.cgpa !== null && edu.cgpa !== undefined
+            ? String(edu.cgpa)
+            : "",
+
         AdditionalInformation: edu.additionalInfo || ""
       }));
 

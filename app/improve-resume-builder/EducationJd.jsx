@@ -219,8 +219,8 @@ const EducationJd = ({educationEntries,setEducationEntries,getUpdateResumeInfoDa
                         type="text" 
                         sizing="md" 
                         placeholder='e.g. 3.8/4.0 or 85%'
-                        value={entry.gpa}
-                        onChange={(e) => updateEducationField(entry.id, 'gpa', e.target.value)}
+                        value={entry.cgpa}
+                        onChange={(e) => updateEducationField(entry.id, 'cgpa', e.target.value)}
                       />
                     </div>
                   </div>
