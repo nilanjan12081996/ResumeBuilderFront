@@ -6,12 +6,12 @@ import { useDispatch } from "react-redux";
 import { Spinner } from "flowbite-react";
 import { googleSignIn } from "../reducers/AuthSlice";
 import GoggleChoiceModal from "./GoggleChoiceModal";
-const page=()=>{
-   const dispatch = useDispatch();
+const page = () => {
+    const dispatch = useDispatch();
     const router = useRouter();
     const [isProcessing, setIsProcessing] = useState(true);
-    const[choiceModal,setChoiceModal]=useState(false)
-      const [chooseResumeTypeGgl,setChooseResumeTypeGgl]=useState()
+    const [choiceModal, setChoiceModal] = useState(false)
+    const [chooseResumeTypeGgl, setChooseResumeTypeGgl] = useState()
 
     useEffect(() => {
         const handleGoogleSignIn = async () => {
@@ -26,46 +26,46 @@ const page=()=>{
                     // Wait for the Google sign-in to complete
                     const response = await dispatch(googleSignIn({ token: ggltoken }))
                     console.log("gglresponse: ", response);
-                    
+
                     const userToken = response?.payload?.access_token;
                     console.log("userToken ggl", userToken);
 
                     if (userToken) {
                         console.log("Setting new videoToken...");
-                        console.log("responseggl",response);
-                        if(response?.payload?.data?.signUpType?.length===0){
+                        console.log("responseggl", response);
+                        if (response?.payload?.data?.signUpType?.length === 0) {
                             sessionStorage.setItem(
                                 "userToken",
                                 JSON.stringify({ token: userToken })
                             );
                             setChoiceModal(true)
 
-                        }else{
-                              sessionStorage.setItem(
-                            "resumeToken",
-                            JSON.stringify({ token: userToken })
-                        );
-                        console.log("response?.payload?.signUpType?.[0]?",response?.payload?.data?.signUpType?.[0]);
-                        console.log("response?.payload?.signUpType?.[0]?",response?.payload);
-                        console.log("response?.payload?.signUpType?.[0]?",response?.payload?.data?.signUpType);
-                        console.log("response?.payload?.signUpType?.[0]?",response?.payload?.data?.signUpType?.[0]?.id);
-                          sessionStorage.setItem(
-                    'signup_type_id',
-                    JSON.stringify({ signup_type_id:response?.payload?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id })
-                );
-                        console.log("New videoToken set:", sessionStorage.getItem("resumeToken"));
-                        
-                        // Wait a bit to ensure token is properly set
-                       
+                        } else {
+                            sessionStorage.setItem(
+                                "resumeToken",
+                                JSON.stringify({ token: userToken })
+                            );
+                            console.log("response?.payload?.signUpType?.[0]?", response?.payload?.data?.signUpType?.[0]);
+                            console.log("response?.payload?.signUpType?.[0]?", response?.payload);
+                            console.log("response?.payload?.signUpType?.[0]?", response?.payload?.data?.signUpType);
+                            console.log("response?.payload?.signUpType?.[0]?", response?.payload?.data?.signUpType?.[0]?.id);
+                            sessionStorage.setItem(
+                                'signup_type_id',
+                                JSON.stringify({ signup_type_id: response?.payload?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id })
+                            );
+                            console.log("New videoToken set:", sessionStorage.getItem("resumeToken"));
+
+                            // Wait a bit to ensure token is properly set
+
                             router.push("/dashboard");
                         }
-                        
+
                         // Update the token in sessionStorage
-                      
-                     
-                        
-                    
-                        
+
+
+
+
+
                     } else {
                         // Handle error case
                         console.error("No token received from Google sign-in");
@@ -102,15 +102,15 @@ const page=()=>{
                 )}
             </div>
             {
-            choiceModal&&(
-              <GoggleChoiceModal
-              choiceModal={choiceModal}
-              setChoiceModal={setChoiceModal}
-              setChooseResumeTypeGgl={setChooseResumeTypeGgl}
-              
-              />
-            )
-          }
+                choiceModal && (
+                    <GoggleChoiceModal
+                        choiceModal={choiceModal}
+                        setChoiceModal={setChoiceModal}
+                        setChooseResumeTypeGgl={setChooseResumeTypeGgl}
+
+                    />
+                )
+            }
         </>
     );
 }

@@ -246,7 +246,8 @@ const Page = () => {
 // }
 
 const handleAppChange = () => {
-  const storedToken = sessionStorage.getItem("resumeToken");
+  // const storedToken = sessionStorage.getItem("resumeToken");c
+  const storedToken = localStorage.getItem("resumeToken");
 
   if (!storedToken) {
     console.error("No token found in sessionStorage!");

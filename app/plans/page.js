@@ -29,7 +29,8 @@ const Page = () => {
     (state) => state.planst || {}
   );
 
-  const usertypeId = sessionStorage.getItem("signup_type_id");
+  // const usertypeId = sessionStorage.getItem("signup_type_id");c
+   const usertypeId = localStorage.getItem("signup_type_id");
   const parsed = usertypeId ? JSON.parse(usertypeId) : null;
 
   const [openCouponModal, setOpenCouponModal] = useState(false);

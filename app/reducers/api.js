@@ -8,7 +8,8 @@ const formDataURL = ['/user/user-profile/change-avatar', '/api/improve-resume/im
 api.interceptors.request.use((req) => {
     let userTokenData;
     try {
-        userTokenData = JSON.parse(sessionStorage.getItem('resumeToken'));
+        // userTokenData = JSON.parse(sessionStorage.getItem('resumeToken'));c
+         userTokenData = JSON.parse(localStorage.getItem('resumeToken'));
     } catch (error) {
         userTokenData = null;
     }
@@ -30,7 +31,8 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && [401, 403].includes(error.response.status)) {
-            sessionStorage.removeItem('resumeToken');
+            // sessionStorage.removeItem('resumeToken');c 
+             localStorage.removeItem('resumeToken');
             // toast.error("You have been logout, Please login again");
         }
         return Promise.reject(error);

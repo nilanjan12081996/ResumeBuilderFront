@@ -91,7 +91,12 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
                 }
 
                 if (accessToken) {
-                    sessionStorage.setItem(
+                    // sessionStorage.setItem(
+                    //     "resumeToken",
+                    //     JSON.stringify({ token: accessToken })
+                    // );c
+
+                     localStorage.setItem(
                         "resumeToken",
                         JSON.stringify({ token: accessToken })
                     );
@@ -145,7 +150,8 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
                 setOtpSuccess("OTP Verified Successfully!");
 
                 if (accessToken) {
-                    sessionStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));
+                    // sessionStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));c
+                     localStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));
                     router.push("/dashboard");
                     dispatch(getProfile());
 

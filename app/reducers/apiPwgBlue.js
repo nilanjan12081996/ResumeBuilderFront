@@ -8,7 +8,8 @@ const formDataURL = [''];
 apiPwgBlue.interceptors.request.use((req) => {
     let userTokenData;
     try {
-        userTokenData = JSON.parse(sessionStorage.getItem('getMobileToken'));
+        // userTokenData = JSON.parse(sessionStorage.getItem('getMobileToken'));c
+        userTokenData = JSON.parse(localStorage.getItem('getMobileToken'));
     } catch (error) {
         userTokenData = null;
     }
@@ -33,7 +34,8 @@ apiPwgBlue.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && [401, 403].includes(error.response.status)) {
-            sessionStorage.removeItem('getMobileToken');
+            // sessionStorage.removeItem('getMobileToken');c
+            localStorage.removeItem('getMobileToken');
             // toast.error("You have been logout, Please login again");
         }
         return Promise.reject(error);

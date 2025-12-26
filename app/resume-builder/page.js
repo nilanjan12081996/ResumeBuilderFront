@@ -80,7 +80,8 @@ const page = () => {
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
   const template = searchParams.get("template");
-  const user_id = sessionStorage.getItem('user_id')
+  // const user_id = sessionStorage.getItem('user_id');c
+   const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const [type, setType] = useState()
   const [isCreated, setIsCreated] = useState(false)

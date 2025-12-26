@@ -16,7 +16,7 @@ const Page = () => {
         const decodedToken = atob(decodeURIComponent(encodedToken));
 
         // Save to session storage
-        sessionStorage.setItem("resumeToken", decodedToken);
+        // sessionStorage.setItem("resumeToken", decodedToken);c
         localStorage.setItem("resumeToken", decodedToken);
         console.log("✅ Token stored:", decodedToken);
 

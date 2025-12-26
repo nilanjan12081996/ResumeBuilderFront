@@ -14,7 +14,7 @@ export default function ClientLayoutWrapper({ children }) {
     const router = useRouter();
 
     // Define public routes that don't require authentication
-    const publicRoutes = ['/', '/about-us', '/contact', '/privacy-policy', '/support', '/cancellation-policy', '/pricing', '/how-it-works', '/features', '/privacy', '/faqs', '/featured-jobs', '/featured-jobs-details', '/resume-builder', '/linkedIn-rewrite', '/invite-students','/loading-page','/google-redirect','/terms-conditions', '/forgot-password', '/reset-password'];
+    const publicRoutes = ['/', '/about-us', '/contact', '/privacy-policy', '/support', '/cancellation-policy', '/pricing', '/how-it-works', '/features', '/privacy', '/faqs', '/featured-jobs', '/featured-jobs-details', '/resume-builder', '/linkedIn-rewrite', '/invite-students', '/loading-page', '/google-redirect', '/terms-conditions', '/forgot-password', '/reset-password'];
 
     const isPublicRoute =
         publicRoutes.includes(pathname) ||
@@ -24,7 +24,8 @@ export default function ClientLayoutWrapper({ children }) {
     // Function to check token validity
     const checkTokenValidity = () => {
         try {
-            const storedToken = sessionStorage.getItem("resumeToken");
+            // const storedToken = sessionStorage.getItem("resumeToken");c
+            const storedToken = localStorage.getItem("resumeToken");
             if (!storedToken) return false;
 
             const parsedToken = JSON.parse(storedToken);
@@ -36,7 +37,8 @@ export default function ClientLayoutWrapper({ children }) {
         } catch (error) {
             console.error("Error parsing token:", error);
             // Clear invalid token
-            sessionStorage.removeItem("resumeToken");
+            // sessionStorage.removeItem("resumeToken");c
+            localStorage.removeItem("resumeToken")
             return false;
         }
     };
@@ -50,6 +52,10 @@ export default function ClientLayoutWrapper({ children }) {
             // Redirect to home if no token and trying to access protected route
             if (!tokenExists && !isPublicRoute) {
                 router.push('/');
+            }
+
+            if (tokenExists && pathname === "/") {
+                router.push('/dashboard');
             }
         };
 
@@ -114,7 +120,7 @@ export default function ClientLayoutWrapper({ children }) {
     }
 
     if (pathname === "/forgot-password") {
-        return <main>{children}</main>; 
+        return <main>{children}</main>;
     }
 
     // Public layout (not authenticated)

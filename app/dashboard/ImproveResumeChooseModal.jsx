@@ -15,7 +15,8 @@ const ImproveResumeChooseModal=({
     const encodedId = btoa(improveResumeId);
     
     const dispatch=useDispatch()
-      const user_id = sessionStorage.getItem('user_id')
+      // const user_id = sessionStorage.getItem('user_id');c
+      const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
         const router = useRouter();
   const [selectedResume, setSelectedResume] = useState(null);

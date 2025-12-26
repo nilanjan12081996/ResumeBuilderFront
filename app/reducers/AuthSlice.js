@@ -322,6 +322,10 @@ const authSlice = createSlice({
             sessionStorage.removeItem('user_id');
             sessionStorage.removeItem('fullname')
             sessionStorage.removeItem('signup_type_id')
+            localStorage.removeItem('resumeToken');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('fullname')
+            localStorage.removeItem('signup_type_id')
             localStorage.removeItem('projects')
             sessionStorage.clear()
             localStorage.clear()
@@ -342,16 +346,30 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isLoggedIn = true;
                 state.message = payload;
-                sessionStorage.setItem(
+                // sessionStorage.setItem(
+                //     'resumeToken',
+                //     JSON.stringify({ token: access_token })
+                // );
+
+                // sessionStorage.setItem(
+                //     'signup_type_id',
+                //     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
+                // );
+                // sessionStorage.setItem(
+                //     'user_id',
+                //     JSON.stringify({ user_id: data?.id })
+                // );c
+
+                localStorage.setItem(
                     'resumeToken',
                     JSON.stringify({ token: access_token })
                 );
 
-                sessionStorage.setItem(
+                localStorage.setItem(
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
-                sessionStorage.setItem(
+                localStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
@@ -407,22 +425,31 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isLoggedIn = true;
                 localStorage.setItem('projects', JSON.stringify({ projects: data?.project }))
-                sessionStorage.setItem(
+                // sessionStorage.setItem(
+                //     'user_id',
+                //     JSON.stringify({ user_id: data?.id })
+                // );
+                // sessionStorage.setItem(
+                //     'fullname',
+                //     JSON.stringify({ fullname: data?.fullname })
+                // );
+                // sessionStorage.setItem(
+                //     'signup_type_id',
+                //     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
+                // );c
+                localStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
-                sessionStorage.setItem(
+                localStorage.setItem(
                     'fullname',
                     JSON.stringify({ fullname: data?.fullname })
                 );
-                sessionStorage.setItem(
+                localStorage.setItem(
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
-                // sessionStorage.setItem(
-                //     'resumeToken',
-                //     JSON.stringify({ token: access_token })
-                // );
+                
             })
             .addCase(loginCustomer.rejected, (state, { payload }) => {
                 state.loading = false;
@@ -462,7 +489,11 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isLoggedIn = true;
                 state.message = payload;
-                sessionStorage.setItem(
+                // sessionStorage.setItem(
+                //     'resumeToken',
+                //     JSON.stringify({ token: access_token })
+                // );c
+                localStorage.setItem(
                     'resumeToken',
                     JSON.stringify({ token: access_token })
                 );
@@ -512,15 +543,15 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isLoggedIn = true;
                 state.isGoogleLoggedIn = true
-                sessionStorage.setItem(
+                // sessionStorage.setItem(
+                //     'user_id',
+                //     JSON.stringify({ user_id: data?.id })
+                // );c
+                 localStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
                 console.log("response?.data", access_token)
-                // sessionStorage.setItem(
-                //     'resumeToken',
-                //     JSON.stringify({ token: access_token })
-                // );
             })
             .addCase(googleSignIn.rejected, (state, { payload }) => {
                 state.loading = false
@@ -580,7 +611,8 @@ const authSlice = createSlice({
 
                 // Save only the access token
                 if (access_token) {
-                    sessionStorage.setItem('resumeToken', JSON.stringify({ token: access_token }));
+                    // sessionStorage.setItem('resumeToken', JSON.stringify({ token: access_token }));c
+                    localStorage.setItem('resumeToken', JSON.stringify({ token: access_token }));
                 }
             })
 
