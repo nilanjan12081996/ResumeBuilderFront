@@ -71,7 +71,7 @@ import CertificatesJd from './CertificatesJd';
 import AchivmentsJd from './AchivmentsJd';
 import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 import ImpAtsScoreAnalyzeModal from '../modal/ImpAtsScoreAnalyzeModal';
-import { addCountResume } from '../reducers/ResumeSlice';
+import { addCountResume, addCountResumeOrg } from '../reducers/ResumeSlice';
 import { toast, ToastContainer } from 'react-toastify';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
@@ -85,7 +85,7 @@ const page = () => {
   const template = searchParams.get("template");
   const id = atob(searchParams.get("id"))
   // const user_id = sessionStorage.getItem('user_id');c
-   const user_id = localStorage.getItem('user_id')
+  const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const componentRef = useRef();
   const dispatch = useDispatch()
@@ -114,6 +114,7 @@ const page = () => {
   const [atsData, setAtsData] = useState(null)
   const [enhancing, setEnhancing] = useState(false);
   // const [resumeid, setResumeid] = useState();
+  const { profileData } = useSelector((state) => state?.profile)
 
   const {
     register,
@@ -139,7 +140,7 @@ const page = () => {
       setValue("full_name", basicInfo.candidate_name)
       setValue("email", basicInfo.email)
       setValue("phone", basicInfo.phone)
-      setValue("location", "") // Location not available in new data structure
+      setValue("location", basicInfo.location) // Location not available in new data structure
       setValue("title", basicInfo.professional_title)
       setValue("personal_web", getUpdateResumeInfoData.data?.other_url_link)
       setValue("github_profile", getUpdateResumeInfoData.data?.github_url_link)
@@ -589,39 +590,23 @@ const page = () => {
         EmailAddress: data.email || "",
         PhoneNumber: data.phone || "",
         ProfessionalTitle: data.title || "",
-        Summary: data.goal || ""
+        Summary: data.goal || "",
+        location: data.location || ""
       };
 
-      dispatch(addCountResume({ ref_type: "improve_resume" })).then(res => {
-        if (res?.payload?.status_code === 200) {
+      // dispatch(addCountResume({ ref_type: "improve_resume" })).then(res => {
+      //   if (res?.payload?.status_code === 200) {
 
-          dispatch(updateBasicInfo(basicInfoPayload));
-        } else {
-          console.log("hiii")
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", { autoClose: false })
-        }
-      })
+      //     dispatch(updateBasicInfo(basicInfoPayload));
+      //   } else {
+      //     console.log("hiii")
+      //     toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", { autoClose: false })
+      //   }
+      // })
 
+      // 1. Update Basic Info (NO COUNT)
+      await dispatch(updateBasicInfo(basicInfoPayload));
 
-      // 2. Update Experience
-      // const experiencePayload = experiences.map(exp => ({
-      //   id: exp.id && exp.id.toString().includes('exp-') ? null : exp.id, // Only keep numeric IDs
-      //   CompanyName: exp.company_name || "",
-      //   Position: exp.position || "",
-      //   Duration: {
-      //     StartDate: exp.start_date ? convertToSubmitFormat(exp.start_date) : "",
-      //     EndDate: exp.current_work ? "Present" : (exp.end_date ? convertToSubmitFormat(exp.end_date) : "")
-      //   },
-      //   Location: exp.location || "",
-      //   SkillSet: exp.skill ? exp.skill.split(",").map(s => s.trim()).filter(s => s) : [],
-      //   Projects: exp.projects.map(proj => ({
-      //     id: proj.id && proj.id.toString().includes('proj-') ? null : proj.id,
-      //     Project_title: proj.title || "",
-      //     Role: proj.role || "",
-      //     technologies_used: proj.technology ? proj.technology.split(",").map(t => t.trim()).filter(t => t) : [],
-      //     Description: proj.description || ""
-      //   }))
-      // }));
 
       const experiencePayload = experiences.map(exp => ({
         id: exp.id && exp.id.toString().includes("exp-") ? null : exp.id,
@@ -661,11 +646,14 @@ const page = () => {
         Location: edu.location || "",
         CourseDegree: edu.degree || "",
         GraduationYear: edu.end_time ? new Date(edu.end_time).getFullYear().toString() : "",
+        // GPAorGrade:
+        //   edu.cgpa !== null && edu.cgpa !== undefined
+        //     ? String(edu.cgpa)
+        //     : "",
         GPAorGrade:
-          edu.cgpa !== null && edu.cgpa !== undefined
-            ? String(edu.cgpa)
+          edu.cgpa !== null && edu.cgpa !== undefined && edu.cgpa !== ""
+            ? `${edu.cgpa}`
             : "",
-
         AdditionalInformation: edu.additionalInfo || ""
       }));
 
@@ -909,6 +897,28 @@ const page = () => {
       ? maxLimit - used
       : 5;
 
+  const handleDownloadWithCount = () => {
+    const isIndividual =
+      profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
+
+
+    const countAction = isIndividual ? addCountResume : addCountResumeOrg;
+
+    dispatch(countAction({ ref_type: "improve_resume" }))
+      .then((res) => {
+        if (res?.payload?.status_code === 200) {
+          handlePrint();
+        } else if (res?.payload?.response?.data?.status_code === 400) {
+          toast.error(res?.payload?.response?.data?.message, {
+            autoClose: false,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Download count error:", err);
+        toast.error("Something went wrong while downloading");
+      });
+  };
 
   return (
     <div className='lg:flex gap-5 pb-5'>
@@ -1076,7 +1086,7 @@ const page = () => {
             {/* <button onClick={() => console.log('Download DOCX clicked')} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
             {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
             <div className="relative group inline-block">
-              <button
+              {/* <button
                 onClick={remaining === 5 ? null : handlePrint}
                 className={`
                               rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
@@ -1087,7 +1097,20 @@ const page = () => {
                             `}
               >
                 <IoMdDownload className="text-[18px]" /> Download PDF
+              </button> */}
+              <button
+                onClick={remaining === 5 ? null : handleDownloadWithCount}
+                className={`
+    rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
+    ${remaining === 5
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
+                  }
+  `}
+              >
+                <IoMdDownload className="text-[18px]" /> Download PDF
               </button>
+
 
               {/* Tooltip */}
               {remaining === 5 && (

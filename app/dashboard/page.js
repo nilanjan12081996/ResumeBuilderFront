@@ -241,13 +241,13 @@ const Page = () => {
           imp_resume_id: res?.payload?.data?.id,
           raw_data: res?.payload?.raw_data,
         };
-        const rawDataExperience = res?.payload?.raw_data?.experience?.Experience;
+        const rawDataExperience = res?.payload?.raw_data?.experience?.steps?.[0]?.Experience;
         if (rawDataExperience) {
           localStorage.setItem('imp_resume_raw_experience', JSON.stringify(rawDataExperience));
         }
         const questionPayload = {
           imp_resume_id: res?.payload?.data?.id,
-          generated_questions: res?.payload?.questions
+          generated_questions: res?.payload?.generated_questions,
         }
 
         dispatch(checkATS(userData))
@@ -279,32 +279,37 @@ const Page = () => {
     clearFileInput();
   };
 
-  const onSubmit = (data) => {
-    if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
-      dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
-        if (res?.payload?.status_code === 200) {
-          handleResumeImprove(data);
-        } else if (res?.payload?.response?.data?.status_code === 400) {
-          // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error(res?.payload?.response?.data?.message, {
-            autoClose: false,
-          });
-        }
-      });
-    } else {
-      dispatch(addCountResumeOrg({ ref_type: "improve_resume" })).then((res) => {
-        if (res?.payload?.status_code === 200) {
-          handleResumeImprove(data);
-        } else if (res?.payload?.response?.data?.status_code === 400) {
-          // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-          toast.error(res?.payload?.response?.data?.message, {
-            autoClose: false,
-          });
-        }
-      });
-    }
+  // const onSubmit = (data) => {
+  //   if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
+  //     dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
+  //       if (res?.payload?.status_code === 200) {
+  //         handleResumeImprove(data);
+  //       } else if (res?.payload?.response?.data?.status_code === 400) {
+  //         // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
+  //         toast.error(res?.payload?.response?.data?.message, {
+  //           autoClose: false,
+  //         });
+  //       }
+  //     });
+  //   } else {
+  //     dispatch(addCountResumeOrg({ ref_type: "improve_resume" })).then((res) => {
+  //       if (res?.payload?.status_code === 200) {
+  //         handleResumeImprove(data);
+  //       } else if (res?.payload?.response?.data?.status_code === 400) {
+  //         // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
+  //         toast.error(res?.payload?.response?.data?.message, {
+  //           autoClose: false,
+  //         });
+  //       }
+  //     });
+  //   }
 
-  };
+  // };
+
+  const onSubmit = (data) => {
+  handleResumeImprove(data);
+};
+
 
   useEffect(() => {
     dispatch(getRecentResume()).then((res) => {

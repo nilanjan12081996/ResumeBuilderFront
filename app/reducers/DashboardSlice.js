@@ -7,7 +7,8 @@ export const improveResume = createAsyncThunk(
     'improveResume',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/improve-resume/improve-resume', userInput);
+            // const response = await api.post('/api/improve-resume/improve-resume', userInput);
+            const response = await api.post('/api/improve-resume/extract-imp-resume', userInput);
             if (response?.data?.status_code === 201) {
                 return response.data;
             } else {
@@ -46,7 +47,8 @@ export const jdBasedResume = createAsyncThunk(
     'jdBasedResume',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/js-based-resume/jd-based-improve', userInput);
+            // const response = await api.post('/api/js-based-resume/jd-based-improve', userInput);
+            const response = await api.post('/api/js-based-resume/extract-info', userInput);
             if (response?.data?.status_code === 201) {
                 return response.data;
             } else {
