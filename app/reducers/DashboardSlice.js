@@ -245,24 +245,27 @@ export const jdBasedResumeDetails = createAsyncThunk(
 )
 
 export const updateBasicInfo = createAsyncThunk(
-    'updateBasicInfo',
-    async (userInput, { rejectWithValue }) => {
-        try {
-            const response = await api.put('/api/improve-resume/update-basic-info', userInput);
-            if (response?.data?.status_code === 200) {
-                return response.data;
-            } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue('Something went wrong.');
-                }
-            }
-        } catch (err) {
-            return rejectWithValue(err);
-        }
+  "updateBasicInfo",
+  async ({ resumeid, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(
+        `/api/improve-resume/update-basic-info/${resumeid}`,
+        data
+      );
+
+      if (response?.data?.status_code === 200) {
+        return response.data;
+      }
+
+      return rejectWithValue(
+        response?.data?.errors || "Something went wrong."
+      );
+    } catch (err) {
+      return rejectWithValue(err?.response?.data || err);
     }
-)
+  }
+);
+
 
 export const updateExperience = createAsyncThunk(
     'updateExperience',

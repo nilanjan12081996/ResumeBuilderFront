@@ -17,6 +17,7 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
   }, [])
   console.log("currentSubscriptionData", currentSubscriptionData);
   console.log('skills', skills)
+  console.log("all data", data)
   return (
     <div ref={ref} className="flex justify-center p-6 bg-gray-100 min-h-screen">
       <style jsx>{`
@@ -86,11 +87,11 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
         <div className="px-6 mt-10">
           <h1 className="text-2xl font-semibold">{data?.full_name || "Manisha Sharma"}</h1>
           <p className="text-gray-600 mt-1">
-            {data?.about || "Web development & UI/UX design specialist focused on building intuitive, impactful digital products with innovative technologies."}
+            {data?.about}
 
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            {data?.location || "Hyderabad, Telangana, India"}
+            {data?.location}
           </p>
         </div>
 
@@ -174,17 +175,16 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                         month: "short",
                         year: "numeric",
                       })
-                      : "N/A"}{" "}
+                      : ""}{" "}
                     –{" "}
-                    {exp.current_work
+                    {exp.current_work === 1 || exp.status === 1 || !exp.end_date
                       ? "Present"
-                      : exp.end_date
-                        ? new Date(exp.end_date).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })
-                        : "N/A"}
+                      : new Date(exp.end_date).toLocaleDateString("en-US", {
+                        month: "short",
+                        year: "numeric",
+                      })}
                   </p>
+
 
                   {exp.job_description && (
                     <p className="mt-2 text-sm text-gray-700 leading-relaxed">
@@ -274,13 +274,14 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
                   </p>
 
                   {/* GPA or Additional Info (Optional) */}
-                  {(edu.cgpa || edu.additionalInfo) && (
+                  {((Number(edu.cgpa) > 0) || edu.additionalInfo) && (
                     <p className="text-xs text-gray-500 mt-1">
-                      {/* {edu.cgpa ? `GPA: ${edu.cgpa}` : ""}{" "} */}
-                      {edu.cgpa ? `GPA: ${parseInt(edu.cgpa)}` : ""}
-                      {edu.additionalInfo ? ` | ${edu.additionalInfo}` : ""}
+                      {Number(edu.cgpa) > 0 && `GPA: ${parseInt(edu.cgpa)}`}
+                      {Number(edu.cgpa) > 0 && edu.additionalInfo && " | "}
+                      {edu.additionalInfo || ""}
                     </p>
                   )}
+
                 </div>
               </div>
             ))
@@ -295,12 +296,12 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
           <h2 className="text-lg font-semibold mb-4">Languages</h2>
           {languages && languages.length > 0 ? (
             languages.map((lang, idx) => (
-              <div key={lang.id || idx} className="flex items-start space-x-3 mb-4">
+              <div key={lang.id || idx} className="flex items-center space-x-3 mb-4">
                 <div className="bg-blue-100 p-2 rounded-full mt-1">
                   <Globe className="text-blue-600 w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium">
+                  <h3 className="font-medium text-sm">
                     {lang.language_name || "Language not specified"}
                   </h3>
                   {lang.proficiency && (
@@ -312,7 +313,7 @@ const LinkedInTemplate = forwardRef(({ data, educationEntries, experiences, lang
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-500">No languages listed.</p>
+            <p className="text-sm text-gray-500"></p>
           )}
         </div>
 

@@ -11,7 +11,7 @@ const BasicInfoLkdin=({lkdDetails,setValue, register})=>{
         setValue("location",lkdDetails?.data?.[0]?.basic_info?.[0]?.location)
         setValue("about",lkdDetails?.data?.[0]?.basic_info?.[0]?.summary)
         setValue("summary",lkdDetails?.data?.[0]?.basic_info?.[0]?.summary)
-        setValue("description",lkdDetails?.data?.[0]?.basic_info?.[0]?.description)
+        setValue("description",lkdDetails?.data?.[0]?.basic_info?.[0]?.professional_title)
         setValue("current_company", lkdDetails?.data?.[0]?.basic_info?.[0]?.current_company || "");
     },[lkdDetails])
     return(

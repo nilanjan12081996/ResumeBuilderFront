@@ -13,7 +13,7 @@ const PersonalInfoJd=({register,errors,jdBasedDetailsData,setValue})=>{
       setValue("full_name",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.candidate_name)
        setValue("email",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.email)
        setValue("phone",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.phone)
-      //  setValue("location",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.location)
+       setValue("location",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.location)
       setValue("title",jdBasedDetailsData?.data?.[0]?.basic_info?.[0]?.role)
       setValue("personal_web",jdBasedDetailsData?.data?.[0]?.other_url_link)
       setValue("github_profile",jdBasedDetailsData?.data?.[0]?.github_url_link)

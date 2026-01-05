@@ -66,8 +66,9 @@ import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { useReactToPrint } from 'react-to-print';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import LinkdinAtsScoreAnalyzeModal from '../modal/LinkdinAtsScoreAnalyzeModal';
+import { addCountResume, addCountResumeOrg } from '../reducers/ResumeSlice';
 
 const page = () => {
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
@@ -75,6 +76,7 @@ const page = () => {
   const [enhancing, setEnhancing] = useState(false);
   const [openLinkdinAtsModal, setOpenLinkdinAtsModal] = useState(false);
   const [atsData, setAtsData] = useState(null)
+  const { profileData } = useSelector((state) => state?.profile)
 
   const dispatch = useDispatch()
   const searchParams = useSearchParams();
@@ -118,26 +120,31 @@ const page = () => {
 
   useEffect(() => {
     if (lkdDetails?.data?.[0]?.experience_info) {
-      const mappedExp = lkdDetails?.data?.[0]?.experience_info?.map((exp) => (
-        {
+      const mappedExp = lkdDetails.data[0].experience_info.map((exp) => {
+        const isCurrent = exp.end_date === "Present" || exp.current_work === 1;
+
+        return {
           id: exp.id,
           company_name: exp.company_name || "",
           position: exp.position || "",
           location: exp.location || "",
           skill: exp.skill_set || "",
           job_type: exp.job_type || "",
-          // start_date: exp.start_date || null,
-          // end_date: exp.end_date || null,
-          // current_work: exp.end_date === null, // mark current if no end_date
+
           start_date: parseDate(exp.start_date),
-          end_date: parseDate(exp.end_date),
-          current_work: exp.end_date === "Present",
+
+          // 🔑 IMPORTANT
+          end_date: isCurrent ? "Present" : parseDate(exp.end_date),
+
+          current_work: isCurrent,
           job_description: exp.job_description || "",
-        }
-      ))
-      setExperiences(mappedExp)
+          projects: exp.projects || [],
+        };
+      });
+
+      setExperiences(mappedExp);
     }
-  }, [lkdDetails])
+  }, [lkdDetails]);
 
   const [educationEntries, setEducationEntries] = useState([
     { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
@@ -532,11 +539,32 @@ const page = () => {
       ? maxLimit - used
       : 5;
 
+  const handleDownloadWithCount = () => {
+    const isIndividual =
+      profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
 
+
+    const countAction = isIndividual ? addCountResume : addCountResumeOrg;
+
+    dispatch(countAction({ ref_type: "linkedin_resume" }))
+      .then((res) => {
+        if (res?.payload?.status_code === 200) {
+          handlePrint();
+        } else if (res?.payload?.response?.data?.status_code === 400) {
+          toast.error(res?.payload?.response?.data?.message, {
+            autoClose: false,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Download count error:", err);
+        toast.error("Something went wrong while downloading");
+      });
+  };
 
   return (
     <div className='lg:flex gap-5 pb-5'>
-
+      <ToastContainer/>
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className='border-b border-[#E5E5E5] p-5'>
@@ -669,18 +697,17 @@ const page = () => {
             {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
             <div className="relative group inline-block">
               <button
-                onClick={remaining === 5 ? null : handlePrint}
+                onClick={remaining === 5 ? null : handleDownloadWithCount}
                 className={`
-      rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
-      ${remaining === 5
+                                rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
+                                ${remaining === 5
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
                   }
-    `}
+                              `}
               >
                 <IoMdDownload className="text-[18px]" /> Download PDF
               </button>
-
               {/* Tooltip */}
               {remaining === 5 && (
                 <div className="

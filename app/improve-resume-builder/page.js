@@ -605,7 +605,10 @@ const page = () => {
       // })
 
       // 1. Update Basic Info (NO COUNT)
-      await dispatch(updateBasicInfo(basicInfoPayload));
+      await dispatch(updateBasicInfo({
+        resumeid: resumeid,
+        data: basicInfoPayload
+      }));
 
 
       const experiencePayload = experiences.map(exp => ({
@@ -791,11 +794,110 @@ const page = () => {
   //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
   // };
 
+  // const handleEnhancePDF = async () => {
+  //   try {
+  //     setEnhancing(true);
+
+  //     const imp_resume_id = getUpdateResumeInfoData?.data?.imp_basic_info?.imp_resume_id;
+  //     console.log('sss',getUpdateResumeInfoData)
+
+  //     console.log("imp_resume_id", imp_resume_id);
+
+  //     if (!imp_resume_id) {
+  //       setEnhancing(false);
+  //       return;
+  //     }
+
+  //     const payload = {
+  //       imp_resume_id: imp_resume_id,
+  //       imp_resume_text: getUpdateResumeInfoData?.data,
+  //     };
+
+  //     const resultAction = await dispatch(getImpEnhance(payload));
+
+  //     if (getImpEnhance.fulfilled.match(resultAction)) {
+  //       dispatch(impEnhanceUsageInfo(id))
+
+  //       const rewriteData = resultAction?.payload?.data;
+  //       console.log("rewriteData", rewriteData);
+
+  //       // -------------------------
+  //       // FIXED PAYLOAD MAPPING
+  //       // -------------------------
+
+  //       const basicPayload = {
+  //         basic_info_id: getUpdateResumeInfoData?.data?.imp_basic_info?.id,
+  //         ...rewriteData?.basic_information,
+  //       };
+
+
+  //       const expPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.experience?.Experience || [],
+  //       };
+
+  //       const eduPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.education?.Education || [],
+  //       };
+
+  //       const skillPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.skills?.Skills || [],
+  //       };
+
+  //       const langPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.languages?.Languages || [],
+  //       };
+
+  //       const certPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.certifications?.Certifications || [],
+  //       };
+
+  //       const achPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.achievements?.Achievements || [],
+  //       };
+
+  //       const projectPayload = {
+  //         imp_resume_id,
+  //         data: rewriteData?.projects?.Projects || [],
+  //       };
+
+  //       // -------------------------
+  //       // DISPATCH ALL
+  //       // -------------------------
+
+  //       await dispatch(updateBasicInfo({ resumeid: imp_resume_id, data: basicPayload }));
+  //       await dispatch(updateExperience({ resumeid: imp_resume_id, data: expPayload.data }));
+  //       await dispatch(updateEducation({ resumeid: imp_resume_id, data: eduPayload.data }));
+  //       await dispatch(updateSkills({ resumeid: imp_resume_id, data: skillPayload.data }));
+  //       await dispatch(updateLanguage({ resumeid: imp_resume_id, data: langPayload.data }));
+  //       await dispatch(updateCertification({ resumeid: imp_resume_id, data: certPayload.data }));
+  //       await dispatch(updateAchievements({ resumeid: imp_resume_id, data: achPayload.data }));
+  //       await dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectPayload.data }));
+
+
+  //       await dispatch(getUpdateResumeInfo({ id }));
+  //     }
+  //     else {
+  //       console.error("IMP Enhance Error:", resultAction.payload);
+  //     }
+  //   } catch (error) {
+  //     console.error("Enhance PDF Error:", error);
+  //   } finally {
+  //     setEnhancing(false);
+  //   }
+  // };
+
   const handleEnhancePDF = async () => {
     try {
       setEnhancing(true);
 
-      const imp_resume_id = getUpdateResumeInfoData?.data?.imp_basic_info?.imp_resume_id;
+      const resumeData = getUpdateResumeInfoData?.data;
+      const imp_resume_id = resumeData?.imp_basic_info?.imp_resume_id;
 
       console.log("imp_resume_id", imp_resume_id);
 
@@ -805,88 +907,100 @@ const page = () => {
       }
 
       const payload = {
-        imp_resume_id: imp_resume_id,
-        imp_resume_text: getUpdateResumeInfoData?.data,
+        imp_resume_id,
+        imp_resume_text: resumeData,
       };
 
       const resultAction = await dispatch(getImpEnhance(payload));
 
-      if (getImpEnhance.fulfilled.match(resultAction)) {
-        dispatch(impEnhanceUsageInfo(id));
-
-        const rewriteData = resultAction?.payload?.data;
-        console.log("rewriteData", rewriteData);
-
-        // -------------------------
-        // FIXED PAYLOAD MAPPING
-        // -------------------------
-
-        const basicPayload = {
-          basic_info_id: getUpdateResumeInfoData?.data?.imp_basic_info?.id,
-          ...rewriteData?.basic_information,
-        };
-
-
-        const expPayload = {
-          imp_resume_id,
-          data: rewriteData?.experience?.Experience || [],
-        };
-
-        const eduPayload = {
-          imp_resume_id,
-          data: rewriteData?.education?.Education || [],
-        };
-
-        const skillPayload = {
-          imp_resume_id,
-          data: rewriteData?.skills?.Skills || [],
-        };
-
-        const langPayload = {
-          imp_resume_id,
-          data: rewriteData?.languages?.Languages || [],
-        };
-
-        const certPayload = {
-          imp_resume_id,
-          data: rewriteData?.certifications?.Certifications || [],
-        };
-
-        const achPayload = {
-          imp_resume_id,
-          data: rewriteData?.achievements?.Achievements || [],
-        };
-
-        const projectPayload = {
-          imp_resume_id,
-          data: rewriteData?.projects?.Projects || [],
-        };
-
-        // -------------------------
-        // DISPATCH ALL
-        // -------------------------
-
-        await dispatch(updateBasicInfo(basicPayload));
-        await dispatch(updateExperience({ resumeid: imp_resume_id, data: expPayload.data }));
-        await dispatch(updateEducation({ resumeid: imp_resume_id, data: eduPayload.data }));
-        await dispatch(updateSkills({ resumeid: imp_resume_id, data: skillPayload.data }));
-        await dispatch(updateLanguage({ resumeid: imp_resume_id, data: langPayload.data }));
-        await dispatch(updateCertification({ resumeid: imp_resume_id, data: certPayload.data }));
-        await dispatch(updateAchievements({ resumeid: imp_resume_id, data: achPayload.data }));
-        await dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectPayload.data }));
-
-
-        await dispatch(getUpdateResumeInfo({ id }));
-      }
-      else {
+      if (!getImpEnhance.fulfilled.match(resultAction)) {
         console.error("IMP Enhance Error:", resultAction.payload);
+        return;
       }
+
+      // usage count
+      dispatch(impEnhanceUsageInfo(id));
+
+      const rewriteData = resultAction?.payload?.data;
+      console.log("rewriteData", rewriteData);
+
+      /* --------------------------------
+         BASIC INFO (already correct)
+      -------------------------------- */
+      const basicPayload = {
+        basic_info_id: resumeData?.imp_basic_info?.id,
+        ...rewriteData?.basic_information,
+      };
+
+      /* --------------------------------
+         HELPERS
+      -------------------------------- */
+      const mapWithId = (rewriteArr = [], existingArr = []) =>
+        rewriteArr.map((item, index) => ({
+          ...item,
+          id: existingArr[index]?.id, // ✅ existing unique id
+          imp_resume_id,
+        }));
+
+      /* --------------------------------
+         MAP ALL SECTIONS WITH IDS
+      -------------------------------- */
+      const experienceData = mapWithId(
+        rewriteData?.experience?.Experience,
+        resumeData?.imp_experience_info
+      );
+
+      const educationData = mapWithId(
+        rewriteData?.education?.Education,
+        resumeData?.imp_education_info
+      );
+
+      const skillsData = mapWithId(
+        rewriteData?.skills?.Skills,
+        resumeData?.imp_skill_info
+      );
+
+      const languageData = mapWithId(
+        rewriteData?.languages?.Languages,
+        resumeData?.imp_language_info
+      );
+
+      const certificationData = mapWithId(
+        rewriteData?.certifications?.Certifications,
+        resumeData?.imp_certification_info
+      );
+
+      const achievementData = mapWithId(
+        rewriteData?.achievements?.Achievements,
+        resumeData?.imp_achievement_info
+      );
+
+      const projectData = mapWithId(
+        rewriteData?.projects?.Projects,
+        resumeData?.imp_project_info
+      );
+
+      /* --------------------------------
+         DISPATCH UPDATES
+      -------------------------------- */
+      await dispatch(updateBasicInfo({ resumeid: imp_resume_id, data: basicPayload }));
+      await dispatch(updateExperience({ resumeid: imp_resume_id, data: experienceData }));
+      await dispatch(updateEducation({ resumeid: imp_resume_id, data: educationData }));
+      await dispatch(updateSkills({ resumeid: imp_resume_id, data: skillsData }));
+      await dispatch(updateLanguage({ resumeid: imp_resume_id, data: languageData }));
+      await dispatch(updateCertification({ resumeid: imp_resume_id, data: certificationData }));
+      await dispatch(updateAchievements({ resumeid: imp_resume_id, data: achievementData }));
+      await dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectData }));
+
+      await dispatch(getUpdateResumeInfo({ id }));
+
     } catch (error) {
       console.error("Enhance PDF Error:", error);
     } finally {
       setEnhancing(false);
     }
   };
+
 
 
   const maxLimit = impEnUsageInfo?.data?.enhance_limit?.max_limit;

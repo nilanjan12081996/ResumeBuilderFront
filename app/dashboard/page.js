@@ -69,7 +69,7 @@ import { BiLogoLinkedin } from "react-icons/bi";
 import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
-import { addImpQuestions, checkATS, improveResume } from "../reducers/DashboardSlice";
+import { addImpQuestions, checkATS, getUpdateResumeInfo, improveResume, updateAchievements, updateBasicInfo, updateCertification, updateEducation, updateExperience, updateExtraProject, updateLanguage, updateSkills } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
@@ -233,50 +233,429 @@ const Page = () => {
       console.log(key, value);
     }
 
+    // dispatch(improveResume(formData))
+    //   .then((res) => {
+    //     console.log("res?.payload?.data?.id", res?.payload?.data?.id);
+    //     setImproveResumeId(res?.payload?.data?.id);
+    //     const userData = {
+    //       imp_resume_id: res?.payload?.data?.id,
+    //       raw_data: res?.payload?.raw_data,
+    //     };
+    //     const rawDataExperience = res?.payload?.raw_data?.experience?.steps?.[0]?.Experience;
+    //     if (rawDataExperience) {
+    //       localStorage.setItem('imp_resume_raw_experience', JSON.stringify(rawDataExperience));
+    //     }
+    //     const questionPayload = {
+    //       imp_resume_id: res?.payload?.data?.id,
+    //       generated_questions: res?.payload?.generated_questions,
+    //     }
+
+    //     dispatch(checkATS(userData))
+    //       .then((res) => {
+    //         // toast.success(res?.payload?.message || "ATS score");
+    //         console.log("ATSresponse", res);
+    //         setATSscore(res?.payload?.data?.old_ats);
+    //         setopenATSmodal(true);
+    //       })
+    //       .catch((err) => {
+    //         console.log("err", err);
+    //       });
+    //     // add questions 
+    //     dispatch(addImpQuestions(questionPayload))
+    //       .then((res) => {
+    //         console.log("addImpQuestions", res);
+    //       })
+    //       .catch((err) => {
+    //         console.log("err", err);
+    //       });
+
+    //   })
+    //   .catch((err) => {
+    //     console.log("err", err);
+    //     toast.error(
+    //       err?.message || "An error occurred while improving the resume."
+    //     );
+    //   });
+    // clearFileInput();
+
+    // dispatch(improveResume(formData))
+    //   .then(async (res) => {
+    //     const payload = res?.payload;
+    //     console.log('payload',payload)
+
+    //     // ❌ Stop everything if improveResume failed
+    //     if (payload?.status_code !== 201) {
+    //       toast.error(payload?.message || "Resume extraction failed", {
+    //         autoClose: false,
+    //       });
+    //       return;
+    //     }
+
+    //     /* ===================== BASIC DATA ===================== */
+    //     const resumeid = payload?.data?.id;
+    //     setImproveResumeId(resumeid);
+
+    //     const rawDataExperience =
+    //       payload?.raw_data?.experience?.steps?.[0]?.Experience;
+
+    //     if (rawDataExperience) {
+    //       localStorage.setItem(
+    //         "imp_resume_raw_experience",
+    //         JSON.stringify(rawDataExperience)
+    //       );
+    //     }
+
+    //     /* ===================== UPDATE BASIC INFO ===================== */
+    //     console.log("sp")
+    //     await dispatch(
+    //       updateBasicInfo({
+    //         basic_info_id: basicInfoId,
+    //         SuggestedRole: data.title || "",
+    //         CandidateFullName: data.full_name || "",
+    //         EmailAddress: data.email || "",
+    //         PhoneNumber: data.phone || "",
+    //         ProfessionalTitle: data.title || "",
+    //         Summary: data.goal || "",
+    //         location: data.location || "",
+    //       })
+    //     );
+
+    //     /* ===================== EXPERIENCE ===================== */
+    //     const experiencePayload = experiences.map((exp) => ({
+    //       id: exp.id && exp.id.toString().includes("exp-") ? null : exp.id,
+    //       CompanyName: exp.company_name || null,
+    //       Position: exp.position || null,
+    //       Duration: {
+    //         StartDate: exp.start_date
+    //           ? convertToSubmitFormat(exp.start_date)
+    //           : null,
+    //         EndDate: exp.current_work
+    //           ? "Present"
+    //           : exp.end_date
+    //             ? convertToSubmitFormat(exp.end_date)
+    //             : null,
+    //       },
+    //       Location: exp.location || null,
+    //       SkillSet: exp.skill
+    //         ? exp.skill.split(",").map((s) => s.trim()).filter(Boolean)
+    //         : [],
+    //       Projects: Array.isArray(exp.projects)
+    //         ? exp.projects.map((proj) => ({
+    //           id:
+    //             proj.id && proj.id.toString().includes("proj-")
+    //               ? null
+    //               : proj.id,
+    //           Project_title: proj.title || null,
+    //           Role: proj.role || null,
+    //           Description: proj.description || null,
+    //         }))
+    //         : [],
+    //     }));
+
+    //     await dispatch(updateExperience({ resumeid, data: experiencePayload }));
+
+    //     /* ===================== EDUCATION ===================== */
+    //     const educationPayload = educationEntries.map((edu) => ({
+    //       id: edu.id && edu.id.toString().includes("edu-") ? null : edu.id,
+    //       CollegeUniversity: edu.institution || "",
+    //       Location: edu.location || "",
+    //       CourseDegree: edu.degree || "",
+    //       GraduationYear: edu.end_time
+    //         ? new Date(edu.end_time).getFullYear().toString()
+    //         : "",
+    //       GPAorGrade:
+    //         edu.cgpa && Number(edu.cgpa) !== 0 ? String(edu.cgpa) : "",
+    //       AdditionalInformation: edu.additionalInfo || "",
+    //     }));
+
+    //     await dispatch(updateEducation({ resumeid, data: educationPayload }));
+
+    //     /* ===================== SKILLS ===================== */
+    //     await dispatch(
+    //       updateSkills({
+    //         resumeid,
+    //         data: skills.map((sk) => ({
+    //           id:
+    //             sk.id && sk.id.toString().includes("skill-") ? null : sk.id,
+    //           Skill_Category: sk.skill_category || "",
+    //           Skills: sk.skill
+    //             ? sk.skill.split(",").map((s) => s.trim()).filter(Boolean)
+    //             : [],
+    //         })),
+    //       })
+    //     );
+
+    //     /* ===================== LANGUAGES ===================== */
+    //     await dispatch(
+    //       updateLanguage({
+    //         resumeid,
+    //         data: languages.map((lang) => ({
+    //           id:
+    //             lang.id && lang.id.toString().includes("lang-") ? null : lang.id,
+    //           Language: lang.language_name || "",
+    //           proficiency: lang.proficiency || "",
+    //         })),
+    //       })
+    //     );
+
+    //     /* ===================== EXTRA PROJECTS ===================== */
+    //     await dispatch(
+    //       updateExtraProject({
+    //         resumeid,
+    //         data: personalPro.map((p) => ({
+    //           id: p.id && p.id.toString().includes("proj-") ? null : p.id,
+    //           ProjectName: p.project_title || "",
+    //           Description: p.description || "",
+    //           Technologies: p.skill
+    //             ? p.skill.split(",").map((t) => t.trim()).filter(Boolean)
+    //             : [],
+    //           YourRole: p.role || "",
+    //           Duration: {
+    //             StartDate: p.start_time
+    //               ? convertToSubmitFormat(p.start_time)
+    //               : "",
+    //             EndDate: p.end_time
+    //               ? convertToSubmitFormat(p.end_time)
+    //               : "",
+    //           },
+    //         })),
+    //       })
+    //     );
+
+    //     /* ===================== CERTIFICATIONS ===================== */
+    //     await dispatch(
+    //       updateCertification({
+    //         resumeid,
+    //         data: certificates.map((cer) => ({
+    //           id:
+    //             cer.id && cer.id.toString().includes("cert-")
+    //               ? null
+    //               : cer.id,
+    //           CertificationName: cer.certification_name || "",
+    //           Issuing_Organization: cer.issuing_organization || "",
+    //           DateObtained: cer.obtained_date
+    //             ? convertToSubmitFormat(cer.obtained_date)
+    //             : "",
+    //           Certification_ID: cer.certification_id || "",
+    //           Description: "",
+    //         })),
+    //       })
+    //     );
+
+    //     /* ===================== ACHIEVEMENTS ===================== */
+    //     await dispatch(
+    //       updateAchievements({
+    //         resumeid,
+    //         data: achivments.map((ach) => ({
+    //           id:
+    //             ach.id && ach.id.toString().includes("ach-") ? null : ach.id,
+    //           Achievement_Titlee: ach.achievement_title || "",
+    //           Issuing_Organization: ach.organization || "",
+    //           Date_Received: ach.receive_date
+    //             ? convertToSubmitFormat(ach.receive_date)
+    //             : "",
+    //           Description: ach.description || "",
+    //         })),
+    //       })
+    //     );
+
+    //     /* ===================== ATS ===================== */
+    //     dispatch(
+    //       checkATS({
+    //         imp_resume_id: resumeid,
+    //         raw_data: payload?.raw_data,
+    //       })
+    //     ).then((atsRes) => {
+    //       if (atsRes?.payload?.status_code === 200) {
+    //         setATSscore(atsRes?.payload?.data?.old_ats);
+    //         setopenATSmodal(true);
+    //       }
+    //     });
+
+    //     /* ===================== QUESTIONS ===================== */
+    //     dispatch(
+    //       addImpQuestions({
+    //         imp_resume_id: resumeid,
+    //         generated_questions: payload?.generated_questions,
+    //       })
+    //     );
+
+
+    //     await dispatch(getUpdateResumeInfo({ id: resumeid }));
+
+    //     console.log("✅ All updates completed successfully");
+    //   })
+    //   .catch(() => {
+    //     toast.error("Something went wrong while improving resume");
+    //   })
+    //   .finally(() => {
+    //     clearFileInput();
+    //   });
+
     dispatch(improveResume(formData))
-      .then((res) => {
-        console.log("res?.payload?.data?.id", res?.payload?.data?.id);
-        setImproveResumeId(res?.payload?.data?.id);
-        const userData = {
-          imp_resume_id: res?.payload?.data?.id,
-          raw_data: res?.payload?.raw_data,
-        };
-        const rawDataExperience = res?.payload?.raw_data?.experience?.steps?.[0]?.Experience;
+      .then(async (res) => {
+        const payload = res?.payload;
+        console.log("payload", payload);
+
+        // ✅ Only success case
+        if (payload?.status_code !== 201) return;
+
+        /* ===================== RESUME ID ===================== */
+        const resumeid = payload?.data?.id;
+        setImproveResumeId(resumeid);
+
+        /* ===================== RAW EXPERIENCE (LOCAL STORAGE) ===================== */
+        const rawDataExperience =
+          payload?.raw_data?.experience?.steps?.[0]?.Experience;
+
         if (rawDataExperience) {
-          localStorage.setItem('imp_resume_raw_experience', JSON.stringify(rawDataExperience));
-        }
-        const questionPayload = {
-          imp_resume_id: res?.payload?.data?.id,
-          generated_questions: res?.payload?.generated_questions,
+          localStorage.setItem(
+            "imp_resume_raw_experience",
+            JSON.stringify(rawDataExperience)
+          );
         }
 
-        dispatch(checkATS(userData))
-          .then((res) => {
-            // toast.success(res?.payload?.message || "ATS score");
-            console.log("ATSresponse", res);
-            setATSscore(res?.payload?.data?.old_ats);
-            setopenATSmodal(true);
-          })
-          .catch((err) => {
-            console.log("err", err);
-          });
-        // add questions 
-        dispatch(addImpQuestions(questionPayload))
-          .then((res) => {
-            console.log("addImpQuestions", res);
-          })
-          .catch((err) => {
-            console.log("err", err);
-          });
+        const raw = payload?.raw_data || {};
+        /* ===================== BASIC INFO ===================== */
+        const basicInfoData = {
+          SuggestedRole: raw?.suggested_role || "",
+          CandidateFullName: raw?.full_name || "",
+          EmailAddress: raw?.email || "",
+          PhoneNumber: raw?.phone || "",
+          ProfessionalTitle: raw?.professional_title || "",
+          Summary: raw?.summary || "",
+          location: raw?.location || "",
+        };
 
-      })
-      .catch((err) => {
-        console.log("err", err);
-        toast.error(
-          err?.message || "An error occurred while improving the resume."
+        await dispatch(
+          updateBasicInfo({
+            resumeid: resumeid,  
+            data: basicInfoData       
+          })
         );
+
+        /* ===================== EXPERIENCE ===================== */
+        const experiencePayload =
+          raw?.experience?.steps?.[0]?.Experience?.map((exp) => ({
+            id: null,
+            CompanyName: exp?.CompanyName || "",
+            Position: exp?.Position || "",
+            Duration: {
+              StartDate: exp?.Duration?.StartDate || "",
+              EndDate: exp?.Duration?.EndDate || "",
+            },
+            Location: exp?.Location || "",
+            SkillSet: exp?.SkillSet || [],
+            Projects: exp?.Projects?.map((proj) => ({
+              id: null,
+              Project_title: proj?.Project_title || "",
+              Role: proj?.Role || "",
+              Description: proj?.Description || "",
+            })) || [],
+          })) || [];
+
+        if (experiencePayload.length) {
+          await dispatch(updateExperience({ resumeid, data: experiencePayload }));
+        }
+
+        /* ===================== EDUCATION ===================== */
+        const educationPayload =
+          raw?.education?.map((edu) => ({
+            id: null,
+            CollegeUniversity: edu?.CollegeUniversity || "",
+            Location: edu?.Location || "",
+            CourseDegree: edu?.CourseDegree || "",
+            GraduationYear: edu?.GraduationYear
+              ? String(edu.GraduationYear)
+              : "",
+            GPAorGrade:
+              edu?.GPAorGrade && Number(edu.GPAorGrade) !== 0
+                ? String(edu.GPAorGrade)
+                : "",
+            AdditionalInformation: edu?.AdditionalInformation || "",
+          })) || [];
+
+        if (educationPayload.length) {
+          await dispatch(updateEducation({ resumeid, data: educationPayload }));
+        }
+
+        /* ===================== SKILLS ===================== */
+        const skillsPayload =
+          raw?.skills?.map((sk) => ({
+            id: null,
+            Skill_Category: sk?.Skill_Category || "",
+            Skills: sk?.Skills || [],
+          })) || [];
+
+        if (skillsPayload.length) {
+          await dispatch(updateSkills({ resumeid, data: skillsPayload }));
+        }
+
+        /* ===================== LANGUAGES ===================== */
+        const languagePayload =
+          raw?.languages?.map((lang) => ({
+            id: null,
+            Language: lang?.Language || "",
+            proficiency: lang?.Proficiency || "",
+          })) || [];
+
+        if (languagePayload.length) {
+          await dispatch(updateLanguage({ resumeid, data: languagePayload }));
+        }
+
+        /* ===================== ACHIEVEMENTS ===================== */
+        const achievementPayload =
+          raw?.achievements?.map((ach) => ({
+            id: null,
+            Achievement_Titlee: ach?.Achievement_Titlee || "",
+            Issuing_Organization: ach?.Issuing_Organization || "",
+            Date_Received: ach?.Date_Received || "",
+            Description: ach?.Description || "",
+          })) || [];
+
+        if (achievementPayload.length) {
+          await dispatch(
+            updateAchievements({ resumeid, data: achievementPayload })
+          );
+        }
+
+        /* ===================== ATS CHECK ===================== */
+        const atsRes = await dispatch(
+          checkATS({
+            imp_resume_id: resumeid,
+            raw_data: raw,
+          })
+        );
+
+        if (atsRes?.payload?.status_code === 200) {
+          setATSscore(atsRes?.payload?.data?.old_ats);
+          setopenATSmodal(true);
+        }
+
+        /* ===================== QUESTIONS ===================== */
+        if (payload?.generated_questions) {
+          await dispatch(
+            addImpQuestions({
+              imp_resume_id: resumeid,
+              generated_questions: payload.generated_questions,
+            })
+          );
+        }
+
+        /* ===================== FINAL FETCH ===================== */
+        await dispatch(getUpdateResumeInfo({ id: resumeid }));
+
+        console.log("✅ Resume improve flow completed successfully");
+      })
+      .catch(() => {
+        toast.error("Something went wrong while improving resume");
+      })
+      .finally(() => {
+        clearFileInput();
       });
-    clearFileInput();
+
+
+
   };
 
   // const onSubmit = (data) => {
@@ -307,8 +686,8 @@ const Page = () => {
   // };
 
   const onSubmit = (data) => {
-  handleResumeImprove(data);
-};
+    handleResumeImprove(data);
+  };
 
 
   useEffect(() => {
@@ -492,7 +871,7 @@ const Page = () => {
                       </div>
                     </div>
                   ))
-              )}
+                )}
               </div>
 
               <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">

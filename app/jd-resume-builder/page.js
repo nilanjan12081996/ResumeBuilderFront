@@ -99,7 +99,7 @@ const page = () => {
   }, [id])
 
   console.log("jdBasedDetailsData", jdBasedDetailsData);
-
+const { profileData } = useSelector((state) => state?.profile)
   const handleAnalyzeResume = async () => {
     try {
       const res = await dispatch(jdBasedAtsScoreAnalyze({ id })).unwrap();
@@ -838,7 +838,28 @@ const page = () => {
       ? maxLimit - used
       : 5;
 
+  const handleDownloadWithCount = () => {
+    const isIndividual =
+      profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
 
+
+    const countAction = isIndividual ? addCountResume : addCountResumeOrg;
+
+    dispatch(countAction({ ref_type: "jd_based_resume" }))
+      .then((res) => {
+        if (res?.payload?.status_code === 200) {
+          handlePrint();
+        } else if (res?.payload?.response?.data?.status_code === 400) {
+          toast.error(res?.payload?.response?.data?.message, {
+            autoClose: false,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Download count error:", err);
+        toast.error("Something went wrong while downloading");
+      });
+  };
   return (
     <div className='lg:flex gap-5 pb-5 min-h-screen'>
 
@@ -1009,7 +1030,7 @@ const page = () => {
             {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
             <div className="relative group inline-block">
               <button
-                onClick={remaining === 5 ? null : handlePrint}
+                onClick={remaining === 5 ? null : handleDownloadWithCount}
                 className={`
                   rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
                   ${remaining === 5
