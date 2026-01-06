@@ -81,7 +81,7 @@ const page = () => {
   const searchParams = useSearchParams();
   const template = searchParams.get("template");
   // const user_id = sessionStorage.getItem('user_id');c
-   const user_id = localStorage.getItem('user_id')
+  const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const [type, setType] = useState()
   const [isCreated, setIsCreated] = useState(false)
@@ -142,281 +142,403 @@ const page = () => {
     console.log("data", data);
 
 
-    if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
-      dispatch(addCountResume({ ref_type: "scratch_resume" })).then((res) => {
-        console.log(res, "rescount");
-        if (res?.payload?.status_code === 200) {
-          dispatch(savePersonalInfo(data)).then((res) => {
-            console.log("res", res);
+    // if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
+    //   dispatch(addCountResume({ ref_type: "scratch_resume" })).then((res) => {
+    //     console.log(res, "rescount");
+    //     if (res?.payload?.status_code === 200) {
+    //       dispatch(savePersonalInfo(data)).then((res) => {
+    //         console.log("res", res);
 
-            if (res?.payload?.status_code === 201) {
+    //         if (res?.payload?.status_code === 201) {
 
-              const eduPayload = {
-                resume_id: res?.payload?.id,
-                education_arr: educationEntries.map((edu) => (
-                  {
-                    institution: edu?.institution,
-                    location: edu?.location,
-                    field_study: edu?.field_study,
-                    degree: edu?.degree,
-                    start_time: convertToSubmitFormat(edu?.start_time),
-                    end_time: convertToSubmitFormat(edu?.end_time),
-                    cgpa: edu?.gpa,
-                    information: edu?.additionalInfo
-                  }
-                ))
-              }
-              const payload = {
-                resume_id: res?.payload?.id,
-                data: experiences.map(exp => ({
-                  company_name: exp.company_name,
-                  position: exp.position,
-                  location: exp.location,
-                  skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-                  start_date: convertToSubmitFormat(exp.start_date),
-                  end_date: convertToSubmitFormat(exp.end_date),
-                  current_work: exp.current_work ? 1 : 0,
-                  projects: exp.projects.map(proj => ({
-                    title: proj.title,
-                    role: proj.role,
-                    technology: proj.technology.split(",").map(t => t.trim()),
-                    description: proj.description
-                  }))
-                }))
-              };
-              const payloadLang = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: languages.map((lang) => ({
-                  language_name: lang.language_name,
-                  proficiency: lang.proficiency,
-                })),
-              };
-              const payloadSkills = {
-                user_id: parseUserId?.user_id,
-                data: skills.map((sk) => (
-                  {
-                    resume_id: res?.payload?.id,
-                    skill_category: sk.skill_category,
-                    position: "test",
-                    skill: sk.skill.split(',').map(t => t.trim())
-                  }
+    //           const eduPayload = {
+    //             resume_id: res?.payload?.id,
+    //             education_arr: educationEntries.map((edu) => (
+    //               {
+    //                 institution: edu?.institution,
+    //                 location: edu?.location,
+    //                 field_study: edu?.field_study,
+    //                 degree: edu?.degree,
+    //                 start_time: convertToSubmitFormat(edu?.start_time),
+    //                 end_time: convertToSubmitFormat(edu?.end_time),
+    //                 cgpa: edu?.gpa,
+    //                 information: edu?.additionalInfo
+    //               }
+    //             ))
+    //           }
+    //           const payload = {
+    //             resume_id: res?.payload?.id,
+    //             data: experiences.map(exp => ({
+    //               company_name: exp.company_name,
+    //               position: exp.position,
+    //               location: exp.location,
+    //               skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
+    //               start_date: convertToSubmitFormat(exp.start_date),
+    //               end_date: convertToSubmitFormat(exp.end_date),
+    //               current_work: exp.current_work ? 1 : 0,
+    //               projects: exp.projects.map(proj => ({
+    //                 title: proj.title,
+    //                 role: proj.role,
+    //                 technology: proj.technology.split(",").map(t => t.trim()),
+    //                 description: proj.description
+    //               }))
+    //             }))
+    //           };
+    //           const payloadLang = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: languages.map((lang) => ({
+    //               language_name: lang.language_name,
+    //               proficiency: lang.proficiency,
+    //             })),
+    //           };
+    //           const payloadSkills = {
+    //             user_id: parseUserId?.user_id,
+    //             data: skills.map((sk) => (
+    //               {
+    //                 resume_id: res?.payload?.id,
+    //                 skill_category: sk.skill_category,
+    //                 position: "test",
+    //                 skill: sk.skill.split(',').map(t => t.trim())
+    //               }
 
-                ))
-              }
-              const payloadProject = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: personalPro.map((pPro) => (
-                  {
-                    project_title: pPro?.project_title,
-                    role: pPro?.role,
-                    start_time: convertToSubmitFormat(pPro?.start_time),
-                    end_time: convertToSubmitFormat(pPro?.end_time),
-                    project_url: pPro?.project_url,
-                    skill: pPro.skill.split(',').map(t => t.trim())
-                  }
-                ))
-              }
-              const payloadCerticate = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: certificates.map((cer) => (
-                  {
-                    certification_name: cer?.certification_name,
-                    issuing_organization: cer?.issuing_organization,
-                    obtained_date: convertToSubmitFormat(cer?.obtained_date),
-                    certification_id: cer?.certification_id
-                  }
-                ))
-              }
-              const payloadAchive = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: achivments.map((achiv) => (
-                  {
+    //             ))
+    //           }
+    //           const payloadProject = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: personalPro.map((pPro) => (
+    //               {
+    //                 project_title: pPro?.project_title,
+    //                 role: pPro?.role,
+    //                 start_time: convertToSubmitFormat(pPro?.start_time),
+    //                 end_time: convertToSubmitFormat(pPro?.end_time),
+    //                 project_url: pPro?.project_url,
+    //                 skill: pPro.skill.split(',').map(t => t.trim())
+    //               }
+    //             ))
+    //           }
+    //           const payloadCerticate = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: certificates.map((cer) => (
+    //               {
+    //                 certification_name: cer?.certification_name,
+    //                 issuing_organization: cer?.issuing_organization,
+    //                 obtained_date: convertToSubmitFormat(cer?.obtained_date),
+    //                 certification_id: cer?.certification_id
+    //               }
+    //             ))
+    //           }
+    //           const payloadAchive = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: achivments.map((achiv) => (
+    //               {
 
-                    achievement_title: achiv?.achievement_title,
-                    organization: achiv?.organization,
-                    receive_date: convertToSubmitFormat(achiv?.receive_date),
-                    description: achiv?.description
-                  }
-                ))
-              }
-              dispatch(saveForDraft({
-                flag: type,
-                id: res?.payload?.id
-              }))
-              dispatch(saveTemplate({
-                templete_id: template,
-                jd_id: res?.payload?.id,
-                jd_type: "scratch",
-                user_id: parseUserId?.user_id
-              }))
-              dispatch(saveEducationInfo(eduPayload))
-              dispatch(saveWorkExp(payload))
-              dispatch(saveLanguageInfo(payloadLang))
-              dispatch(saveSkillInfo(payloadSkills))
-              dispatch(saveProjectInfo(payloadProject))
-              dispatch(saveCertificatesInfo(payloadCerticate))
-              dispatch(saveAchivmentInfo(payloadAchive))
+    //                 achievement_title: achiv?.achievement_title,
+    //                 organization: achiv?.organization,
+    //                 receive_date: convertToSubmitFormat(achiv?.receive_date),
+    //                 description: achiv?.description
+    //               }
+    //             ))
+    //           }
+    //           dispatch(saveForDraft({
+    //             flag: type,
+    //             id: res?.payload?.id
+    //           }))
+    //           dispatch(saveTemplate({
+    //             templete_id: template,
+    //             jd_id: res?.payload?.id,
+    //             jd_type: "scratch",
+    //             user_id: parseUserId?.user_id
+    //           }))
+    //           dispatch(saveEducationInfo(eduPayload))
+    //           dispatch(saveWorkExp(payload))
+    //           dispatch(saveLanguageInfo(payloadLang))
+    //           dispatch(saveSkillInfo(payloadSkills))
+    //           dispatch(saveProjectInfo(payloadProject))
+    //           dispatch(saveCertificatesInfo(payloadCerticate))
+    //           dispatch(saveAchivmentInfo(payloadAchive))
 
-              toast.success(res?.payload?.message)
-              setIsCreated(true)
+    //           toast.success(res?.payload?.message)
+    //           setIsCreated(true)
 
+    //         }
+
+    //       })
+    //     }
+    //     else if (res?.payload?.response?.data?.status_code === 400) {
+    //       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+    //         autoClose: false
+    //       })
+    //     }
+
+    //   })
+    // }
+    // else {
+    //   dispatch(addCountResumeOrg({ ref_type: "scratch_resume" })).then((res) => {
+    //     console.log(res, "rescount");
+    //     if (res?.payload?.status_code === 200) {
+    //       dispatch(savePersonalInfo(data)).then((res) => {
+    //         console.log("res", res);
+
+    //         if (res?.payload?.status_code === 201) {
+
+    //           const eduPayload = {
+    //             resume_id: res?.payload?.id,
+    //             education_arr: educationEntries.map((edu) => (
+    //               {
+    //                 institution: edu?.institution,
+    //                 location: edu?.location,
+    //                 field_study: edu?.field_study,
+    //                 degree: edu?.degree,
+    //                 start_time: convertToSubmitFormat(edu?.start_time),
+    //                 end_time: convertToSubmitFormat(edu?.end_time),
+    //                 cgpa: edu?.gpa,
+    //                 information: edu?.additionalInfo
+    //               }
+    //             ))
+    //           }
+    //           const payload = {
+    //             resume_id: res?.payload?.id,
+    //             data: experiences.map(exp => ({
+    //               company_name: exp.company_name,
+    //               position: exp.position,
+    //               location: exp.location,
+    //               skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
+    //               start_date: convertToSubmitFormat(exp.start_date),
+    //               end_date: convertToSubmitFormat(exp.end_date),
+    //               current_work: exp.current_work ? 1 : 0,
+    //               projects: exp.projects.map(proj => ({
+    //                 title: proj.title,
+    //                 role: proj.role,
+    //                 technology: proj.technology.split(",").map(t => t.trim()),
+    //                 description: proj.description
+    //               }))
+    //             }))
+    //           };
+    //           const payloadLang = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: languages.map((lang) => ({
+    //               language_name: lang.language_name,
+    //               proficiency: lang.proficiency,
+    //             })),
+    //           };
+    //           const payloadSkills = {
+    //             user_id: parseUserId?.user_id,
+    //             data: skills.map((sk) => (
+    //               {
+    //                 resume_id: res?.payload?.id,
+    //                 skill_category: sk.skill_category,
+    //                 position: "test",
+    //                 skill: sk.skill.split(',').map(t => t.trim())
+    //               }
+
+    //             ))
+    //           }
+    //           const payloadProject = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: personalPro.map((pPro) => (
+    //               {
+    //                 project_title: pPro?.project_title,
+    //                 role: pPro?.role,
+    //                 start_time: convertToSubmitFormat(pPro?.start_time),
+    //                 end_time: convertToSubmitFormat(pPro?.end_time),
+    //                 project_url: pPro?.project_url,
+    //                 skill: pPro.skill.split(',').map(t => t.trim())
+    //               }
+    //             ))
+    //           }
+    //           const payloadCerticate = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: certificates.map((cer) => (
+    //               {
+    //                 certification_name: cer?.certification_name,
+    //                 issuing_organization: cer?.issuing_organization,
+    //                 obtained_date: convertToSubmitFormat(cer?.obtained_date),
+    //                 certification_id: cer?.certification_id
+    //               }
+    //             ))
+    //           }
+    //           const payloadAchive = {
+    //             user_id: parseUserId?.user_id,
+    //             resume_id: res?.payload?.id,
+    //             data: achivments.map((achiv) => (
+    //               {
+
+    //                 achievement_title: achiv?.achievement_title,
+    //                 organization: achiv?.organization,
+    //                 receive_date: convertToSubmitFormat(achiv?.receive_date),
+    //                 description: achiv?.description
+    //               }
+    //             ))
+    //           }
+    //           dispatch(saveForDraft({
+    //             flag: type,
+    //             id: res?.payload?.id
+    //           }))
+    //           dispatch(saveTemplate({
+    //             templete_id: template,
+    //             jd_id: res?.payload?.id,
+    //             jd_type: "scratch",
+    //             user_id: parseUserId?.user_id
+    //           }))
+    //           dispatch(saveEducationInfo(eduPayload))
+    //           dispatch(saveWorkExp(payload))
+    //           dispatch(saveLanguageInfo(payloadLang))
+    //           dispatch(saveSkillInfo(payloadSkills))
+    //           dispatch(saveProjectInfo(payloadProject))
+    //           dispatch(saveCertificatesInfo(payloadCerticate))
+    //           dispatch(saveAchivmentInfo(payloadAchive))
+
+    //           toast.success(res?.payload?.message)
+    //           setIsCreated(true)
+
+    //         }
+
+    //       })
+    //     }
+    //     else if (res?.payload?.response?.data?.status_code === 400) {
+    //       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
+    //         autoClose: false
+    //       })
+    //     }
+
+    //   })
+    // }
+
+    dispatch(savePersonalInfo(data)).then((res) => {
+      console.log("res", res);
+
+      if (res?.payload?.status_code === 201) {
+
+        const eduPayload = {
+          resume_id: res?.payload?.id,
+          education_arr: educationEntries.map((edu) => (
+            {
+              institution: edu?.institution,
+              location: edu?.location,
+              field_study: edu?.field_study,
+              degree: edu?.degree,
+              start_time: convertToSubmitFormat(edu?.start_time),
+              end_time: convertToSubmitFormat(edu?.end_time),
+              cgpa: edu?.gpa,
+              information: edu?.additionalInfo
+            }
+          ))
+        }
+        const payload = {
+          resume_id: res?.payload?.id,
+          data: experiences.map(exp => ({
+            company_name: exp.company_name,
+            position: exp.position,
+            location: exp.location,
+            skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
+            start_date: convertToSubmitFormat(exp.start_date),
+            end_date: convertToSubmitFormat(exp.end_date),
+            current_work: exp.current_work ? 1 : 0,
+            projects: exp.projects.map(proj => ({
+              title: proj.title,
+              role: proj.role,
+              technology: proj.technology.split(",").map(t => t.trim()),
+              description: proj.description
+            }))
+          }))
+        };
+        const payloadLang = {
+          user_id: parseUserId?.user_id,
+          resume_id: res?.payload?.id,
+          data: languages.map((lang) => ({
+            language_name: lang.language_name,
+            proficiency: lang.proficiency,
+          })),
+        };
+        const payloadSkills = {
+          user_id: parseUserId?.user_id,
+          data: skills.map((sk) => (
+            {
+              resume_id: res?.payload?.id,
+              skill_category: sk.skill_category,
+              position: "test",
+              skill: sk.skill.split(',').map(t => t.trim())
             }
 
-          })
+          ))
         }
-        else if (res?.payload?.response?.data?.status_code === 400) {
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-            autoClose: false
-          })
-        }
-
-      })
-    }
-    else {
-      dispatch(addCountResumeOrg({ ref_type: "scratch_resume" })).then((res) => {
-        console.log(res, "rescount");
-        if (res?.payload?.status_code === 200) {
-          dispatch(savePersonalInfo(data)).then((res) => {
-            console.log("res", res);
-
-            if (res?.payload?.status_code === 201) {
-
-              const eduPayload = {
-                resume_id: res?.payload?.id,
-                education_arr: educationEntries.map((edu) => (
-                  {
-                    institution: edu?.institution,
-                    location: edu?.location,
-                    field_study: edu?.field_study,
-                    degree: edu?.degree,
-                    start_time: convertToSubmitFormat(edu?.start_time),
-                    end_time: convertToSubmitFormat(edu?.end_time),
-                    cgpa: edu?.gpa,
-                    information: edu?.additionalInfo
-                  }
-                ))
-              }
-              const payload = {
-                resume_id: res?.payload?.id,
-                data: experiences.map(exp => ({
-                  company_name: exp.company_name,
-                  position: exp.position,
-                  location: exp.location,
-                  skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-                  start_date: convertToSubmitFormat(exp.start_date),
-                  end_date: convertToSubmitFormat(exp.end_date),
-                  current_work: exp.current_work ? 1 : 0,
-                  projects: exp.projects.map(proj => ({
-                    title: proj.title,
-                    role: proj.role,
-                    technology: proj.technology.split(",").map(t => t.trim()),
-                    description: proj.description
-                  }))
-                }))
-              };
-              const payloadLang = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: languages.map((lang) => ({
-                  language_name: lang.language_name,
-                  proficiency: lang.proficiency,
-                })),
-              };
-              const payloadSkills = {
-                user_id: parseUserId?.user_id,
-                data: skills.map((sk) => (
-                  {
-                    resume_id: res?.payload?.id,
-                    skill_category: sk.skill_category,
-                    position: "test",
-                    skill: sk.skill.split(',').map(t => t.trim())
-                  }
-
-                ))
-              }
-              const payloadProject = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: personalPro.map((pPro) => (
-                  {
-                    project_title: pPro?.project_title,
-                    role: pPro?.role,
-                    start_time: convertToSubmitFormat(pPro?.start_time),
-                    end_time: convertToSubmitFormat(pPro?.end_time),
-                    project_url: pPro?.project_url,
-                    skill: pPro.skill.split(',').map(t => t.trim())
-                  }
-                ))
-              }
-              const payloadCerticate = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: certificates.map((cer) => (
-                  {
-                    certification_name: cer?.certification_name,
-                    issuing_organization: cer?.issuing_organization,
-                    obtained_date: convertToSubmitFormat(cer?.obtained_date),
-                    certification_id: cer?.certification_id
-                  }
-                ))
-              }
-              const payloadAchive = {
-                user_id: parseUserId?.user_id,
-                resume_id: res?.payload?.id,
-                data: achivments.map((achiv) => (
-                  {
-
-                    achievement_title: achiv?.achievement_title,
-                    organization: achiv?.organization,
-                    receive_date: convertToSubmitFormat(achiv?.receive_date),
-                    description: achiv?.description
-                  }
-                ))
-              }
-              dispatch(saveForDraft({
-                flag: type,
-                id: res?.payload?.id
-              }))
-              dispatch(saveTemplate({
-                templete_id: template,
-                jd_id: res?.payload?.id,
-                jd_type: "scratch",
-                user_id: parseUserId?.user_id
-              }))
-              dispatch(saveEducationInfo(eduPayload))
-              dispatch(saveWorkExp(payload))
-              dispatch(saveLanguageInfo(payloadLang))
-              dispatch(saveSkillInfo(payloadSkills))
-              dispatch(saveProjectInfo(payloadProject))
-              dispatch(saveCertificatesInfo(payloadCerticate))
-              dispatch(saveAchivmentInfo(payloadAchive))
-
-              toast.success(res?.payload?.message)
-              setIsCreated(true)
-
+        const payloadProject = {
+          user_id: parseUserId?.user_id,
+          resume_id: res?.payload?.id,
+          data: personalPro.map((pPro) => (
+            {
+              project_title: pPro?.project_title,
+              role: pPro?.role,
+              start_time: convertToSubmitFormat(pPro?.start_time),
+              end_time: convertToSubmitFormat(pPro?.end_time),
+              project_url: pPro?.project_url,
+              skill: pPro.skill.split(',').map(t => t.trim())
             }
-
-          })
+          ))
         }
-        else if (res?.payload?.response?.data?.status_code === 400) {
-          toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-            autoClose: false
-          })
+        const payloadCerticate = {
+          user_id: parseUserId?.user_id,
+          resume_id: res?.payload?.id,
+          data: certificates.map((cer) => (
+            {
+              certification_name: cer?.certification_name,
+              issuing_organization: cer?.issuing_organization,
+              obtained_date: convertToSubmitFormat(cer?.obtained_date),
+              certification_id: cer?.certification_id
+            }
+          ))
         }
+        const payloadAchive = {
+          user_id: parseUserId?.user_id,
+          resume_id: res?.payload?.id,
+          data: achivments.map((achiv) => (
+            {
 
-      })
-    }
+              achievement_title: achiv?.achievement_title,
+              organization: achiv?.organization,
+              receive_date: convertToSubmitFormat(achiv?.receive_date),
+              description: achiv?.description
+            }
+          ))
+        }
+        dispatch(saveForDraft({
+          flag: type,
+          id: res?.payload?.id
+        }))
+        dispatch(saveTemplate({
+          templete_id: template,
+          jd_id: res?.payload?.id,
+          jd_type: "scratch",
+          user_id: parseUserId?.user_id
+        }))
+        dispatch(saveEducationInfo(eduPayload))
+        dispatch(saveWorkExp(payload))
+        dispatch(saveLanguageInfo(payloadLang))
+        dispatch(saveSkillInfo(payloadSkills))
+        dispatch(saveProjectInfo(payloadProject))
+        dispatch(saveCertificatesInfo(payloadCerticate))
+        dispatch(saveAchivmentInfo(payloadAchive))
+
+        toast.success(res?.payload?.message)
+        setIsCreated(true)
+
+      }
+
+    })
 
 
   }
 
 
   const handlePrint = useReactToPrint({
-  
+
     contentRef: componentRef, // Updated for newer versions of react-to-print
     documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
     pageStyle: `
@@ -462,22 +584,51 @@ const page = () => {
 
 
 
-  const handleDownloadClick = () => {
-    console.log("hello");
-    
-  if (!isCreated) {
-    // Show toast notification - adjust based on your toast library
-    // For react-hot-toast:
-    toast.error('Please save your resume first before downloading!');
-    
-    // For react-toastify:
-    // toast.error('Please save your resume first before downloading!');
-    
-    return;
-  }
-  
-  handlePrint();
-};
+  // const handleDownloadClick = () => {
+  //   console.log("hello");
+
+  //   if (!isCreated) {
+  //     toast.error('Please save your resume first before downloading!');
+  //     return;
+  //   }
+
+  //   handlePrint();
+  // };
+
+  const handleDownloadClick = async () => {
+    if (!isCreated) {
+      toast.error('Please save your resume first before downloading!');
+      return;
+    }
+
+    try {
+      let res;
+      if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
+        res = await dispatch(
+          addCountResume({ ref_type: "scratch_resume" })
+        ).unwrap();
+      }
+      else {
+        res = await dispatch(
+          addCountResumeOrg({ ref_type: "scratch_resume" })
+        ).unwrap();
+      }
+
+      if (res?.status_code === 200) {
+        handlePrint();
+      }
+    } catch (error) {
+      if (error?.response?.data?.status_code === 400) {
+        toast.error(
+          "Your Plan Limit is Expired, Please Upgrade Your Plan!",
+          { autoClose: false }
+        );
+      } else {
+        toast.error("Something went wrong while downloading resume");
+      }
+    }
+  };
+
 
   // const downloadDocx = async () => {
   //   if (!componentRef.current) return;
@@ -621,16 +772,15 @@ const page = () => {
           <div className='lg:flex items-center gap-3'>
             {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
             {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-            <button onClick={handleDownloadClick}
-              // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'
-              // className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
-              // ${!isCreated
-              //     ? "bg-gray-400 text-white cursor-not-allowed"
-              //     : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
-              //   }`}
+            <button
+              onClick={handleDownloadClick}
+              className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
+  bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
+            >
+              <IoMdDownload className='text-[18px]' />
+              Download PDF
+            </button>
 
-              className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5 bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer`}
-            ><IoMdDownload className='text-[18px]' /> Download PDF</button>
           </div>
         </div>
         <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>

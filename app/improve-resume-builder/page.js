@@ -892,7 +892,7 @@ const page = () => {
   //   }
   // };
 
-  const handleEnhancePDF = async () => {
+ const handleEnhancePDF = async () => {
     try {
       setEnhancing(true);
 
@@ -943,13 +943,37 @@ const page = () => {
         }));
 
       /* --------------------------------
-         MAP ALL SECTIONS WITH IDS
+         MAP EXPERIENCE WITH NESTED PROJECTS
       -------------------------------- */
-      const experienceData = mapWithId(
-        rewriteData?.experience?.Experience,
-        resumeData?.imp_experience_info
-      );
+      const experienceData = (rewriteData?.experience?.Experience || []).map((exp, expIndex) => {
+        const existingExp = resumeData?.imp_experience_info?.[expIndex];
+        
+        // Map projects for this experience
+        const mappedProjects = (exp.Projects || []).map((proj, projIndex) => {
+          // Find existing project by matching exp_id or by index
+          const existingProjects = resumeData?.imp_project_info?.filter(
+            p => p.exp_id === existingExp?.id
+          ) || [];
+          const existingProj = existingProjects[projIndex];
+          
+          return {
+            ...proj,
+            id: existingProj?.id, // ✅ Preserve existing project ID
+            exp_id: existingExp?.id, // ✅ Link to parent experience
+          };
+        });
 
+        return {
+          ...exp,
+          id: existingExp?.id, // ✅ Preserve experience ID
+          imp_resume_id,
+          Projects: mappedProjects,
+        };
+      });
+
+      /* --------------------------------
+         MAP OTHER SECTIONS WITH IDS
+      -------------------------------- */
       const educationData = mapWithId(
         rewriteData?.education?.Education,
         resumeData?.imp_education_info
@@ -977,7 +1001,7 @@ const page = () => {
 
       const projectData = mapWithId(
         rewriteData?.projects?.Projects,
-        resumeData?.imp_project_info
+        resumeData?.imp_extra_project_info
       );
 
       /* --------------------------------
