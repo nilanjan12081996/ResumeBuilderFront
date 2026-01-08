@@ -646,7 +646,7 @@ body {
   .react-tabs
   ul
   .react-tabs__tab.react-tabs__tab--selected {
-  background: #F0E3FA;
+  background: #f0e3fa;
   color: #800080;
   border: #e7ebff 1px solid;
   border-radius: 12px;
@@ -1265,6 +1265,77 @@ body {
 
 .resume_templates_section {
   padding: 70px 0;
+}
+
+.acco_section {
+  background: #ffffff;
+  padding: 5px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+.acco_section button {
+  cursor: pointer;
+  margin-bottom: 0;
+  background-color: #f6efff;
+  color: #000000;
+  border-bottom: none;
+  margin-bottom: 5px;
+}
+.acco_section button:hover {
+  background-color: #f3f4f6;
+  color: #000000;
+}
+.acco_section button:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.acco_section [data-testid="flowbite-accordion-content"] {
+  background-color: #ffffff;
+}
+.acco_section [data-testid="flowbite-accordion"] {
+  border: none;
+}
+
+.label_tab_area ul {
+  /* background: #ffffff; */
+  padding: 3px;
+  border-bottom: none;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+.label_tab_area ul li {
+  width: 20%;
+  border-radius: 5px;
+}
+.label_tab_area ul li.react-tabs__tab.react-tabs__tab--selected:after {
+  display: none;
+}
+.label_tab_area ul li:last-child.react-tabs__tab.react-tabs__tab--selected {
+  background: #9ba1fb;
+  border: #9ba1fb 1px solid;
+}
+.label_tab_area ul li:first-child.react-tabs__tab.react-tabs__tab--selected {
+  background: #fe7d8b;
+  border: #fe7d8b 1px solid;
+}
+.label_tab_area ul li:nth-child(2n).react-tabs__tab.react-tabs__tab--selected {
+  background: #f68559;
+  border: #f68559 1px solid;
+}
+.label_tab_area ul li:nth-child(3n).react-tabs__tab.react-tabs__tab--selected {
+  background: #ec930c;
+  border: #ec930c 1px solid;
+}
+.label_tab_area ul li:nth-child(4n).react-tabs__tab.react-tabs__tab--selected {
+  background: #48ba75;
+  border: #48ba75 1px solid;
+}
+
+.acco_section h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 @media only screen and (max-width: 767px) {

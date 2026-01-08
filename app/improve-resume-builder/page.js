@@ -11,6 +11,8 @@ import { IoMdDownload } from "react-icons/io";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { AiFillSave } from "react-icons/ai";
 
+import { RiDraggable } from "react-icons/ri";
+
 import { BiSolidUser } from "react-icons/bi";
 import { BiSolidBriefcase } from "react-icons/bi";
 import { FaGlobe } from "react-icons/fa";
@@ -50,7 +52,7 @@ import resume_score from "../assets/imagesource/resume_score.png";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select } from "flowbite-react";
+import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -73,6 +75,7 @@ import { jdBasedResumeDetails } from '../reducers/DashboardSlice';
 import ImpAtsScoreAnalyzeModal from '../modal/ImpAtsScoreAnalyzeModal';
 import { addCountResume, addCountResumeOrg } from '../reducers/ResumeSlice';
 import { toast, ToastContainer } from 'react-toastify';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
@@ -91,7 +94,7 @@ const page = () => {
   const dispatch = useDispatch()
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-
+ const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
 
   // useEffect(() => {
   //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
@@ -113,8 +116,33 @@ const page = () => {
   const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
   const [atsData, setAtsData] = useState(null)
   const [enhancing, setEnhancing] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   // const [resumeid, setResumeid] = useState();
   const { profileData } = useSelector((state) => state?.profile)
+
+  const tabColors = [
+  "#ffeaec", // 1st tab
+  "#feebe3", // 2nd tab
+  "#fff2cc", // 3rd tab
+  "#e7f4ed", // 4th tab
+  "#f1f2ff", // 5th tab
+];
+const textColor=[
+  "#fe7d8b", // 1st tab
+  "#f68559", // 2nd tab
+  "#ec930c", // 3rd tab
+  "#48ba75", // 4th tab
+  "#9ba1fb", // 5th tab
+]
+
+const levels = [
+    "Novice",
+    "Beginner",
+     "Skillful",
+      "Experienced",
+      "Expert",
+];
 
   const {
     register,
@@ -177,76 +205,7 @@ const page = () => {
     }
   }, [getUpdateResumeInfoData]);
 
-  // Populate experience entries from getUpdateResumeInfoData
-  // useEffect(() => {
-  //   if (getUpdateResumeInfoData?.data?.imp_experience_info && getUpdateResumeInfoData.data.imp_experience_info.length > 0) {
-  //     const experienceData = getUpdateResumeInfoData.data.imp_experience_info.map(exp => ({
-  //       id: exp.id,
-  //       company_name: exp.company_name,
-  //       position: exp.Position,
-  //       location: exp.location,
-  //       skill: exp.skill_set ? exp.skill_set.join(", ") : "",
-  //       start_date: exp.start_date ? new Date(exp.start_date) : null,
-  //       end_date: exp.end_date ? new Date(exp.end_date) : null,
-  //       current_work: !exp.end_date,
-  //       projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
-  //     }));
-  //     setExperiences(experienceData);
-  //   } else if (getUpdateResumeInfoData && experiences.length === 0) {
-  //     // Add empty entry if no data and no existing entries
-  //     setExperiences([{
-  //       id: `exp-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-  //       company_name: "",
-  //       position: "",
-  //       location: "",
-  //       skill: "",
-  //       start_date: null,
-  //       end_date: null,
-  //       current_work: false,
-  //       projects: [{ id: `proj-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }]
-  //     }]);
-  //   }
-  // }, [getUpdateResumeInfoData]);
-
-  // useEffect(() => {
-  //   console.log('getUpdateResumeInfoDataExp', getUpdateResumeInfoData?.data?.imp_experience_info);
-  //   if (getUpdateResumeInfoData?.data?.imp_experience_info?.length > 0) {
-  //     const formattedExperiences = getUpdateResumeInfoData.data.imp_experience_info.map(exp => {
-  //       const isCurrent = exp.end_date === "Present" || !exp.end_date;
-  //       return {
-  //         id: exp.id,
-  //         company_name: exp.company_name || "",
-  //         position: exp.Position || "",
-  //         location: exp.location || "",
-  //         skill: Array.isArray(exp.skill_set) ? exp.skill_set.join(",") : "",
-  //         start_date: exp.start_date ? (() => {
-  //           try {
-  //             const date = new Date(exp.start_date);
-  //             return isNaN(date.getTime()) ? null : date;
-  //           } catch (e) {
-  //             console.error('Error parsing start date:', exp.start_date, e);
-  //             return null;
-  //           }
-  //         })() : null,
-  //         end_date: exp.end_date ? (() => {
-  //           try {
-  //             const date = new Date(exp.end_date);
-  //             return isNaN(date.getTime()) ? null : date;
-  //           } catch (e) {
-  //             console.error('Error parsing end date:', exp.end_date, e);
-  //             return null;
-  //           }
-  //         })() : null,
-  //         current_work: isCurrent,
-  //         projects: [
-  //           { id: `proj-default-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, title: "", role: "", technology: "", description: "" }
-  //         ]
-  //       };
-  //     });
-  //     setExperiences(formattedExperiences);
-  //   }
-  // }, [getUpdateResumeInfoData]);
-
+  
   useEffect(() => {
     const experiencesData = getUpdateResumeInfoData?.data?.imp_experience_info;
     const projectsData = getUpdateResumeInfoData?.data?.imp_project_info;
@@ -393,22 +352,7 @@ const page = () => {
     }
   }, [getUpdateResumeInfoData]);
 
-  // Populate achievements from getUpdateResumeInfoData
-  // useEffect(() => {
-  //   if (getUpdateResumeInfoData?.data?.imp_achievement_info && getUpdateResumeInfoData.data.imp_achievement_info.length > 0) {
-  //     const achievementData = getUpdateResumeInfoData.data.imp_achievement_info.map(ach => ({
-  //       id: ach.id,
-  //       achievement_title: ach.achivement_name,
-  //       organization: ach.achivement_organization_name,
-  //       receive_date: ach.achivement_date ? new Date(ach.achivement_date) : null,
-  //       description: ach.description
-  //     }));
-  //     setAchivments(achievementData);
-  //   } else if (getUpdateResumeInfoData && achivments.length === 0) {
-  //     // Add empty entry if no data and no existing entries
-  //     setAchivments([{ id: `ach-init-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, achievement_title: "", organization: "", receive_date: null, description: "" }]);
-  //   }
-  // }, [getUpdateResumeInfoData]);
+ 
 
   useEffect(() => {
     if (
@@ -463,14 +407,7 @@ const page = () => {
   console.log("achivments", achivments);
   console.log("atsScoreAnalyzeData", atsScoreAnalyzeData);
 
-  // Function to handle ATS score analysis
-  // const handleAnalyzeResume = async () => {
-  //   const resumeid = getUpdateResumeInfoData?.data?.id;
-  //   if (resumeid) {
-  //     await dispatch(atsScoreAnalyze({ id: resumeid }));
-  //     setOpenModalAnalyzeResume(true);
-  //   }
-  // };
+
 
   const handleAnalyzeResume = async () => {
     try {
@@ -594,15 +531,6 @@ const page = () => {
         location: data.location || ""
       };
 
-      // dispatch(addCountResume({ ref_type: "improve_resume" })).then(res => {
-      //   if (res?.payload?.status_code === 200) {
-
-      //     dispatch(updateBasicInfo(basicInfoPayload));
-      //   } else {
-      //     console.log("hiii")
-      //     toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", { autoClose: false })
-      //   }
-      // })
 
       // 1. Update Basic Info (NO COUNT)
       await dispatch(updateBasicInfo({
@@ -767,131 +695,7 @@ const page = () => {
     },
   });
 
-  // const downloadDocx = async () => {
-  //   if (!componentRef.current) return;
-
-  //   const content = componentRef.current.innerHTML;
-
-  //   const html = `
-  //     <!DOCTYPE html>
-  //     <html>
-  //       <head>
-  //         <meta charset="utf-8" />
-  //         <style>
-  //           ${document.querySelector("style")?.innerHTML || ""}
-  //         </style>
-  //       </head>
-  //       <body>
-  //         ${content}
-  //       </body>
-  //     </html>
-  //   `;
-
-  //   const blob = await html2docx(html, null, {
-  //     margins: { top: 720, right: 720, bottom: 720, left: 720 }, // Word margins
-  //   });
-
-  //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
-  // };
-
-  // const handleEnhancePDF = async () => {
-  //   try {
-  //     setEnhancing(true);
-
-  //     const imp_resume_id = getUpdateResumeInfoData?.data?.imp_basic_info?.imp_resume_id;
-  //     console.log('sss',getUpdateResumeInfoData)
-
-  //     console.log("imp_resume_id", imp_resume_id);
-
-  //     if (!imp_resume_id) {
-  //       setEnhancing(false);
-  //       return;
-  //     }
-
-  //     const payload = {
-  //       imp_resume_id: imp_resume_id,
-  //       imp_resume_text: getUpdateResumeInfoData?.data,
-  //     };
-
-  //     const resultAction = await dispatch(getImpEnhance(payload));
-
-  //     if (getImpEnhance.fulfilled.match(resultAction)) {
-  //       dispatch(impEnhanceUsageInfo(id))
-
-  //       const rewriteData = resultAction?.payload?.data;
-  //       console.log("rewriteData", rewriteData);
-
-  //       // -------------------------
-  //       // FIXED PAYLOAD MAPPING
-  //       // -------------------------
-
-  //       const basicPayload = {
-  //         basic_info_id: getUpdateResumeInfoData?.data?.imp_basic_info?.id,
-  //         ...rewriteData?.basic_information,
-  //       };
-
-
-  //       const expPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.experience?.Experience || [],
-  //       };
-
-  //       const eduPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.education?.Education || [],
-  //       };
-
-  //       const skillPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.skills?.Skills || [],
-  //       };
-
-  //       const langPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.languages?.Languages || [],
-  //       };
-
-  //       const certPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.certifications?.Certifications || [],
-  //       };
-
-  //       const achPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.achievements?.Achievements || [],
-  //       };
-
-  //       const projectPayload = {
-  //         imp_resume_id,
-  //         data: rewriteData?.projects?.Projects || [],
-  //       };
-
-  //       // -------------------------
-  //       // DISPATCH ALL
-  //       // -------------------------
-
-  //       await dispatch(updateBasicInfo({ resumeid: imp_resume_id, data: basicPayload }));
-  //       await dispatch(updateExperience({ resumeid: imp_resume_id, data: expPayload.data }));
-  //       await dispatch(updateEducation({ resumeid: imp_resume_id, data: eduPayload.data }));
-  //       await dispatch(updateSkills({ resumeid: imp_resume_id, data: skillPayload.data }));
-  //       await dispatch(updateLanguage({ resumeid: imp_resume_id, data: langPayload.data }));
-  //       await dispatch(updateCertification({ resumeid: imp_resume_id, data: certPayload.data }));
-  //       await dispatch(updateAchievements({ resumeid: imp_resume_id, data: achPayload.data }));
-  //       await dispatch(updateExtraProject({ resumeid: imp_resume_id, data: projectPayload.data }));
-
-
-  //       await dispatch(getUpdateResumeInfo({ id }));
-  //     }
-  //     else {
-  //       console.error("IMP Enhance Error:", resultAction.payload);
-  //     }
-  //   } catch (error) {
-  //     console.error("Enhance PDF Error:", error);
-  //   } finally {
-  //     setEnhancing(false);
-  //   }
-  // };
-
+  
  const handleEnhancePDF = async () => {
     try {
       setEnhancing(true);
@@ -1059,12 +863,344 @@ const page = () => {
   };
 
   return (
-    <div className='lg:flex gap-5 pb-5'>
+    <div className='lg:flex gap-2 pb-0'>
       <ToastContainer />
 
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className='border-b border-[#E5E5E5] p-5'>
+
+
+            <div className='mb-10'>
+
+              <div className='mb-4'>
+                 <div className='flex items-center gap-2 mb-2'>
+                   <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
+                   <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
+                 </div>
+                 <div className="flex flex-col gap-2">
+                  <Progress progress={45} size="sm" />
+                </div>
+              </div>
+
+              <div className='flex items-center mb-4'>
+                <div className='w-6/12'>
+                   <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Existing Resume</button>
+                </div>
+                 <div className='w-6/12'>
+                   <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Changed Resume</button>
+                </div>
+              </div>
+
+              <div className='acco_section'>
+
+                  <Accordion>
+                   
+                    <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl'>Personal details</AccordionTitle>
+                      <AccordionContent>
+                         <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+                          {/* Job Target */}
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Job Target
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="SENIOR SOFTWARE ENGINEER"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500"
+                            />
+                          </div>
+
+                          {/* First Name */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              First Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="SRAVYA"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+                          {/* Last Name */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="BOBBALI"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+                          {/* Email */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              placeholder="test2333@yopmail.com"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+                          {/* Phone */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Phone
+                            </label>
+                            <input
+                              type="tel"
+                              placeholder="9502829805"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+                          {/* LinkedIn */}
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              LinkedIn URL
+                            </label>
+                            <input
+                              type="url"
+                              placeholder="linkedin.com/in/yourprofile"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+                          {/* City */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              City, State
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Hyderabad, Telangana"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+                          {/* Country */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Country
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="India"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            />
+                          </div>
+
+
+
+                           <div className="md:col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                  className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                >
+                  {showAdditionalDetails ? (
+                    <>
+                     Hide additional details
+                      <ChevronUp size={20} />
+                     
+                    </>
+                  ) : (
+                    <>
+                    Add more details
+                      <ChevronDown size={20} />
+                      
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Additional Details - Conditionally Rendered */}
+              {showAdditionalDetails && (
+                <>
+                  
+                 
+
+                  {/* Address */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your address"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                    />
+                  </div>
+
+                  {/* Nationality */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Nationality
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Indian"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                    />
+                  </div>
+
+                  {/* Place of Birth */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Place of Birth
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="City, Country"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                    />
+                  </div>
+
+                  {/* Date of Birth */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Date of Birth
+                    </label>
+                    <input
+                      type="date"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                    />
+                  </div>
+
+                  {/* Driving License */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Driving License
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="License Number"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                    />
+                  </div>
+                </>
+              )}
+
+                        </form>
+
+                        {/* 🔹 Nested Accordion */}
+                        
+                      </AccordionContent>
+                    </AccordionPanel>
+
+                 
+                    <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl flex items-center gap-5'><RiDraggable className='text-xl' /> Skills</AccordionTitle>
+                      <AccordionContent>
+                        <p className="text-gray-500 dark:text-gray-400 mb-4">
+                         Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
+                          (especially when applying via an online system).
+                        </p>
+                         <Accordion collapseAll>
+                          <AccordionPanel>
+                            <AccordionTitle className='font-bold text-xl'> <RiDraggable className='text-xl' />Java</AccordionTitle>
+                            <AccordionContent>
+                                 
+                            <div className='flex gap-10'>
+                               <div className='w-6/12'>
+                                <Label className="!text-gray-400">Skill</Label>
+                                <input
+                                  type="text"
+                                  placeholder="Your Skill"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                />
+                              </div>
+                              <div className='w-6/12 '
+                               
+                              >
+                                <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
+                                style={{ color: textColor[selectedIndex] }}
+                                >{levels[selectedIndex]}</span></Label>
+                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' style={{ backgroundColor: tabColors[selectedIndex] }}>
+                                  <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                                    <TabList>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                    </TabList>
+                                  </Tabs>
+                                </div>
+                              </div>
+                            </div>
+                        
+                            </AccordionContent>
+                          </AccordionPanel>
+                        </Accordion>
+                          <Accordion collapseAll>
+                          <AccordionPanel>
+                            <AccordionTitle className='font-bold text-xl'><RiDraggable className='text-xl' />Python</AccordionTitle>
+                            <AccordionContent>
+                             <div className='flex gap-10'>
+                               <div className='w-6/12'>
+                                <Label className="!text-gray-400">Skill</Label>
+                                <input
+                                  type="text"
+                                  placeholder="Your Skill"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                />
+                              </div>
+                              <div className='w-6/12 '
+                               
+                              >
+                                <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
+                                style={{ color: tabColors[selectedIndex] }}
+                                >{levels[selectedIndex]}</span></Label>
+                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' style={{ backgroundColor: tabColors[selectedIndex] }}>
+                                  <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                                    <TabList>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                    </TabList>
+                                  </Tabs>
+                                </div>
+                              </div>
+                            </div>
+                            </AccordionContent>
+                          </AccordionPanel>
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionPanel>
+
+                    <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl'> <RiDraggable className='text-xl' />Professional Summary</AccordionTitle>
+                      <AccordionContent>
+                        Hello
+
+                       
+                        
+                      </AccordionContent>
+                    </AccordionPanel>
+                  </Accordion>
+
+                  
+              </div>
+
+
+
+            </div>
+
+
+
+           <div className='hidden'>
+
+
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
                 <HiClipboardList className='text-[#800080] text-2xl' />
@@ -1115,7 +1251,7 @@ const page = () => {
             <p className="text-[11px] text-gray-600 mt-1 text-center">
               Enhancing attempts remaining: <span className="font-semibold text-[#800080]">{remaining}</span>
             </p>
-          </div>
+          
           <div className='resume_tab_section'>
             <Tabs selectedIndex={activeTabIndex} onSelect={(index) => setActiveTabIndex(index)}>
               <div className='border-b border-[#E5E5E5] p-5'>
@@ -1194,6 +1330,9 @@ const page = () => {
                 </div>
               </div>
             </Tabs>
+          </div>
+
+          </div>
           </div>
         </form>
       </div>

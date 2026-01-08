@@ -104,12 +104,12 @@ export default function ClientLayoutWrapper({ children }) {
         return (
             <main>
                 <div className="dashboard_wrapper lg:flex bg-[#f3f4f6] p-0">
-                    <div className="sidebar_area w-[300px] lg:w-[20%]">
+                    {/* <div className="sidebar_area w-[300px] lg:w-[20%]">
                         <Sidebar />
-                    </div>
-                    <div className="content_area w-full lg:w-[80%]">
+                    </div> */}
+                    <div className="content_area w-full lg:w-[100%]">
                         <Insideheader />
-                        <div className="px-5 lg:px-10 lg:py-2">
+                        <div className="px-5 lg:px-5 lg:py-2">
                             {children}
                         </div>
 
