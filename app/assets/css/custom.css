@@ -1338,6 +1338,33 @@ body {
   gap: 8px;
 }
 
+.resume_tab_scrach {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.resume_tab_scrach .tab_point ul {
+  border: none;
+  margin-bottom: 0px;
+  display: flex;
+  gap: 7px;
+}
+.resume_tab_scrach .tab_point {
+  background: #f7f9fc;
+  border-radius: 10px;
+  padding: 10px;
+}
+.resume_tab_scrach .tab_point ul li.react-tabs__tab {
+  margin-bottom: 0;
+  margin-right: 0;
+}
+.resume_tab_scrach
+  .tab_point
+  ul
+  li.react-tabs__tab.react-tabs__tab--selected:after {
+  display: none;
+}
+
 @media only screen and (max-width: 767px) {
   .invited_students_table_wrap table tr td:first-child,
   .invited_students_table_wrap table tr td:last-child {

@@ -50,7 +50,7 @@ import resume_score from "../assets/imagesource/resume_score.png";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast } from "flowbite-react";
+import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
 import PersonalInfo from './PersonalInfo';
 import Education from './Education';
 import WorkExp from './WorkExp';
@@ -73,7 +73,11 @@ import { toast, ToastContainer } from 'react-toastify';
 // import juice from 'juice';
 // import html2docx from "html2docx";
 
+import { ChevronDown, ChevronUp } from 'lucide-react';
+
+
 const page = () => {
+  const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
   const { loading } = useSelector((state) => state?.resume)
   const { profileData } = useSelector((state) => state?.profile)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
@@ -657,56 +661,19 @@ const page = () => {
   //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
   // };
   return (
-    <div className='lg:flex gap-5 pb-5'>
-
-      <ToastContainer />
-      <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
-            <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
-              <HiClipboardList className='text-[#800080] text-2xl' />
-              <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
-            </div>
-            <div className='flex gap-2'>
-              <button disabled={isCreated} onClick={() => setType("draft")} type="submit"
-                // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
-                className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
-                          ${isCreated
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
-                  }`}
-              >
-                <AiFillSave className='text-[18px]' />{loading ? "Waiting..." : "Save as Draft"} </button>
-              <button
-                disabled={isCreated} onClick={() => setType("save")} type="submit"
-                // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
-                className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
-                  ${isCreated
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
-                  }`}
-              ><AiFillSave className='text-[18px]' />{loading ? "Waiting..." : "Save Resume"} </button>
-
-            </div>
-
-          </div>
-          <div className='resume_tab_section'>
-            <Tabs>
-              <div className='border-b border-[#E5E5E5] p-5'>
+    <div>
+      <Tabs>
+          <div className='resume_tab_scrach mb-4 px-8'>
+            
+              <div className='p-0'>
                 <div className='tab_point'>
                   <TabList>
-                    <Tab><span><BiSolidUser /></span> Personal Info</Tab>
-                    <Tab><span><HiAcademicCap /></span> Education</Tab>
-                    <Tab><span><BiSolidBriefcase /></span> Work Experience</Tab>
-                    <Tab><span><FaLanguage /></span> Languages</Tab>
-                    <Tab><span><MdSettingsSuggest /></span> Skills</Tab>
-                    <Tab><span><FaDiagramProject /></span> Personal Projects</Tab>
-                    <Tab><span><FaCertificate /></span> Certifications</Tab>
-                    <Tab><span><FaTrophy /></span> Achievements</Tab>
+                    <Tab>Edit</Tab>
+                    <Tab>Customize</Tab>
                   </TabList>
                 </div>
               </div>
-              <div className='p-5 pr-0'>
+              {/* <div className='p-5 pr-0'>
                 <div className='mb-4'>
                   <div>
                     <TabPanel>
@@ -716,183 +683,471 @@ const page = () => {
                     <TabPanel>
                       <Education register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} />
                     </TabPanel>
-
-
-                    <TabPanel>
-                      <WorkExp experiences={experiences} setExperiences={setExperiences} register={register} errors={errors} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <Language
-                        languages={languages}
-                        setLanguages={setLanguages}
-                      />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <Skills register={register} errors={errors} skills={skills} setSkills={setSkills} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <PersonalProject register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <Certificates register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <Achivments register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} />
-                    </TabPanel>
-
                   </div>
                 </div>
-              </div>
-            </Tabs>
+              </div> */}
+            
           </div>
-        </form>
-      </div>
+          <div className='lg:flex gap-5 pb-5'>
+
+            <ToastContainer />
+            <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
+
+              <TabPanel>
+              <div className='mb-10'>
+
+                <div className='mb-4 px-8 py-6'>
+                    <div className='flex justify-between items-center'>
+                      <div className='flex items-center gap-2 mb-2'>
+                        <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
+                        <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
+                      </div>
+                      <div className='flex items-center gap-2 mb-2'>
+                        <span className='bg-[#e7f4ed] rounded-[5px] px-2 py-1 text-[14px] text-[#477d62] font-bold'>+10%</span>
+                        <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Add job title</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Progress progress={10} size="sm" />
+                    </div>
+                </div>
+
+                <div className='px-8 h-[400px] overflow-y-scroll'>
+                  <div className='mb-4'>
+                    <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
+                    <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
+                  </div>
+                  <div>
+                    <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Job Target */}
+                            <div className="md:col-span-2">
+                              <label className="block text-sm font-medium text-gray-700">
+                                Job Target
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="SENIOR SOFTWARE ENGINEER"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
+                              />
+                            </div>
+
+                            {/* First Name */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                First Name
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="SRAVYA"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              />
+                            </div>
+
+                            {/* Last Name */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Last Name
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="BOBBALI"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              />
+                            </div>
+
+                            {/* Email */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Email
+                              </label>
+                              <input
+                                type="email"
+                                placeholder="test2333@yopmail.com"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              />
+                            </div>
+
+                            {/* Phone */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Phone
+                              </label>
+                              <input
+                                type="tel"
+                                placeholder="9502829805"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              />
+                            </div>
+
+                            {/* Address */}
+                            <div className="md:col-span-2">
+                              <label className="block text-sm font-medium text-gray-700">
+                                Address
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Enter your address"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                              />
+                            </div>
+
+                            {/* City */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                City, State
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Hyderabad, Telangana"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              />
+                            </div>
+
+                            {/* Country */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Country
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="India"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              />
+                            </div>
 
 
 
+                            <div className="md:col-span-2">
+                              <button
+                                type="button"
+                                onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                                className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                              >
+                                {showAdditionalDetails ? (
+                                  <>
+                                  Hide additional details
+                                    <ChevronUp size={20} />
+                                  
+                                  </>
+                                ) : (
+                                  <>
+                                  Add more details
+                                    <ChevronDown size={20} />
+                                    
+                                  </>
+                                )}
+                              </button>
+                            </div>
+
+                            {/* Additional Details - Conditionally Rendered */}
+                            {showAdditionalDetails && (
+                              <>
+                                {/* Postal Code */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Postal Code
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="Postal Code"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  />
+                                </div>
+
+                              {/* Driving License */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Driving License
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="License Number"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  />
+                                </div>
+
+                                {/* Date of Birth */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Date of Birth
+                                  </label>
+                                  <input
+                                    type="date"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  />
+                                </div>
+
+                                {/* Place of Birth */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Place of Birth
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="City, Country"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  />
+                                </div>
+
+                                {/* Nationality */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Nationality
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="Indian"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  />
+                                </div>
+
+                                
+                              </>
+                            )}
+
+                      </form>
+                  </div>
+                </div>
+
+              </div>
+              </TabPanel>
+              <TabPanel>Customize</TabPanel>
+
+              <div className='hidden'>
+
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
+                    <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
+                      <HiClipboardList className='text-[#800080] text-2xl' />
+                      <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+                    </div>
+                    <div className='flex gap-2'>
+                      <button disabled={isCreated} onClick={() => setType("draft")} type="submit"
+                        // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
+                        className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
+                                  ${isCreated
+                            ? "bg-gray-400 text-white cursor-not-allowed"
+                            : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
+                          }`}
+                      >
+                        <AiFillSave className='text-[18px]' />{loading ? "Waiting..." : "Save as Draft"} </button>
+                      <button
+                        disabled={isCreated} onClick={() => setType("save")} type="submit"
+                        // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
+                        className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
+                          ${isCreated
+                            ? "bg-gray-400 text-white cursor-not-allowed"
+                            : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
+                          }`}
+                      ><AiFillSave className='text-[18px]' />{loading ? "Waiting..." : "Save Resume"} </button>
+
+                    </div>
+
+                  </div>
+                  <div className='resume_tab_section'>
+                    <Tabs>
+                      <div className='border-b border-[#E5E5E5] p-5'>
+                        <div className='tab_point'>
+                          <TabList>
+                            <Tab><span><BiSolidUser /></span> Personal Info</Tab>
+                            <Tab><span><HiAcademicCap /></span> Education</Tab>
+                            <Tab><span><BiSolidBriefcase /></span> Work Experience</Tab>
+                            <Tab><span><FaLanguage /></span> Languages</Tab>
+                            <Tab><span><MdSettingsSuggest /></span> Skills</Tab>
+                            <Tab><span><FaDiagramProject /></span> Personal Projects</Tab>
+                            <Tab><span><FaCertificate /></span> Certifications</Tab>
+                            <Tab><span><FaTrophy /></span> Achievements</Tab>
+                          </TabList>
+                        </div>
+                      </div>
+                      <div className='p-5 pr-0'>
+                        <div className='mb-4'>
+                          <div>
+                            <TabPanel>
+                              <PersonalInfo register={register} errors={errors} />
+                            </TabPanel>
+
+                            <TabPanel>
+                              <Education register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} />
+                            </TabPanel>
 
 
-      <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
-        <div className='flex items-center justify-between mb-4'>
-          <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-            <button
-              onClick={() => setOpenPreviewModal(true)}
-              className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
+                            <TabPanel>
+                              <WorkExp experiences={experiences} setExperiences={setExperiences} register={register} errors={errors} />
+                            </TabPanel>
+
+                            <TabPanel>
+                              <Language
+                                languages={languages}
+                                setLanguages={setLanguages}
+                              />
+                            </TabPanel>
+
+                            <TabPanel>
+                              <Skills register={register} errors={errors} skills={skills} setSkills={setSkills} />
+                            </TabPanel>
+
+                            <TabPanel>
+                              <PersonalProject register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} />
+                            </TabPanel>
+
+                            <TabPanel>
+                              <Certificates register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} />
+                            </TabPanel>
+
+                            <TabPanel>
+                              <Achivments register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} />
+                            </TabPanel>
+
+                          </div>
+                        </div>
+                      </div>
+                    </Tabs>
+                  </div>
+                </form>
+
+              </div>
+
+            </div>
+
+            <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
+              <div className='flex items-center justify-between mb-4'>
+                <div className='flex items-center gap-1 mb-2 lg:mb-0'>
+                  <button
+                    onClick={() => setOpenPreviewModal(true)}
+                    className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
+                  >
+                    <MdPreview className='text-[#800080] text-2xl' />
+                    Preview
+                  </button>
+
+                </div>
+                <div className='lg:flex items-center gap-3'>
+                  {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
+                  {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
+                  <button
+                    onClick={handleDownloadClick}
+                    className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
+        bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
+                  >
+                    <IoMdDownload className='text-[18px]' />
+                    Download PDF
+                  </button>
+
+                </div>
+              </div>
+              <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+                {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
+                {
+                  template == 1 && (
+                    <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+                  )
+                }
+                {
+                  template == 2 && (
+                    <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
+                  )
+                }
+
+              </div>
+              {/* <div className='flex items-center justify-between mb-0'>
+                  <div className='flex items-center gap-1'>
+                    <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
+                  </div>
+                </div> */}
+            </div>
+
+            {/* add modal for apply job start here */}
+            <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
+              <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
+              <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
+                <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
+                  <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
+                  <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+                    <Image src={resume_sections_view} alt="resume_sections_view" className='' />
+                  </div>
+                  <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
+                    <Image src={resume_score} alt="resume_score" className='mb-0' />
+                  </div>
+                </div>
+                <div>
+                  <p className='text-[14px] text-[#DF1B35] font-semibold pb-0'>Important Note: </p>
+                  <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
+                </div>
+              </ModalBody>
+            </Modal>
+            {/* add modal for apply job ends here */}
+
+            {/* add modal for apply job start here */}
+            <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
+              <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
+              <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
+                <div className='flex gap-4'>
+                  <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
+                    <h3 className='text-base font-medium mb-4 text-[#151515]'>Before</h3>
+                    <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+                      <Image src={resume_sections_view} alt="resume_sections_view" className='' />
+                    </div>
+                    <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[10px] bottom-[20px] p-5'>
+                      <Image src={resume_score} alt="resume_score" className='mb-0' />
+                    </div>
+                  </div>
+                  <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
+                    <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
+                    <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+                      <Image src={resume_sections_view} alt="resume_sections_view" className='' />
+                    </div>
+                    <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute right-[10px] bottom-[20px] p-5'>
+                      <Image src={resume_score2} alt="resume_score2" className='mb-0' />
+                    </div>
+                  </div>
+                </div>
+              </ModalBody>
+            </Modal>
+            {/* add modal for apply job ends here */}
+            <Modal
+              show={openPreviewModal}
+              size="6xl"
+              onClose={() => setOpenPreviewModal(false)}
             >
-              <MdPreview className='text-[#800080] text-2xl' />
-              Preview
-            </button>
+              <ModalHeader className='text-black border-0 pt-2 pr-2'>
+                Preview
+              </ModalHeader>
+              <ModalBody className='bg-white p-5 rounded-b-[4px]'>
+                <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
+                  {template == 1 && (
+                    <Template1
+                      data={formValues}
+                      education={educationEntries}
+                      experiences={experiences}
+                      skills={skills}
+                      languages={languages}
+                      personalPro={personalPro}
+                      achivments={achivments}
+                      certificates={certificates}
+                    />
+                  )}
+                  {template == 2 && (
+                    <Template2
+                      data={formValues}
+                      education={educationEntries}
+                      experiences={experiences}
+                      skills={skills}
+                      languages={languages}
+                      personalPro={personalPro}
+                      achivments={achivments}
+                      certificates={certificates}
+                    />
+                  )}
+                </div>
+              </ModalBody>
+            </Modal>
 
           </div>
-          <div className='lg:flex items-center gap-3'>
-            {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
-            {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-            <button
-              onClick={handleDownloadClick}
-              className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
-  bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
-            >
-              <IoMdDownload className='text-[18px]' />
-              Download PDF
-            </button>
-
-          </div>
-        </div>
-        <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-          {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-          {
-            template == 1 && (
-              <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-            )
-          }
-          {
-            template == 2 && (
-              <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-            )
-          }
-
-        </div>
-        {/* <div className='flex items-center justify-between mb-0'>
-            <div className='flex items-center gap-1'>
-              <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
-            </div>
-            <div className='flex items-center gap-3'>
-              <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
-            </div>
-          </div> */}
-      </div>
-
-      {/* add modal for apply job start here */}
-      <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
-        <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
-        <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
-          <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
-            <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-            <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-              <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-            </div>
-            <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
-              <Image src={resume_score} alt="resume_score" className='mb-0' />
-            </div>
-          </div>
-          <div>
-            <p className='text-[14px] text-[#DF1B35] font-semibold pb-0'>Important Note: </p>
-            <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
-          </div>
-        </ModalBody>
-      </Modal>
-      {/* add modal for apply job ends here */}
-
-      {/* add modal for apply job start here */}
-      <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
-        <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
-        <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
-          <div className='flex gap-4'>
-            <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
-              <h3 className='text-base font-medium mb-4 text-[#151515]'>Before</h3>
-              <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-              </div>
-              <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[10px] bottom-[20px] p-5'>
-                <Image src={resume_score} alt="resume_score" className='mb-0' />
-              </div>
-            </div>
-            <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
-              <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-              <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-              </div>
-              <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute right-[10px] bottom-[20px] p-5'>
-                <Image src={resume_score2} alt="resume_score2" className='mb-0' />
-              </div>
-            </div>
-          </div>
-        </ModalBody>
-      </Modal>
-      {/* add modal for apply job ends here */}
-      <Modal
-        show={openPreviewModal}
-        size="6xl"
-        onClose={() => setOpenPreviewModal(false)}
-      >
-        <ModalHeader className='text-black border-0 pt-2 pr-2'>
-          Preview
-        </ModalHeader>
-        <ModalBody className='bg-white p-5 rounded-b-[4px]'>
-          <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
-            {template == 1 && (
-              <Template1
-                data={formValues}
-                education={educationEntries}
-                experiences={experiences}
-                skills={skills}
-                languages={languages}
-                personalPro={personalPro}
-                achivments={achivments}
-                certificates={certificates}
-              />
-            )}
-            {template == 2 && (
-              <Template2
-                data={formValues}
-                education={educationEntries}
-                experiences={experiences}
-                skills={skills}
-                languages={languages}
-                personalPro={personalPro}
-                achivments={achivments}
-                certificates={certificates}
-              />
-            )}
-          </div>
-        </ModalBody>
-      </Modal>
-
+      </Tabs>
     </div>
   )
 }
