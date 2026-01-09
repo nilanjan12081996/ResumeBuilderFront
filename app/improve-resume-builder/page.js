@@ -960,6 +960,15 @@ const handleSkillDrop = (e, sectionIndex, targetSkillIndex) => {
   setDraggedSkillIndex(null);
 };
 
+
+ const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
+                          const updatedSections = [...sections];
+                          updatedSections[sectionIndex].skills = updatedSections[sectionIndex].skills.map(sk => 
+                            sk.id === skillId ? { ...sk, [field]: value } : sk
+                          );
+                          setSections(updatedSections);
+                        };
+
 return (
     <div className='lg:flex gap-2 pb-0'>
       <ToastContainer />
@@ -1232,6 +1241,7 @@ return (
                           (especially when applying via an online system).
                         </p>
                         {
+                         
                           section.skills.map((skill, sIndex)=>(
                              <div
                            key={skill.id}
@@ -1256,7 +1266,9 @@ return (
                                 <Label className="!text-gray-400">Skill</Label>
                                 <input
                                   type="text"
+                                  value={skill.name}
                                   placeholder="Your Skill"
+                                  onChange={(e) => handleSkillUpdate(index, skill.id, 'name', e.target.value)}
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                 />
                               </div>
@@ -1264,10 +1276,19 @@ return (
                                
                               >
                                 <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
-                                style={{ color: textColor[selectedIndex] }}
-                                >{levels[selectedIndex]}</span></Label>
-                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' style={{ backgroundColor: tabColors[selectedIndex] }}>
-                                  <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                               style={{ color: textColor[skill.level] }}
+                                >
+                                  {/* {levels[selectedIndex]} */}
+                                  {levels[skill.level]}
+                                </span></Label>
+                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' 
+                                style={{ backgroundColor: tabColors[skill.level]}}
+                                >
+                                  <Tabs 
+                                 // selectedIndex={selectedIndex} onSelect={setSelectedIndex}
+                                 selectedIndex={skill.level} // Use level from the skill object
+                                 onSelect={(tabIndex) => handleSkillUpdate(index, skill.id, 'level', tabIndex)}
+                                  >
                                     <TabList>
                                       <Tab>&nbsp;</Tab>
                                       <Tab>&nbsp;</Tab>
@@ -1294,15 +1315,36 @@ return (
                             </>
                           )
                         }
-                        {
-                          section.type==='summary'&&(
-                           <input
-                           type='text'
-                           placeholder='Summary'
-                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                           /> 
-                          )
-                        }
+                      {/* {
+                      section.type === 'summary' && (
+                        <div className="space-y-2">
+                          <Label className="text-gray-400">Professional Summary</Label>
+                          <textarea
+                            placeholder="Write a brief professional summary..."
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm h-32 resize-none focus:ring-2 focus:ring-cyan-500"
+                            {...register("goal")} // THIS IS THE KEY FIX
+                          />
+                        </div>
+                      )
+                    } */}
+
+                    {
+                    section.type === 'summary' && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-400">Professional Summary</label>
+                        <textarea
+                          placeholder="Write a brief professional summary..."
+                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm h-32 resize-none focus:ring-2 focus:ring-cyan-500"
+                          /* Use the watched value from useForm to make it a controlled input */
+                          value={watch("goal") || ""} 
+                          onChange={(e) => {
+                            // Manually update the react-hook-form state
+                            setValue("goal", e.target.value);
+                          }}
+                        />
+                      </div>
+                    )
+                  }
                        
 
                   

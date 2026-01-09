@@ -1,8 +1,11 @@
 import React from 'react';
 
+
 const DynamicTemplate = ({ levels, sections, data }) => {
   // 1. Helper: Render content based on section type
   const renderDynamicSection = (section) => {
+    console.log(section,"section");
+    
     switch (section.type) {
       case 'summary':
         // Only render if user has typed a goal
