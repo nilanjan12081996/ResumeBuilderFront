@@ -941,7 +941,7 @@ const page = () => {
                                         <input
                                           type="text"
                                           placeholder=""
-                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                         />
                                       </div>
 
@@ -953,26 +953,22 @@ const page = () => {
                                         <input
                                           type="text"
                                           placeholder=""
-                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                         />
                                       </div>
 
                                       {/* Strat & End Date */}
-                                      <div>
+                                      <div className='date_area'>
                                         <label className="block text-sm font-medium text-gray-700">
                                           Strat & End Date
                                         </label>
                                         <div className='flex gap-5'>
-                                          <input
-                                            type="tel"
-                                            placeholder="mm/yy"
-                                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                          />
-                                          <input
-                                            type="tel"
-                                            placeholder="mm/yy"
-                                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                          />
+                                          <div>
+                                            <Datepicker />
+                                          </div>
+                                          <div>
+                                            <Datepicker />
+                                          </div>
                                         </div>
                                       </div>
                                       
@@ -983,8 +979,8 @@ const page = () => {
                                         </label>
                                         <input
                                           type="text"
-                                          placeholder="Hyderabad, Telangana"
-                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                          placeholder=""
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                         />
                                       </div>
 
