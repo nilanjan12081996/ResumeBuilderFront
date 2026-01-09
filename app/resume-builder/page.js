@@ -74,6 +74,9 @@ import { toast, ToastContainer } from 'react-toastify';
 // import html2docx from "html2docx";
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import Link from 'next/link';
+
+import { RiDraggable } from "react-icons/ri";
 
 
 const page = () => {
@@ -696,7 +699,7 @@ const page = () => {
               <TabPanel>
               <div className='mb-10'>
 
-                <div className='mb-4 px-8 py-6'>
+                <div className='mb-4 px-8 py-4 border-b border-[#e7e8ec]'>
                     <div className='flex justify-between items-center'>
                       <div className='flex items-center gap-2 mb-2'>
                         <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
@@ -712,200 +715,309 @@ const page = () => {
                     </div>
                 </div>
 
-                <div className='px-8 h-[400px] overflow-y-scroll'>
-                  <div className='mb-4'>
-                    <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
-                    <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
-                  </div>
-                  <div>
-                    <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Job Target */}
-                            <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700">
-                                Job Target
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="SENIOR SOFTWARE ENGINEER"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
-                              />
-                            </div>
+                <div className='px-8 h-[430px] overflow-y-scroll pb-4'>
 
-                            {/* First Name */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                First Name
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="SRAVYA"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
+                  <div className='hidden'>
+                    <div className='mb-4'>
+                      <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
+                      <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
+                    </div>
+                    <div>
+                      <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* Job Target */}
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Job Target
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="SENIOR SOFTWARE ENGINEER"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
+                                />
+                              </div>
 
-                            {/* Last Name */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                Last Name
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="BOBBALI"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
+                              {/* First Name */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  First Name
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="SRAVYA"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                />
+                              </div>
 
-                            {/* Email */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                Email
-                              </label>
-                              <input
-                                type="email"
-                                placeholder="test2333@yopmail.com"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
+                              {/* Last Name */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Last Name
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="BOBBALI"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                />
+                              </div>
 
-                            {/* Phone */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                Phone
-                              </label>
-                              <input
-                                type="tel"
-                                placeholder="9502829805"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
+                              {/* Email */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Email
+                                </label>
+                                <input
+                                  type="email"
+                                  placeholder="test2333@yopmail.com"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                />
+                              </div>
 
-                            {/* Address */}
-                            <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700">
-                                Address
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Enter your address"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              />
-                            </div>
+                              {/* Phone */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Phone
+                                </label>
+                                <input
+                                  type="tel"
+                                  placeholder="9502829805"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                />
+                              </div>
 
-                            {/* City */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                City, State
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Hyderabad, Telangana"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
+                              {/* Address */}
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Address
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Enter your address"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                />
+                              </div>
 
-                            {/* Country */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700">
-                                Country
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="India"
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              />
-                            </div>
+                              {/* City */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  City, State
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Hyderabad, Telangana"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                />
+                              </div>
+
+                              {/* Country */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Country
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="India"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                />
+                              </div>
 
 
 
-                            <div className="md:col-span-2">
-                              <button
-                                type="button"
-                                onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
-                                className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
-                              >
-                                {showAdditionalDetails ? (
-                                  <>
-                                  Hide additional details
-                                    <ChevronUp size={20} />
-                                  
-                                  </>
-                                ) : (
-                                  <>
-                                  Add more details
-                                    <ChevronDown size={20} />
+                              <div className="md:col-span-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                                  className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                                >
+                                  {showAdditionalDetails ? (
+                                    <>
+                                    Hide additional details
+                                      <ChevronUp size={20} />
                                     
-                                  </>
-                                )}
-                              </button>
+                                    </>
+                                  ) : (
+                                    <>
+                                    Add more details
+                                      <ChevronDown size={20} />
+                                      
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+
+                              {/* Additional Details - Conditionally Rendered */}
+                              {showAdditionalDetails && (
+                                <>
+                                  {/* Postal Code */}
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Postal Code
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="Postal Code"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                    />
+                                  </div>
+
+                                {/* Driving License */}
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Driving License
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="License Number"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                    />
+                                  </div>
+
+                                  {/* Date of Birth */}
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Date of Birth
+                                    </label>
+                                    <input
+                                      type="date"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                    />
+                                  </div>
+
+                                  {/* Place of Birth */}
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Place of Birth
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="City, Country"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                    />
+                                  </div>
+
+                                  {/* Nationality */}
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Nationality
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="Indian"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                    />
+                                  </div>
+
+                                  
+                                </>
+                              )}
+
+                        </form>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className='mb-4'>
+                      <h2 className='text-xl font-bold text-black pb-1'>Employment History</h2>
+                      <p className='text-sm text-[#808897] font-medium'>
+                        Show your relevant experience (last 10 years). Use bullet points to note your achievements, if possible - use numbers/facts (Achieved X, measured by Y, by doing Z).
+                      </p>
+                    </div>
+                    <div className='acco_section'>
+                      <Accordion>                    
+                        <AccordionPanel>
+                          <div className='flex items-start gap-2'>
+                            <div className='drag_point'>
+                              <button><RiDraggable className='text-xl' /></button>
                             </div>
+                            <div className='w-full'>
+                              <AccordionTitle className='font-bold text-xl'>(Not specified)</AccordionTitle>
+                              <AccordionContent>
+                                  <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                            {/* Additional Details - Conditionally Rendered */}
-                            {showAdditionalDetails && (
-                              <>
-                                {/* Postal Code */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Postal Code
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Postal Code"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                  />
-                                </div>
+                                      {/* Job Title */}
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Job Title
+                                        </label>
+                                        <input
+                                          type="text"
+                                          placeholder=""
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                        />
+                                      </div>
 
-                              {/* Driving License */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Driving License
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="License Number"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                  />
-                                </div>
+                                      {/* Employer */}
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Employer
+                                        </label>
+                                        <input
+                                          type="text"
+                                          placeholder=""
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                        />
+                                      </div>
 
-                                {/* Date of Birth */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Date of Birth
-                                  </label>
-                                  <input
-                                    type="date"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                  />
-                                </div>
+                                      {/* Strat & End Date */}
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Strat & End Date
+                                        </label>
+                                        <div className='flex gap-5'>
+                                          <input
+                                            type="tel"
+                                            placeholder="mm/yy"
+                                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                          />
+                                          <input
+                                            type="tel"
+                                            placeholder="mm/yy"
+                                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                          />
+                                        </div>
+                                      </div>
+                                      
+                                      {/* City */}
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          City, State
+                                        </label>
+                                        <input
+                                          type="text"
+                                          placeholder="Hyderabad, Telangana"
+                                          className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                        />
+                                      </div>
 
-                                {/* Place of Birth */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Place of Birth
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="City, Country"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                  />
-                                </div>
+                                      {/* Address */}
+                                      <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Description
+                                        </label>
+                                        <textarea id="message" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm" placeholder="Write here..."></textarea>
+                                      </div>
 
-                                {/* Nationality */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Nationality
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Indian"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                  />
-                                </div>
+                                  </form>
+                              </AccordionContent>
+                            </div>
+                            <div className='delete_point'>
+                              <button><MdDelete className='text-xl' /></button>
+                            </div>
+                          </div>
+                        </AccordionPanel>
+                      </Accordion>
+                    </div >
+                  </div>
 
-                                
-                              </>
-                            )}
+                </div>
 
-                      </form>
+                <div className='flex items-center px-8 py-3 border-t border-[#e7e8ec]'>
+                  <div className='w-9/12'>
+                    <p className='text-[#828bb7] text-[10px] font-normal'>
+                      By signing up by email you agree with our <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Terms of use</Link> and <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Privacy Policy</Link>, and topresume.com&lsquo;s <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Terms & Conditions</Link> and <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Privacy Policy</Link>.
+                    </p>
+                  </div>
+                  <div className='w-3/12'>
+                    <button className='cursor-pointer rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5   bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'>Next: Employment History</button>
                   </div>
                 </div>
 

@@ -1365,6 +1365,21 @@ body {
   display: none;
 }
 
+.acco_section div > div {
+  border: none;
+}
+
+.acco_section .drag_point button {
+  background: none;
+  margin-top: 20px;
+  color: #9fa6bb;
+}
+.acco_section .delete_point button {
+  background: none;
+  margin-top: 20px;
+  color: #9fa6bb;
+}
+
 @media only screen and (max-width: 767px) {
   .invited_students_table_wrap table tr td:first-child,
   .invited_students_table_wrap table tr td:last-child {
