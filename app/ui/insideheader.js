@@ -265,6 +265,8 @@ const Insideheader = () => {
           </Link>
         </div>
 
+        
+
         {/* Buttons and profile */}
         <div className='flex justify-end items-center gap-3'>
           {/* Upgrade / Subscription Plan Button */}

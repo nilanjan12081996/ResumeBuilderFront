@@ -35,6 +35,8 @@ import { CgProfile } from 'react-icons/cg';
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 import { GrTransaction } from 'react-icons/gr';
 
+import { IoMenuOutline } from "react-icons/io5";
+
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'], // specify desired weights
