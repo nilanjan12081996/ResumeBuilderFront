@@ -52,7 +52,7 @@ import resume_score from "../assets/imagesource/resume_score.png";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
+import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Progress, Accordion, AccordionPanel, AccordionTitle, AccordionContent  } from "flowbite-react";
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -79,6 +79,19 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 // import htmlDocx from "html-docx-js/dist/html-docx";
 // import juice from 'juice';
 // import html2docx from "html2docx";
+import {
+  DndContext,
+  closestCenter,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import DraggableWrapper from "./DraggableWrapper";
+import DragIcon from './DragIcon';
+import { TfiHandDrag } from "react-icons/tfi";
+import DynamicTemplate from '../temp/DynamicTemplate';
 
 const page = () => {
   // const { improveResumeData } = useSelector((state) => state?.dash)
@@ -862,7 +875,92 @@ const levels = [
       });
   };
 
-  return (
+// const [sections, setSections] = useState([
+ 
+//   { id: 1, title: 'Skills', type: 'skills' },
+//   { id: 3, title: 'Professional Summary', type: 'summary' }
+// ]);
+
+const [sections, setSections] = useState([
+  
+  { 
+    id: 0, 
+    title: 'Skills', 
+    type: 'skills', 
+    skills: [
+      { id: 's1', name: 'Java', level: 3 },
+      { id: 's2', name: 'Python', level: 4 }
+    ] 
+  },
+  { id: 1, title: 'Professional Summary', type: 'summary' }
+]);
+const [draggedIndex, setDraggedIndex] = useState(null);
+
+
+const handleDragStart = (e, index) => {
+  setDraggedIndex(index);
+  
+
+  const dragTarget = e.currentTarget;
+  e.dataTransfer.setDragImage(dragTarget, 20, 20); 
+  e.dataTransfer.effectAllowed = "move";
+};
+
+
+const handleDragEnd = () => {
+  setDraggedIndex(null);
+};
+
+const handleDragOver = (e) => {
+  e.preventDefault(); // Necessary to allow drop
+  e.dataTransfer.dropEffect = "move"
+};
+
+
+const handleDrop = (e, targetIndex) => {
+  e.preventDefault();
+  
+  if (draggedIndex === targetIndex) return;
+
+  const updatedSections = [...sections];
+  // 1. Remove the dragged item
+  const [draggedItem] = updatedSections.splice(draggedIndex, 1);
+  // 2. Insert it at the new target position
+  updatedSections.splice(targetIndex, 0, draggedItem);
+
+  setSections(updatedSections);
+  setDraggedIndex(null);
+}; 
+
+
+// Add state to track which sub-skill is being dragged
+const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
+
+// --- Skill Drag Handlers ---
+const handleSkillDragStart = (e, index) => {
+  e.stopPropagation(); // Stops the parent section from dragging
+  setDraggedSkillIndex(index);
+};
+
+const handleSkillDrop = (e, sectionIndex, targetSkillIndex) => {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  if (draggedSkillIndex === null || draggedSkillIndex === targetSkillIndex) return;
+
+  const updatedSections = [...sections];
+  const skillsList = [...updatedSections[sectionIndex].skills];
+  
+  // Reorder the skills array
+  const [movedSkill] = skillsList.splice(draggedSkillIndex, 1);
+  skillsList.splice(targetSkillIndex, 0, movedSkill);
+  
+  updatedSections[sectionIndex].skills = skillsList;
+  setSections(updatedSections);
+  setDraggedSkillIndex(null);
+};
+
+return (
     <div className='lg:flex gap-2 pb-0'>
       <ToastContainer />
 
@@ -893,15 +991,339 @@ const levels = [
               </div>
 
               <div className='acco_section'>
-
-                  <Accordion>
-                   
-                    <AccordionPanel>
-                      <AccordionTitle className='font-bold text-xl'>Personal details</AccordionTitle>
+                 <Accordion>                    
+                  <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
                       <AccordionContent>
-                         <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                         
+                              <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-                          {/* Job Target */}
+                     
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Job Target
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Enter Your Job Target"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500"
+                            {...register("job_target")}
+                            />
+                          </div>
+
+                        
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              First Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="First Name"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                               {...register("first_name")}
+                            />
+                          </div>
+
+                      
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Last Name"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("last_name")}
+                            />
+                          </div>
+
+                        
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Email
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Email"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("email_add")}
+                            />
+                          </div>
+
+                    
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Phone
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Phone No."
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("phone_no")}
+                            />
+                          </div>
+
+                     
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              LinkedIn URL
+                            </label>
+                            <input
+                              type="url"
+                              placeholder="linkedin.com/in/yourprofile"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("linkedin")}
+                            />
+                          </div>
+
+                       
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              City, State
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="City, State"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("city_state")}
+                            />
+                          </div>
+
+                         
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Country
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Country"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("country")}
+                            />
+                          </div>
+
+
+
+                           <div className="md:col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                  className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                >
+                  {showAdditionalDetails ? (
+                    <>
+                     Hide additional details
+                      <ChevronUp size={20} />
+                     
+                    </>
+                  ) : (
+                    <>
+                    Add more details
+                      <ChevronDown size={20} />
+                      
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {showAdditionalDetails && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your address"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                      {...register("address")}
+                    />
+                  </div>
+
+                 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Nationality
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Nationality"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                      {...register("nationality")}
+                    />
+                  </div>
+
+                 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Place of Birth
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="City, Country"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                      {...register("birth_place")}
+                    />
+                  </div>
+
+                
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Date of Birth
+                    </label>
+                    <input
+                      type="date"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                      {...register("dob")}
+                    />
+                  </div>
+
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Driving License
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="License Number"
+                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                      {...register("driving_licence")}
+                    />
+                  </div>
+                </>
+              )}
+
+                              </form>
+                      </AccordionContent>
+                    </AccordionPanel>
+                    </Accordion>
+
+    
+                    <div className="space-y-2">
+                    {
+                      sections.map((section,index)=>(
+                        <div
+                        key={section.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, index)}
+                          className={`
+                            mb-4 transition-all duration-200 bg-white rounded-xl border
+                            ${draggedIndex === index 
+                              ? "opacity-20 border-cyan-500 scale-95" // The "hole" left behind
+                              : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
+                            }
+                            cursor-grab active:cursor-grabbing
+                          `}
+                        >
+                          <Accordion flush={true}>
+
+                         <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl'><TfiHandDrag className='text-xl' title="drag and drop" />{section.title}</AccordionTitle>
+                      <AccordionContent>
+                        {
+                          section.type==='skills'&&(
+                            <>
+                             <p className="text-gray-500 dark:text-gray-400 mb-4">
+                         Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
+                          (especially when applying via an online system).
+                        </p>
+                        {
+                          section.skills.map((skill, sIndex)=>(
+                             <div
+                           key={skill.id}
+                            draggable
+                            onDragStart={(e) => handleSkillDragStart(e, sIndex)}
+                            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                            onDrop={(e) => handleSkillDrop(e, index, sIndex)}
+                            onDragEnd={() => setDraggedSkillIndex(null)}
+                            className={`transition-all duration-200 rounded-lg border 
+                              ${draggedSkillIndex === sIndex 
+                                ? "opacity-20 border-cyan-500 scale-95" 
+                                : "bg-white border-gray-200 shadow-sm"
+                              }`}>
+
+                          <Accordion collapseAll>
+                          <AccordionPanel>
+                            <AccordionTitle className='font-bold text-xl'> <TfiHandDrag  className='text-xl' title="drag and drop"/>{skill.name}</AccordionTitle>
+                            <AccordionContent>
+                                 
+                            <div className='flex gap-10'>
+                               <div className='w-6/12'>
+                                <Label className="!text-gray-400">Skill</Label>
+                                <input
+                                  type="text"
+                                  placeholder="Your Skill"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                />
+                              </div>
+                              <div className='w-6/12 '
+                               
+                              >
+                                <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
+                                style={{ color: textColor[selectedIndex] }}
+                                >{levels[selectedIndex]}</span></Label>
+                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' style={{ backgroundColor: tabColors[selectedIndex] }}>
+                                  <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                                    <TabList>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                    </TabList>
+                                  </Tabs>
+                                </div>
+                              </div>
+                            </div>
+                        
+                            </AccordionContent>
+                          </AccordionPanel>
+                        </Accordion>
+
+                          </div>
+
+                          ))
+                         
+                        }
+                        
+                         
+                            </>
+                          )
+                        }
+                        {
+                          section.type==='summary'&&(
+                           <input
+                           type='text'
+                           placeholder='Summary'
+                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                           /> 
+                          )
+                        }
+                       
+
+                  
+                        
+                      </AccordionContent>
+                        </AccordionPanel>
+                        </Accordion>
+                        </div>
+
+                      ))
+                    }
+                    </div>
+                   
+                    {/* <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl'>{sections.title}</AccordionTitle>
+                      <AccordionContent>
+                        {
+                          sections.type==='personal'&&(
+                              <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+                     
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700">
                               Job Target
@@ -913,7 +1335,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* First Name */}
+                        
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               First Name
@@ -925,7 +1347,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* Last Name */}
+                      
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               Last Name
@@ -937,7 +1359,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* Email */}
+                        
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               Email
@@ -949,7 +1371,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* Phone */}
+                    
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               Phone
@@ -961,7 +1383,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* LinkedIn */}
+                     
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700">
                               LinkedIn URL
@@ -973,7 +1395,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* City */}
+                       
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               City, State
@@ -985,7 +1407,7 @@ const levels = [
                             />
                           </div>
 
-                          {/* Country */}
+                         
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               Country
@@ -1021,13 +1443,12 @@ const levels = [
                 </button>
               </div>
 
-              {/* Additional Details - Conditionally Rendered */}
               {showAdditionalDetails && (
                 <>
                   
                  
 
-                  {/* Address */}
+               
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Address
@@ -1039,7 +1460,7 @@ const levels = [
                     />
                   </div>
 
-                  {/* Nationality */}
+                 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Nationality
@@ -1051,7 +1472,7 @@ const levels = [
                     />
                   </div>
 
-                  {/* Place of Birth */}
+                 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Place of Birth
@@ -1063,7 +1484,7 @@ const levels = [
                     />
                   </div>
 
-                  {/* Date of Birth */}
+                
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Date of Birth
@@ -1074,7 +1495,7 @@ const levels = [
                     />
                   </div>
 
-                  {/* Driving License */}
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Driving License
@@ -1088,16 +1509,107 @@ const levels = [
                 </>
               )}
 
-                        </form>
+                              </form>
+                          )
+                        }
+                        {
+                          sections.type==='skills'&&(
+                            <>
+                             <p className="text-gray-500 dark:text-gray-400 mb-4">
+                         Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
+                          (especially when applying via an online system).
+                        </p>
+                         <Accordion collapseAll>
+                          <AccordionPanel>
+                            <AccordionTitle className='font-bold text-xl'> <RiDraggable className='text-xl' />Java</AccordionTitle>
+                            <AccordionContent>
+                                 
+                            <div className='flex gap-10'>
+                               <div className='w-6/12'>
+                                <Label className="!text-gray-400">Skill</Label>
+                                <input
+                                  type="text"
+                                  placeholder="Your Skill"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                />
+                              </div>
+                              <div className='w-6/12 '
+                               
+                              >
+                                <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
+                                style={{ color: textColor[selectedIndex] }}
+                                >{levels[selectedIndex]}</span></Label>
+                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' style={{ backgroundColor: tabColors[selectedIndex] }}>
+                                  <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                                    <TabList>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                    </TabList>
+                                  </Tabs>
+                                </div>
+                              </div>
+                            </div>
+                        
+                            </AccordionContent>
+                          </AccordionPanel>
+                        </Accordion>
+                          <Accordion collapseAll>
+                          <AccordionPanel>
+                            <AccordionTitle className='font-bold text-xl'><RiDraggable className='text-xl' />Python</AccordionTitle>
+                            <AccordionContent>
+                             <div className='flex gap-10'>
+                               <div className='w-6/12'>
+                                <Label className="!text-gray-400">Skill</Label>
+                                <input
+                                  type="text"
+                                  placeholder="Your Skill"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                />
+                              </div>
+                              <div className='w-6/12 '
+                               
+                              >
+                                <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
+                                style={{ color: tabColors[selectedIndex] }}
+                                >{levels[selectedIndex]}</span></Label>
+                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' style={{ backgroundColor: tabColors[selectedIndex] }}>
+                                  <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                                    <TabList>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                      <Tab>&nbsp;</Tab>
+                                    </TabList>
+                                  </Tabs>
+                                </div>
+                              </div>
+                            </div>
+                            </AccordionContent>
+                          </AccordionPanel>
+                        </Accordion>
+                            </>
+                          )
+                        }
+                        {
+                          sections.type==='summary'&&(
+                           <p>Hello</p>  
+                          )
+                        }
+                       
 
-                        {/* 🔹 Nested Accordion */}
+                  
                         
                       </AccordionContent>
-                    </AccordionPanel>
-
+                    </AccordionPanel> */}
+                  
                  
-                    <AccordionPanel>
-                      <AccordionTitle className='font-bold text-xl flex items-center gap-5'><RiDraggable className='text-xl' /> Skills</AccordionTitle>
+                 
+                    {/* <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl flex items-center gap-5'><DragIcon /> Skills</AccordionTitle>
                       <AccordionContent>
                         <p className="text-gray-500 dark:text-gray-400 mb-4">
                          Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
@@ -1176,18 +1688,22 @@ const levels = [
                           </AccordionPanel>
                         </Accordion>
                       </AccordionContent>
-                    </AccordionPanel>
-
-                    <AccordionPanel>
-                      <AccordionTitle className='font-bold text-xl'> <RiDraggable className='text-xl' />Professional Summary</AccordionTitle>
+                    </AccordionPanel> */}
+                  
+                    
+                    {/* <AccordionPanel>
+                      <AccordionTitle className='font-bold text-xl'> <DragIcon />Professional Summary</AccordionTitle>
                       <AccordionContent>
                         Hello
 
                        
                         
                       </AccordionContent>
-                    </AccordionPanel>
-                  </Accordion>
+                    </AccordionPanel> */}
+                   
+                  
+               
+                
 
                   
               </div>
@@ -1405,16 +1921,21 @@ const levels = [
         <div className='h-screen overflow-y-scroll border border-[#E5E5E5] rounded-[8px]'>
           <div ref={componentRef} className=''>
             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-            {
+            {/* {
               template == 1 && (
                 <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
               )
-            }
-            {
-              template == 2 && (
-                <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-              )
-            }
+            } */}
+            
+              
+                {/* <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} /> */}
+                <DynamicTemplate
+                levels={levels}
+          sections={sections} 
+          data={formValues} 
+        />
+              
+            
 
           </div>
         </div>
