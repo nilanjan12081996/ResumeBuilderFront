@@ -230,20 +230,17 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
 
         </div>
         <div className="max-w-4xl mx-auto bg-white shadow-xl">
-          {/* Header */}
+        
           <div className=" text-black">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-center text-[#2f6aeb]">{data?.full_name || ""}</h1>
-            <p className="text-sm font-semibold text-[#2f6aeb] mb-4 text-center">{data?.title || ""}</p>
-            {/* <div className="text-xs sm:text-sm leading-relaxed text-center">
-            <p className="mb-1">{data?.email||""} • {data?.phone||""} • {data?.location||""}</p>
-            <p>{data?.github_profile||""} •{data?.linkdin_profile||""} • {data?.personal_web||""}</p>
-          </div> */}
+            <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-center text-[#2f6aeb]">{data?.first_name + " "+data?.last_name|| ""}</h1>
+            <p className="text-sm font-semibold text-[#2f6aeb] mb-4 text-center">{data?.job_target || ""}</p>
+        
             <div className="text-xs sm:text-sm leading-relaxed text-center">
               <p className="mb-1">
-                {[data?.email, data?.phone, data?.location].filter(Boolean).join(' • ')}
+                {[data?.email, data?.phone, data?.city_state,data?.country].filter(Boolean).join(' • ')}
               </p>
               <p>
-                {[data?.github_profile, data?.linkdin_profile, data?.personal_web].filter(Boolean).join(' • ')}
+                {[data?.github_profile, data?.linkedin, data?.personal_web].filter(Boolean).join(' • ')}
               </p>
             </div>
 
@@ -261,30 +258,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                 </p>
               </section>
             )}
-            {/* Education */}
-            {/* <section className="mb-6">
-            <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
-            <div className="border-b border-blue-700 mb-3"></div>
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">B.Tech</p>
-                  <p className="text-sm text-gray-700">Bharathidasan College of Engineering</p>
-                </div>
-                <div className="mt-1 sm:mt-0 sm:ml-4">
-                  <p className="text-sm text-gray-600">2017 GGN</p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                <div className="flex-1">
-                  <p className="text-sm text-gray-700">Level Higher Secondary School</p>
-                </div>
-                <div className="mt-1 sm:mt-0 sm:ml-4">
-                  <p className="text-sm text-gray-600">2013</p>
-                </div>
-              </div>
-            </div>
-          </section> */}
+       
             {validEducation.length > 0 && (
               <section className="mb-6">
                 <h2 className="text-lg font-bold text-blue-700 mb-2">Education</h2>
@@ -359,47 +333,6 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
               </section>
             )}
 
-
-            {/* Professional Experience */}
-            {/* <section className="mb-6">
-            <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Experience</h2>
-            <div className="border-b border-blue-700 mb-4"></div>
-            
-           
-            <div className="mb-5">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1">
-                <h3 className="font-semibold text-gray-900">Software Developer</h3>
-                <p className="text-sm text-gray-600 mt-1 sm:mt-0">March 2021 - Present</p>
-              </div>
-              <p className="text-sm text-gray-700 mb-2">JollyGood Software (P) Ltd</p>
-              <ul className="text-sm text-gray-800 space-y-1">
-                <li>• Developed responsive client programs using React.js and tailored CSS. Created and website performance and code modularity</li>
-                <li>• improving load times by 30%</li>
-              </ul>
-            </div>
-
-            <div className="mb-5">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1">
-                <h3 className="font-semibold text-gray-900">Front-End Developer Intern</h3>
-              </div>
-              <p className="text-sm text-gray-700 mb-2">Uniqkey</p>
-              <ul className="text-sm text-gray-800 space-y-1">
-                <li>• Built & 3 responsive web application for developers using React.js and TypeScript, improved user engagement by</li>
-                <li>• 20% through UI/UX updates</li>
-              </ul>
-            </div>
-
-   
-            <div className="mb-5">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1">
-                <h3 className="font-semibold text-gray-900">Web Developer Intern</h3>
-              </div>
-              <p className="text-sm text-gray-700 mb-2">Bharath Intern</p>
-              <ul className="text-sm text-gray-800 space-y-1">
-                <li>• Built & fully responsive business website using Rest.js and tailored CSS, achieving a 95+ mobile responsiveness score</li>
-              </ul>
-            </div>
-          </section> */}
             {validExperiences.length > 0 && (
               <section className="mb-6">
                 <h2 className="text-lg font-bold text-blue-700 mb-2">Professional Experience</h2>
@@ -413,17 +346,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                         <h3 className="font-semibold text-gray-900">
                           {exp.position || ""}
                         </h3>
-                        {/* <p className="text-sm text-gray-600 mt-1 sm:mt-0">
-                        {exp.start_date
-                          ? formatSmartDate(exp.start_date)
-                          : ""}{" "}
-                        –{" "}
-                        {exp.current_work
-                          ? "Present"
-                          : exp.end_date
-                            ? formatSmartDate(exp.end_date)
-                            : ""}
-                      </p> */}
+                       
                         <p className="text-sm text-gray-600 mt-1 sm:mt-0">
                           {exp.start_date ? formatSmartDate(exp.start_date) : ""}
 
@@ -445,12 +368,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                         {exp.location ? `– ${exp.location}` : ""}
                       </p>
 
-                      {/* Skill Set */}
-                      {/* {exp.skill && (
-                      <p className="text-xs text-gray-500 italic mb-2">
-                        Skills: {exp.skill} 
-                      </p>
-                    )} */}
+                     
                       {exp.skill && (
                         <p className="text-xs text-gray-500 italic mb-2">
                           Skills:&nbsp;
@@ -473,12 +391,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                               {proj.role && (
                                 <>{" "}– {proj.role}</>
                               )}
-                              {/* {proj.technology && (
-                                <span className="text-gray-600">
-                                  {" "}
-                                  | Tech: {proj.technology}
-                                </span>
-                              )} */}
+                         
                               <p className="text-gray-700 text-xs ml-4">
                                 {proj.description ||
                                   ""}
@@ -497,21 +410,13 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
 
 
             {/* Skills */}
-            {/* <section className="mb-6">
-            <h2 className="text-lg font-bold text-blue-700 mb-2">Skills</h2>
-            <div className="border-b border-blue-700 mb-3"></div>
-            <div className="text-sm text-gray-800 space-y-2">
-              <p><span className="font-semibold">JavaScript (ES6+):</span> Java, C++, SQL</p>
-              <p><span className="font-semibold">React.js, Express.js, MongoDB:</span> Git, GitHub, Postman, Vercel, Netlify</p>
-              <p><span className="font-semibold">REST API, CRUD Operations, Responsive Design, State Management (React Context API)</span></p>
-            </div>
-          </section> */}
+           
             {validSkills.length > 0 && (
               <section className="mb-6">
                 <h2 className="text-lg font-bold text-blue-700 mb-2">Skills</h2>
                 <div className="border-b border-blue-700 mb-3"></div>
 
-                {/* If skills are available from form, show them; else fallback to defaults */}
+               
                 {skills && skills.length > 0 ? (
                   <div className="text-sm text-gray-800 space-y-2">
                     {skills.map((sk) => (
@@ -524,7 +429,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
                     ))}
                   </div>
                 ) : (
-                  // Default static values
+                
                   <div className="text-sm text-gray-800 space-y-2">
                     <p>
                       <span className="font-semibold">JavaScript (ES6+):</span> Java, C++, SQL
@@ -541,28 +446,13 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
             )}
 
 
-            {/* Languages */}
-            {/* <section className="mb-6">
-            <h2 className="text-lg font-bold text-blue-700 mb-2">Languages</h2>
-            <div className="border-b border-blue-700 mb-3"></div>
-            <ul className="text-sm text-gray-800 space-y-1">
-              <li>• Tamil - Native</li>
-              <li>• English - Native / Speech Intermediate</li>
-            </ul>
-          </section> */}
+   
             {validLanguages.length > 0 && (
               <section className="mb-6">
                 <h2 className="text-lg font-bold text-blue-700 mb-2">Languages</h2>
                 <div className="border-b border-blue-700 mb-3"></div>
                 <ul className="text-sm text-gray-800 space-y-1">
-                  {/* {
-                  languages.map((lang) => (
-                    <li key={lang.id}>
-                      • {lang.language_name || ""} -{" "}
-                      {lang.proficiency || ""}
-                    </li>
-                  ))
-                } */}
+              
                   <ul className="text-sm text-gray-800 space-y-1">
                     {languages.map((lang) => {
                       const parts = [lang.language_name, lang.proficiency].filter(Boolean);
@@ -581,11 +471,7 @@ const Template2 = forwardRef(({ data, education, experiences, skills, languages,
             )}
 
 
-            {/* Projects */}
-            {/* <section>
-            <h2 className="text-lg font-bold text-blue-700 mb-2">Projects</h2>
-            <div className="border-b border-blue-700 mb-3"></div>
-          </section> */}
+    
             {validPersonalProjects.length > 0 && (
               <section className="mb-6">
                 <h2 className="text-lg font-bold text-blue-700 mb-2">Projects</h2>
