@@ -1064,6 +1064,9 @@ body {
   transform-origin: 50% 50%;
 } */
 
+
+
+
 .resume_list_area :checked + label {
   border-color: #92278f;
 }

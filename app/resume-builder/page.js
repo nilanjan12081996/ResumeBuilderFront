@@ -51,11 +51,11 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import PersonalInfo from './PersonalInfo';
-import Education from './Education';
+import PersonalInfo from './PersonalSummary';
+import Education from './EducationNew';
 import WorkExp from './WorkExp';
 import Language from './Language';
-import Skills from './Skills';
+import Skills from './SkillsNew';
 import PersonalProject from './PersonalProject';
 import Certificates from './Certificates';
 import Achivments from './Achivments';
@@ -79,6 +79,9 @@ import Link from 'next/link';
 import { RiDraggable } from "react-icons/ri";
 import Professional from '../TemplateNew/Professional';
 import EmpHistory from './EmpHistory';
+import EducationNew from './EducationNew';
+import SkillsNew from './SkillsNew';
+import PersonalSummary from './PersonalSummary';
 
 
 const page = () => {
@@ -138,287 +141,53 @@ const page = () => {
     { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
   ])
   console.log("profileData", profileData);
-
+const [empHistory, setEmpHistory] = useState([{ id: 1 }])
+const [education,setEducation] = useState([{ id: 1 }])
+const[newskill,setNewSkill]=useState([{id:1}])
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm();
 
-  const formValues = watch();
+  
+  const STEPS = [
+  { id: 1, title: "Personal Details" },
+  { id: 2, title: "Employment History" },
+  { id: 3, title: "Education" },
+  { id: 4, title: "Skills" },
+  {id:5,title:"Professional Summary"}
+];
+
+  const [step, setStep] = useState(1);
+  const methods = useForm({
+    mode: "onChange",
+    defaultValues: {
+      employmentHistory: [{}],
+      educationHistory:[{}],
+      newSkillHistory:[{}] 
+    }
+  });
+  const nextStep = () => setStep((prev) => prev + 1);
+  const prevStep = () => setStep((prev) => prev - 1);
+
+  const onSubmit = (data) => {
+    if (step < 6) {
+      nextStep();
+    } else {
+      console.log("Final Submission:", data);
+    }
+  };
+    const formValues =watch();
+
+
   const onSubmit1 = (data) => {
     console.log("data", data);
 
 
-    // if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
-    //   dispatch(addCountResume({ ref_type: "scratch_resume" })).then((res) => {
-    //     console.log(res, "rescount");
-    //     if (res?.payload?.status_code === 200) {
-    //       dispatch(savePersonalInfo(data)).then((res) => {
-    //         console.log("res", res);
 
-    //         if (res?.payload?.status_code === 201) {
-
-    //           const eduPayload = {
-    //             resume_id: res?.payload?.id,
-    //             education_arr: educationEntries.map((edu) => (
-    //               {
-    //                 institution: edu?.institution,
-    //                 location: edu?.location,
-    //                 field_study: edu?.field_study,
-    //                 degree: edu?.degree,
-    //                 start_time: convertToSubmitFormat(edu?.start_time),
-    //                 end_time: convertToSubmitFormat(edu?.end_time),
-    //                 cgpa: edu?.gpa,
-    //                 information: edu?.additionalInfo
-    //               }
-    //             ))
-    //           }
-    //           const payload = {
-    //             resume_id: res?.payload?.id,
-    //             data: experiences.map(exp => ({
-    //               company_name: exp.company_name,
-    //               position: exp.position,
-    //               location: exp.location,
-    //               skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-    //               start_date: convertToSubmitFormat(exp.start_date),
-    //               end_date: convertToSubmitFormat(exp.end_date),
-    //               current_work: exp.current_work ? 1 : 0,
-    //               projects: exp.projects.map(proj => ({
-    //                 title: proj.title,
-    //                 role: proj.role,
-    //                 technology: proj.technology.split(",").map(t => t.trim()),
-    //                 description: proj.description
-    //               }))
-    //             }))
-    //           };
-    //           const payloadLang = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: languages.map((lang) => ({
-    //               language_name: lang.language_name,
-    //               proficiency: lang.proficiency,
-    //             })),
-    //           };
-    //           const payloadSkills = {
-    //             user_id: parseUserId?.user_id,
-    //             data: skills.map((sk) => (
-    //               {
-    //                 resume_id: res?.payload?.id,
-    //                 skill_category: sk.skill_category,
-    //                 position: "test",
-    //                 skill: sk.skill.split(',').map(t => t.trim())
-    //               }
-
-    //             ))
-    //           }
-    //           const payloadProject = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: personalPro.map((pPro) => (
-    //               {
-    //                 project_title: pPro?.project_title,
-    //                 role: pPro?.role,
-    //                 start_time: convertToSubmitFormat(pPro?.start_time),
-    //                 end_time: convertToSubmitFormat(pPro?.end_time),
-    //                 project_url: pPro?.project_url,
-    //                 skill: pPro.skill.split(',').map(t => t.trim())
-    //               }
-    //             ))
-    //           }
-    //           const payloadCerticate = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: certificates.map((cer) => (
-    //               {
-    //                 certification_name: cer?.certification_name,
-    //                 issuing_organization: cer?.issuing_organization,
-    //                 obtained_date: convertToSubmitFormat(cer?.obtained_date),
-    //                 certification_id: cer?.certification_id
-    //               }
-    //             ))
-    //           }
-    //           const payloadAchive = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: achivments.map((achiv) => (
-    //               {
-
-    //                 achievement_title: achiv?.achievement_title,
-    //                 organization: achiv?.organization,
-    //                 receive_date: convertToSubmitFormat(achiv?.receive_date),
-    //                 description: achiv?.description
-    //               }
-    //             ))
-    //           }
-    //           dispatch(saveForDraft({
-    //             flag: type,
-    //             id: res?.payload?.id
-    //           }))
-    //           dispatch(saveTemplate({
-    //             templete_id: template,
-    //             jd_id: res?.payload?.id,
-    //             jd_type: "scratch",
-    //             user_id: parseUserId?.user_id
-    //           }))
-    //           dispatch(saveEducationInfo(eduPayload))
-    //           dispatch(saveWorkExp(payload))
-    //           dispatch(saveLanguageInfo(payloadLang))
-    //           dispatch(saveSkillInfo(payloadSkills))
-    //           dispatch(saveProjectInfo(payloadProject))
-    //           dispatch(saveCertificatesInfo(payloadCerticate))
-    //           dispatch(saveAchivmentInfo(payloadAchive))
-
-    //           toast.success(res?.payload?.message)
-    //           setIsCreated(true)
-
-    //         }
-
-    //       })
-    //     }
-    //     else if (res?.payload?.response?.data?.status_code === 400) {
-    //       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-    //         autoClose: false
-    //       })
-    //     }
-
-    //   })
-    // }
-    // else {
-    //   dispatch(addCountResumeOrg({ ref_type: "scratch_resume" })).then((res) => {
-    //     console.log(res, "rescount");
-    //     if (res?.payload?.status_code === 200) {
-    //       dispatch(savePersonalInfo(data)).then((res) => {
-    //         console.log("res", res);
-
-    //         if (res?.payload?.status_code === 201) {
-
-    //           const eduPayload = {
-    //             resume_id: res?.payload?.id,
-    //             education_arr: educationEntries.map((edu) => (
-    //               {
-    //                 institution: edu?.institution,
-    //                 location: edu?.location,
-    //                 field_study: edu?.field_study,
-    //                 degree: edu?.degree,
-    //                 start_time: convertToSubmitFormat(edu?.start_time),
-    //                 end_time: convertToSubmitFormat(edu?.end_time),
-    //                 cgpa: edu?.gpa,
-    //                 information: edu?.additionalInfo
-    //               }
-    //             ))
-    //           }
-    //           const payload = {
-    //             resume_id: res?.payload?.id,
-    //             data: experiences.map(exp => ({
-    //               company_name: exp.company_name,
-    //               position: exp.position,
-    //               location: exp.location,
-    //               skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-    //               start_date: convertToSubmitFormat(exp.start_date),
-    //               end_date: convertToSubmitFormat(exp.end_date),
-    //               current_work: exp.current_work ? 1 : 0,
-    //               projects: exp.projects.map(proj => ({
-    //                 title: proj.title,
-    //                 role: proj.role,
-    //                 technology: proj.technology.split(",").map(t => t.trim()),
-    //                 description: proj.description
-    //               }))
-    //             }))
-    //           };
-    //           const payloadLang = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: languages.map((lang) => ({
-    //               language_name: lang.language_name,
-    //               proficiency: lang.proficiency,
-    //             })),
-    //           };
-    //           const payloadSkills = {
-    //             user_id: parseUserId?.user_id,
-    //             data: skills.map((sk) => (
-    //               {
-    //                 resume_id: res?.payload?.id,
-    //                 skill_category: sk.skill_category,
-    //                 position: "test",
-    //                 skill: sk.skill.split(',').map(t => t.trim())
-    //               }
-
-    //             ))
-    //           }
-    //           const payloadProject = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: personalPro.map((pPro) => (
-    //               {
-    //                 project_title: pPro?.project_title,
-    //                 role: pPro?.role,
-    //                 start_time: convertToSubmitFormat(pPro?.start_time),
-    //                 end_time: convertToSubmitFormat(pPro?.end_time),
-    //                 project_url: pPro?.project_url,
-    //                 skill: pPro.skill.split(',').map(t => t.trim())
-    //               }
-    //             ))
-    //           }
-    //           const payloadCerticate = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: certificates.map((cer) => (
-    //               {
-    //                 certification_name: cer?.certification_name,
-    //                 issuing_organization: cer?.issuing_organization,
-    //                 obtained_date: convertToSubmitFormat(cer?.obtained_date),
-    //                 certification_id: cer?.certification_id
-    //               }
-    //             ))
-    //           }
-    //           const payloadAchive = {
-    //             user_id: parseUserId?.user_id,
-    //             resume_id: res?.payload?.id,
-    //             data: achivments.map((achiv) => (
-    //               {
-
-    //                 achievement_title: achiv?.achievement_title,
-    //                 organization: achiv?.organization,
-    //                 receive_date: convertToSubmitFormat(achiv?.receive_date),
-    //                 description: achiv?.description
-    //               }
-    //             ))
-    //           }
-    //           dispatch(saveForDraft({
-    //             flag: type,
-    //             id: res?.payload?.id
-    //           }))
-    //           dispatch(saveTemplate({
-    //             templete_id: template,
-    //             jd_id: res?.payload?.id,
-    //             jd_type: "scratch",
-    //             user_id: parseUserId?.user_id
-    //           }))
-    //           dispatch(saveEducationInfo(eduPayload))
-    //           dispatch(saveWorkExp(payload))
-    //           dispatch(saveLanguageInfo(payloadLang))
-    //           dispatch(saveSkillInfo(payloadSkills))
-    //           dispatch(saveProjectInfo(payloadProject))
-    //           dispatch(saveCertificatesInfo(payloadCerticate))
-    //           dispatch(saveAchivmentInfo(payloadAchive))
-
-    //           toast.success(res?.payload?.message)
-    //           setIsCreated(true)
-
-    //         }
-
-    //       })
-    //     }
-    //     else if (res?.payload?.response?.data?.status_code === 400) {
-    //       toast.error("Your Plan Limit is Expired,Please Upgrade Your Plan!", {
-    //         autoClose: false
-    //       })
-    //     }
-
-    //   })
-    // }
 
     dispatch(savePersonalInfo(data)).then((res) => {
       console.log("res", res);
@@ -591,19 +360,6 @@ const page = () => {
   });
 
 
-
-
-  // const handleDownloadClick = () => {
-  //   console.log("hello");
-
-  //   if (!isCreated) {
-  //     toast.error('Please save your resume first before downloading!');
-  //     return;
-  //   }
-
-  //   handlePrint();
-  // };
-
   const handleDownloadClick = async () => {
     if (!isCreated) {
       toast.error('Please save your resume first before downloading!');
@@ -639,50 +395,7 @@ const page = () => {
   };
 
 
-  // const downloadDocx = async () => {
-  //   if (!componentRef.current) return;
 
-  //   const content = componentRef.current.innerHTML;
-
-  //   const html = `
-  //     <!DOCTYPE html>
-  //     <html>
-  //       <head>
-  //         <meta charset="utf-8" />
-  //         <style>
-  //           ${document.querySelector("style")?.innerHTML || ""}
-  //         </style>
-  //       </head>
-  //       <body>
-  //         ${content}
-  //       </body>
-  //     </html>
-  //   `;
-
-  //   const blob = await html2docx(html, null, {
-  //     margins: { top: 720, right: 720, bottom: 720, left: 720 }, // Word margins
-  //   });
-
-  //   saveAs(blob, `${formValues?.full_name || "Resume"}_Resume.docx`);
-  // };
-
-  const [step, setStep] = useState(1);
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {
-      employmentHistory: [{}], // Initialize for your dynamic fields
-    }
-  });
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
-
-  const onSubmit = (data) => {
-    if (step < 4) {
-      nextStep();
-    } else {
-      console.log("Final Submission:", data);
-    }
-  };
 
   return (
     <div>
@@ -945,39 +658,79 @@ const page = () => {
                       {
                         step === 2 && (
                           <div>
-                            <EmpHistory />
+                            <EmpHistory 
+                              register={register}
+                              empHistory={empHistory}
+                              setEmpHistory={setEmpHistory}
+                              watch={watch}
+                            />
+                          </div>
+                        )
+                      }
+                      {
+                        step===3 &&(
+                          <div>
+                            <EducationNew   
+                            register={register}
+                              education={education}
+                              setEducation={setEducation}
+                              watch={watch}/>
+                          </div>
+                        )
+                      }
+                      {
+                        step===4&&(
+                          <div>
+                            <SkillsNew
+                            register={register}
+                              newskill={newskill}
+                              setNewSkill={setNewSkill}
+                              watch={watch}
+                              setValue={setValue}
+                            />
+                            </div>
+                        )
+                      }
+                      {
+                        step===5&&(
+                          <div>
+                            <PersonalSummary
+                              register={register}
+                               watch={watch}
+                            />
                           </div>
                         )
                       }
 
 
+
                     </div>
 
                     <div className='flex justify-between items-center px-8 py-3 border-t border-[#e7e8ec]'>
-                      {/* <div className='w-9/12'>
-                        <p className='text-[#828bb7] text-[10px] font-normal'>
-                          By signing up by email you agree with our <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Terms of use</Link> and <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Privacy Policy</Link>, and topresume.com&lsquo;s <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Terms & Conditions</Link> and <Link className='text-[#b215ac] hover:text-[#828bb7]' href="/#" passHref>Privacy Policy</Link>.
-                        </p>
-                      </div> */}
+                  
                       <div className='w-3/12'>
                         <button
                           type="button"
                           onClick={prevStep}
                           disabled={step === 1}
-                          className={`text-sm font-medium ${step === 1 ? 'invisible' : 'text-gray-500'}`}
+                          className={`text-sm font-medium ${step === 1 ? 'invisible' : 'text-gray-500'} rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700`}
                         >
                           Back
                         </button>
                       </div>
 
 
-                      <div className='w-3/12'>
+                      <div className='w-5/12'>
 
                         <button
                           type="submit"
                           className='rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700'
                         >
-                          {step === 4 ? "Finish" : "Next Section"}
+                                {step === STEPS.length ? (
+                                    "Finish"
+                                  ) : (
+                                    `Next: ${STEPS.find(s => s.id === step + 1)?.title}`
+                                  )}
                         </button>
                       </div>
                     </div>
@@ -987,102 +740,6 @@ const page = () => {
               </FormProvider>
             </TabPanel>
             <TabPanel>Customize</TabPanel>
-
-            {/* <div className='hidden'>
-
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
-                    <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
-                      <HiClipboardList className='text-[#800080] text-2xl' />
-                      <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
-                    </div>
-                    <div className='flex gap-2'>
-                      <button disabled={isCreated} onClick={() => setType("draft")} type="submit"
-                        // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
-                        className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
-                                  ${isCreated
-                            ? "bg-gray-400 text-white cursor-not-allowed"
-                            : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
-                          }`}
-                      >
-                        <AiFillSave className='text-[18px]' />{loading ? "Waiting..." : "Save as Draft"} </button>
-                      <button
-                        disabled={isCreated} onClick={() => setType("save")} type="submit"
-                        // className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'
-                        className={`rounded-[7px] text-[12px] leading-[36px] font-medium px-2 lg:px-4 flex items-center gap-1.5
-                          ${isCreated
-                            ? "bg-gray-400 text-white cursor-not-allowed"
-                            : "bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F] cursor-pointer"
-                          }`}
-                      ><AiFillSave className='text-[18px]' />{loading ? "Waiting..." : "Save Resume"} </button>
-
-                    </div>
-
-                  </div>
-                  <div className='resume_tab_section'>
-                    <Tabs>
-                      <div className='border-b border-[#E5E5E5] p-5'>
-                        <div className='tab_point'>
-                          <TabList>
-                            <Tab><span><BiSolidUser /></span> Personal Info</Tab>
-                            <Tab><span><HiAcademicCap /></span> Education</Tab>
-                            <Tab><span><BiSolidBriefcase /></span> Work Experience</Tab>
-                            <Tab><span><FaLanguage /></span> Languages</Tab>
-                            <Tab><span><MdSettingsSuggest /></span> Skills</Tab>
-                            <Tab><span><FaDiagramProject /></span> Personal Projects</Tab>
-                            <Tab><span><FaCertificate /></span> Certifications</Tab>
-                            <Tab><span><FaTrophy /></span> Achievements</Tab>
-                          </TabList>
-                        </div>
-                      </div>
-                      <div className='p-5 pr-0'>
-                        <div className='mb-4'>
-                          <div>
-                            <TabPanel>
-                              <PersonalInfo register={register} errors={errors} />
-                            </TabPanel>
-
-                            <TabPanel>
-                              <Education register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} />
-                            </TabPanel>
-
-
-                            <TabPanel>
-                              <WorkExp experiences={experiences} setExperiences={setExperiences} register={register} errors={errors} />
-                            </TabPanel>
-
-                            <TabPanel>
-                              <Language
-                                languages={languages}
-                                setLanguages={setLanguages}
-                              />
-                            </TabPanel>
-
-                            <TabPanel>
-                              <Skills register={register} errors={errors} skills={skills} setSkills={setSkills} />
-                            </TabPanel>
-
-                            <TabPanel>
-                              <PersonalProject register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} />
-                            </TabPanel>
-
-                            <TabPanel>
-                              <Certificates register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} />
-                            </TabPanel>
-
-                            <TabPanel>
-                              <Achivments register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} />
-                            </TabPanel>
-
-                          </div>
-                        </div>
-                      </div>
-                    </Tabs>
-                  </div>
-                </form>
-
-              </div> */}
-
           </div>
 
           <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
@@ -1123,7 +780,7 @@ const page = () => {
                     <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
                 } */}
-              <Professional formData={formValues} />
+              <Professional formData={formValues} empHistory={empHistory} />
 
             </div>
             {/* <div className='flex items-center justify-between mb-0'>
