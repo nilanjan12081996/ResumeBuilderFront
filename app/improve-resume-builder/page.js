@@ -22,7 +22,7 @@ import { MdEmail } from "react-icons/md";
 import { FaLocationDot } from "react-icons/fa6";
 import { BiSolidPhone } from "react-icons/bi";
 
-import { HiAcademicCap } from "react-icons/hi2";
+import { HiAcademicCap, HiSparkles } from "react-icons/hi2";
 
 import { FaLanguage } from "react-icons/fa6";
 import { MdSettingsSuggest } from "react-icons/md";
@@ -52,7 +52,7 @@ import resume_score from "../assets/imagesource/resume_score.png";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Progress, Accordion, AccordionPanel, AccordionTitle, AccordionContent  } from "flowbite-react";
+import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Progress, Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
 
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -92,6 +92,8 @@ import DraggableWrapper from "./DraggableWrapper";
 import DragIcon from './DragIcon';
 import { TfiHandDrag } from "react-icons/tfi";
 import DynamicTemplate from '../temp/DynamicTemplate';
+import GenerateWithAiModal from '../modal/GenerateWithAiModal';
+
 
 const page = () => {
   // const { improveResumeData } = useSelector((state) => state?.dash)
@@ -107,7 +109,8 @@ const page = () => {
   const dispatch = useDispatch()
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
- const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
+  const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   // useEffect(() => {
   //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
@@ -135,27 +138,27 @@ const page = () => {
   const { profileData } = useSelector((state) => state?.profile)
 
   const tabColors = [
-  "#ffeaec", // 1st tab
-  "#feebe3", // 2nd tab
-  "#fff2cc", // 3rd tab
-  "#e7f4ed", // 4th tab
-  "#f1f2ff", // 5th tab
-];
-const textColor=[
-  "#fe7d8b", // 1st tab
-  "#f68559", // 2nd tab
-  "#ec930c", // 3rd tab
-  "#48ba75", // 4th tab
-  "#9ba1fb", // 5th tab
-]
+    "#ffeaec", // 1st tab
+    "#feebe3", // 2nd tab
+    "#fff2cc", // 3rd tab
+    "#e7f4ed", // 4th tab
+    "#f1f2ff", // 5th tab
+  ];
+  const textColor = [
+    "#fe7d8b", // 1st tab
+    "#f68559", // 2nd tab
+    "#ec930c", // 3rd tab
+    "#48ba75", // 4th tab
+    "#9ba1fb", // 5th tab
+  ]
 
-const levels = [
+  const levels = [
     "Novice",
     "Beginner",
-     "Skillful",
-      "Experienced",
-      "Expert",
-];
+    "Skillful",
+    "Experienced",
+    "Expert",
+  ];
 
   const {
     register,
@@ -218,7 +221,7 @@ const levels = [
     }
   }, [getUpdateResumeInfoData]);
 
-  
+
   useEffect(() => {
     const experiencesData = getUpdateResumeInfoData?.data?.imp_experience_info;
     const projectsData = getUpdateResumeInfoData?.data?.imp_project_info;
@@ -365,7 +368,7 @@ const levels = [
     }
   }, [getUpdateResumeInfoData]);
 
- 
+
 
   useEffect(() => {
     if (
@@ -708,8 +711,8 @@ const levels = [
     },
   });
 
-  
- const handleEnhancePDF = async () => {
+
+  const handleEnhancePDF = async () => {
     try {
       setEnhancing(true);
 
@@ -764,7 +767,7 @@ const levels = [
       -------------------------------- */
       const experienceData = (rewriteData?.experience?.Experience || []).map((exp, expIndex) => {
         const existingExp = resumeData?.imp_experience_info?.[expIndex];
-        
+
         // Map projects for this experience
         const mappedProjects = (exp.Projects || []).map((proj, projIndex) => {
           // Find existing project by matching exp_id or by index
@@ -772,7 +775,7 @@ const levels = [
             p => p.exp_id === existingExp?.id
           ) || [];
           const existingProj = existingProjects[projIndex];
-          
+
           return {
             ...proj,
             id: existingProj?.id, // ✅ Preserve existing project ID
@@ -875,101 +878,101 @@ const levels = [
       });
   };
 
-// const [sections, setSections] = useState([
- 
-//   { id: 1, title: 'Skills', type: 'skills' },
-//   { id: 3, title: 'Professional Summary', type: 'summary' }
-// ]);
+  // const [sections, setSections] = useState([
 
-const [sections, setSections] = useState([
-  
-  { 
-    id: 0, 
-    title: 'Skills', 
-    type: 'skills', 
-    skills: [
-      { id: 's1', name: 'Java', level: 3 },
-      { id: 's2', name: 'Python', level: 4 }
-    ] 
-  },
-  { id: 1, title: 'Professional Summary', type: 'summary' }
-]);
-const [draggedIndex, setDraggedIndex] = useState(null);
+  //   { id: 1, title: 'Skills', type: 'skills' },
+  //   { id: 3, title: 'Professional Summary', type: 'summary' }
+  // ]);
 
+  const [sections, setSections] = useState([
 
-const handleDragStart = (e, index) => {
-  setDraggedIndex(index);
-  
-
-  const dragTarget = e.currentTarget;
-  e.dataTransfer.setDragImage(dragTarget, 20, 20); 
-  e.dataTransfer.effectAllowed = "move";
-};
+    {
+      id: 0,
+      title: 'Skills',
+      type: 'skills',
+      skills: [
+        { id: 's1', name: 'Java', level: 3 },
+        { id: 's2', name: 'Python', level: 4 }
+      ]
+    },
+    { id: 1, title: 'Professional Summary', type: 'summary' }
+  ]);
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
 
-const handleDragEnd = () => {
-  setDraggedIndex(null);
-};
-
-const handleDragOver = (e) => {
-  e.preventDefault(); // Necessary to allow drop
-  e.dataTransfer.dropEffect = "move"
-};
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
 
 
-const handleDrop = (e, targetIndex) => {
-  e.preventDefault();
-  
-  if (draggedIndex === targetIndex) return;
-
-  const updatedSections = [...sections];
-  // 1. Remove the dragged item
-  const [draggedItem] = updatedSections.splice(draggedIndex, 1);
-  // 2. Insert it at the new target position
-  updatedSections.splice(targetIndex, 0, draggedItem);
-
-  setSections(updatedSections);
-  setDraggedIndex(null);
-}; 
+    const dragTarget = e.currentTarget;
+    e.dataTransfer.setDragImage(dragTarget, 20, 20);
+    e.dataTransfer.effectAllowed = "move";
+  };
 
 
-// Add state to track which sub-skill is being dragged
-const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
 
-// --- Skill Drag Handlers ---
-const handleSkillDragStart = (e, index) => {
-  e.stopPropagation(); // Stops the parent section from dragging
-  setDraggedSkillIndex(index);
-};
-
-const handleSkillDrop = (e, sectionIndex, targetSkillIndex) => {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  if (draggedSkillIndex === null || draggedSkillIndex === targetSkillIndex) return;
-
-  const updatedSections = [...sections];
-  const skillsList = [...updatedSections[sectionIndex].skills];
-  
-  // Reorder the skills array
-  const [movedSkill] = skillsList.splice(draggedSkillIndex, 1);
-  skillsList.splice(targetSkillIndex, 0, movedSkill);
-  
-  updatedSections[sectionIndex].skills = skillsList;
-  setSections(updatedSections);
-  setDraggedSkillIndex(null);
-};
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Necessary to allow drop
+    e.dataTransfer.dropEffect = "move"
+  };
 
 
- const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
-                          const updatedSections = [...sections];
-                          updatedSections[sectionIndex].skills = updatedSections[sectionIndex].skills.map(sk => 
-                            sk.id === skillId ? { ...sk, [field]: value } : sk
-                          );
-                          setSections(updatedSections);
-                        };
+  const handleDrop = (e, targetIndex) => {
+    e.preventDefault();
 
-return (
+    if (draggedIndex === targetIndex) return;
+
+    const updatedSections = [...sections];
+    // 1. Remove the dragged item
+    const [draggedItem] = updatedSections.splice(draggedIndex, 1);
+    // 2. Insert it at the new target position
+    updatedSections.splice(targetIndex, 0, draggedItem);
+
+    setSections(updatedSections);
+    setDraggedIndex(null);
+  };
+
+
+  // Add state to track which sub-skill is being dragged
+  const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
+
+  // --- Skill Drag Handlers ---
+  const handleSkillDragStart = (e, index) => {
+    e.stopPropagation(); // Stops the parent section from dragging
+    setDraggedSkillIndex(index);
+  };
+
+  const handleSkillDrop = (e, sectionIndex, targetSkillIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedSkillIndex === null || draggedSkillIndex === targetSkillIndex) return;
+
+    const updatedSections = [...sections];
+    const skillsList = [...updatedSections[sectionIndex].skills];
+
+    // Reorder the skills array
+    const [movedSkill] = skillsList.splice(draggedSkillIndex, 1);
+    skillsList.splice(targetSkillIndex, 0, movedSkill);
+
+    updatedSections[sectionIndex].skills = skillsList;
+    setSections(updatedSections);
+    setDraggedSkillIndex(null);
+  };
+
+
+  const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex].skills = updatedSections[sectionIndex].skills.map(sk =>
+      sk.id === skillId ? { ...sk, [field]: value } : sk
+    );
+    setSections(updatedSections);
+  };
+
+  return (
     <div className='lg:flex gap-2 pb-0'>
       <ToastContainer />
 
@@ -981,341 +984,341 @@ return (
             <div className='mb-10'>
 
               <div className='mb-4'>
-                 <div className='flex items-center gap-2 mb-2'>
-                   <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
-                   <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
-                 </div>
-                 <div className="flex flex-col gap-2">
+                <div className='flex items-center gap-2 mb-2'>
+                  <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
+                  <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
+                </div>
+                <div className="flex flex-col gap-2">
                   <Progress progress={45} size="sm" />
                 </div>
               </div>
 
               <div className='flex items-center mb-4'>
                 <div className='w-6/12'>
-                   <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Existing Resume</button>
+                  <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Existing Resume</button>
                 </div>
-                 <div className='w-6/12'>
-                   <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Changed Resume</button>
+                <div className='w-6/12'>
+                  <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Changed Resume</button>
                 </div>
               </div>
 
               <div className='acco_section'>
-                 <Accordion>                    
+                <Accordion>
                   <AccordionPanel>
-                      <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
-                      <AccordionContent>
-                        
-                         
-                              <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-                     
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              Job Target
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Enter Your Job Target"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500"
+                    <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
+                    <AccordionContent>
+
+
+                      <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Job Target
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Enter Your Job Target"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500"
                             {...register("job_target")}
-                            />
-                          </div>
+                          />
+                        </div>
 
-                        
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              First Name
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="First Name"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                               {...register("first_name")}
-                            />
-                          </div>
 
-                      
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Last Name
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Last Name"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              {...register("last_name")}
-                            />
-                          </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            First Name
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="First Name"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("first_name")}
+                          />
+                        </div>
 
-                        
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Email
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Email"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Last Name
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Last Name"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("last_name")}
+                          />
+                        </div>
+
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Email
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Email"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                             {...register("email_add")}
-                            />
-                          </div>
-
-                    
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Phone
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Phone No."
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              {...register("phone_no")}
-                            />
-                          </div>
-
-                     
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              LinkedIn URL
-                            </label>
-                            <input
-                              type="url"
-                              placeholder="linkedin.com/in/yourprofile"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              {...register("linkedin")}
-                            />
-                          </div>
-
-                       
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              City, State
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="City, State"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              {...register("city_state")}
-                            />
-                          </div>
-
-                         
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Country
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Country"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                              {...register("country")}
-                            />
-                          </div>
+                          />
+                        </div>
 
 
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Phone
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Phone No."
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("phone_no")}
+                          />
+                        </div>
 
-                           <div className="md:col-span-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
-                  className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
-                >
-                  {showAdditionalDetails ? (
-                    <>
-                     Hide additional details
-                      <ChevronUp size={20} />
-                     
-                    </>
-                  ) : (
-                    <>
-                    Add more details
-                      <ChevronDown size={20} />
-                      
-                    </>
-                  )}
-                </button>
-              </div>
 
-              {showAdditionalDetails && (
-                <>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter your address"
-                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                      {...register("address")}
-                    />
-                  </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            LinkedIn URL
+                          </label>
+                          <input
+                            type="url"
+                            placeholder="linkedin.com/in/yourprofile"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("linkedin")}
+                          />
+                        </div>
 
-                 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Nationality
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Nationality"
-                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                      {...register("nationality")}
-                    />
-                  </div>
 
-                 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Place of Birth
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="City, Country"
-                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                      {...register("birth_place")}
-                    />
-                  </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            City, State
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="City, State"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("city_state")}
+                          />
+                        </div>
 
-                
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Date of Birth
-                    </label>
-                    <input
-                      type="date"
-                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                      {...register("dob")}
-                    />
-                  </div>
 
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Driving License
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="License Number"
-                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                      {...register("driving_licence")}
-                    />
-                  </div>
-                </>
-              )}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Country
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Country"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                            {...register("country")}
+                          />
+                        </div>
 
-                              </form>
-                      </AccordionContent>
-                    </AccordionPanel>
-                    </Accordion>
 
-    
-                    <div className="space-y-2">
-                    {
-                      sections.map((section,index)=>(
-                        <div
+
+                        <div className="md:col-span-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                            className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                          >
+                            {showAdditionalDetails ? (
+                              <>
+                                Hide additional details
+                                <ChevronUp size={20} />
+
+                              </>
+                            ) : (
+                              <>
+                                Add more details
+                                <ChevronDown size={20} />
+
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {showAdditionalDetails && (
+                          <>
+                            <div className="md:col-span-2">
+                              <label className="block text-sm font-medium text-gray-700">
+                                Address
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Enter your address"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register("address")}
+                              />
+                            </div>
+
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Nationality
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Nationality"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register("nationality")}
+                              />
+                            </div>
+
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Place of Birth
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="City, Country"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register("birth_place")}
+                              />
+                            </div>
+
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Date of Birth
+                              </label>
+                              <input
+                                type="date"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register("dob")}
+                              />
+                            </div>
+
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700">
+                                Driving License
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="License Number"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register("driving_licence")}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                      </form>
+                    </AccordionContent>
+                  </AccordionPanel>
+                </Accordion>
+
+
+                <div className="space-y-2">
+                  {
+                    sections.map((section, index) => (
+                      <div
                         key={section.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, index)}
-                          onDragEnd={handleDragEnd}
-                          onDragOver={handleDragOver}
-                          onDrop={(e) => handleDrop(e, index)}
-                          className={`
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, index)}
+                        className={`
                             mb-4 transition-all duration-200 bg-white rounded-xl border
-                            ${draggedIndex === index 
-                              ? "opacity-20 border-cyan-500 scale-95" // The "hole" left behind
-                              : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
-                            }
+                            ${draggedIndex === index
+                            ? "opacity-20 border-cyan-500 scale-95" // The "hole" left behind
+                            : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
+                          }
                             cursor-grab active:cursor-grabbing
                           `}
-                        >
-                          <Accordion flush={true}>
+                      >
+                        <Accordion flush={true}>
 
-                         <AccordionPanel>
-                      <AccordionTitle className='font-bold text-xl'><TfiHandDrag className='text-xl' title="drag and drop" />{section.title}</AccordionTitle>
-                      <AccordionContent>
-                        {
-                          section.type==='skills'&&(
-                            <>
-                             <p className="text-gray-500 dark:text-gray-400 mb-4">
-                         Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
-                          (especially when applying via an online system).
-                        </p>
-                        {
-                         
-                          section.skills.map((skill, sIndex)=>(
-                             <div
-                           key={skill.id}
-                            draggable
-                            onDragStart={(e) => handleSkillDragStart(e, sIndex)}
-                            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                            onDrop={(e) => handleSkillDrop(e, index, sIndex)}
-                            onDragEnd={() => setDraggedSkillIndex(null)}
-                            className={`transition-all duration-200 rounded-lg border 
-                              ${draggedSkillIndex === sIndex 
-                                ? "opacity-20 border-cyan-500 scale-95" 
-                                : "bg-white border-gray-200 shadow-sm"
-                              }`}>
-
-                          <Accordion collapseAll>
                           <AccordionPanel>
-                            <AccordionTitle className='font-bold text-xl'> <TfiHandDrag  className='text-xl' title="drag and drop"/>{skill.name}</AccordionTitle>
+                            <AccordionTitle className='font-bold text-xl'><TfiHandDrag className='text-xl' title="drag and drop" />{section.title}</AccordionTitle>
                             <AccordionContent>
-                                 
-                            <div className='flex gap-10'>
-                               <div className='w-6/12'>
-                                <Label className="!text-gray-400">Skill</Label>
-                                <input
-                                  type="text"
-                                  value={skill.name}
-                                  placeholder="Your Skill"
-                                  onChange={(e) => handleSkillUpdate(index, skill.id, 'name', e.target.value)}
-                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                />
-                              </div>
-                              <div className='w-6/12 '
-                               
-                              >
-                                <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
-                               style={{ color: textColor[skill.level] }}
-                                >
-                                  {/* {levels[selectedIndex]} */}
-                                  {levels[skill.level]}
-                                </span></Label>
-                                <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0' 
-                                style={{ backgroundColor: tabColors[skill.level]}}
-                                >
-                                  <Tabs 
-                                 // selectedIndex={selectedIndex} onSelect={setSelectedIndex}
-                                 selectedIndex={skill.level} // Use level from the skill object
-                                 onSelect={(tabIndex) => handleSkillUpdate(index, skill.id, 'level', tabIndex)}
-                                  >
-                                    <TabList>
-                                      <Tab>&nbsp;</Tab>
-                                      <Tab>&nbsp;</Tab>
-                                      <Tab>&nbsp;</Tab>
-                                      <Tab>&nbsp;</Tab>
-                                      <Tab>&nbsp;</Tab>
-                                    </TabList>
-                                  </Tabs>
-                                </div>
-                              </div>
-                            </div>
-                        
-                            </AccordionContent>
-                          </AccordionPanel>
-                        </Accordion>
+                              {
+                                section.type === 'skills' && (
+                                  <>
+                                    <p className="text-gray-500 dark:text-gray-400 mb-4">
+                                      Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
+                                      (especially when applying via an online system).
+                                    </p>
+                                    {
 
-                          </div>
+                                      section.skills.map((skill, sIndex) => (
+                                        <div
+                                          key={skill.id}
+                                          draggable
+                                          onDragStart={(e) => handleSkillDragStart(e, sIndex)}
+                                          onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                          onDrop={(e) => handleSkillDrop(e, index, sIndex)}
+                                          onDragEnd={() => setDraggedSkillIndex(null)}
+                                          className={`transition-all duration-200 rounded-lg border 
+                              ${draggedSkillIndex === sIndex
+                                              ? "opacity-20 border-cyan-500 scale-95"
+                                              : "bg-white border-gray-200 shadow-sm"
+                                            }`}>
 
-                          ))
-                         
-                        }
-                        
-                         
-                            </>
-                          )
-                        }
-                      {/* {
+                                          <Accordion collapseAll>
+                                            <AccordionPanel>
+                                              <AccordionTitle className='font-bold text-xl'> <TfiHandDrag className='text-xl' title="drag and drop" />{skill.name}</AccordionTitle>
+                                              <AccordionContent>
+
+                                                <div className='flex gap-10'>
+                                                  <div className='w-6/12'>
+                                                    <Label className="!text-gray-400">Skill</Label>
+                                                    <input
+                                                      type="text"
+                                                      value={skill.name}
+                                                      placeholder="Your Skill"
+                                                      onChange={(e) => handleSkillUpdate(index, skill.id, 'name', e.target.value)}
+                                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                                    />
+                                                  </div>
+                                                  <div className='w-6/12 '
+
+                                                  >
+                                                    <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
+                                                      style={{ color: textColor[skill.level] }}
+                                                    >
+                                                      {/* {levels[selectedIndex]} */}
+                                                      {levels[skill.level]}
+                                                    </span></Label>
+                                                    <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0'
+                                                      style={{ backgroundColor: tabColors[skill.level] }}
+                                                    >
+                                                      <Tabs
+                                                        // selectedIndex={selectedIndex} onSelect={setSelectedIndex}
+                                                        selectedIndex={skill.level} // Use level from the skill object
+                                                        onSelect={(tabIndex) => handleSkillUpdate(index, skill.id, 'level', tabIndex)}
+                                                      >
+                                                        <TabList>
+                                                          <Tab>&nbsp;</Tab>
+                                                          <Tab>&nbsp;</Tab>
+                                                          <Tab>&nbsp;</Tab>
+                                                          <Tab>&nbsp;</Tab>
+                                                          <Tab>&nbsp;</Tab>
+                                                        </TabList>
+                                                      </Tabs>
+                                                    </div>
+                                                  </div>
+                                                </div>
+
+                                              </AccordionContent>
+                                            </AccordionPanel>
+                                          </Accordion>
+
+                                        </div>
+
+                                      ))
+
+                                    }
+
+
+                                  </>
+                                )
+                              }
+                              {/* {
                       section.type === 'summary' && (
                         <div className="space-y-2">
                           <Label className="text-gray-400">Professional Summary</Label>
@@ -1328,37 +1331,60 @@ return (
                       )
                     } */}
 
-                    {
-                    section.type === 'summary' && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-400">Professional Summary</label>
-                        <textarea
-                          placeholder="Write a brief professional summary..."
-                          className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm h-32 resize-none focus:ring-2 focus:ring-cyan-500"
-                          /* Use the watched value from useForm to make it a controlled input */
-                          value={watch("goal") || ""} 
-                          onChange={(e) => {
-                            // Manually update the react-hook-form state
-                            setValue("goal", e.target.value);
-                          }}
-                        />
-                      </div>
-                    )
-                  }
-                       
+                              {
+                                section.type === 'summary' && (
+                                  <div className="space-y-2">
+                                    <div className='flex justify-between items-center'>
+                                      <label className="text-sm font-medium text-gray-400">Professional Summary</label>
+                                      <div className="relative">
+                                        <button
+                                          type="button"
+                                          onClick={() => setAiModalOpen(true)}
+                                          className="flex items-center gap-2 px-4 py-2 rounded-lg !bg-[#f6efff] !text-[#800080] font-medium !transition-all !duration-200 hover:!bg-[#800080] hover:!text-white"
+                                        >
+                                          <HiSparkles className="text-lg" />
+                                          Get help with writing
+                                        </button>
+                                        <GenerateWithAiModal
+                                          open={aiModalOpen}
+                                          onClose={() => setAiModalOpen(false)}
+                                          aiType="imp_summary"
+                                          initialText={watch("goal") || ""}
+                                          onApply={(text) => {
+                                            setValue("goal", text);
+                                          }}
+                                        />
+                                      </div>
 
-                  
-                        
-                      </AccordionContent>
-                        </AccordionPanel>
+
+                                    </div>
+                                    <textarea
+                                      placeholder="Write a brief professional summary..."
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm h-32 resize-none focus:ring-2 focus:ring-cyan-500"
+                                      /* Use the watched value from useForm to make it a controlled input */
+                                      value={watch("goal") || ""}
+                                      onChange={(e) => {
+                                        // Manually update the react-hook-form state
+                                        setValue("goal", e.target.value);
+                                      }}
+                                    />
+                                  </div>
+                                )
+                              }
+
+
+
+
+                            </AccordionContent>
+                          </AccordionPanel>
                         </Accordion>
-                        </div>
+                      </div>
 
-                      ))
-                    }
-                    </div>
-                   
-                    {/* <AccordionPanel>
+                    ))
+                  }
+                </div>
+
+                {/* <AccordionPanel>
                       <AccordionTitle className='font-bold text-xl'>{sections.title}</AccordionTitle>
                       <AccordionContent>
                         {
@@ -1647,10 +1673,10 @@ return (
                         
                       </AccordionContent>
                     </AccordionPanel> */}
-                  
-                 
-                 
-                    {/* <AccordionPanel>
+
+
+
+                {/* <AccordionPanel>
                       <AccordionTitle className='font-bold text-xl flex items-center gap-5'><DragIcon /> Skills</AccordionTitle>
                       <AccordionContent>
                         <p className="text-gray-500 dark:text-gray-400 mb-4">
@@ -1731,9 +1757,9 @@ return (
                         </Accordion>
                       </AccordionContent>
                     </AccordionPanel> */}
-                  
-                    
-                    {/* <AccordionPanel>
+
+
+                {/* <AccordionPanel>
                       <AccordionTitle className='font-bold text-xl'> <DragIcon />Professional Summary</AccordionTitle>
                       <AccordionContent>
                         Hello
@@ -1742,12 +1768,12 @@ return (
                         
                       </AccordionContent>
                     </AccordionPanel> */}
-                   
-                  
-               
-                
 
-                  
+
+
+
+
+
               </div>
 
 
@@ -1756,141 +1782,141 @@ return (
 
 
 
-           <div className='hidden'>
+            <div className='hidden'>
 
 
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
-                <HiClipboardList className='text-[#800080] text-2xl' />
-                <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
-              </div>
-              <div className='flex items-center gap-1'>
-                <button
-                  onClick={handleEnhancePDF}
-                  disabled={enhancing}
-                  className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
-                >
-                  {enhancing ? (
-                    <>
-                      <svg
-                        className="animate-spin h-4 w-4 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        ></path>
-                      </svg>
-                      Enhancing...
-                    </>
-                  ) : (
-                    <>
-                      Enhance
-                      <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
-                        {remaining}
-                      </span>
-                    </>
-                  )}
-                </button>
-              </div>
-              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
-            </div>
-            <p className="text-[11px] text-gray-600 mt-1 text-center">
-              Enhancing attempts remaining: <span className="font-semibold text-[#800080]">{remaining}</span>
-            </p>
-          
-          <div className='resume_tab_section'>
-            <Tabs selectedIndex={activeTabIndex} onSelect={(index) => setActiveTabIndex(index)}>
-              <div className='border-b border-[#E5E5E5] p-5'>
-                <div className='tab_point relative'>
-                  <span
-                    className="absolute -top-3 right-2 text-xs font-semibold bg-purple-600 text-white px-2 py-1 rounded-full animate-pulse cursor-pointer z-10"
-                    onClick={() => {
-                      setActiveTabIndex(2);
-                      setTimeout(() => {
-                        const section = document.getElementById("resumate-section2");
-                        if (section) {
-                          section.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
-                        }
-                      }, 150);
-                    }}
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-1 lg:mb-4 lg:mb-0'>
+                  <HiClipboardList className='text-[#800080] text-2xl' />
+                  <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
+                </div>
+                <div className='flex items-center gap-1'>
+                  <button
+                    onClick={handleEnhancePDF}
+                    disabled={enhancing}
+                    className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
                   >
-                    ResuMate
-                  </span>
-
-                  <TabList>
-                    <Tab><span><BiSolidUser /></span> Personal Info</Tab>
-                    <Tab><span><HiAcademicCap /></span> Education</Tab>
-                    <Tab><span><BiSolidBriefcase /></span> Work Experience</Tab>
-                    <Tab><span><FaLanguage /></span> Languages</Tab>
-                    <Tab><span><MdSettingsSuggest /></span> Skills</Tab>
-                    <Tab><span><FaDiagramProject /></span> Personal Projects</Tab>
-                    <Tab><span><FaCertificate /></span> Certifications</Tab>
-                    <Tab><span><FaTrophy /></span> Achievements</Tab>
-                  </TabList>
+                    {enhancing ? (
+                      <>
+                        <svg
+                          className="animate-spin h-4 w-4 mr-2 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          ></path>
+                        </svg>
+                        Enhancing...
+                      </>
+                    ) : (
+                      <>
+                        Enhance
+                        <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
+                          {remaining}
+                        </span>
+                      </>
+                    )}
+                  </button>
                 </div>
+                <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
               </div>
-              <div className='p-5 pr-0'>
-                <div className='mb-4'>
-                  <div>
-                    <TabPanel key="personal-info">
-                      <PersonalInfoJd register={register} errors={errors} getUpdateResumeInfoData={getUpdateResumeInfoData} setValue={setValue} />
-                    </TabPanel>
+              <p className="text-[11px] text-gray-600 mt-1 text-center">
+                Enhancing attempts remaining: <span className="font-semibold text-[#800080]">{remaining}</span>
+              </p>
 
-                    <TabPanel key="education">
-                      <EducationJd register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} getUpdateResumeInfoData={getUpdateResumeInfoData} setValue={setValue} />
-                    </TabPanel>
+              <div className='resume_tab_section'>
+                <Tabs selectedIndex={activeTabIndex} onSelect={(index) => setActiveTabIndex(index)}>
+                  <div className='border-b border-[#E5E5E5] p-5'>
+                    <div className='tab_point relative'>
+                      <span
+                        className="absolute -top-3 right-2 text-xs font-semibold bg-purple-600 text-white px-2 py-1 rounded-full animate-pulse cursor-pointer z-10"
+                        onClick={() => {
+                          setActiveTabIndex(2);
+                          setTimeout(() => {
+                            const section = document.getElementById("resumate-section2");
+                            if (section) {
+                              section.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
+                            }
+                          }, 150);
+                        }}
+                      >
+                        ResuMate
+                      </span>
 
-
-                    <TabPanel key="work-experience">
-                      <WorkExpJd experiences={experiences} setExperiences={setExperiences} register={register} getUpdateResumeInfoData={getUpdateResumeInfoData} errors={errors} />
-                    </TabPanel>
-
-                    <TabPanel key="languages">
-                      <LanguageJd
-                        languages={languages}
-                        setLanguages={setLanguages}
-                        getUpdateResumeInfoData={getUpdateResumeInfoData}
-                      />
-                    </TabPanel>
-
-                    <TabPanel key="skills">
-                      <SkillsJd register={register} errors={errors} skills={skills} setSkills={setSkills} getUpdateResumeInfoData={getUpdateResumeInfoData} />
-                    </TabPanel>
-
-                    <TabPanel key="personal-projects">
-                      <PersonalProjectJd register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} getUpdateResumeInfoData={getUpdateResumeInfoData} />
-                    </TabPanel>
-
-                    <TabPanel key="certificates">
-                      <CertificatesJd register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} getUpdateResumeInfoData={getUpdateResumeInfoData} />
-                    </TabPanel>
-
-                    <TabPanel key="achievements">
-                      <AchivmentsJd register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} getUpdateResumeInfoData={getUpdateResumeInfoData} />
-                    </TabPanel>
-
+                      <TabList>
+                        <Tab><span><BiSolidUser /></span> Personal Info</Tab>
+                        <Tab><span><HiAcademicCap /></span> Education</Tab>
+                        <Tab><span><BiSolidBriefcase /></span> Work Experience</Tab>
+                        <Tab><span><FaLanguage /></span> Languages</Tab>
+                        <Tab><span><MdSettingsSuggest /></span> Skills</Tab>
+                        <Tab><span><FaDiagramProject /></span> Personal Projects</Tab>
+                        <Tab><span><FaCertificate /></span> Certifications</Tab>
+                        <Tab><span><FaTrophy /></span> Achievements</Tab>
+                      </TabList>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </Tabs>
-          </div>
+                  <div className='p-5 pr-0'>
+                    <div className='mb-4'>
+                      <div>
+                        <TabPanel key="personal-info">
+                          <PersonalInfoJd register={register} errors={errors} getUpdateResumeInfoData={getUpdateResumeInfoData} setValue={setValue} />
+                        </TabPanel>
 
-          </div>
+                        <TabPanel key="education">
+                          <EducationJd register={register} errors={errors} educationEntries={educationEntries} setEducationEntries={setEducationEntries} getUpdateResumeInfoData={getUpdateResumeInfoData} setValue={setValue} />
+                        </TabPanel>
+
+
+                        <TabPanel key="work-experience">
+                          <WorkExpJd experiences={experiences} setExperiences={setExperiences} register={register} getUpdateResumeInfoData={getUpdateResumeInfoData} errors={errors} />
+                        </TabPanel>
+
+                        <TabPanel key="languages">
+                          <LanguageJd
+                            languages={languages}
+                            setLanguages={setLanguages}
+                            getUpdateResumeInfoData={getUpdateResumeInfoData}
+                          />
+                        </TabPanel>
+
+                        <TabPanel key="skills">
+                          <SkillsJd register={register} errors={errors} skills={skills} setSkills={setSkills} getUpdateResumeInfoData={getUpdateResumeInfoData} />
+                        </TabPanel>
+
+                        <TabPanel key="personal-projects">
+                          <PersonalProjectJd register={register} errors={errors} personalPro={personalPro} setPersonalPro={setPersonalPro} getUpdateResumeInfoData={getUpdateResumeInfoData} />
+                        </TabPanel>
+
+                        <TabPanel key="certificates">
+                          <CertificatesJd register={register} errors={errors} certificates={certificates} setCertificates={setCertificates} getUpdateResumeInfoData={getUpdateResumeInfoData} />
+                        </TabPanel>
+
+                        <TabPanel key="achievements">
+                          <AchivmentsJd register={register} errors={errors} achivments={achivments} setAchivments={setAchivments} getUpdateResumeInfoData={getUpdateResumeInfoData} />
+                        </TabPanel>
+
+                      </div>
+                    </div>
+                  </div>
+                </Tabs>
+              </div>
+
+            </div>
           </div>
         </form>
       </div>
@@ -1968,16 +1994,16 @@ return (
                 <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
               )
             } */}
-            
-              
-                {/* <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} /> */}
-                <DynamicTemplate
-                levels={levels}
-          sections={sections} 
-          data={formValues} 
-        />
-              
-            
+
+
+            {/* <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} /> */}
+            <DynamicTemplate
+              levels={levels}
+              sections={sections}
+              data={formValues}
+            />
+
+
 
           </div>
         </div>
@@ -1990,6 +2016,9 @@ return (
           </div>
         </div> */}
       </div>
+
+
+
 
       <ImpAtsScoreAnalyzeModal
         show={openJdAtsModal}

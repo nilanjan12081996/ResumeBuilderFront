@@ -1,6 +1,7 @@
 'use client';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from './api';
+import axios from 'axios';
 
 
 export const improveResume = createAsyncThunk(
@@ -245,25 +246,25 @@ export const jdBasedResumeDetails = createAsyncThunk(
 )
 
 export const updateBasicInfo = createAsyncThunk(
-  "updateBasicInfo",
-  async ({ resumeid, data }, { rejectWithValue }) => {
-    try {
-      const response = await api.put(
-        `/api/improve-resume/update-basic-info/${resumeid}`,
-        data
-      );
+    "updateBasicInfo",
+    async ({ resumeid, data }, { rejectWithValue }) => {
+        try {
+            const response = await api.put(
+                `/api/improve-resume/update-basic-info/${resumeid}`,
+                data
+            );
 
-      if (response?.data?.status_code === 200) {
-        return response.data;
-      }
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            }
 
-      return rejectWithValue(
-        response?.data?.errors || "Something went wrong."
-      );
-    } catch (err) {
-      return rejectWithValue(err?.response?.data || err);
+            return rejectWithValue(
+                response?.data?.errors || "Something went wrong."
+            );
+        } catch (err) {
+            return rejectWithValue(err?.response?.data || err);
+        }
     }
-  }
 );
 
 
@@ -656,6 +657,49 @@ export const impEnhanceUsageInfo = createAsyncThunk(
     }
 );
 
+export const generateImpSummary = createAsyncThunk(
+    "dashboard/generateImpSummary",
+    async (payload, { rejectWithValue }) => {
+        try {
+            // const res = await api.post(
+            //     "/agent/professional/summary",
+            //     payload
+            // );
+            const res = await axios.post(
+                "https://resumebuilderai.hiringeye.ai/agent/professional/summary",
+                payload
+            );
+            console.log("hello",res)
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+export const generateImpExperience = createAsyncThunk(
+    "dashboard/generateImpExperience",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await api.post(
+                "/agent/Experience/Description",
+                payload
+            );
+
+            if (res?.data?.status === true || res?.data?.status_code === 200) {
+                return res.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+
 
 
 
@@ -699,6 +743,12 @@ const initialState = {
 
     impEnhance: {},
     impEnUsageInfo: {},
+
+    generateImpSummaryLoading: false,
+    generateImpSummaryData: {},
+
+    generateImpExperienceLoading: false,
+    generateImpExperienceData: {},
 }
 
 const DashboardSlice = createSlice(
@@ -1122,7 +1172,7 @@ const DashboardSlice = createSlice(
                 })
 
 
-                 // ---------- IMP ENHANCE ----------
+                // ---------- IMP ENHANCE ----------
                 .addCase(getImpEnhance.pending, (state) => {
                     state.loading = true;
                     state.error = false;
@@ -1149,6 +1199,34 @@ const DashboardSlice = createSlice(
                     state.loading = false;
                     state.error = payload;
                 })
+
+                // ---------- GENERATE IMP SUMMARY ----------
+                .addCase(generateImpSummary.pending, (state) => {
+                    state.generateImpSummaryLoading = true;
+                    state.error = false;
+                })
+                .addCase(generateImpSummary.fulfilled, (state, { payload }) => {
+                    state.generateImpSummaryLoading = false;
+                    state.generateImpSummaryData = payload;
+                })
+                .addCase(generateImpSummary.rejected, (state, { payload }) => {
+                    state.generateImpSummaryLoading = false;
+                    state.error = payload;
+                })
+
+                // ---------- GENERATE IMP EXPERIENCE ----------
+                .addCase(generateImpExperience.pending, (state) => {
+                    state.generateImpExperienceLoading = true;
+                    state.error = false;
+                })
+                .addCase(generateImpExperience.fulfilled, (state, { payload }) => {
+                    state.generateImpExperienceLoading = false;
+                    state.generateImpExperienceData = payload;
+                })
+                .addCase(generateImpExperience.rejected, (state, { payload }) => {
+                    state.generateImpExperienceLoading = false;
+                    state.error = payload;
+                });
 
 
         }
