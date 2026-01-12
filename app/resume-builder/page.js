@@ -77,6 +77,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 
 import { RiDraggable } from "react-icons/ri";
+import Professional from '../TemplateNew/Professional';
 
 
 const page = () => {
@@ -716,14 +717,14 @@ const page = () => {
                 </div>
 
                 <div className='px-8 h-[430px] overflow-y-scroll pb-4'>
-
-                  <div className='hidden'>
+                  <form>
+                  <div className=''>
                     <div className='mb-4'>
                       <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
                       <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
                     </div>
                     <div>
-                      <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {/* Job Target */}
                               <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700">
@@ -733,6 +734,7 @@ const page = () => {
                                   type="text"
                                   placeholder="SENIOR SOFTWARE ENGINEER"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
+                                {...register("job_target")}
                                 />
                               </div>
 
@@ -743,8 +745,9 @@ const page = () => {
                                 </label>
                                 <input
                                   type="text"
-                                  placeholder="SRAVYA"
+                                  placeholder="First Name"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                  {...register("first_name")}
                                 />
                               </div>
 
@@ -755,8 +758,9 @@ const page = () => {
                                 </label>
                                 <input
                                   type="text"
-                                  placeholder="BOBBALI"
+                                  placeholder="Last Name"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                    {...register("last_name")}
                                 />
                               </div>
 
@@ -767,8 +771,9 @@ const page = () => {
                                 </label>
                                 <input
                                   type="email"
-                                  placeholder="test2333@yopmail.com"
+                                  placeholder="Email"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                  {...register("email")}
                                 />
                               </div>
 
@@ -778,9 +783,10 @@ const page = () => {
                                   Phone
                                 </label>
                                 <input
-                                  type="tel"
-                                  placeholder="9502829805"
+                                  type="text"
+                                  placeholder="Phone"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                  {...register("phone")}
                                 />
                               </div>
 
@@ -793,6 +799,7 @@ const page = () => {
                                   type="text"
                                   placeholder="Enter your address"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  {...register("address")}
                                 />
                               </div>
 
@@ -803,8 +810,9 @@ const page = () => {
                                 </label>
                                 <input
                                   type="text"
-                                  placeholder="Hyderabad, Telangana"
+                                  placeholder="City,State"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                  {...register("city_state")}
                                 />
                               </div>
 
@@ -817,6 +825,7 @@ const page = () => {
                                   type="text"
                                   placeholder="India"
                                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                  {...register("country")}
                                 />
                               </div>
 
@@ -856,6 +865,7 @@ const page = () => {
                                       type="text"
                                       placeholder="Postal Code"
                                       className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                      {...register("postal_code")}
                                     />
                                   </div>
 
@@ -868,6 +878,7 @@ const page = () => {
                                       type="text"
                                       placeholder="License Number"
                                       className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                      {...register("driving_licence")}
                                     />
                                   </div>
 
@@ -877,8 +888,9 @@ const page = () => {
                                       Date of Birth
                                     </label>
                                     <input
-                                      type="date"
+                                      type="text"
                                       className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                      {...register("dob")}
                                     />
                                   </div>
 
@@ -891,6 +903,7 @@ const page = () => {
                                       type="text"
                                       placeholder="City, Country"
                                       className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                      {...register("birth_place")}
                                     />
                                   </div>
 
@@ -901,8 +914,10 @@ const page = () => {
                                     </label>
                                     <input
                                       type="text"
-                                      placeholder="Indian"
+                                      placeholder="Nationality"
                                       className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                      {...register("nationality")}
+
                                     />
                                   </div>
 
@@ -910,7 +925,7 @@ const page = () => {
                                 </>
                               )}
 
-                        </form>
+                      </div>
                     </div>
                   </div>
 
@@ -1003,7 +1018,8 @@ const page = () => {
                       </Accordion>
                     </div >
                   </div>
-
+                    </form>
+         
                 </div>
 
                 <div className='flex items-center px-8 py-3 border-t border-[#e7e8ec]'>
@@ -1021,7 +1037,7 @@ const page = () => {
               </TabPanel>
               <TabPanel>Customize</TabPanel>
 
-              <div className='hidden'>
+              {/* <div className='hidden'>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className='border-b border-[#E5E5E5] p-5 flex items-center justify-between'>
@@ -1114,7 +1130,7 @@ const page = () => {
                   </div>
                 </form>
 
-              </div>
+              </div> */}
 
             </div>
 
@@ -1146,7 +1162,7 @@ const page = () => {
               </div>
               <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
                 {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-                {
+                {/* {
                   template == 1 && (
                     <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
@@ -1155,7 +1171,8 @@ const page = () => {
                   template == 2 && (
                     <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
-                }
+                } */}
+                <Professional formData={formValues}/>
 
               </div>
               {/* <div className='flex items-center justify-between mb-0'>
