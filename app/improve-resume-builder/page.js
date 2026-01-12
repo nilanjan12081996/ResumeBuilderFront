@@ -1340,9 +1340,9 @@ const page = () => {
                                         <button
                                           type="button"
                                           onClick={() => setAiModalOpen(true)}
-                                          className="flex items-center gap-2 px-4 py-2 rounded-lg !bg-[#f6efff] !text-[#800080] font-medium !transition-all !duration-200 hover:!bg-[#800080] hover:!text-white"
+                                          className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] font-medium !transition-all !duration-200 hover:!bg-[#800080] hover:!text-white"
                                         >
-                                          <HiSparkles className="text-lg" />
+                                          <HiSparkles className="text-md" />
                                           Get help with writing
                                         </button>
                                         <GenerateWithAiModal
