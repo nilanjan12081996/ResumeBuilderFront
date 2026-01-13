@@ -1270,11 +1270,59 @@ body {
   padding: 70px 0;
 }
 
-.acco_section {
+/* .acco_section {
   background: #ffffff;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
+} */
+
+.acco_section button {
+  cursor: pointer;
+  margin-bottom: 0;
+  background-color: #fff;
+  color: #000000;
+  border-bottom: none;
 }
+.acco_section button:hover {
+  background-color: #f3f4f6;
+  color: #000000;
+}
+.acco_section button:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.acco_section [data-testid="flowbite-accordion-content"] {
+  background-color: #ffffff;
+}
+.acco_section [data-testid="flowbite-accordion"] {
+  border: none;
+}
+
+
+svg[data-testid="flowbite-accordion-arrow"] {
+  color: #ccc;
+  width: 25px;
+  height: 25px;
+}
+
+
+.acco_section input, .acco_section textarea{
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border:none;
+  background-color: #EFF2F9;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.acco_section input:focus, .acco_section textarea:focus {
+  border-radius: 6px 6px 0 0; 
+  border-bottom: 2px solid #800080;
+}
+
 
 
 
