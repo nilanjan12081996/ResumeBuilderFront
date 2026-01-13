@@ -138,7 +138,7 @@ const Professional = ({ formData ,empHistory}) => {
         )}
 
         {/* Employment History */}
-        {hasEmployment && (
+        {/* {hasEmployment && (
         
         <section>
     <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1">
@@ -163,8 +163,54 @@ const Professional = ({ formData ,empHistory}) => {
         </div>
       ))}
     </div>
+         </section>
+        )} */}
+
+  {hasEmployment && (
+  <section>
+    <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1">
+      Employment History
+    </h2>
+    <div className="flex flex-col gap-4">
+      {formData.employmentHistory.map((job, index) => {
+        
+        // --- ADD THIS HELPER FUNCTION ---
+        const formatDate = (dateValue) => {
+          if (!dateValue) return "";
+          const d = new Date(dateValue);
+          // Returns format: JAN 2026
+          return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+        };
+
+        const displayStart = formatDate(job.startDate);
+        const displayEnd = formatDate(job.endDate);
+
+        return (
+          <div key={index} className="mb-2">
+            <h3 className="text-[12px] font-bold text-black">
+              {job.job_title}
+              {job.employer ? `, ${job.employer}` : ''}
+              {job.city_state ? `, ${job.city_state}` : ''}
+            </h3>
+            
+            {/* --- UPDATED DATE ROW --- */}
+            {(displayStart || displayEnd) && (
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
+                {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+              </div>
+            )}
+            
+            {job.description && (
+              <p className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {job.description}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
   </section>
-        )}
+)}
 
         {/* education */}
         {formData.educationHistory?.some(job => job.school || job.degree)&&formData.educationHistory && formData.educationHistory.length > 0 && (
@@ -173,7 +219,18 @@ const Professional = ({ formData ,empHistory}) => {
         Education
       </h2>
       <div className="flex flex-col gap-4 mt-3">
-        {formData.educationHistory.map((edu, index) => (
+        {formData.educationHistory.map((edu, index) => {
+            const formatDate = (dateValue) => {
+          if (!dateValue) return "";
+          const d = new Date(dateValue);
+          // Returns format: JAN 2026
+          return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+        };
+
+        const displayStart = formatDate(edu.startDate);
+        const displayEnd = formatDate(edu.endDate);
+
+          return(
           <div key={index} className="mb-2">
             {/* School, Degree, and City */}
             <h3 className="text-[12px] font-bold text-black leading-tight">
@@ -181,11 +238,17 @@ const Professional = ({ formData ,empHistory}) => {
             </h3>
             
             {/* Dates - Formatted as uppercase Jan 2026 — Apr 2026 */}
-            <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide mt-1 mb-1">
+            {/* <div className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide mt-1 mb-1">
               {edu.startDate && edu.endDate 
                 ? `${new Date(edu.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} — ${new Date(edu.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
                 : ""}
-            </div>
+            </div> */}
+              {(displayStart || displayEnd) && (
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
+                {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+              </div>
+            )}
+            
             
             {/* Education Description */}
             {edu.description && (
@@ -194,7 +257,8 @@ const Professional = ({ formData ,empHistory}) => {
               </p>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
     </section>
   )}

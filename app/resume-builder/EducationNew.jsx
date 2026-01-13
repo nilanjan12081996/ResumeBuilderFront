@@ -1,13 +1,15 @@
 
 
 "use client";
-import { Accordion, AccordionContent, AccordionPanel, AccordionTitle, Datepicker } from "flowbite-react"
+import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react"
 import { MdDelete } from "react-icons/md"
 import { RiDraggable } from "react-icons/ri"
 import { useState } from "react"
 import { FaPlus } from "react-icons/fa6";
+import { Controller } from "react-hook-form";
+import Datepicker from "../utils/Datepicker";
 
-const EducationNew = ({ education,setEducation,register,watch}) => {
+const EducationNew = ({ education,setEducation,register,watch,control}) => {
  
     const addMore = () => {
         setEducation([...education, { id: Date.now() }])
@@ -51,7 +53,7 @@ const EducationNew = ({ education,setEducation,register,watch}) => {
                             ? `${watchedDegree || ''}${watchedDegree ? ' at ' + watchedSchoole : ''}` 
                             : "(Not specified)"}</AccordionTitle>
                       <AccordionContent>
-                          <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     
                               {/* Job Title */}
                               <div>
@@ -80,19 +82,38 @@ const EducationNew = ({ education,setEducation,register,watch}) => {
                               </div>
     
                               {/* Strat & End Date */}
-                              <div className='date_area'>
-                                <label className="block text-sm font-medium text-gray-700">
-                                  Strat & End Date
-                                </label>
-                                <div className='flex gap-5'>
-                                  <div>
-                                    <Datepicker />
-                                  </div>
-                                  <div>
-                                    <Datepicker />
-                                  </div>
-                                  </div>
+                            <div className='date_area'>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Strat & End Date
+                            </label>
+                            <div className='flex gap-5'>
+                         
+                              <div className="flex-1">
+                              <Controller
+                              control={control} // Ensure you pass 'control' as a prop from parent
+                              name={`educationHistory.${index}.startDate`}
+                              render={({ field }) => (
+                                <Datepicker 
+                                  selectedDate={field.value} 
+                                  onChange={(date) => field.onChange(date)} 
+                                />
+                              )}
+                            />
+                            </div>
+                              <div className="flex-1">
+                              <Controller
+                                control={control}
+                                name={`educationHistory.${index}.endDate`}
+                                render={({ field }) => (
+                                  <Datepicker 
+                                    selectedDate={field.value} 
+                                    onChange={(date) => field.onChange(date)} 
+                                  />
+                                )}
+                              />
+                            </div>
                               </div>
+                          </div>
                               
                               {/* City */}
                               <div>
@@ -117,7 +138,7 @@ const EducationNew = ({ education,setEducation,register,watch}) => {
                                 ></textarea>
                               </div>
     
-                          </form>
+                          </div>
                       </AccordionContent>
                     </div>
                     <div className='delete_point'>
