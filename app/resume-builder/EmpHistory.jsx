@@ -205,7 +205,7 @@ import { FaPlus } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../utils/Datepicker";
 
-const EmpHistory = ({ register, empHistory, setEmpHistory, watch, control, fields,append, remove,move }) => {
+const EmpHistory = ({ register, watch, control, fields, append, remove, move }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
 
@@ -233,23 +233,17 @@ const EmpHistory = ({ register, empHistory, setEmpHistory, watch, control, field
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
 
-    const updatedList = [...empHistory];
-    const [draggedItem] = updatedList.splice(draggedIndex, 1);
-    updatedList.splice(targetIndex, 0, draggedItem);
-
-    setEmpHistory(updatedList);
+    move(draggedIndex, targetIndex);
     setDraggedIndex(null);
   };
 
   const addMore = () => {
-    setEmpHistory([...empHistory, { id: Date.now() }]);
+    append({}); 
   };
 
   const deleteEmp = (index) => {
-    if (empHistory.length > 1) {
-      const list = [...empHistory];
-      list.splice(index, 1);
-      setEmpHistory(list);
+    if (fields.length > 1) {
+      remove(index);
     }
   };
 
@@ -264,7 +258,7 @@ const EmpHistory = ({ register, empHistory, setEmpHistory, watch, control, field
 
       <div className='acco_section'>
         <div className="space-y-3">
-          {empHistory.map((item, index) => {
+          {fields.map((item, index) => {
             const watchedJob = watch(`employmentHistory.${index}.job_title`);
             const watchedEmployer = watch(`employmentHistory.${index}.employer`);
 
