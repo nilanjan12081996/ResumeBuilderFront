@@ -90,9 +90,9 @@ import {
 } from "@dnd-kit/sortable";
 import DraggableWrapper from "./DraggableWrapper";
 import DragIcon from './DragIcon';
-import { TfiHandDrag } from "react-icons/tfi";
 import DynamicTemplate from '../temp/DynamicTemplate';
 import GenerateWithAiModal from '../modal/GenerateWithAiModal';
+import { HiDocumentText, HiArrowPath } from "react-icons/hi2";
 
 
 const page = () => {
@@ -976,51 +976,79 @@ const page = () => {
     <div className='lg:flex gap-2 pb-0'>
       <ToastContainer />
 
-      <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
+      <div className='lg:w-6/12 bg-[#eff2f9] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-b border-[#E5E5E5] p-5'>
+          <div className='border-b border-[#E5E5E5] p-1'>
 
 
             <div className='mb-10'>
+              <div className='bg-white rounded-sm p-5 mb-2'>
+                <div className='mb-4'>
+                  <div className='flex items-center gap-2 mb-2'>
+                    <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
+                    <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume Ats Score</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Progress progress={45} size="sm" className="[&>div]:bg-[#800080]" />
+                  </div>
+                </div>
 
-              <div className='mb-4'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
-                  <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Progress progress={45} size="sm" />
-                </div>
-              </div>
 
-              <div className='flex items-center mb-4'>
-                <div className='w-6/12'>
-                  <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Existing Resume</button>
+                <div className="flex items-center mb-3 gap-3">
+                  {/* Existing Resume */}
+                  <button
+                    className="
+                      w-6/12 flex items-center justify-center gap-2
+                      px-4 py-2 rounded-lg
+                      text-sm font-medium
+                      text-[#800080] bg-[#f6efff]
+                      border border-[#e5d6ff]
+                      hover:bg-[#800080] hover:text-white
+                      transition-all duration-200
+                      cursor-pointer
+                    "
+                  >
+                    <HiDocumentText className="text-lg" />
+                    Existing Resume
+                  </button>
+
+                  {/* Changed Resume */}
+                  <button
+                    className="
+                    w-6/12 flex items-center justify-center gap-2
+                    px-4 py-2 rounded-lg
+                    text-sm font-medium
+                    text-[#1e2532] bg-[#f4f6fa]
+                    border border-gray-200
+                    hover:bg-[#f6efff] hover:text-[#800080]
+                    transition-all duration-200
+                    cursor-pointer hover:border-[#e5d6ff]
+                  "
+                  >
+                    <HiArrowPath className="text-lg" />
+                    Changed Resume
+                  </button>
                 </div>
-                <div className='w-6/12'>
-                  <button className='text-sm text-[#800080] hover:text-[#1e2532] font-medium cursor-pointer'>Changed Resume</button>
-                </div>
+
               </div>
 
               <div className='acco_section'>
-                <Accordion>
+                <Accordion className='mb-2'>
                   <AccordionPanel>
                     <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
-                    <AccordionContent>
-
-
+                    <AccordionContent className='pt-0'>
                       <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-700">
-                            Job Target
+                            Job Title
                           </label>
                           <input
                             type="text"
-                            placeholder="Enter Your Job Target"
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500"
-                            {...register("job_target")}
+                            placeholder="Enter Your Job Title"
+                            className="mt-1 w-full rounded-lg"
+                            {...register("job_title")}
                           />
                         </div>
 
@@ -1121,7 +1149,7 @@ const page = () => {
                           <button
                             type="button"
                             onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
-                            className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                            className="flex items-center gap-2 !text-[#800080] hover:!text-[#b98ab9] font-medium transition-colors"
                           >
                             {showAdditionalDetails ? (
                               <>
@@ -1234,12 +1262,18 @@ const page = () => {
                         <Accordion flush={true}>
 
                           <AccordionPanel>
-                            <AccordionTitle className='font-bold text-xl'><TfiHandDrag className='text-xl' title="drag and drop" />{section.title}</AccordionTitle>
-                            <AccordionContent>
+                            <AccordionTitle className='font-bold text-xl'>
+                              <span className="drag-wrapper">
+                                <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                <span className="tooltip">Click and drag to move</span>
+                              </span>
+                              {section.title}
+                            </AccordionTitle>
+                            <AccordionContent className='pt-0'>
                               {
                                 section.type === 'skills' && (
                                   <>
-                                    <p className="text-gray-500 dark:text-gray-400 mb-4">
+                                    <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
                                       Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
                                       (especially when applying via an online system).
                                     </p>
@@ -1261,8 +1295,14 @@ const page = () => {
 
                                           <Accordion collapseAll>
                                             <AccordionPanel>
-                                              <AccordionTitle className='font-bold text-xl'> <TfiHandDrag className='text-xl' title="drag and drop" />{skill.name}</AccordionTitle>
-                                              <AccordionContent>
+                                              <AccordionTitle className='font-bold text-sm'>
+                                                <span className="drag-wrapper">
+                                                  <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                                  <span className="tooltip">Click and drag to move</span>
+                                                </span>
+                                                {skill.name}
+                                              </AccordionTitle>
+                                              <AccordionContent className='pt-0'>
 
                                                 <div className='flex gap-10'>
                                                   <div className='w-6/12'>
@@ -1360,7 +1400,7 @@ const page = () => {
                                     </div>
                                     <textarea
                                       placeholder="Write a brief professional summary..."
-                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm h-32 resize-none focus:ring-2 focus:ring-cyan-500"
+                                      className="mt-1 w-ful text-sm h-32"
                                       /* Use the watched value from useForm to make it a controlled input */
                                       value={watch("goal") || ""}
                                       onChange={(e) => {

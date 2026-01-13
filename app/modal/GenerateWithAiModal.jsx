@@ -160,7 +160,7 @@ const GenerateWithAiModal = ({
 
                 {/* Tone Selector - Functional Horizontal Tabs */}
                 <div className="mt-5">
-                    <p className="text-sm font-medium text-gray-600 mb-3">
+                    <p className="text-sm font-medium text-gray-600">
                         Select Tone
                     </p>
 

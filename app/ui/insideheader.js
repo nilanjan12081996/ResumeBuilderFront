@@ -256,7 +256,7 @@ const Insideheader = () => {
 
 
   return (
-    <div className='bg-[#ffffff] rounded-[0px] py-4 px-6 mb-6 border-l border-[#f3f4f6]'>
+    <div className='bg-[#ffffff] rounded-[0px] py-2 px-6 border-l border-[#f3f4f6]'>
       <div className='flex justify-between items-center'>
         {/* Logo */}
         <div className='w-3/12'>

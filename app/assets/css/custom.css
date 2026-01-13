@@ -1272,33 +1272,52 @@ body {
 
 .acco_section {
   background: #ffffff;
-  padding: 5px;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
-.acco_section button {
-  cursor: pointer;
-  margin-bottom: 0;
-  background-color: #f6efff;
-  color: #000000;
-  border-bottom: none;
-  margin-bottom: 5px;
-}
-.acco_section button:hover {
-  background-color: #f3f4f6;
-  color: #000000;
-}
-.acco_section button:focus {
-  border: none;
-  box-shadow: none;
+
+
+
+.drag-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
-.acco_section [data-testid="flowbite-accordion-content"] {
-  background-color: #ffffff;
+.tooltip {
+  position: absolute;
+  bottom: 130%;
+  left: 0;
+  background-color: #303848;
+  color: #fff;
+  font-weight: 400;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  z-index: 999;
 }
-.acco_section [data-testid="flowbite-accordion"] {
-  border: none;
+
+/* arrow */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 10px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #303848 transparent transparent transparent;
 }
+
+.drag-wrapper:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+
 
 .label_tab_area ul {
   /* background: #ffffff; */
