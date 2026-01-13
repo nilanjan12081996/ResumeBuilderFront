@@ -82,6 +82,11 @@ import EmpHistory from './EmpHistory';
 import EducationNew from './EducationNew';
 import SkillsNew from './SkillsNew';
 import PersonalSummary from './PersonalSummary';
+import AddSection from './AddSection';
+import Courses from './Courses';
+import Hobbies from './Hobbies';
+import Activities from './Activities';
+import Languages from './newLanguage';
 
 
 const page = () => {
@@ -149,7 +154,11 @@ const page = () => {
     defaultValues: {
       employmentHistory: [{}],
       educationHistory: [{}],
-      newSkillHistory: [{}]
+      newSkillHistory: [{}],
+      coursesHistory: [{}],
+      activityHistory: [{}],
+      languageHistory: [{}],
+      hobbies: ""
     }
   });
 
@@ -162,7 +171,11 @@ const page = () => {
     formState: { errors },
   } = methods;
 
-  const STEPS = [
+  // Track which optional sections are active
+  const [activeSections, setActiveSections] = useState([]);
+
+  // Base Steps
+  const BASE_STEPS = [
     { id: 1, title: "Personal Details" },
     { id: 2, title: "Employment History" },
     { id: 3, title: "Education" },
@@ -170,17 +183,78 @@ const page = () => {
     { id: 5, title: "Professional Summary" }
   ];
 
+  // SECTION CONFIG
+  const OPTIONAL_SECTIONS_CONFIG = [
+    { id: 'courses', title: 'Courses', component: Courses },
+    { id: 'hobbies', title: 'Hobbies', component: Hobbies },
+    { id: 'extra_curricular', title: 'Extra-curricular Activities', component: Activities },
+    { id: 'languages', title: 'Languages', component: Languages }
+  ];
+
+  // Dynamic Steps generation
+  const getSteps = () => {
+    let steps = [...BASE_STEPS];
+
+    // Add active optional sections
+    activeSections.forEach((sectionId) => {
+      const config = OPTIONAL_SECTIONS_CONFIG.find(c => c.id === sectionId);
+      if (config) {
+        steps.push({ id: steps.length + 1, title: config.title, sectionId: sectionId });
+      }
+    });
+
+    // Always add "Add Section" at the end
+    steps.push({ id: steps.length + 1, title: "Add Section", isAddSectionStep: true });
+
+    return steps;
+  };
+
+  const STEPS = getSteps();
+
   const [step, setStep] = useState(1);
 
-  const { fields, append, remove, move } = useFieldArray({
+  // Employment History Field Array
+  const { fields: empFields, append: empAppend, remove: empRemove, move: empMove } = useFieldArray({
     control,
     name: "employmentHistory",
   });
+
+  // Education History Field Array
+  const { fields: eduFields, append: eduAppend, remove: eduRemove, move: eduMove } = useFieldArray({
+    control,
+    name: "educationHistory",
+  });
+
+  // Skills Field Array
+  const { fields: skillFields, append: skillAppend, remove: skillRemove, move: skillMove } = useFieldArray({
+    control,
+    name: "newSkillHistory",
+  });
+
+  // Courses Field Array
+  const { fields: coursesFields, append: coursesAppend, remove: coursesRemove, move: coursesMove } = useFieldArray({
+    control,
+    name: "coursesHistory",
+  });
+
+  // Activities Field Array
+  const { fields: activitiesFields, append: activitiesAppend, remove: activitiesRemove, move: activitiesMove } = useFieldArray({
+    control,
+    name: "activityHistory",
+  });
+
+  // Languages Field Array
+  const { fields: languageFields, append: languageAppend, remove: languageRemove, move: languageMove } = useFieldArray({
+    control,
+    name: "languageHistory",
+  });
+
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
   const onSubmit = (data) => {
-    if (step < 6) {
+    // If we're not at the last step, go next
+    if (step < STEPS.length) {
       nextStep();
     } else {
       console.log("Final Submission:", data);
@@ -670,10 +744,10 @@ const page = () => {
                               setEmpHistory={setEmpHistory}
                               watch={watch}
                               control={control}
-                              fields={fields} // Use this instead of empHistory state
-                              append={append} // Use this instead of setEmpHistory add
-                              remove={remove} // Use this instead of setEmpHistory delete
-                              move={move}
+                              fields={empFields}
+                              append={empAppend}
+                              remove={empRemove}
+                              move={empMove}
                             />
                           </div>
                         )
@@ -687,6 +761,10 @@ const page = () => {
                               setEducation={setEducation}
                               watch={watch}
                               control={control}
+                              fields={eduFields}
+                              append={eduAppend}
+                              remove={eduRemove}
+                              move={eduMove}
                             />
                           </div>
                         )
@@ -700,6 +778,11 @@ const page = () => {
                               setNewSkill={setNewSkill}
                               watch={watch}
                               setValue={setValue}
+                              control={control}
+                              fields={skillFields}
+                              append={skillAppend}
+                              remove={skillRemove}
+                              move={skillMove}
                             />
                           </div>
                         )
@@ -710,6 +793,105 @@ const page = () => {
                             <PersonalSummary
                               register={register}
                               watch={watch}
+                            />
+                          </div>
+                        )
+                      }
+
+                      {/* Dynamic Sections Rendering */}
+                      {(() => {
+                        const currentStepObj = STEPS.find(s => s.id === step);
+                        if (currentStepObj && currentStepObj.sectionId === 'courses') {
+                          return (
+                            <div>
+                              <Courses
+                                register={register}
+                                watch={watch}
+                                control={control}
+                                fields={coursesFields}
+                                append={coursesAppend}
+                                remove={coursesRemove}
+                                move={coursesMove}
+                              />
+                            </div>
+                          );
+                        }
+                        if (currentStepObj && currentStepObj.sectionId === 'hobbies') {
+                          return (
+                            <div>
+                              <Hobbies register={register} />
+                            </div>
+                          );
+                        }
+                        if (currentStepObj && currentStepObj.sectionId === 'extra_curricular') {
+                          return (
+                            <div>
+                              <Activities
+                                register={register}
+                                watch={watch}
+                                control={control}
+                                fields={activitiesFields}
+                                append={activitiesAppend}
+                                remove={activitiesRemove}
+                                move={activitiesMove}
+                              />
+                            </div>
+                          );
+                        }
+
+                        if (currentStepObj && currentStepObj.sectionId === 'languages') {
+                          return (
+                            <div>
+                              <Languages
+                                register={register}
+                                watch={watch}
+                                control={control}
+                                fields={languageFields}
+                                append={languageAppend}
+                                remove={languageRemove}
+                                move={languageMove}
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+
+                      {
+                        // Check if current step is the "Add Section" step
+                        STEPS.find(s => s.id === step)?.isAddSectionStep && (
+                          <div>
+                            <AddSection
+                              onSelectSection={(sectionId) => {
+                                if (sectionId === 'courses') {
+                                  if (!activeSections.includes('courses')) {
+                                    setActiveSections([...activeSections, 'courses']);
+                                  } else {
+                                    toast.info("Section already added!");
+                                  }
+                                } else if (sectionId === 'hobbies') {
+                                  if (!activeSections.includes('hobbies')) {
+                                    setActiveSections([...activeSections, 'hobbies']);
+                                  } else {
+                                    toast.info("Section already added!");
+                                  }
+                                } else if (sectionId === 'extra_curricular') {
+                                  if (!activeSections.includes('extra_curricular')) {
+                                    setActiveSections([...activeSections, 'extra_curricular']);
+                                  } else {
+                                    toast.info("Section already added!");
+                                  }
+                                } else if (sectionId === 'languages') {
+                                  if (!activeSections.includes('languages')) {
+                                    setActiveSections([...activeSections, 'languages']);
+                                  } else {
+                                    toast.info("Section already added!");
+                                  }
+                                } else {
+                                  console.log("Selected section:", sectionId);
+                                  toast.info(`Clicked ${sectionId} - Feature coming soon!`);
+                                }
+                              }}
                             />
                           </div>
                         )

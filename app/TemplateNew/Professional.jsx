@@ -121,8 +121,53 @@ const Professional = ({ formData ,empHistory}) => {
             </div>
           </div>
         )}
+
+        {/* Hobbies Section on Left Sidebar */}
+        {formData.hobbies && (
+          <div className="mt-4">
+            <h3 className="text-lg font-serif font-bold mb-3">Hobbies</h3>
+            <p className="text-xs text-gray-300 font-light whitespace-pre-wrap leading-relaxed">
+                {formData.hobbies}
+            </p>
+          </div>
+        )}
+
+                {formData.languageHistory?.some(l => l.language) && formData.languageHistory.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-lg font-serif font-bold mb-3">Languages</h3>
+            <div className="flex flex-col gap-4">
+              {formData.languageHistory.map((item, index) => {
+                let percentage = 20; // Default
+                switch(item.level) {
+                    case "Native speaker": percentage = 100; break;
+                    case "Highly proficient": percentage = 80; break;
+                    case "Very good command": percentage = 60; break;
+                    case "Good working knowledge": percentage = 40; break;
+                    case "Working knowledge": percentage = 20; break;
+                    default: percentage = 20;
+                }
+
+                return (
+                  <div key={index} className="w-full">
+                    <div className="text-xs text-white mb-1.5">{item.language || ""}</div>
+                    <div className="w-full bg-[#1a4f46] h-[2px] rounded-full overflow-hidden">
+                        <div
+                            className="bg-white h-full transition-all duration-500 shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                            style={{ width: `${percentage}%` }}
+                        />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
    
       </div>
+        
+
+        {/* Languages Section on Left Sidebar with Progress Bar */}
+
 
       {/* ----------------- RIGHT CONTENT ----------------- */}
       <div className="w-[65%] p-10 flex flex-col gap-8 text-gray-800">
@@ -137,34 +182,7 @@ const Professional = ({ formData ,empHistory}) => {
           </section>
         )}
 
-        {/* Employment History */}
-        {/* {hasEmployment && (
-        
-        <section>
-    <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1">
-      Employment History
-    </h2>
-    <div className="flex flex-col gap-4">
-      {formData.employmentHistory.map((job, index) => (
-        <div key={index} className="mb-2">
-          <h3 className="text-[12px] font-bold text-black">
-            {job.job_title}{job.employer ? `, ${job.employer}` : ''}{job.city_state ?','+ job.city_state : ''}
-          </h3>
-          
-          <div className="text-[10px] text-gray-500 uppercase tracking-wide mb-2">
-            {job.city_state ? job.city_state : ''}
-          </div>
-          
-          {job.description && (
-            <p className="text-xs text-gray-700 whitespace-pre-wrap">
-              {job.description}
-            </p>
-          )}
-        </div>
-      ))}
-    </div>
-         </section>
-        )} */}
+ 
 
   {hasEmployment && (
   <section>
@@ -258,6 +276,88 @@ const Professional = ({ formData ,empHistory}) => {
             )}
           </div>
           )
+        })}
+      </div>
+    </section>
+  )}
+  
+  {/* Courses Section */}
+  {formData.coursesHistory?.some(c => c.course || c.institution) && formData.coursesHistory.length > 0 && (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1 border-gray-200">
+        Courses
+      </h2>
+      <div className="flex flex-col gap-4 mt-3">
+        {formData.coursesHistory.map((course, index) => {
+          const formatDate = (dateValue) => {
+            if (!dateValue) return "";
+            const d = new Date(dateValue);
+            return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+          };
+
+          const displayStart = formatDate(course.startDate);
+          const displayEnd = formatDate(course.endDate);
+
+          return (
+            <div key={index} className="mb-2">
+              <h3 className="text-[12px] font-bold text-black leading-tight">
+                {course.course}{course.institution ? `, ${course.institution}` : ''}
+              </h3>
+
+              {(displayStart || displayEnd) && (
+                <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
+                   {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+                </div>
+              )}
+
+              {course.description && (
+                <p className="text-xs text-gray-700 whitespace-pre-wrap mt-1">
+                  {course.description}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  {/* Extra-curricular Activities Section */}
+  {formData.activityHistory?.some(a => a.functionTitle || a.employer) && formData.activityHistory.length > 0 && (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1 border-gray-200">
+        Extra-curricular Activities
+      </h2>
+      <div className="flex flex-col gap-4 mt-3">
+        {formData.activityHistory.map((activity, index) => {
+          const formatDate = (dateValue) => {
+            if (!dateValue) return "";
+            const d = new Date(dateValue);
+            return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+          };
+
+          const displayStart = formatDate(activity.startDate);
+          const displayEnd = formatDate(activity.endDate);
+
+          return (
+            <div key={index} className="mb-2">
+              <h3 className="text-[12px] font-bold text-black leading-tight">
+                {activity.functionTitle}{activity.employer ? `, ${activity.employer}` : ''}{activity.city ? `, ${activity.city}` : ''}
+              </h3>
+
+              {(displayStart || displayEnd) && (
+                <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
+                   {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+                </div>
+              )}
+
+              {activity.description && (
+                <p className="text-xs text-gray-700 whitespace-pre-wrap mt-1">
+                  {activity.description}
+                </p>
+              )}
+            </div>
+          );
         })}
       </div>
     </section>
