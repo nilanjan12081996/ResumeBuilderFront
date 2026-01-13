@@ -1392,6 +1392,28 @@ body {
   background-color: initial;
   color: #ffffff;
 }
+.acco_section .date_area button.date_picker {
+  background-color: initial;
+  color: #000000;
+  border-bottom: #9ca3af 1px solid !important;
+}
+
+
+.react-datepicker-wrapper {
+  display: block !important;
+  width: 100% !important;
+}
+
+
+.react-datepicker__input-container {
+  display: block !important;
+}
+
+
+.react-datepicker--month-text--selected {
+  background-color: #3b82f6 !important; /* Tailwind blue-500 */
+  border-radius: 0.375rem;
+}
 
 @media only screen and (max-width: 767px) {
   .invited_students_table_wrap table tr td:first-child,

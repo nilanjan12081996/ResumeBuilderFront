@@ -59,7 +59,7 @@ import Skills from './SkillsNew';
 import PersonalProject from './PersonalProject';
 import Certificates from './Certificates';
 import Achivments from './Achivments';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { addCountResume, addCountResumeOrg, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
@@ -149,6 +149,7 @@ const[newskill,setNewSkill]=useState([{id:1}])
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm();
 
@@ -170,6 +171,10 @@ const[newskill,setNewSkill]=useState([{id:1}])
       newSkillHistory:[{}] 
     }
   });
+  const { fields, append, remove, move } = useFieldArray({
+  control,
+  name: "employmentHistory", 
+});
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
@@ -663,6 +668,11 @@ const[newskill,setNewSkill]=useState([{id:1}])
                               empHistory={empHistory}
                               setEmpHistory={setEmpHistory}
                               watch={watch}
+                              control={control}
+                              fields={fields} // Use this instead of empHistory state
+                              append={append} // Use this instead of setEmpHistory add
+                              remove={remove} // Use this instead of setEmpHistory delete
+                              move={move}
                             />
                           </div>
                         )
@@ -674,7 +684,9 @@ const[newskill,setNewSkill]=useState([{id:1}])
                             register={register}
                               education={education}
                               setEducation={setEducation}
-                              watch={watch}/>
+                              watch={watch}
+                              control={control}
+                              />
                           </div>
                         )
                       }
