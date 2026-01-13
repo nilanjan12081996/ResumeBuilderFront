@@ -1330,6 +1330,7 @@ svg[data-testid="flowbite-accordion-arrow"] {
   position: relative;
   display: inline-flex;
   align-items: center;
+  border:none;
 }
 
 .tooltip {
