@@ -87,6 +87,7 @@ import Courses from './Courses';
 import Hobbies from './Hobbies';
 import Activities from './Activities';
 import Languages from './newLanguage';
+import Internships from './Internships';
 
 
 const page = () => {
@@ -158,6 +159,7 @@ const page = () => {
       coursesHistory: [{}],
       activityHistory: [{}],
       languageHistory: [{}],
+      internshipHistory: [{}],
       hobbies: ""
     }
   });
@@ -188,7 +190,8 @@ const page = () => {
     { id: 'courses', title: 'Courses', component: Courses },
     { id: 'hobbies', title: 'Hobbies', component: Hobbies },
     { id: 'extra_curricular', title: 'Extra-curricular Activities', component: Activities },
-    { id: 'languages', title: 'Languages', component: Languages }
+    { id: 'languages', title: 'Languages', component: Languages },
+    { id: 'internships', title: 'Internships', component: Internships }
   ];
 
   // Dynamic Steps generation
@@ -247,6 +250,12 @@ const page = () => {
   const { fields: languageFields, append: languageAppend, remove: languageRemove, move: languageMove } = useFieldArray({
     control,
     name: "languageHistory",
+  });
+
+  // Internships Field Array
+  const { fields: internshipFields, append: internshipAppend, remove: internshipRemove, move: internshipMove } = useFieldArray({
+    control,
+    name: "internshipHistory",
   });
 
   const nextStep = () => setStep((prev) => prev + 1);
@@ -854,6 +863,22 @@ const page = () => {
                             </div>
                           );
                         }
+
+                        if (currentStepObj && currentStepObj.sectionId === 'internships') {
+                          return (
+                            <div>
+                              <Internships
+                                register={register}
+                                watch={watch}
+                                control={control}
+                                fields={internshipFields}
+                                append={internshipAppend}
+                                remove={internshipRemove}
+                                move={internshipMove}
+                              />
+                            </div>
+                          );
+                        }
                         return null;
                       })()}
 
@@ -884,6 +909,12 @@ const page = () => {
                                 } else if (sectionId === 'languages') {
                                   if (!activeSections.includes('languages')) {
                                     setActiveSections([...activeSections, 'languages']);
+                                  } else {
+                                    toast.info("Section already added!");
+                                  }
+                                } else if (sectionId === 'internships') {
+                                  if (!activeSections.includes('internships')) {
+                                    setActiveSections([...activeSections, 'internships']);
                                   } else {
                                     toast.info("Section already added!");
                                   }

@@ -362,6 +362,49 @@ const Professional = ({ formData ,empHistory}) => {
       </div>
     </section>
   )}
+
+  {/* Internship Section */}
+{formData.internshipHistory?.some(intern => intern.jobTitle || intern.employer) && formData.internshipHistory.length > 0 && (
+  <section>
+    <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1">
+      Internships
+    </h2>
+    <div className="flex flex-col gap-4">
+      {formData.internshipHistory.map((intern, index) => {
+        const formatDate = (dateValue) => {
+          if (!dateValue) return "";
+          const d = new Date(dateValue);
+          return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+        };
+
+        const displayStart = formatDate(intern.startDate);
+        const displayEnd = formatDate(intern.endDate);
+
+        return (
+          <div key={index} className="mb-2">
+            <h3 className="text-[12px] font-bold text-black">
+              {intern.jobTitle}
+              {intern.employer ? `, ${intern.employer}` : ''}
+              {intern.city ? `, ${intern.city}` : ''}
+            </h3>
+            
+            {(displayStart || displayEnd) && (
+              <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
+                {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+              </div>
+            )}
+            
+            {intern.description && (
+              <p className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {intern.description}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </section>
+)}
       </div>
     </div>
   );
