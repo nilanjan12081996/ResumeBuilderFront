@@ -277,6 +277,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                     : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
                 } cursor-default`}
               >
+                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
                 <Accordion flush={true}>
                   <AccordionPanel>
                     <AccordionTitle className="p-4">
@@ -306,7 +307,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                           <input
                             type="text"
                             placeholder="e.g. Software Engineer"
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-cyan-500"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                             {...register(`employmentHistory.${index}.job_title`)}
                           />
                         </div>
@@ -317,14 +318,16 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                           <input
                             type="text"
                             placeholder="e.g. Google"
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-cyan-500"
+                             className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                             {...register(`employmentHistory.${index}.employer`)}
                           />
                         </div>
 
                         {/* Start & End Date */}
-                        <div className='md:col-span-1'>
-                          <label className="block text-xs font-semibold text-gray-500 uppercase">Dates</label>
+                        <div className='md:col-span-1 date_area'>
+                          <label className="block text-sm font-medium text-gray-700">
+                              Strat & End Date
+                            </label>
                           <div className='flex gap-2 mt-1'>
                             <Controller
                               control={control}
@@ -349,7 +352,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                           <input
                             type="text"
                             placeholder="e.g. San Francisco, CA"
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-cyan-500"
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                             {...register(`employmentHistory.${index}.city_state`)}
                           />
                         </div>
@@ -359,26 +362,27 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                           <label className="block text-xs font-semibold text-gray-500 uppercase">Description</label>
                           <textarea 
                             rows="4" 
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-cyan-500" 
+                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                             placeholder="Describe your responsibilities and achievements..."
                             {...register(`employmentHistory.${index}.description`)}
                           />
                         </div>
 
                         {/* Delete Button inside the Content */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2">
+                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
                           <button 
                             type="button" 
                             onClick={() => deleteEmp(index)}
                             className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
                           >
-                            <MdDelete className='text-lg' /> Delete Entry
+                            <MdDelete className='text-lg' /> 
                           </button>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionPanel>
                 </Accordion>
+                </div>
               </div>
             );
           })}

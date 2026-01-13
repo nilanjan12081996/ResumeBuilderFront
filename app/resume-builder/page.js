@@ -141,9 +141,18 @@ const page = () => {
     { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
   ])
   console.log("profileData", profileData);
-const [empHistory, setEmpHistory] = useState([{ id: 1 }])
-const [education,setEducation] = useState([{ id: 1 }])
-const[newskill,setNewSkill]=useState([{id:1}])
+  const [empHistory, setEmpHistory] = useState([{ id: 1 }])
+  const [education, setEducation] = useState([{ id: 1 }])
+  const [newskill, setNewSkill] = useState([{ id: 1 }])
+  const methods = useForm({
+    mode: "onChange",
+    defaultValues: {
+      employmentHistory: [{}],
+      educationHistory: [{}],
+      newSkillHistory: [{}]
+    }
+  });
+
   const {
     register,
     handleSubmit,
@@ -151,30 +160,22 @@ const[newskill,setNewSkill]=useState([{id:1}])
     setValue,
     control,
     formState: { errors },
-  } = useForm();
+  } = methods;
 
-  
   const STEPS = [
-  { id: 1, title: "Personal Details" },
-  { id: 2, title: "Employment History" },
-  { id: 3, title: "Education" },
-  { id: 4, title: "Skills" },
-  {id:5,title:"Professional Summary"}
-];
+    { id: 1, title: "Personal Details" },
+    { id: 2, title: "Employment History" },
+    { id: 3, title: "Education" },
+    { id: 4, title: "Skills" },
+    { id: 5, title: "Professional Summary" }
+  ];
 
   const [step, setStep] = useState(1);
-  const methods = useForm({
-    mode: "onChange",
-    defaultValues: {
-      employmentHistory: [{}],
-      educationHistory:[{}],
-      newSkillHistory:[{}] 
-    }
-  });
+
   const { fields, append, remove, move } = useFieldArray({
-  control,
-  name: "employmentHistory", 
-});
+    control,
+    name: "employmentHistory",
+  });
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
@@ -185,7 +186,7 @@ const[newskill,setNewSkill]=useState([{id:1}])
       console.log("Final Submission:", data);
     }
   };
-    const formValues =watch();
+  const formValues = watch();
 
 
   const onSubmit1 = (data) => {
@@ -663,7 +664,7 @@ const[newskill,setNewSkill]=useState([{id:1}])
                       {
                         step === 2 && (
                           <div>
-                            <EmpHistory 
+                            <EmpHistory
                               register={register}
                               empHistory={empHistory}
                               setEmpHistory={setEmpHistory}
@@ -678,37 +679,37 @@ const[newskill,setNewSkill]=useState([{id:1}])
                         )
                       }
                       {
-                        step===3 &&(
+                        step === 3 && (
                           <div>
-                            <EducationNew   
-                            register={register}
+                            <EducationNew
+                              register={register}
                               education={education}
                               setEducation={setEducation}
                               watch={watch}
                               control={control}
-                              />
+                            />
                           </div>
                         )
                       }
                       {
-                        step===4&&(
+                        step === 4 && (
                           <div>
                             <SkillsNew
-                            register={register}
+                              register={register}
                               newskill={newskill}
                               setNewSkill={setNewSkill}
                               watch={watch}
                               setValue={setValue}
                             />
-                            </div>
+                          </div>
                         )
                       }
                       {
-                        step===5&&(
+                        step === 5 && (
                           <div>
                             <PersonalSummary
                               register={register}
-                               watch={watch}
+                              watch={watch}
                             />
                           </div>
                         )
@@ -719,7 +720,7 @@ const[newskill,setNewSkill]=useState([{id:1}])
                     </div>
 
                     <div className='flex justify-between items-center px-8 py-3 border-t border-[#e7e8ec]'>
-                  
+
                       <div className='w-3/12'>
                         <button
                           type="button"
@@ -738,11 +739,11 @@ const[newskill,setNewSkill]=useState([{id:1}])
                           type="submit"
                           className='rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700'
                         >
-                                {step === STEPS.length ? (
-                                    "Finish"
-                                  ) : (
-                                    `Next: ${STEPS.find(s => s.id === step + 1)?.title}`
-                                  )}
+                          {step === STEPS.length ? (
+                            "Finish"
+                          ) : (
+                            `Next: ${STEPS.find(s => s.id === step + 1)?.title}`
+                          )}
                         </button>
                       </div>
                     </div>
