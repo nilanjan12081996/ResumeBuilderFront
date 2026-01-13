@@ -1293,13 +1293,13 @@ const page = () => {
                                               : "bg-white border-gray-200 shadow-sm"
                                             }`}>
 
-                                          <Accordion collapseAll>
-                                            <AccordionPanel>
-                                               <span className="drag-wrapper !border-0">
+                                          <Accordion collapseAll className='!border !border-[#a1a8b9] overflow-hidden mb-2'>
+                                            <AccordionPanel className='!border'>
+                                              <AccordionTitle className='font-bold text-sm'>
+                                                <span className="drag-wrapper">
                                                   <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
                                                   <span className="tooltip">Click and drag to move</span>
                                                 </span>
-                                              <AccordionTitle className='font-bold text-sm'> 
                                                 {skill.name}
                                               </AccordionTitle>
                                               <AccordionContent className='pt-0'>
