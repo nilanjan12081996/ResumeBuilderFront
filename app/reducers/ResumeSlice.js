@@ -288,7 +288,7 @@ export const saveResumeNew = createAsyncThunk(
     async (userInput, { rejectWithValue }) => {
         try {
             const response = await api.post('/api/scatch/resume/save', userInput);
-            if (response?.data?.status_code === 201) {
+            if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {
@@ -317,7 +317,8 @@ const initialState = {
     saveAchiveInfo: "",
     saveTemplateInfo: "",
     singleResumeInfo: "",
-    updateBasicInfoData: ""
+    updateBasicInfoData: "",
+    saveResumeData: ""
 }
 const ResumeSlice = createSlice(
     {
@@ -454,6 +455,18 @@ const ResumeSlice = createSlice(
                     state.error = false
                 })
                 .addCase(updatePersonalInfo.rejected, (state, { payload }) => {
+                    state.loading = false
+                    state.error = payload
+                })
+                .addCase(saveResumeNew.pending, (state) => {
+                    state.loading = true
+                })
+                .addCase(saveResumeNew.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.saveResumeData = payload
+                    state.error = false
+                })
+                .addCase(saveResumeNew.rejected, (state, { payload }) => {
                     state.loading = false
                     state.error = payload
                 })
