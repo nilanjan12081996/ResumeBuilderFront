@@ -267,7 +267,7 @@ const Insideheader = () => {
           </Link>
         </div>
 
-        <div className="flex justify-center my-4">
+        <div className="flex justify-center">
           <div className="flex bg-gray-100 rounded-full p-1">
             <button
               onClick={() => setActiveTab("edit")}
