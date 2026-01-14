@@ -111,6 +111,9 @@ const page = () => {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
+  const [activeExp, setActiveExp] = useState(null);
+  const [activeExpId, setActiveExpId] = useState(null);
+
 
   // useEffect(() => {
   //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
@@ -945,22 +948,57 @@ const page = () => {
           description: ""
         }
       ]
+    },
+    {
+      id: 4,
+      title: "Experience",
+      type: "experience",
+      experiences: [
+        {
+          id: "x1",
+          jobTitle: "Freelance HTML Developer",
+          company: "Self-employed",
+          city: "",
+          startDate: "Sept, 2023",
+          endDate: "May, 2024",
+          description: "Developed responsive and user-friendly websites using HTML, CSS, JavaScript, and modern frontend best practices while converting Figma and PSD designs into pixel-perfect web pages with full cross-browser compatibility. Improved website performance and accessibility by optimizing layouts, images, and reusable components and worked directly with clients to understand requirements, implement revisions, and deliver high-quality projects within deadlines."
+        },
+        {
+          id: "x2",
+          jobTitle: "Frontend Developer (Trainee)",
+          company: "Webskitters Technology Solutions",
+          city: "",
+          startDate: "Jun, 2024",
+          endDate: "Apr, 2025",
+          description: "Worked on real-world frontend applications using React.js, JavaScript, HTML, CSS, and Bootstrap by building reusable UI components and implementing dynamic features based on project requirements. Integrated REST APIs using Axios and React hooks, collaborated with designers and backend developers, fixed UI bugs, improved performance, and followed clean coding and best development practices."
+        }
+      ]
     }
-
   ]);
   const [draggedIndex, setDraggedIndex] = useState(null);
 
 
 
 
+  // const handleDragStart = (e, index) => {
+  //   setDraggedIndex(index);
+
+
+  //   const dragTarget = e.currentTarget;
+  //   e.dataTransfer.setDragImage(dragTarget, 20, 20);
+  //   e.dataTransfer.effectAllowed = "move";
+  // };
+
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
 
+    const sectionEl = e.currentTarget.closest(".section-item");
 
-    const dragTarget = e.currentTarget;
-    e.dataTransfer.setDragImage(dragTarget, 20, 20);
-    e.dataTransfer.effectAllowed = "move";
+    if (sectionEl) {
+      e.dataTransfer.setDragImage(sectionEl, 20, 20);
+    }
   };
+
 
 
   const handleDragEnd = () => {
@@ -1137,6 +1175,58 @@ const page = () => {
       ...updatedSections[sectionIndex].certifications,
       newCert
     ];
+
+    setSections(updatedSections);
+  };
+
+  // for experince 
+  const [draggedExpIndex, setDraggedExpIndex] = useState(null);
+
+  const handleExpDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedExpIndex(index);
+  };
+
+  const handleExpDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedExpIndex === null || draggedExpIndex === targetIndex) return;
+
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].experiences];
+
+    const [moved] = list.splice(draggedExpIndex, 1);
+    list.splice(targetIndex, 0, moved);
+
+    updatedSections[sectionIndex].experiences = list;
+    setSections(updatedSections);
+    setDraggedExpIndex(null);
+  };
+
+  const handleExpUpdate = (sectionIndex, expId, field, value) => {
+    const updatedSections = [...sections];
+
+    updatedSections[sectionIndex].experiences =
+      updatedSections[sectionIndex].experiences.map(exp =>
+        exp.id === expId ? { ...exp, [field]: value } : exp
+      );
+
+    setSections(updatedSections);
+  };
+
+  const handleAddExperience = (sectionIndex) => {
+    const updatedSections = [...sections];
+
+    updatedSections[sectionIndex].experiences.push({
+      id: `x${Date.now()}`,
+      jobTitle: "",
+      company: "",
+      city: "",
+      startDate: "",
+      endDate: "",
+      description: ""
+    });
 
     setSections(updatedSections);
   };
@@ -1407,9 +1497,6 @@ const page = () => {
                     sections.map((section, index) => (
                       <div
                         key={section.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragEnd={handleDragEnd}
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, index)}
                         className={`
@@ -1425,7 +1512,12 @@ const page = () => {
 
                           <AccordionPanel>
                             <AccordionTitle className='font-bold text-xl'>
-                              <span className="drag-wrapper">
+                              <span
+                                className="drag-wrapper"
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, index)}
+                                onDragEnd={handleDragEnd}
+                              >
                                 <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
                                 <span className="tooltip">Click and drag to move</span>
                               </span>
@@ -1444,18 +1536,20 @@ const page = () => {
                                       section.skills.map((skill, sIndex) => (
                                         <div
                                           key={skill.id}
-                                          draggable
-                                          onDragStart={(e) => handleSkillDragStart(e, sIndex)}
                                           onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                                           onDrop={(e) => handleSkillDrop(e, index, sIndex)}
-                                          onDragEnd={() => setDraggedSkillIndex(null)}
                                           className={`transition-all duration-200 rounded-lg border 
                               ${draggedSkillIndex === sIndex
                                               ? "opacity-20 border-cyan-500 scale-95"
                                               : "bg-white border-gray-200 shadow-sm"
                                             }`}>
                                           <div className="flex items-start gap-2">
-                                            <span className="drag-wrapper mt-5">
+                                            <span
+                                              className="drag-wrapper mt-5"
+                                              draggable
+                                              onDragStart={(e) => handleSkillDragStart(e, sIndex)}
+                                              onDragEnd={() => setDraggedSkillIndex(null)}
+                                            >
                                               <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
                                               <span className="tooltip">Click and drag to move</span>
                                             </span>
@@ -1525,32 +1619,13 @@ const page = () => {
                                 section.type === 'summary' && (
                                   <div className="space-y-2">
                                     <div className='flex justify-between items-center'>
-                                      <label className="text-sm font-medium text-gray-400">Professional Summary</label>
-                                      <div className="relative">
-                                        <button
-                                          type="button"
-                                          onClick={() => setAiModalOpen(true)}
-                                          className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] font-medium !transition-all !duration-200 hover:!bg-[#800080] hover:!text-white"
-                                        >
-                                          <HiSparkles className="text-md" />
-                                          Get help with writing
-                                        </button>
-                                        <GenerateWithAiModal
-                                          open={aiModalOpen}
-                                          onClose={() => setAiModalOpen(false)}
-                                          aiType="imp_summary"
-                                          initialText={watch("goal") || ""}
-                                          onApply={(text) => {
-                                            setValue("goal", text);
-                                          }}
-                                        />
-                                      </div>
-
-
+                                      <p className="!text-sm !font-medium !text-gray-500 mb-4">
+                                        Write 2-4 short, energetic sentences about how great you are. Mention the role and what you did. What were the big achievements? Describe your motivation and list your skills.
+                                      </p>
                                     </div>
                                     <textarea
                                       placeholder="Write a brief professional summary..."
-                                      className="mt-1 w-ful text-sm h-32"
+                                      className="mt-1 w-ful text-sm h-32 resize-none"
                                       /* Use the watched value from useForm to make it a controlled input */
                                       value={watch("goal") || ""}
                                       onChange={(e) => {
@@ -1558,6 +1633,25 @@ const page = () => {
                                         setValue("goal", e.target.value);
                                       }}
                                     />
+                                    <div className="relative flex justify-end">
+                                      <button
+                                        type="button"
+                                        onClick={() => setAiModalOpen(true)}
+                                        className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] font-medium !transition-all !duration-200 hover:!bg-[#800080] hover:!text-white"
+                                      >
+                                        <HiSparkles className="text-md" />
+                                        Get help with writing
+                                      </button>
+                                      <GenerateWithAiModal
+                                        open={aiModalOpen}
+                                        onClose={() => setAiModalOpen(false)}
+                                        aiType="imp_summary"
+                                        initialText={watch("goal") || ""}
+                                        onApply={(text) => {
+                                          setValue("goal", text);
+                                        }}
+                                      />
+                                    </div>
                                   </div>
                                 )
                               }
@@ -1566,7 +1660,7 @@ const page = () => {
                                 section.type === "education" && (
                                   <>
                                     {/* Section intro text */}
-                                    <p className="!text-sm !font-medium !text-gray-500">
+                                    <p className="!text-sm !font-medium !text-gray-500 pb-2">
                                       A varied education on your resume sums up the value that your learnings
                                       and background will bring to job.
                                     </p>
@@ -1574,20 +1668,23 @@ const page = () => {
                                     {section.educations.map((edu, eIndex) => (
                                       <div
                                         key={edu.id}
-                                        draggable
-                                        onDragStart={(e) => handleEducationDragStart(e, eIndex)}
                                         onDragOver={(e) => e.preventDefault()}
                                         onDrop={(e) => handleEducationDrop(e, index, eIndex)}
-                                        className="transition-all duration-200 rounded-lg border border-gray-200 shadow-sm mb-3"
+                                        className="transition-all duration-200 rounded-sm mb-3"
                                       >
                                         <div className="flex items-start gap-2">
-                                          <span className="drag-wrapper mt-5">
+                                          <span
+                                            className="drag-wrapper mt-5"
+                                            draggable
+                                            onDragStart={(e) => handleEducationDragStart(e, eIndex)}
+                                            onDragEnd={handleDragEnd}
+                                          >
                                             <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
                                             <span className="tooltip">Click and drag to move</span>
                                           </span>
                                           <Accordion
                                             collapseAll
-                                            className="w-full overflow-hidden border border-gray-300 rounded-lg"
+                                            className="w-full overflow-hidden !border !border-gray-300 rounded-lg"
                                           >
                                             <AccordionPanel>
                                               <AccordionTitle className="font-semibold text-sm">
@@ -1677,7 +1774,6 @@ const page = () => {
                                   </>
                                 )
                               }
-
                               {section.type === "certifications" && (
                                 <>
                                   <p className="!text-sm !font-medium !text-gray-500 mb-4">
@@ -1687,20 +1783,24 @@ const page = () => {
                                   {section.certifications.map((cert, cIndex) => (
                                     <div
                                       key={cert.id}
-                                      draggable
-                                      onDragStart={(e) => handleCertDragStart(e, cIndex)}
                                       onDragOver={(e) => e.preventDefault()}
                                       onDrop={(e) => handleCertDrop(e, index, cIndex)}
-                                      className="transition-all duration-200 rounded-lg border border-gray-200 shadow-sm mb-3"
+                                      className="transition-all duration-200 mb-3"
                                     >
                                       <div className="flex items-start gap-2">
 
                                         {/* Drag icon */}
-                                        <span className="drag-wrapper mt-5">
+                                        <span
+                                          className="drag-wrapper mt-5"
+                                          draggable
+                                          onDragStart={(e) => handleCertDragStart(e, cIndex)}
+                                          onDragEnd={handleDragEnd}
+                                        >
                                           <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                          <span className="tooltip">Click and drag to move</span>
                                         </span>
 
-                                        <Accordion collapseAll className="w-full border border-gray-300 rounded-lg">
+                                        <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
                                           <AccordionPanel>
 
                                             {/* TITLE */}
@@ -1786,8 +1886,153 @@ const page = () => {
                                   </button>
                                 </>
                               )}
+                              {section.type === "experience" && (
+                                <>
+                                  <p className="!text-sm !font-medium !text-gray-500 mb-4">
+                                    Show your relevant experience (last 10 years). Use bullet points to highlight achievements.
+                                  </p>
 
+                                  {section.experiences.map((exp, eIndex) => (
+                                    <div
+                                      key={exp.id}
+                                      onDragOver={(e) => e.preventDefault()}
+                                      onDrop={(e) => handleExpDrop(e, index, eIndex)}
+                                      className="transition-all duration-20 mb-3"
+                                    >
+                                      <div className="flex items-start gap-2">
 
+                                        {/* Drag icon ONLY */}
+                                        <span
+                                          className="drag-wrapper mt-5"
+                                          draggable
+                                          onDragStart={(e) => handleExpDragStart(e, eIndex)}
+                                          onDragEnd={handleDragEnd}
+                                        >
+                                          <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                          <span className="tooltip">Click and drag to move</span>
+                                        </span>
+
+                                        <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
+                                          <AccordionPanel>
+
+                                            {/* TITLE */}
+                                            <AccordionTitle className="font-semibold text-sm">
+                                              {exp.jobTitle?.trim()
+                                                ? `${exp.jobTitle} at ${exp.company || "(Not specified)"}`
+                                                : "(Not specified)"}
+                                            </AccordionTitle>
+
+                                            {/* CONTENT */}
+                                            <AccordionContent className="pt-0">
+
+                                              <div className="grid grid-cols-2 gap-4 mb-4">
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">Job title</Label>
+                                                  <input
+                                                    value={exp.jobTitle}
+                                                    onChange={(e) =>
+                                                      handleExpUpdate(index, exp.id, "jobTitle", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">Employer</Label>
+                                                  <input
+                                                    value={exp.company}
+                                                    onChange={(e) =>
+                                                      handleExpUpdate(index, exp.id, "company", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">Start Date</Label>
+                                                  <input
+                                                    value={exp.startDate}
+                                                    onChange={(e) =>
+                                                      handleExpUpdate(index, exp.id, "startDate", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">End Date</Label>
+                                                  <input
+                                                    value={exp.endDate}
+                                                    onChange={(e) =>
+                                                      handleExpUpdate(index, exp.id, "endDate", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div className="col-span-2">
+                                                  <Label className="!text-sm !font-medium !text-gray-500">City</Label>
+                                                  <input
+                                                    value={exp.city}
+                                                    onChange={(e) =>
+                                                      handleExpUpdate(index, exp.id, "city", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+                                              </div>
+
+                                              <div>
+                                                <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                                                <textarea
+                                                  value={exp.description}
+                                                  onChange={(e) =>
+                                                    handleExpUpdate(index, exp.id, "description", e.target.value)
+                                                  }
+                                                  className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
+                                                />
+                                                <div className="relative flex justify-end">
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                      setActiveExpId(exp.id);
+                                                    }}
+                                                    className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080]"
+                                                  >
+                                                    <HiSparkles className="text-md" />
+                                                    Get help with writing
+                                                  </button>
+                                                  {activeExpId === exp.id && (
+                                                    <GenerateWithAiModal
+                                                      open={true}
+                                                      onClose={() => setActiveExpId(null)}
+                                                      aiType="imp_experience"
+                                                      initialText={exp.description || ""}
+                                                      onApply={(text) => {
+                                                        handleExpUpdate(index, exp.id, "description", text);
+                                                      }}
+                                                    />
+                                                  )}
+                                                </div>
+                                              </div>
+
+                                            </AccordionContent>
+                                          </AccordionPanel>
+                                        </Accordion>
+                                      </div>
+                                    </div>
+                                  ))}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAddExperience(index)}
+                                    className="!text-sm !text-[#800080] font-medium mt-2"
+                                  >
+                                    + Add one more employment
+                                  </button>
+                                </>
+                              )}
                             </AccordionContent>
                           </AccordionPanel>
                         </Accordion>
@@ -2336,71 +2581,9 @@ const page = () => {
       </div>
 
 
-
-
-
-      <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
-        <div className='flex items-center justify-between mb-4'>
-          <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-            <button
-              onClick={() => setOpenPreviewModal(true)}
-              className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
-            >
-              <MdPreview className='text-[#800080] text-2xl' />
-              Preview
-            </button>
-          </div>
-          <div className='lg:flex items-center gap-3'>
-            <button
-              onClick={handleAnalyzeResume}
-              className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'
-            >
-              <IoStatsChart className='text-base' />Check Resume Score
-            </button>
-            {/* <button onClick={handleAnalyzeResume} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
-            {/* <button onClick={() => console.log('Download DOCX clicked')} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-            {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
-            <div className="relative group inline-block">
-              {/* <button
-                onClick={remaining === 5 ? null : handlePrint}
-                className={`
-                              rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
-                              ${remaining === 5
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
-                  }
-                            `}
-              >
-                <IoMdDownload className="text-[18px]" /> Download PDF
-              </button> */}
-              <button
-                onClick={remaining === 5 ? null : handleDownloadWithCount}
-                className={`
-    rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
-    ${remaining === 5
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
-                  }
-  `}
-              >
-                <IoMdDownload className="text-[18px]" /> Download PDF
-              </button>
-
-
-              {/* Tooltip */}
-              {remaining === 5 && (
-                <div className="
-                              absolute left-1/2 -translate-x-1/2 top-[110%]
-                              bg-black text-white text-[11px] px-2 py-1 rounded opacity-0 
-                              group-hover:opacity-100 transition-all whitespace-nowrap
-                            ">
-                  Enhance your resume first
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className='h-screen overflow-y-scroll border border-[#E5E5E5] rounded-[8px]'>
+      <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] py-5 px-0'>
+        
+        <div className='h-screen overflow-y-scroll rounded-[8px]'>
           <div ref={componentRef} className=''>
             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
             {/* {

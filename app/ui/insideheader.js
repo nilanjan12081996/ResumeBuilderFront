@@ -192,6 +192,8 @@ const Insideheader = () => {
 
   const [open, setOpen] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("edit");
+
 
   useEffect(() => {
     dispatch(getProfile());
@@ -259,40 +261,61 @@ const Insideheader = () => {
     <div className='bg-[#ffffff] rounded-[0px] py-2 px-6 border-l border-[#f3f4f6]'>
       <div className='flex justify-between items-center'>
         {/* Logo */}
-        <div className='w-3/12'>
+        <div className=''>
           <Link className='block lg:hidden' href="/dashboard">
             <Image src={logoAdmin} alt="logoAdmin" className='w-full' />
           </Link>
         </div>
 
-        
+        <div className="flex justify-center my-4">
+          <div className="flex bg-gray-100 rounded-full p-1">
+            <button
+              onClick={() => setActiveTab("edit")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition
+        ${activeTab === "edit"
+                  ? "bg-white shadow text-black"
+                  : "text-gray-500 hover:text-black"}`}
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() => setActiveTab("customize")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition
+        ${activeTab === "customize"
+                  ? "bg-white shadow text-black"
+                  : "text-gray-500 hover:text-black"}`}
+            >
+              Customize
+            </button>
+          </div>
+        </div>
+
+
 
         {/* Buttons and profile */}
         <div className='flex justify-end items-center gap-3'>
           {/* Upgrade / Subscription Plan Button */}
-          <button
+          {/* <button
             onClick={handleUpgrade}
             className={`mr-4 cursor-pointer text-[15px] leading-[45px] rounded-[25px] text-white font-semibold px-5 flex items-center gap-1 transition-all duration-300 ${hasActiveSubscription() ? "bg-[#30B980] hover:bg-[#249b6e]" : "bg-[#800080] hover:bg-black"
               }`}
           >
             <BiSolidCrown className='text-xl' />
             {hasActiveSubscription() ? "Subscription Plan" : "Upgrade Now"}
-          </button>
+          </button> */}
 
           {/* Cancel Subscription Button */}
-          {hasActiveSubscription() && (
+          {/* {hasActiveSubscription() && (
             <button
               onClick={() => setShowCancelModal(true)}
               className="mr-4 cursor-pointer bg-red-500 hover:bg-red-600 text-white font-semibold px-5 py-2 rounded-[25px] transition-all duration-300"
             >
               Cancel Subscription
             </button>
-          )}
+          )} */}
 
-          {/* Profile Name */}
-          <p className='text-base text-[#cccccc]'>{profileData?.data?.fullname}</p>
-
-          {/* Profile Image and Dropdown */}
+          {/* Profile Name & Image */}
           <div className="relative">
             <div
               className="user_face cursor-pointer"
@@ -302,31 +325,52 @@ const Insideheader = () => {
                 <Image
                   src={profileData?.data?.avatar}
                   alt="userFace"
-                  width={50}
-                  height={50}
-                  className="rounded-full w-[50px] h-[50px] border border-gray-300"
+                  width={40}
+                  height={40}
+                  className="rounded-full w-[40px] h-[40px] border border-gray-300"
                 />
               ) : (
-                <div className="rounded-full w-[50px] h-[50px] bg-gray-300 flex items-center justify-center border border-gray-300">
-                  <FaUser className="text-gray-600 text-[24px]" />
+                <div className="rounded-full w-[40px] h-[40px] bg-gray-300 flex items-center justify-center border border-gray-300">
+                  <FaUser className="text-gray-600 text-[20px]" />
                 </div>
               )}
             </div>
 
             {open && (
-              <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
-                <ul className="flex flex-col text-sm py-2">
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                {/* Header: Name & Email */}
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <p className="text-sm font-semibold text-gray-800">
+                    {profileData?.data?.fullname}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {profileData?.data?.email}
+                  </p>
+                </div>
+
+                {/* Menu Items */}
+                <ul className="flex flex-col py-2">
+                  <li className="px-0">
+                    <Link
+                      href="/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-gray-600 text-sm cursor-pointer rounded-lg hover:bg-gray-100"
+                    >
+                      <FaUser className="text-base" />
+                      My Profile
+                    </Link>
+                  </li>
                   <li
-                    className="flex align-center px-4 py-2 gap-2 cursor-pointer text-[#8C8C8C] hover:bg-graydark hover:text-[#a635a2]"
+                    className="flex items-center gap-2 px-4 py-2 text-gray-600 text-sm cursor-pointer rounded-lg hover:bg-gray-100"
                     onClick={handleLogout}
                   >
-                    <MdOutlineLogout className="text-2xl" />
-                    <p className='pt-1'>Logout</p>
+                    <MdOutlineLogout className="text-base" />
+                    Log Out
                   </li>
                 </ul>
               </div>
             )}
           </div>
+
         </div>
       </div>
 
