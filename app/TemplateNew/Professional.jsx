@@ -23,11 +23,11 @@ const Professional = ({ formData ,empHistory}) => {
     <div className="min-h-[297mm] bg-white shadow-xl flex text-sm font-sans">
       
       {/* ----------------- LEFT SIDEBAR ----------------- */}
-      <div className="w-[35%] bg-[#0e3f36] text-white p-8 flex flex-col gap-6">
+      <div className="w-[35%] bg-[#0e3f36] text-white p-8 flex flex-col gap-6 items-center text-center">
         
         {/* Profile Image */}
         {formData.profileImage && (
-          <div className="w-22 h-22 mx-auto mb-1 rounded-full overflow-hidden border-4 border-white shadow-lg">
+          <div className="w-15 h-15 mb-1 rounded-full overflow-hidden border-4 border-white shadow-lg">
             <img 
               src={formData.profileImage} 
               alt="Profile" 
@@ -37,15 +37,17 @@ const Professional = ({ formData ,empHistory}) => {
         )}
         
         {/* Name Block */}
-        <div className="mt-4">
-          <h1 className="text-sm font-serif font-bold leading-tight break-words">
-            {formData.first_name} 
+        <div className="mt-1 w-full flex flex-col items-center">
+          <h1 className="text-xl font-serif font-bold leading-tight break-words">
+            {formData.first_name} <br />
             {formData.last_name}
           </h1>
           
+          <div className="w-8 h-[1px] bg-gray-400 my-4 opacity-50"></div>
+
           {formData.job_target && (
-            <div className="mt-4 pb-4 border-b border-gray-500">
-              <p className="text-[12px] uppercase tracking-[0.2em] font-medium text-gray-300">
+            <div className="">
+              <p className="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-300">
                 {formData.job_target}
               </p>
             </div>
@@ -54,51 +56,52 @@ const Professional = ({ formData ,empHistory}) => {
 
         {/* Details Section */}
         {hasContactInfo && (
-          <div>
-            <h3 className="text-lg font-serif font-bold mb-1">Details</h3>
-            <div className="flex flex-col gap-2 text-xs text-gray-300 font-light">
+          <div className="w-full flex flex-col items-start">
+            <h3 className="text-xs font-serif font-bold mb-2">Details</h3>
+            <div className="flex flex-col gap-2 text-xs text-gray-300 font-light items-start">
               
               {(formData.address || formData.city_state) && (
                 <div className="mb-1">
-                  <span className="block">{formData.address}</span>
-                  <span className="block">{formData.city_state}{formData?.country&&","+formData.country}</span>
-                  {formData.postal_code && <span className="block">{formData.postal_code}</span>}
+                  <span className="block text-start">{formData.address}</span>
+                  <span className="block text-start">{formData.city_state}{formData?.country&&","+formData.country}</span>
+                  {formData.postal_code && <span className="block text-start">{formData.postal_code}</span>}
                 </div>
               )}
 
-              {formData.phone && (
-                <div className="block">{formData.phone}</div>
-              )}
-
               {formData.email && (
-                <a href={`mailto:${formData.email}`} className="break-words block hover:text-white">
+                <a href={`mailto:${formData.email}`} className="break-all hover:text-white border-b border-gray-400 pb-0.5">
                   {formData.email}
                 </a>
               )}
+
+              {formData.phone && (
+                <div className="block text-start">{formData.phone}</div>
+              )}
+
               
               {formData.driving_licence && (
-                <div className="mt-2">
+                <div className="mt-2 text-start">
                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Driving License</span>
                    <span>{formData.driving_licence}</span>
                 </div>
               )}
 
               {formData.nationality && (
-                <div className="mt-1">
+                <div className="mt-1 text-start">
                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Nationality</span>
                    <span>{formData.nationality}</span>
                 </div>
               )}
 
                {formData.birth_place && (
-                <div className="mt-1">
+                <div className="mt-1 text-start">
                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Place of Birth</span>
                    <span>{formData.birth_place}</span>
                 </div>
               )}
                
                {formData.dob && (
-                <div className="mt-1">
+                <div className="mt-1 text-start">
                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Date of Birth</span>
                    <span>{formData.dob}</span>
                 </div>
@@ -107,11 +110,11 @@ const Professional = ({ formData ,empHistory}) => {
           </div>
         )}
         {hasSkills && (
-          <div className="mt-4">
-            <h3 className="text-lg font-serif font-bold mb-3">Skills</h3>
+          <div className="mt-1 w-full text-start">
+            <h3 className="text-xs font-serif font-bold mb-2">Skills</h3>
             <div className="flex flex-col gap-4">
               {formData.newSkillHistory.map((item, index) => {
-                // Calculate percentage: (index 0-4 + 1) * 20
+                
                 const percentage = ((item.level ?? 3) + 1) * 20;
 
                 return (
@@ -132,23 +135,20 @@ const Professional = ({ formData ,empHistory}) => {
             </div>
           </div>
         )}
-
-        {/* Hobbies Section on Left Sidebar */}
         {formData.hobbies && (
-          <div className="mt-4">
-            <h3 className="text-lg font-serif font-bold mb-3">Hobbies</h3>
+          <div className="mt-4 w-full text-start">
+            <h3 className="text-xs font-serif font-bold mb-2">Hobbies</h3>
             <p className="text-xs text-gray-300 font-light whitespace-pre-wrap leading-relaxed">
                 {formData.hobbies}
             </p>
           </div>
         )}
-
-                {formData.languageHistory?.some(l => l.language) && formData.languageHistory.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-serif font-bold mb-3">Languages</h3>
+        {formData.languageHistory?.some(l => l.language) && formData.languageHistory.length > 0 && (
+          <div className="mt-4 w-full text-start">
+            <h3 className="text-xs font-serif font-bold mb-2">Languages</h3>
             <div className="flex flex-col gap-4">
               {formData.languageHistory.map((item, index) => {
-                let percentage = 20; // Default
+                let percentage = 20; 
                 switch(item.level) {
                     case "Native speaker": percentage = 100; break;
                     case "Highly proficient": percentage = 80; break;
@@ -173,6 +173,7 @@ const Professional = ({ formData ,empHistory}) => {
             </div>
           </div>
         )}
+ 
    
       </div>
         
