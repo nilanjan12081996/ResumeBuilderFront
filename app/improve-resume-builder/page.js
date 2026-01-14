@@ -973,16 +973,14 @@ const page = () => {
   };
 
   return (
-    <div className='lg:flex gap-2 pb-0'>
+    <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
 
-      <div className='lg:w-6/12 bg-[#eff2f9] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
+      <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-b border-[#E5E5E5] p-1'>
-
-
+          <div>
             <div className='mb-10'>
-              <div className='bg-white rounded-sm p-5 mb-2'>
+              <div className='bg-white rounded-sm p-5 mb-[4px]'>
                 <div className='mb-4'>
                   <div className='flex items-center gap-2 mb-2'>
                     <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
@@ -1033,7 +1031,7 @@ const page = () => {
               </div>
 
               <div className='acco_section'>
-                <Accordion className='mb-2'>
+                <Accordion className='mb-[4px]'>
                   <AccordionPanel>
                     <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
                     <AccordionContent className='pt-0'>
@@ -1251,7 +1249,7 @@ const page = () => {
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, index)}
                         className={`
-                            mb-4 transition-all duration-200 bg-white rounded-xl border
+                            mb-[4px] transition-all duration-200 bg-white rounded-xl border
                             ${draggedIndex === index
                             ? "opacity-20 border-cyan-500 scale-95" // The "hole" left behind
                             : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
@@ -1293,7 +1291,7 @@ const page = () => {
                                               : "bg-white border-gray-200 shadow-sm"
                                             }`}>
 
-                                          <Accordion collapseAll className='!border !border-[#a1a8b9] overflow-hidden mb-2'>
+                                          <Accordion collapseAll className='!border !border-gray-400 overflow-hidden mb-2'>
                                             <AccordionPanel className='!border'>
                                               <AccordionTitle className='font-bold text-sm'>
                                                 <span className="drag-wrapper">
@@ -1411,9 +1409,6 @@ const page = () => {
                                   </div>
                                 )
                               }
-
-
-
 
                             </AccordionContent>
                           </AccordionPanel>
