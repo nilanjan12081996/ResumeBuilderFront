@@ -309,6 +309,7 @@ import { reset } from '../reducers/SearchHistroySlice';
 
 import { Poppins } from 'next/font/google';
 import { FiMenu } from 'react-icons/fi';
+import { HiX } from 'react-icons/hi';
 import { HiDocumentText, HiHome, HiUserAdd } from 'react-icons/hi';
 import { BiSolidDashboard, BiSolidBriefcase } from 'react-icons/bi';
 import { VscChecklist } from 'react-icons/vsc';
@@ -347,12 +348,20 @@ const Sidebar = () => {
   return (
     <>
       {/* Toggle Button */}
-      <button
-        onClick={toggleSidebar}
-        className="menu_btn fixed"
-      >
-        <FiMenu className="text-lg text-white" />
-      </button>
+     {/* Toggle Button */}
+<button
+  onClick={toggleSidebar}
+  className={`menu_btn fixed transition-all duration-300
+    ${sidebarOpen ? 'left-64' : 'left-2'}
+  `}
+>
+  {sidebarOpen ? (
+    <HiX className="text-xl text-white" />
+  ) : (
+    <FiMenu className="text-xl text-white" />
+  )}
+</button>
+
 
 
       {/* Sidebar */}

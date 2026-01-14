@@ -491,15 +491,16 @@ body {
   z-index: 99999;
   cursor: pointer;
   position: absolute;
-  top: 62px;
+  top: 20px;
   background: #7f0082;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
+
 
 .user_face {
   position: relative;
