@@ -88,6 +88,7 @@ import Hobbies from './Hobbies';
 import Activities from './Activities';
 import Languages from './newLanguage';
 import Internships from './Internships';
+import CustomSection from './CustomSection';
 
 
 const page = () => {
@@ -160,6 +161,9 @@ const page = () => {
       activityHistory: [{}],
       languageHistory: [{}],
       internshipHistory: [{}],
+      internshipHistory: [{}],
+      customSectionHistory: [{}],
+      customSectionTitle: "Custom Section",
       hobbies: ""
     }
   });
@@ -191,7 +195,9 @@ const page = () => {
     { id: 'hobbies', title: 'Hobbies', component: Hobbies },
     { id: 'extra_curricular', title: 'Extra-curricular Activities', component: Activities },
     { id: 'languages', title: 'Languages', component: Languages },
-    { id: 'internships', title: 'Internships', component: Internships }
+    { id: 'languages', title: 'Languages', component: Languages },
+    { id: 'internships', title: 'Internships', component: Internships },
+    { id: 'custom', title: watch('customSectionTitle') || 'Custom Section', component: CustomSection }
   ];
 
   // Dynamic Steps generation
@@ -256,6 +262,12 @@ const page = () => {
   const { fields: internshipFields, append: internshipAppend, remove: internshipRemove, move: internshipMove } = useFieldArray({
     control,
     name: "internshipHistory",
+  });
+
+  // Custom Section Field Array
+  const { fields: customFields, append: customAppend, remove: customRemove, move: customMove } = useFieldArray({
+    control,
+    name: "customSectionHistory",
   });
 
   const nextStep = () => setStep((prev) => prev + 1);
@@ -879,6 +891,38 @@ const page = () => {
                             </div>
                           );
                         }
+                        if (currentStepObj && currentStepObj.sectionId === 'internships') {
+                          return (
+                            <div>
+                              <Internships
+                                register={register}
+                                watch={watch}
+                                control={control}
+                                fields={internshipFields}
+                                append={internshipAppend}
+                                remove={internshipRemove}
+                                move={internshipMove}
+                              />
+                            </div>
+                          );
+                        }
+
+                        if (currentStepObj && currentStepObj.sectionId === 'custom') {
+                          return (
+                            <div>
+                              <CustomSection
+                                register={register}
+                                watch={watch}
+                                control={control}
+                                fields={customFields}
+                                append={customAppend}
+                                remove={customRemove}
+                                move={customMove}
+                                removeSection={() => setActiveSections(prev => prev.filter(s => s !== 'custom'))}
+                              />
+                            </div>
+                          );
+                        }
                         return null;
                       })()}
 
@@ -915,6 +959,12 @@ const page = () => {
                                 } else if (sectionId === 'internships') {
                                   if (!activeSections.includes('internships')) {
                                     setActiveSections([...activeSections, 'internships']);
+                                  } else {
+                                    toast.info("Section already added!");
+                                  }
+                                } else if (sectionId === 'custom') {
+                                  if (!activeSections.includes('custom')) {
+                                    setActiveSections([...activeSections, 'custom']);
                                   } else {
                                     toast.info("Section already added!");
                                   }
