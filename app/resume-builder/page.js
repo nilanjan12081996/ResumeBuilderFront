@@ -61,19 +61,21 @@ import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { addCountResume, addCountResumeOrg, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
+import { addCountResume, addCountResumeOrg, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp, saveResumeNew } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Template2 from '../temp/Template2';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { saveAs } from "file-saver";
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
+import isEqual from 'lodash.isequal';
 
 import { RiDraggable } from "react-icons/ri";
 import Professional from '../TemplateNew/Professional';
+import PrimeATS from '../TemplateNew/PrimeATS';
 import EmpHistory from './EmpHistory';
 import EducationNew from './EducationNew';
 import SkillsNew from './SkillsNew';
@@ -100,9 +102,14 @@ const page = () => {
   const [type, setType] = useState()
   const [isCreated, setIsCreated] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
+  const lastSavedData = useRef(null); // Ref to track last saved state
 
   const componentRef = useRef();
+
   const dispatch = useDispatch()
+  // const router = useRouter(); // Router not needed for this flow anymore
+  const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
+  const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
   console.log("profileData", profileData);
   const [empHistory, setEmpHistory] = useState([{ id: 1 }])
   const [education, setEducation] = useState([{ id: 1 }])
@@ -151,7 +158,7 @@ const page = () => {
     { id: 'courses', title: 'Courses', component: Courses },
     { id: 'hobbies', title: 'Hobbies', component: Hobbies },
     { id: 'extra_curricular', title: 'Extra-curricular Activities', component: Activities },
-    { id: 'languages', title: 'Languages', component: Languages },
+    // { id: 'languages', title: 'Languages', component: Languages },
     { id: 'languages', title: 'Languages', component: Languages },
     { id: 'internships', title: 'Internships', component: Internships },
     { id: 'custom', title: watch('customSectionTitle') || 'Custom Section', component: CustomSection }
@@ -226,19 +233,95 @@ const page = () => {
     control,
     name: "customSectionHistory",
   });
-
+  const formValues = watch();
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
   const onSubmit = (data) => {
-    // If we're not at the last step, go next
-    if (step < STEPS.length) {
-      nextStep();
+    // If we haven't saved initially yet
+    if (!resumeIds.mongo_id) {
+      setSavingStatus('saving');
+      // Add resume_type to the data we are saving
+      const dataToSave = { ...data, resume_type: "scratch" };
+
+      dispatch(saveResumeNew(dataToSave)).then((res) => {
+        if (res.payload && res.payload.status_code === 200) {
+          const newMongoId = res.payload.sectionsdata?.mongo_id;
+          const newMysqlId = res.payload.sectionsdata?.mysql_id;
+
+          if (newMongoId && newMysqlId) {
+            setResumeIds({
+              mongo_id: newMongoId,
+              mysql_id: newMysqlId
+            });
+
+            // Initialize lastSavedData with what we submitted
+            lastSavedData.current = JSON.parse(JSON.stringify(data));
+
+            setSavingStatus('saved');
+
+            // Proceed to next step
+            if (step < STEPS.length) {
+              nextStep();
+            }
+          } else {
+            setSavingStatus('error');
+            toast.error("Error saving resume: Missing IDs");
+          }
+        } else {
+          setSavingStatus('error');
+          toast.error("Error saving resume");
+        }
+      });
     } else {
-      console.log("Final Submission:", data);
+      // We are in edit mode, just go to next step (auto-save handles data)
+      if (step < STEPS.length) {
+        nextStep();
+      } else {
+        console.log("Final Submission:", data);
+      }
     }
   };
-  const formValues = watch();
+
+  // Auto-Save Effect
+  useEffect(() => {
+    if (resumeIds.mongo_id && resumeIds.mysql_id) {
+      // Normalize formValues to ensure fair comparison
+      // JSON stringify removes undefined values, matching our lastSavedData structure
+      const currentDataNormalized = JSON.parse(JSON.stringify(formValues));
+
+      // Check if data is actually different from last saved
+      if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
+        return; // Data hasn't changed, don't save.
+      }
+
+      setSavingStatus('saving');
+      const timeoutId = setTimeout(() => {
+        // Capture current values for the API call and for updating the ref on success
+        // Use deep copy to ensure we have a snapshot that won't mutate
+        const currentData = JSON.parse(JSON.stringify(formValues));
+
+        const dataToSave = {
+          ...currentData,
+          resume_type: "scratch",
+          ...resumeIds // Include IDs for update
+        };
+
+        dispatch(saveResumeNew(dataToSave)).then((res) => {
+          if (res.payload && res.payload.status_code === 200) {
+            setSavingStatus('saved');
+            lastSavedData.current = currentData; // Update the ref to the data we just successfully saved
+          } else {
+            setSavingStatus('error');
+          }
+        });
+      }, 2000); // 2 second debounce
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [formValues, resumeIds]);
+
+
 
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -814,6 +897,12 @@ const page = () => {
                         </button>
                       </div>
 
+                      <div className="w-4/12 flex justify-center">
+                        {savingStatus === 'saving' && <span className="text-gray-500 text-sm font-medium animate-pulse">Saving...</span>}
+                        {savingStatus === 'saved' && <span className="text-green-600 text-sm font-medium flex items-center gap-1"><AiFillSave /> Saved</span>}
+                        {savingStatus === 'error' && <span className="text-red-500 text-sm font-medium">Error saving</span>}
+                      </div>
+
 
                       <div className='w-5/12'>
 
@@ -875,7 +964,8 @@ const page = () => {
                     <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
                 } */}
-              <Professional formData={formValues} empHistory={empHistory} />
+              {/* <Professional formData={formValues} empHistory={empHistory} /> */}
+              <PrimeATS formData={formValues} empHistory={empHistory} />
 
             </div>
             {/* <div className='flex items-center justify-between mb-0'>

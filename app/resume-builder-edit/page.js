@@ -51,11 +51,11 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import PersonalInfo from './PersonalSummary';
-import Education from './EducationNew';
+import PersonalInfo from './PersonalSummaryEdit';
+import Education from './EducationNewEdit';
 import WorkExp from './WorkExp';
 import Language from './Language';
-import Skills from './SkillsNew';
+import Skills from './SkillsNewEdit';
 import PersonalProject from './PersonalProject';
 import Certificates from './Certificates';
 import Achivments from './Achivments';
@@ -74,17 +74,17 @@ import Link from 'next/link';
 
 import { RiDraggable } from "react-icons/ri";
 import Professional from '../TemplateNew/Professional';
-import EmpHistory from './EmpHistory';
-import EducationNew from './EducationNew';
-import SkillsNew from './SkillsNew';
-import PersonalSummary from './PersonalSummary';
-import AddSection from './AddSection';
-import Courses from './Courses';
-import Hobbies from './Hobbies';
-import Activities from './Activities';
-import Languages from './newLanguage';
-import Internships from './Internships';
-import CustomSection from './CustomSection';
+import EmpHistoryEdit from './EmpHistoryEdit';
+import EducationNewEdit from './EducationNewEdit';
+import SkillsNewEdit from './SkillsNewEdit';
+import PersonalSummaryEdit from './PersonalSummaryEdit';
+import AddSectionEdit from './AddSectionEdit';
+import CoursesEdit from './CoursesEdit';
+import HobbiesEdit from './HobbiesEdit';
+import ActivitiesEdit from './ActivitiesEdit';
+import LanguagesEdit from './newLanguageEdit';
+import InternshipsEdit from './InternshipsEdit';
+import CustomSectionEdit from './CustomSectionEdit';
 
 
 const page = () => {
@@ -148,13 +148,12 @@ const page = () => {
 
   // SECTION CONFIG
   const OPTIONAL_SECTIONS_CONFIG = [
-    { id: 'courses', title: 'Courses', component: Courses },
-    { id: 'hobbies', title: 'Hobbies', component: Hobbies },
-    { id: 'extra_curricular', title: 'Extra-curricular Activities', component: Activities },
-    { id: 'languages', title: 'Languages', component: Languages },
-    { id: 'languages', title: 'Languages', component: Languages },
-    { id: 'internships', title: 'Internships', component: Internships },
-    { id: 'custom', title: watch('customSectionTitle') || 'Custom Section', component: CustomSection }
+    { id: 'courses', title: 'Courses', component: CoursesEdit },
+    { id: 'hobbies', title: 'Hobbies', component: HobbiesEdit },
+    { id: 'extra_curricular', title: 'Extra-curricular Activities', component: ActivitiesEdit },
+    { id: 'languages', title: 'Languages', component: LanguagesEdit },
+    { id: 'internships', title: 'Internships', component: InternshipsEdit },
+    { id: 'custom', title: watch('customSectionTitle') || 'Custom Section', component: CustomSectionEdit }
   ];
 
   // Dynamic Steps generation
@@ -578,7 +577,7 @@ const page = () => {
                       {
                         step === 2 && (
                           <div>
-                            <EmpHistory
+                            <EmpHistoryEdit
                               register={register}
                               empHistory={empHistory}
                               setEmpHistory={setEmpHistory}
@@ -595,7 +594,7 @@ const page = () => {
                       {
                         step === 3 && (
                           <div>
-                            <EducationNew
+                            <EducationNewEdit
                               register={register}
                               education={education}
                               setEducation={setEducation}
@@ -612,7 +611,7 @@ const page = () => {
                       {
                         step === 4 && (
                           <div>
-                            <SkillsNew
+                            <SkillsNewEdit
                               register={register}
                               newskill={newskill}
                               setNewSkill={setNewSkill}
@@ -630,7 +629,7 @@ const page = () => {
                       {
                         step === 5 && (
                           <div>
-                            <PersonalSummary
+                            <PersonalSummaryEdit
                               register={register}
                               watch={watch}
                             />
@@ -644,7 +643,7 @@ const page = () => {
                         if (currentStepObj && currentStepObj.sectionId === 'courses') {
                           return (
                             <div>
-                              <Courses
+                              <CoursesEdit
                                 register={register}
                                 watch={watch}
                                 control={control}
@@ -659,14 +658,14 @@ const page = () => {
                         if (currentStepObj && currentStepObj.sectionId === 'hobbies') {
                           return (
                             <div>
-                              <Hobbies register={register} />
+                              <HobbiesEdit register={register} />
                             </div>
                           );
                         }
                         if (currentStepObj && currentStepObj.sectionId === 'extra_curricular') {
                           return (
                             <div>
-                              <Activities
+                              <ActivitiesEdit
                                 register={register}
                                 watch={watch}
                                 control={control}
@@ -698,22 +697,7 @@ const page = () => {
                         if (currentStepObj && currentStepObj.sectionId === 'internships') {
                           return (
                             <div>
-                              <Internships
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={internshipFields}
-                                append={internshipAppend}
-                                remove={internshipRemove}
-                                move={internshipMove}
-                              />
-                            </div>
-                          );
-                        }
-                        if (currentStepObj && currentStepObj.sectionId === 'internships') {
-                          return (
-                            <div>
-                              <Internships
+                              <InternshipsEdit
                                 register={register}
                                 watch={watch}
                                 control={control}
@@ -729,7 +713,7 @@ const page = () => {
                         if (currentStepObj && currentStepObj.sectionId === 'custom') {
                           return (
                             <div>
-                              <CustomSection
+                              <CustomSectionEdit
                                 register={register}
                                 watch={watch}
                                 control={control}
@@ -749,7 +733,7 @@ const page = () => {
                         // Check if current step is the "Add Section" step
                         STEPS.find(s => s.id === step)?.isAddSectionStep && (
                           <div>
-                            <AddSection
+                            <AddSectionEdit
                               onSelectSection={(sectionId) => {
                                 if (sectionId === 'courses') {
                                   if (!activeSections.includes('courses')) {
@@ -910,7 +894,7 @@ const page = () => {
           {/* add modal for apply job ends here */}
 
           {/* add modal for apply job start here */}
-          <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
+          {/* <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
             <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
             <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
               <div className='flex gap-4'>
@@ -934,7 +918,7 @@ const page = () => {
                 </div>
               </div>
             </ModalBody>
-          </Modal>
+          </Modal> */}
           {/* add modal for apply job ends here */}
           <Modal
             show={openPreviewModal}
