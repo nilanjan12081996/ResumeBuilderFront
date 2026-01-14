@@ -22,7 +22,7 @@ import { BiSolidPhone } from "react-icons/bi";
 
 import { HiAcademicCap } from "react-icons/hi2";
 
-import { FaLanguage } from "react-icons/fa6";
+import { FaLanguage, FaPen, FaUser } from "react-icons/fa6";
 import { MdSettingsSuggest } from "react-icons/md";
 import { FaDiagramProject } from "react-icons/fa6";
 import { FaCertificate } from "react-icons/fa";
@@ -164,6 +164,7 @@ const page = () => {
       internshipHistory: [{}],
       customSectionHistory: [{}],
       customSectionTitle: "Custom Section",
+      profileImage: "",
       hobbies: ""
     }
   });
@@ -282,6 +283,25 @@ const page = () => {
     }
   };
   const formValues = watch();
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+        setValue("profileImage", reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setSelectedImage(null);
+    setValue("profileImage", "");
+  };
 
 
   const onSubmit1 = (data) => {
@@ -551,17 +571,63 @@ const page = () => {
 
                             <div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Job Target */}
-                                <div className="md:col-span-2">
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Job Target
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="SENIOR SOFTWARE ENGINEER"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
-                                    {...register("job_target")}
-                                  />
+                                {/* Job Target and Image Upload */}
+                                <div className="md:col-span-2 flex gap-4">
+                                  <div className="flex-1">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Job Target
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="SENIOR SOFTWARE ENGINEER"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
+                                      {...register("job_target")}
+                                    />
+                                  </div>
+
+                                  {/* Image Upload */}
+                                  <div className="flex items-center gap-4">
+                                    <div className="relative w-14 h-14 bg-gray-100 rounded flex items-center justify-center overflow-hidden border border-gray-200">
+                                      {selectedImage ? (
+                                        <img src={selectedImage} alt="Profile" className="w-full h-full object-cover" />
+                                      ) : (
+                                        <FaUser className="text-gray-400 text-2xl" />
+                                      )}
+                                    </div>
+                                    <div>
+                                      {selectedImage ? (
+                                        <div className="flex flex-col gap-1">
+                                          <label
+                                            htmlFor="profile-upload"
+                                            className="flex items-center gap-1 text-cyan-600 text-xs font-medium cursor-pointer hover:underline"
+                                          >
+                                            <FaPen /> Edit photo
+                                          </label>
+                                          <button
+                                            type="button"
+                                            onClick={handleDeleteImage}
+                                            className="flex items-center gap-1 text-gray-500 text-xs font-medium cursor-pointer hover:text-red-500"
+                                          >
+                                            <MdDelete /> Delete
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <label
+                                          htmlFor="profile-upload"
+                                          className="text-cyan-600 text-sm font-medium cursor-pointer hover:underline"
+                                        >
+                                          Upload photo
+                                        </label>
+                                      )}
+                                      <input
+                                        type="file"
+                                        id="profile-upload"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageChange}
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
 
                                 {/* First Name */}

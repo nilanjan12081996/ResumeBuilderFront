@@ -25,16 +25,27 @@ const Professional = ({ formData ,empHistory}) => {
       {/* ----------------- LEFT SIDEBAR ----------------- */}
       <div className="w-[35%] bg-[#0e3f36] text-white p-8 flex flex-col gap-6">
         
+        {/* Profile Image */}
+        {formData.profileImage && (
+          <div className="w-22 h-22 mx-auto mb-1 rounded-full overflow-hidden border-4 border-white shadow-lg">
+            <img 
+              src={formData.profileImage} 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        
         {/* Name Block */}
         <div className="mt-4">
-          <h1 className="text-3xl font-serif font-bold leading-tight break-words">
-            {formData.first_name} <br />
+          <h1 className="text-sm font-serif font-bold leading-tight break-words">
+            {formData.first_name} 
             {formData.last_name}
           </h1>
           
           {formData.job_target && (
             <div className="mt-4 pb-4 border-b border-gray-500">
-              <p className="text-xs uppercase tracking-[0.2em] font-medium text-gray-300">
+              <p className="text-[12px] uppercase tracking-[0.2em] font-medium text-gray-300">
                 {formData.job_target}
               </p>
             </div>
