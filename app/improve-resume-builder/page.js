@@ -895,9 +895,62 @@ const page = () => {
         { id: 's2', name: 'Python', level: 4 }
       ]
     },
-    { id: 1, title: 'Professional Summary', type: 'summary' }
+    { id: 1, title: 'Professional Summary', type: 'summary' },
+    {
+      id: 2,
+      title: 'Education',
+      type: 'education',
+      educations: [
+        {
+          id: 'e1',
+          institute: 'Webskitters Academy',
+          degree: 'Frontend Developer Training',
+          startDate: '',
+          endDate: '',
+          city: 'Kolkata',
+          description: ''
+        },
+        {
+          id: 'e2',
+          institute: 'Netaji Subhas Open University',
+          degree: 'Bachelor of Arts',
+          startDate: '',
+          endDate: '',
+          city: 'Bagnan, Howrah',
+          description: ''
+        }
+      ]
+    },
+    {
+      id: 3,
+      title: "Certifications",
+      type: "certifications",
+      certifications: [
+        {
+          id: "c1",
+          name: "Frontend Developer (React JS)",
+          organization: "Webskitters Academy",
+          city: "",
+          startYear: "2024",
+          endYear: "2025",
+          description: ""
+        },
+        {
+          id: "c2",
+          name: "Code With Puja Contest Award",
+          organization: "Webskitters Academy",
+          city: "",
+          startYear: "2024",
+          endYear: "2025",
+          description: ""
+        }
+      ]
+    }
+
   ]);
   const [draggedIndex, setDraggedIndex] = useState(null);
+
+
 
 
   const handleDragStart = (e, index) => {
@@ -972,6 +1025,126 @@ const page = () => {
     setSections(updatedSections);
   };
 
+
+  // for Education 
+  const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
+  const handleEducationDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedEducationIndex(index);
+  };
+  const handleEducationDrop = (e, sectionIndex, targetEduIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (
+      draggedEducationIndex === null ||
+      draggedEducationIndex === targetEduIndex
+    ) return;
+
+    const updatedSections = [...sections];
+    const educationList = [...updatedSections[sectionIndex].educations];
+
+    const [movedEdu] = educationList.splice(draggedEducationIndex, 1);
+    educationList.splice(targetEduIndex, 0, movedEdu);
+
+    updatedSections[sectionIndex].educations = educationList;
+    setSections(updatedSections);
+    setDraggedEducationIndex(null);
+  };
+  const handleEducationUpdate = (sectionIndex, eduId, field, value) => {
+    const updatedSections = [...sections];
+
+    updatedSections[sectionIndex].educations =
+      updatedSections[sectionIndex].educations.map(edu =>
+        edu.id === eduId ? { ...edu, [field]: value } : edu
+      );
+
+    setSections(updatedSections);
+  };
+
+  const handleAddEducation = (sectionIndex) => {
+    const updatedSections = [...sections];
+
+    const newEducation = {
+      id: `e${Date.now()}`, // temporary unique id
+      institute: "",
+      degree: "",
+      startDate: "",
+      endDate: "",
+      city: "",
+      description: ""
+    };
+
+    updatedSections[sectionIndex].educations = [
+      ...updatedSections[sectionIndex].educations,
+      newEducation
+    ];
+
+    setSections(updatedSections);
+  };
+
+  // for certificates
+  const [draggedCertIndex, setDraggedCertIndex] = useState(null);
+
+  const handleCertDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedCertIndex(index);
+  };
+
+  const handleCertDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedCertIndex === null || draggedCertIndex === targetIndex) return;
+
+    const updatedSections = [...sections];
+    const certList = [...updatedSections[sectionIndex].certifications];
+
+    const [movedCert] = certList.splice(draggedCertIndex, 1);
+    certList.splice(targetIndex, 0, movedCert);
+
+    updatedSections[sectionIndex].certifications = certList;
+    setSections(updatedSections);
+    setDraggedCertIndex(null);
+  };
+
+  const handleCertUpdate = (sectionIndex, certId, field, value) => {
+    const updatedSections = [...sections];
+
+    updatedSections[sectionIndex].certifications =
+      updatedSections[sectionIndex].certifications.map(cert =>
+        cert.id === certId ? { ...cert, [field]: value } : cert
+      );
+
+    setSections(updatedSections);
+  };
+
+
+  const handleAddCertification = (sectionIndex) => {
+    const updatedSections = [...sections];
+
+    const newCert = {
+      id: `c${Date.now()}`,
+      name: "",
+      organization: "",
+      city: "",
+      startYear: "",
+      endYear: "",
+      description: ""
+    };
+
+    updatedSections[sectionIndex].certifications = [
+      ...updatedSections[sectionIndex].certifications,
+      newCert
+    ];
+
+    setSections(updatedSections);
+  };
+
+
+
+
+
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
@@ -992,19 +1165,15 @@ const page = () => {
                 </div>
 
 
-                <div className="flex items-center mb-3 gap-3">
+                <div className="flex items-center gap-3">
                   {/* Existing Resume */}
                   <button
                     className="
                       w-6/12 flex items-center justify-center gap-2
-                      px-4 py-2 rounded-lg
                       text-sm font-medium
-                      text-[#800080] bg-[#f6efff]
-                      border border-[#e5d6ff]
-                      hover:bg-[#800080] hover:text-white
+                      text-[#800080] hover:text-[#e799e7]
                       transition-all duration-200
-                      cursor-pointer
-                    "
+                      cursor-pointer"
                   >
                     <HiDocumentText className="text-lg" />
                     Existing Resume
@@ -1014,14 +1183,9 @@ const page = () => {
                   <button
                     className="
                     w-6/12 flex items-center justify-center gap-2
-                    px-4 py-2 rounded-lg
                     text-sm font-medium
-                    text-[#1e2532] bg-[#f4f6fa]
-                    border border-gray-200
-                    hover:bg-[#f6efff] hover:text-[#800080]
-                    transition-all duration-200
-                    cursor-pointer hover:border-[#e5d6ff]
-                  "
+                    text-[#800080] hover:text-[#e799e7]
+                    transition-all duration-200 cursor-pointer"
                   >
                     <HiArrowPath className="text-lg" />
                     Changed Resume
@@ -1039,7 +1203,7 @@ const page = () => {
 
 
                         <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             Job Title
                           </label>
                           <input
@@ -1052,7 +1216,7 @@ const page = () => {
 
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             First Name
                           </label>
                           <input
@@ -1065,7 +1229,7 @@ const page = () => {
 
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             Last Name
                           </label>
                           <input
@@ -1078,7 +1242,7 @@ const page = () => {
 
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             Email
                           </label>
                           <input
@@ -1091,7 +1255,7 @@ const page = () => {
 
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             Phone
                           </label>
                           <input
@@ -1104,7 +1268,7 @@ const page = () => {
 
 
                         <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             LinkedIn URL
                           </label>
                           <input
@@ -1117,7 +1281,7 @@ const page = () => {
 
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             City, State
                           </label>
                           <input
@@ -1130,7 +1294,7 @@ const page = () => {
 
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">
+                          <label className="block !text-sm !font-medium !text-gray-500">
                             Country
                           </label>
                           <input
@@ -1168,7 +1332,7 @@ const page = () => {
                         {showAdditionalDetails && (
                           <>
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block !text-sm !font-medium !text-gray-500">
                                 Address
                               </label>
                               <input
@@ -1181,7 +1345,7 @@ const page = () => {
 
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block !text-sm !font-medium !text-gray-500">
                                 Nationality
                               </label>
                               <input
@@ -1194,7 +1358,7 @@ const page = () => {
 
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block !text-sm !font-medium !text-gray-500">
                                 Place of Birth
                               </label>
                               <input
@@ -1207,7 +1371,7 @@ const page = () => {
 
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block !text-sm !font-medium !text-gray-500">
                                 Date of Birth
                               </label>
                               <input
@@ -1219,7 +1383,7 @@ const page = () => {
 
 
                             <div>
-                              <label className="block text-sm font-medium text-gray-700">
+                              <label className="block !text-sm !font-medium !text-gray-500">
                                 Driving License
                               </label>
                               <input
@@ -1271,7 +1435,7 @@ const page = () => {
                               {
                                 section.type === 'skills' && (
                                   <>
-                                    <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm">
+                                    <p className="!text-sm !font-medium !text-gray-500 mb-4">
                                       Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing
                                       (especially when applying via an online system).
                                     </p>
@@ -1290,62 +1454,63 @@ const page = () => {
                                               ? "opacity-20 border-cyan-500 scale-95"
                                               : "bg-white border-gray-200 shadow-sm"
                                             }`}>
+                                          <div className="flex items-start gap-2">
+                                            <span className="drag-wrapper mt-5">
+                                              <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                              <span className="tooltip">Click and drag to move</span>
+                                            </span>
+                                            <Accordion collapseAll className='overflow-hidden !border !border-gray-300 mb-2 w-full'>
+                                              <AccordionPanel className=''>
+                                                <AccordionTitle className='font-bold text-sm'>
 
-                                          <Accordion collapseAll className='!border !border-gray-400 overflow-hidden mb-2'>
-                                            <AccordionPanel className='!border'>
-                                              <AccordionTitle className='font-bold text-sm'>
-                                                <span className="drag-wrapper">
-                                                  <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
-                                                  <span className="tooltip">Click and drag to move</span>
-                                                </span>
-                                                {skill.name}
-                                              </AccordionTitle>
-                                              <AccordionContent className='pt-0'>
+                                                  {skill.name}
+                                                </AccordionTitle>
+                                                <AccordionContent className='pt-0'>
 
-                                                <div className='flex gap-10'>
-                                                  <div className='w-6/12'>
-                                                    <Label className="!text-gray-400">Skill</Label>
-                                                    <input
-                                                      type="text"
-                                                      value={skill.name}
-                                                      placeholder="Your Skill"
-                                                      onChange={(e) => handleSkillUpdate(index, skill.id, 'name', e.target.value)}
-                                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                                    />
-                                                  </div>
-                                                  <div className='w-6/12 '
+                                                  <div className='flex gap-10'>
+                                                    <div className='w-6/12'>
+                                                      <Label className="!text-sm !font-medium !text-gray-500">Skill</Label>
+                                                      <input
+                                                        type="text"
+                                                        value={skill.name}
+                                                        placeholder="Your Skill"
+                                                        onChange={(e) => handleSkillUpdate(index, skill.id, 'name', e.target.value)}
+                                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                                      />
+                                                    </div>
+                                                    <div className='w-6/12 '
 
-                                                  >
-                                                    <Label className="!text-gray-400 text-sm">Level - <span className="font-semibold"
-                                                      style={{ color: textColor[skill.level] }}
                                                     >
-                                                      {/* {levels[selectedIndex]} */}
-                                                      {levels[skill.level]}
-                                                    </span></Label>
-                                                    <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0'
-                                                      style={{ backgroundColor: tabColors[skill.level] }}
-                                                    >
-                                                      <Tabs
-                                                        // selectedIndex={selectedIndex} onSelect={setSelectedIndex}
-                                                        selectedIndex={skill.level} // Use level from the skill object
-                                                        onSelect={(tabIndex) => handleSkillUpdate(index, skill.id, 'level', tabIndex)}
+                                                      <Label className="!text-sm !font-medium !text-gray-500">Level - <span className="font-semibold"
+                                                        style={{ color: textColor[skill.level] }}
                                                       >
-                                                        <TabList>
-                                                          <Tab>&nbsp;</Tab>
-                                                          <Tab>&nbsp;</Tab>
-                                                          <Tab>&nbsp;</Tab>
-                                                          <Tab>&nbsp;</Tab>
-                                                          <Tab>&nbsp;</Tab>
-                                                        </TabList>
-                                                      </Tabs>
+                                                        {/* {levels[selectedIndex]} */}
+                                                        {levels[skill.level]}
+                                                      </span></Label>
+                                                      <div className='label_tab_area transition-all duration-300 rounded-[5px] p-0'
+                                                        style={{ backgroundColor: tabColors[skill.level] }}
+                                                      >
+                                                        <Tabs
+                                                          // selectedIndex={selectedIndex} onSelect={setSelectedIndex}
+                                                          selectedIndex={skill.level} // Use level from the skill object
+                                                          onSelect={(tabIndex) => handleSkillUpdate(index, skill.id, 'level', tabIndex)}
+                                                        >
+                                                          <TabList>
+                                                            <Tab>&nbsp;</Tab>
+                                                            <Tab>&nbsp;</Tab>
+                                                            <Tab>&nbsp;</Tab>
+                                                            <Tab>&nbsp;</Tab>
+                                                            <Tab>&nbsp;</Tab>
+                                                          </TabList>
+                                                        </Tabs>
+                                                      </div>
                                                     </div>
                                                   </div>
-                                                </div>
 
-                                              </AccordionContent>
-                                            </AccordionPanel>
-                                          </Accordion>
-
+                                                </AccordionContent>
+                                              </AccordionPanel>
+                                            </Accordion>
+                                          </div>
                                         </div>
 
                                       ))
@@ -1356,19 +1521,6 @@ const page = () => {
                                   </>
                                 )
                               }
-                              {/* {
-                      section.type === 'summary' && (
-                        <div className="space-y-2">
-                          <Label className="text-gray-400">Professional Summary</Label>
-                          <textarea
-                            placeholder="Write a brief professional summary..."
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm h-32 resize-none focus:ring-2 focus:ring-cyan-500"
-                            {...register("goal")} // THIS IS THE KEY FIX
-                          />
-                        </div>
-                      )
-                    } */}
-
                               {
                                 section.type === 'summary' && (
                                   <div className="space-y-2">
@@ -1410,6 +1562,232 @@ const page = () => {
                                 )
                               }
 
+                              {
+                                section.type === "education" && (
+                                  <>
+                                    {/* Section intro text */}
+                                    <p className="!text-sm !font-medium !text-gray-500">
+                                      A varied education on your resume sums up the value that your learnings
+                                      and background will bring to job.
+                                    </p>
+
+                                    {section.educations.map((edu, eIndex) => (
+                                      <div
+                                        key={edu.id}
+                                        draggable
+                                        onDragStart={(e) => handleEducationDragStart(e, eIndex)}
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={(e) => handleEducationDrop(e, index, eIndex)}
+                                        className="transition-all duration-200 rounded-lg border border-gray-200 shadow-sm mb-3"
+                                      >
+                                        <div className="flex items-start gap-2">
+                                          <span className="drag-wrapper mt-5">
+                                            <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                            <span className="tooltip">Click and drag to move</span>
+                                          </span>
+                                          <Accordion
+                                            collapseAll
+                                            className="w-full overflow-hidden border border-gray-300 rounded-lg"
+                                          >
+                                            <AccordionPanel>
+                                              <AccordionTitle className="font-semibold text-sm">
+                                                {edu.institute?.trim()
+                                                  ? edu.institute
+                                                  : "(Not specified)"}
+                                              </AccordionTitle>
+                                              <AccordionContent className="pt-0">
+                                                <div className="grid grid-cols-2 gap-4 mb-4">
+
+                                                  <div>
+                                                    <Label className="!text-sm !font-medium !text-gray-500">School</Label>
+                                                    <input
+                                                      value={edu.institute}
+                                                      onChange={(e) =>
+                                                        handleEducationUpdate(index, edu.id, "institute", e.target.value)
+                                                      }
+                                                      className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                    />
+                                                  </div>
+
+                                                  <div>
+                                                    <Label className="!text-sm !font-medium !text-gray-500">Degree</Label>
+                                                    <input
+                                                      value={edu.degree}
+                                                      onChange={(e) =>
+                                                        handleEducationUpdate(index, edu.id, "degree", e.target.value)
+                                                      }
+                                                      className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                    />
+                                                  </div>
+
+                                                  <div>
+                                                    <Label className="!text-sm !font-medium !text-gray-500">Start Date</Label>
+                                                    <input
+                                                      placeholder="MM / YYYY"
+                                                      value={edu.startDate}
+                                                      className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                    />
+                                                  </div>
+
+                                                  <div>
+                                                    <Label className="!text-sm !font-medium !text-gray-500">End Date</Label>
+                                                    <input
+                                                      placeholder="MM / YYYY"
+                                                      value={edu.endDate}
+                                                      className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                    />
+                                                  </div>
+
+                                                  <div className="col-span-2">
+                                                    <Label className="!text-sm !font-medium !text-gray-500">City</Label>
+                                                    <input
+                                                      value={edu.city}
+                                                      className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                    />
+                                                  </div>
+
+                                                </div>
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                                                  <textarea
+                                                    placeholder="e.g. Graduated with High Honors."
+                                                    value={edu.description}
+                                                    onChange={(e) =>
+                                                      handleEducationUpdate(index, edu.id, "description", e.target.value)
+                                                    }
+                                                    className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
+                                                  />
+                                                </div>
+
+                                              </AccordionContent>
+                                            </AccordionPanel>
+                                          </Accordion>
+                                        </div>
+                                      </div>
+                                    ))}
+
+                                    {/* Add more */}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAddEducation(index)}
+                                      className="!text-sm !text-[#800080] font-medium mt-2"
+                                    >
+                                      + Add one more education
+                                    </button>
+                                  </>
+                                )
+                              }
+
+                              {section.type === "certifications" && (
+                                <>
+                                  <p className="!text-sm !font-medium !text-gray-500 mb-4">
+                                    Certifications can strengthen your profile by highlighting verified skills.
+                                  </p>
+
+                                  {section.certifications.map((cert, cIndex) => (
+                                    <div
+                                      key={cert.id}
+                                      draggable
+                                      onDragStart={(e) => handleCertDragStart(e, cIndex)}
+                                      onDragOver={(e) => e.preventDefault()}
+                                      onDrop={(e) => handleCertDrop(e, index, cIndex)}
+                                      className="transition-all duration-200 rounded-lg border border-gray-200 shadow-sm mb-3"
+                                    >
+                                      <div className="flex items-start gap-2">
+
+                                        {/* Drag icon */}
+                                        <span className="drag-wrapper mt-5">
+                                          <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                                        </span>
+
+                                        <Accordion collapseAll className="w-full border border-gray-300 rounded-lg">
+                                          <AccordionPanel>
+
+                                            {/* TITLE */}
+                                            <AccordionTitle className="font-semibold text-sm">
+                                              {cert.name?.trim() ? cert.name : "(Not specified)"}
+                                            </AccordionTitle>
+
+                                            {/* CONTENT */}
+                                            <AccordionContent className="pt-0">
+
+                                              <div className="grid grid-cols-2 gap-4 mb-4">
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">
+                                                    Activity name, job title, book title etc.
+                                                  </Label>
+                                                  <input type='text'
+                                                    value={cert.name}
+                                                    onChange={(e) =>
+                                                      handleCertUpdate(index, cert.id, "name", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">City</Label>
+                                                  <input
+                                                    value={cert.city}
+                                                    onChange={(e) =>
+                                                      handleCertUpdate(index, cert.id, "city", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">Start Year</Label>
+                                                  <input
+                                                    value={cert.startYear}
+                                                    onChange={(e) =>
+                                                      handleCertUpdate(index, cert.id, "startYear", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+
+                                                <div>
+                                                  <Label className="!text-sm !font-medium !text-gray-500">End Year</Label>
+                                                  <input
+                                                    value={cert.endYear}
+                                                    onChange={(e) =>
+                                                      handleCertUpdate(index, cert.id, "endYear", e.target.value)
+                                                    }
+                                                    className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                                  />
+                                                </div>
+                                              </div>
+
+                                              <div>
+                                                <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                                                <textarea
+                                                  value={cert.description}
+                                                  onChange={(e) =>
+                                                    handleCertUpdate(index, cert.id, "description", e.target.value)
+                                                  }
+                                                  className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
+                                                />
+                                              </div>
+
+                                            </AccordionContent>
+                                          </AccordionPanel>
+                                        </Accordion>
+                                      </div>
+                                    </div>
+                                  ))}
+
+                                  <button
+                                    onClick={() => handleAddCertification(index)}
+                                    className="text-sm !text-[#800080] font-medium mt-2"
+                                  >
+                                    + Add one more item
+                                  </button>
+                                </>
+                              )}
+
+
                             </AccordionContent>
                           </AccordionPanel>
                         </Accordion>
@@ -1418,6 +1796,7 @@ const page = () => {
                     ))
                   }
                 </div>
+
 
                 {/* <AccordionPanel>
                       <AccordionTitle className='font-bold text-xl'>{sections.title}</AccordionTitle>
