@@ -669,7 +669,6 @@ export const generateImpSummary = createAsyncThunk(
                 "https://resumebuilderai.hiringeye.ai/agent/professional/summary",
                 payload
             );
-            console.log("hello",res)
             if (res?.status === 200) {
                 return res?.data;
             }
@@ -684,13 +683,17 @@ export const generateImpExperience = createAsyncThunk(
     "dashboard/generateImpExperience",
     async (payload, { rejectWithValue }) => {
         try {
-            const res = await api.post(
-                "/agent/Experience/Description",
+            // const res = await api.post(
+            //     "/agent/Experience/Description",
+            //     payload
+            // );
+            const res = await axios.post(
+                "https://resumebuilderai.hiringeye.ai/agent/Experience/Description",
                 payload
             );
 
-            if (res?.data?.status === true || res?.data?.status_code === 200) {
-                return res.data;
+            if (res?.status === 200) {
+                return res?.data;
             }
             return rejectWithValue(res?.data?.errors || "Something went wrong.");
         } catch (e) {

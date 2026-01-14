@@ -301,7 +301,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../reducers/AuthSlice';
@@ -309,14 +309,16 @@ import { reset } from '../reducers/SearchHistroySlice';
 
 import { Poppins } from 'next/font/google';
 import { FiMenu } from 'react-icons/fi';
-import { HiX } from 'react-icons/hi';
-import { HiDocumentText, HiHome, HiUserAdd } from 'react-icons/hi';
-import { BiSolidDashboard, BiSolidBriefcase } from 'react-icons/bi';
+import { HiX, HiDocumentText, HiHome, HiUserAdd } from 'react-icons/hi';
+import { BiSolidDashboard, BiSolidBriefcase, BiSolidCrown } from 'react-icons/bi';
 import { VscChecklist } from 'react-icons/vsc';
 import { CgProfile } from 'react-icons/cg';
 import { GrTransaction } from 'react-icons/gr';
 import { CiLogout } from 'react-icons/ci';
+
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
+import { currentSubscription, cancelSubscription, getIpData } from '../reducers/PlanSlice';
+import { toast } from 'react-toastify';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -327,9 +329,21 @@ const poppins = Poppins({
 const Sidebar = () => {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
   const { profileData } = useSelector((state) => state?.profile);
+  const { currentSubscriptionData, ipData } = useSelector((state) => state?.planst);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      const ipResult = await dispatch(getIpData());
+      if (ipResult?.payload?.ip) {
+        dispatch(currentSubscription(ipResult.payload.ip));
+      }
+    };
+    fetchSubscription();
+  }, [dispatch]);
 
   const handleLogout = () => {
     try {
@@ -345,22 +359,51 @@ const Sidebar = () => {
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const closeSidebar = () => setSidebarOpen(false);
 
+  const hasActiveSubscription = () => {
+    if (!currentSubscriptionData?.data || !Array.isArray(currentSubscriptionData.data)) return false;
+    const activeSub = currentSubscriptionData.data.find((sub) => {
+      const endDate = new Date(sub.end_date || sub.subscription_end_date);
+      const currentDate = new Date();
+      return sub.status === 1 && endDate > currentDate;
+    });
+    return !!activeSub;
+  };
+
+  const handleUpgrade = () => {
+    router.push('/plans');
+  };
+
+  const confirmCancel = async () => {
+    if (!ipData?.ip) return;
+    const res = await dispatch(cancelSubscription({ ip_address: ipData.ip }));
+    const result = res?.payload;
+
+    if (result?.status === true) {
+      toast.success("Your subscription has been cancelled");
+      setShowCancelModal(false);
+      dispatch(currentSubscription(ipData.ip));
+      router.push("/dashboard");
+    } else {
+      toast.error(result?.message || "Failed to cancel subscription");
+    }
+  };
+
   return (
     <>
       {/* Toggle Button */}
-     {/* Toggle Button */}
-<button
-  onClick={toggleSidebar}
-  className={`menu_btn fixed transition-all duration-300
+      {/* Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className={`menu_btn fixed transition-all duration-300
     ${sidebarOpen ? 'left-64' : 'left-2'}
   `}
->
-  {sidebarOpen ? (
-    <HiX className="text-xl text-white" />
-  ) : (
-    <FiMenu className="text-xl text-white" />
-  )}
-</button>
+      >
+        {sidebarOpen ? (
+          <HiX className="text-xl text-white" />
+        ) : (
+          <FiMenu className="text-xl text-white" />
+        )}
+      </button>
 
 
 
@@ -488,6 +531,30 @@ const Sidebar = () => {
                   <GrTransaction className="text-2xl" /> Transactions
                 </Link>
               </li>
+              <div className="flex flex-col gap-2 px-4">
+                {/* Upgrade / Subscription Plan */}
+                <button
+                  onClick={handleUpgrade}
+                  className={`flex items-center gap-1 justify-center py-1.5 px-3 rounded-lg text-sm font-semibold transition-all duration-200 transform !text-white cursor-pointer
+      ${hasActiveSubscription()
+                      ? 'bg-green-600 hover:bg-green-700 hover:scale-105'
+                      : 'bg-purple-600 hover:bg-purple-700 hover:scale-105'
+                    }`}
+                >
+                  <BiSolidCrown className="!text-white" />
+                  {hasActiveSubscription() ? "Subscription Plan" : "Upgrade Now"}
+                </button>
+
+                {/* Cancel Subscription */}
+                {hasActiveSubscription() && (
+                  <button
+                    onClick={() => setShowCancelModal(true)}
+                    className="flex items-center justify-center gap-1 py-1 cursor-pointer px-3 rounded-lg bg-red-500 hover:bg-red-600 text-sm font-semibold text-white transition-all duration-200 transform hover:scale-105"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
 
               {/* Logout */}
               <li onClick={closeSidebar}>
@@ -502,6 +569,31 @@ const Sidebar = () => {
           </nav>
         </div>
       </aside>
+      {/* Cancel Subscription Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white p-6 rounded-xl w-96 text-center">
+            <h2 className="text-lg font-semibold mb-4">Cancel Subscription</h2>
+            <p className="mb-6 text-sm text-gray-600">
+              By cancelling your subscription, you will lose access to premium features. Are you sure you want to continue?
+            </p>
+            <div className="flex justify-between gap-4">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="px-4 py-2 rounded-full bg-gray-300 hover:bg-gray-400 w-1/2"
+              >
+                No
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="px-4 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white w-1/2"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

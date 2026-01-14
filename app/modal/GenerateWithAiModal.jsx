@@ -12,9 +12,9 @@ import {
 } from "../reducers/DashboardSlice";
 
 const TONES = [
-    { label: "Professional & Clean", value: "Professional" },
-    { label: "Impactful & Strong", value: "Impactful" },
-    { label: "Leadership Tone", value: "Leadership" },
+    { label: "Professional", value: "Professional" },
+    { label: "Impactful", value: "Impactful" },
+    { label: "Leadership", value: "Leadership" },
 ];
 
 const GenerateWithAiModal = ({
@@ -40,7 +40,6 @@ const GenerateWithAiModal = ({
         generateImpExperienceLoading,
         generateImpExperienceData,
     } = useSelector((state) => state.dash);
-
     useEffect(() => {
         const text =
             aiType === "imp_summary"
@@ -67,23 +66,17 @@ const GenerateWithAiModal = ({
                 return;
             }
 
-            setAnimatedText((prev) => {
-                const nextWord = words[index];
-                if (!nextWord) return prev;
-
-                const updated = prev ? `${prev} ${nextWord}` : nextWord;
-
-                requestAnimationFrame(() => {
-                    if (scrollRef.current) {
-                        scrollRef.current.scrollTop =
-                            scrollRef.current.scrollHeight;
-                    }
-                });
-
-                return updated;
-            });
+            const nextWord = words[index];
+            setAnimatedText((prev) => (prev ? `${prev} ${nextWord}` : nextWord));
 
             index++;
+
+            // Scroll smoothly after updating the text
+            requestAnimationFrame(() => {
+                if (scrollRef.current) {
+                    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                }
+            });
         }, 130);
 
         return () => clearInterval(intervalRef.current);
@@ -92,6 +85,7 @@ const GenerateWithAiModal = ({
         generateImpSummaryData?.summary,
         generateImpExperienceData?.summary,
     ]);
+
 
 
     /* 🔁 Reset on modal close */

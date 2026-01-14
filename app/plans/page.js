@@ -278,7 +278,7 @@ const Page = () => {
   return (
     <>
       <ToastContainer />
-      <div className="key_benefits_section pt-10 pb-10">
+      <div className="key_benefits_section pt-[4px] pb-10">
         <div className="purchase_section py-8 lg:py-20">
           <div className="max-w-6xl mx-auto">
             {/* ACTIVE SUBSCRIPTION NOTICE */}
