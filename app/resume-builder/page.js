@@ -22,7 +22,7 @@ import { BiSolidPhone } from "react-icons/bi";
 
 import { HiAcademicCap } from "react-icons/hi2";
 
-import { FaLanguage } from "react-icons/fa6";
+import { FaLanguage, FaPen, FaUser } from "react-icons/fa6";
 import { MdSettingsSuggest } from "react-icons/md";
 import { FaDiagramProject } from "react-icons/fa6";
 import { FaCertificate } from "react-icons/fa";
@@ -69,10 +69,6 @@ import Template2 from '../temp/Template2';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import { saveAs } from "file-saver";
 import { toast, ToastContainer } from 'react-toastify';
-// import htmlDocx from "html-docx-js/dist/html-docx";
-// import juice from 'juice';
-// import html2docx from "html2docx";
-
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 
@@ -99,7 +95,6 @@ const page = () => {
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
   const template = searchParams.get("template");
-  // const user_id = sessionStorage.getItem('user_id');c
   const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const [type, setType] = useState()
@@ -107,46 +102,7 @@ const page = () => {
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
   const componentRef = useRef();
-
-
   const dispatch = useDispatch()
-  const [experiences, setExperiences] = useState([
-    {
-      id: Date.now(),
-      company_name: "",
-      position: "",
-      location: "",
-      skill: "",
-      start_date: null,
-      end_date: null,
-      current_work: false,
-      projects: [{ id: Date.now() + 1, title: "", role: "", technology: "", description: "" }]
-    }
-  ]);
-
-  const [languages, setLanguages] = useState([
-    { id: Date.now(), language_name: "", proficiency: "" },
-  ]);
-
-  const [skills, setSkills] = useState([
-    { id: Date.now(), skill_category: "", skill: "" }
-  ])
-
-  const [personalPro, setPersonalPro] = useState([
-    { id: Date.now(), project_title: "", role: "", start_time: null, end_time: null, project_url: "", skill: "", description: "" }
-  ])
-
-  const [certificates, setCertificates] = useState([
-    { id: Date.now(), certification_name: "", issuing_organization: "", obtained_date: null, certification_id: "" }
-  ])
-
-  const [achivments, setAchivments] = useState([
-    { id: Date.now(), achievement_title: "", organization: "", receive_date: null, description: "" }
-  ])
-
-  const [educationEntries, setEducationEntries] = useState([
-    { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
-  ])
   console.log("profileData", profileData);
   const [empHistory, setEmpHistory] = useState([{ id: 1 }])
   const [education, setEducation] = useState([{ id: 1 }])
@@ -164,6 +120,7 @@ const page = () => {
       internshipHistory: [{}],
       customSectionHistory: [{}],
       customSectionTitle: "Custom Section",
+      profileImage: "",
       hobbies: ""
     }
   });
@@ -283,217 +240,33 @@ const page = () => {
   };
   const formValues = watch();
 
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const onSubmit1 = (data) => {
-    console.log("data", data);
-
-
-
-
-    dispatch(savePersonalInfo(data)).then((res) => {
-      console.log("res", res);
-
-      if (res?.payload?.status_code === 201) {
-
-        const eduPayload = {
-          resume_id: res?.payload?.id,
-          education_arr: educationEntries.map((edu) => (
-            {
-              institution: edu?.institution,
-              location: edu?.location,
-              field_study: edu?.field_study,
-              degree: edu?.degree,
-              start_time: convertToSubmitFormat(edu?.start_time),
-              end_time: convertToSubmitFormat(edu?.end_time),
-              cgpa: edu?.gpa,
-              information: edu?.additionalInfo
-            }
-          ))
-        }
-        const payload = {
-          resume_id: res?.payload?.id,
-          data: experiences.map(exp => ({
-            company_name: exp.company_name,
-            position: exp.position,
-            location: exp.location,
-            skill: exp.skill.split(",").map(s => s.trim()), // turn comma string into array
-            start_date: convertToSubmitFormat(exp.start_date),
-            end_date: convertToSubmitFormat(exp.end_date),
-            current_work: exp.current_work ? 1 : 0,
-            projects: exp.projects.map(proj => ({
-              title: proj.title,
-              role: proj.role,
-              technology: proj.technology.split(",").map(t => t.trim()),
-              description: proj.description
-            }))
-          }))
-        };
-        const payloadLang = {
-          user_id: parseUserId?.user_id,
-          resume_id: res?.payload?.id,
-          data: languages.map((lang) => ({
-            language_name: lang.language_name,
-            proficiency: lang.proficiency,
-          })),
-        };
-        const payloadSkills = {
-          user_id: parseUserId?.user_id,
-          data: skills.map((sk) => (
-            {
-              resume_id: res?.payload?.id,
-              skill_category: sk.skill_category,
-              position: "test",
-              skill: sk.skill.split(',').map(t => t.trim())
-            }
-
-          ))
-        }
-        const payloadProject = {
-          user_id: parseUserId?.user_id,
-          resume_id: res?.payload?.id,
-          data: personalPro.map((pPro) => (
-            {
-              project_title: pPro?.project_title,
-              role: pPro?.role,
-              start_time: convertToSubmitFormat(pPro?.start_time),
-              end_time: convertToSubmitFormat(pPro?.end_time),
-              project_url: pPro?.project_url,
-              skill: pPro.skill.split(',').map(t => t.trim())
-            }
-          ))
-        }
-        const payloadCerticate = {
-          user_id: parseUserId?.user_id,
-          resume_id: res?.payload?.id,
-          data: certificates.map((cer) => (
-            {
-              certification_name: cer?.certification_name,
-              issuing_organization: cer?.issuing_organization,
-              obtained_date: convertToSubmitFormat(cer?.obtained_date),
-              certification_id: cer?.certification_id
-            }
-          ))
-        }
-        const payloadAchive = {
-          user_id: parseUserId?.user_id,
-          resume_id: res?.payload?.id,
-          data: achivments.map((achiv) => (
-            {
-
-              achievement_title: achiv?.achievement_title,
-              organization: achiv?.organization,
-              receive_date: convertToSubmitFormat(achiv?.receive_date),
-              description: achiv?.description
-            }
-          ))
-        }
-        dispatch(saveForDraft({
-          flag: type,
-          id: res?.payload?.id
-        }))
-        dispatch(saveTemplate({
-          templete_id: template,
-          jd_id: res?.payload?.id,
-          jd_type: "scratch",
-          user_id: parseUserId?.user_id
-        }))
-        dispatch(saveEducationInfo(eduPayload))
-        dispatch(saveWorkExp(payload))
-        dispatch(saveLanguageInfo(payloadLang))
-        dispatch(saveSkillInfo(payloadSkills))
-        dispatch(saveProjectInfo(payloadProject))
-        dispatch(saveCertificatesInfo(payloadCerticate))
-        dispatch(saveAchivmentInfo(payloadAchive))
-
-        toast.success(res?.payload?.message)
-        setIsCreated(true)
-
-      }
-
-    })
-
-
-  }
-
-
-  const handlePrint = useReactToPrint({
-
-    contentRef: componentRef, // Updated for newer versions of react-to-print
-    documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
-    pageStyle: `
-    @page {
-      size: A4;
-      margin: 0.5in;
-    }
-
-    body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      margin: 0;
-    }
-
-    /* Disable browser default headers and footers */
-    @page {
-      margin: 0;
-    }
-
-    /* Hide default header/footer added by Chrome/Edge/WPS */
-    @page :header {
-      display: none;
-    }
-    @page :footer {
-      display: none;
-    }
-  `,
-    onBeforeGetContent: () => {
-      // Optional: You can do something before printing starts
-      console.log('Starting PDF generation...');
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 100);
-      });
-    },
-    onAfterPrint: () => {
-      // Optional: You can do something after printing
-      console.log('PDF generated successfully!');
-    },
-  });
-
-
-  const handleDownloadClick = async () => {
-    if (!isCreated) {
-      toast.error('Please save your resume first before downloading!');
-      return;
-    }
-
-    try {
-      let res;
-      if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
-        res = await dispatch(
-          addCountResume({ ref_type: "scratch_resume" })
-        ).unwrap();
-      }
-      else {
-        res = await dispatch(
-          addCountResumeOrg({ ref_type: "scratch_resume" })
-        ).unwrap();
-      }
-
-      if (res?.status_code === 200) {
-        handlePrint();
-      }
-    } catch (error) {
-      if (error?.response?.data?.status_code === 400) {
-        toast.error(
-          "Your Plan Limit is Expired, Please Upgrade Your Plan!",
-          { autoClose: false }
-        );
-      } else {
-        toast.error("Something went wrong while downloading resume");
-      }
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+        setValue("profileImage", reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
+
+  const handleDeleteImage = () => {
+    setSelectedImage(null);
+    setValue("profileImage", "");
+  };
+
+
+
+
+
+
+
+
+
 
 
 
@@ -551,17 +324,63 @@ const page = () => {
 
                             <div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Job Target */}
-                                <div className="md:col-span-2">
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Job Target
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="SENIOR SOFTWARE ENGINEER"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
-                                    {...register("job_target")}
-                                  />
+                                {/* Job Target and Image Upload */}
+                                <div className="md:col-span-2 flex gap-4">
+                                  <div className="flex-1">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Job Target
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="SENIOR SOFTWARE ENGINEER"
+                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
+                                      {...register("job_target")}
+                                    />
+                                  </div>
+
+                                  {/* Image Upload */}
+                                  <div className="flex items-center gap-4">
+                                    <div className="relative w-14 h-14 bg-gray-100 rounded flex items-center justify-center overflow-hidden border border-gray-200">
+                                      {selectedImage ? (
+                                        <img src={selectedImage} alt="Profile" className="w-full h-full object-cover" />
+                                      ) : (
+                                        <FaUser className="text-gray-400 text-2xl" />
+                                      )}
+                                    </div>
+                                    <div>
+                                      {selectedImage ? (
+                                        <div className="flex flex-col gap-1">
+                                          <label
+                                            htmlFor="profile-upload"
+                                            className="flex items-center gap-1 text-cyan-600 text-xs font-medium cursor-pointer hover:underline"
+                                          >
+                                            <FaPen /> Edit photo
+                                          </label>
+                                          <button
+                                            type="button"
+                                            onClick={handleDeleteImage}
+                                            className="flex items-center gap-1 text-gray-500 text-xs font-medium cursor-pointer hover:text-red-500"
+                                          >
+                                            <MdDelete /> Delete
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <label
+                                          htmlFor="profile-upload"
+                                          className="text-cyan-600 text-sm font-medium cursor-pointer hover:underline"
+                                        >
+                                          Upload photo
+                                        </label>
+                                      )}
+                                      <input
+                                        type="file"
+                                        id="profile-upload"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageChange}
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
 
                                 {/* First Name */}
@@ -1034,7 +853,7 @@ const page = () => {
                 {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
                 {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
                 <button
-                  onClick={handleDownloadClick}
+
                   className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
         bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
                 >
