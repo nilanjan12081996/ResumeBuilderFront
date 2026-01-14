@@ -75,6 +75,7 @@ import isEqual from 'lodash.isequal';
 
 import { RiDraggable } from "react-icons/ri";
 import Professional from '../TemplateNew/Professional';
+import PrimeATS from '../TemplateNew/PrimeATS';
 import EmpHistory from './EmpHistory';
 import EducationNew from './EducationNew';
 import SkillsNew from './SkillsNew';
@@ -963,7 +964,8 @@ const page = () => {
                     <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
                 } */}
-              <Professional formData={formValues} empHistory={empHistory} />
+              {/* <Professional formData={formValues} empHistory={empHistory} /> */}
+              <PrimeATS formData={formValues} empHistory={empHistory} />
 
             </div>
             {/* <div className='flex items-center justify-between mb-0'>
