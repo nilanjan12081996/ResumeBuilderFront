@@ -9,7 +9,10 @@ import { HiSparkles } from "react-icons/hi2";
 import {
     generateImpSummary,
     generateImpExperience,
+    resetImpExperience,
+    resetImpSummary,
 } from "../reducers/DashboardSlice";
+
 
 const TONES = [
     { label: "Professional", value: "Professional" },
@@ -40,44 +43,86 @@ const GenerateWithAiModal = ({
         generateImpExperienceLoading,
         generateImpExperienceData,
     } = useSelector((state) => state.dash);
+
+    const handleClose = () => {
+        if (aiType === "imp_summary") {
+            dispatch(resetImpSummary());
+        } else {
+            dispatch(resetImpExperience());
+        }
+
+        setGeneratedText("");
+        setAnimatedText("");
+        setTypingDone(false);
+
+        onClose();
+    };
+
     useEffect(() => {
-        const text =
+        const raw =
             aiType === "imp_summary"
                 ? generateImpSummaryData?.summary
                 : generateImpExperienceData?.summary;
 
-        if (!text || typeof text !== "string") return;
+        if (!raw) return;
+
+        let text = "";
+
+        if (Array.isArray(raw)) {
+            text = raw.map((line) => `• ${line}`).join("\n");
+        } else if (typeof raw === "string") {
+
+            const hasMultipleLines =
+                raw.includes("\n") || raw.includes("•");
+
+            if (hasMultipleLines) {
+                text = raw
+                    .split(/\n|•/g)
+                    .map(line => line.trim())
+                    .filter(Boolean)
+                    .map(line => `• ${line.replace(/^•+/, "").trim()}`)
+                    .join("\n");
+            } else {
+                text = raw.trim();
+            }
+        }
+
+
 
         clearInterval(intervalRef.current);
 
         const cleanText = text.trim();
-        const words = cleanText.split(/\s+/).filter(Boolean);
+        const tokens = cleanText.split(/(\n|\s+)/).filter(Boolean);
+
 
         setGeneratedText(cleanText);
         setAnimatedText("");
         setTypingDone(false);
 
+
+
         let index = 0;
 
         intervalRef.current = setInterval(() => {
-            if (index >= words.length) {
+            if (index >= tokens.length) {
                 clearInterval(intervalRef.current);
                 setTypingDone(true);
                 return;
             }
 
-            const nextWord = words[index];
-            setAnimatedText((prev) => (prev ? `${prev} ${nextWord}` : nextWord));
+            const next = tokens[index];
+
+            setAnimatedText(prev => prev + next);
 
             index++;
 
-            // Scroll smoothly after updating the text
             requestAnimationFrame(() => {
                 if (scrollRef.current) {
                     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
                 }
             });
-        }, 130);
+        }, 80);
+
 
         return () => clearInterval(intervalRef.current);
     }, [
@@ -107,34 +152,36 @@ const GenerateWithAiModal = ({
             : generateImpExperienceLoading;
 
     const handleGenerate = () => {
+        if (aiType === "imp_summary") {
+            dispatch(generateImpSummary({
+                security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+                tone,
+                original_text: generatedText || initialText || "",
+            }));
+            return;
+        }
         const sourceText = generatedText || initialText;
         if (!sourceText?.trim()) return;
 
-        const payload = {
+        dispatch(generateImpExperience({
             security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
             tone,
             original_text: sourceText,
-        };
-
-        aiType === "imp_summary"
-            ? dispatch(generateImpSummary(payload))
-            : dispatch(generateImpExperience(payload));
+        }));
     };
+
 
     const handleApply = () => {
         if (!generatedText) return;
         onApply(generatedText);
-        onClose();
+        handleClose();
     };
 
+
     return (
-        <div className="absolute z-50 top-1/2 left-full ml-4 -translate-y-1/2">
-            <div
-                className="
-          bg-white min-w-[360px] max-w-md rounded-2xl p-6
-          shadow-[0_12px_32px_rgba(0,0,0,0.18)]
-        "
-            >
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            <div className="bg-white min-w-[360px] max-w-md rounded-2xl p-6 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
+
                 {/* Header */}
                 <div className="flex justify-between items-start">
                     <div>
@@ -147,9 +194,10 @@ const GenerateWithAiModal = ({
                         </p>
                     </div>
 
-                    <button onClick={onClose}>
+                    <button onClick={handleClose}>
                         <FaTimes className="text-gray-400 hover:text-black" />
                     </button>
+
                 </div>
 
                 {/* Tone Selector - Functional Horizontal Tabs */}
@@ -195,7 +243,9 @@ const GenerateWithAiModal = ({
                     <div className="mt-6">
                         <div
                             ref={scrollRef}
-                            className="rounded-lg text-sm bg-gray-50 max-h-40 overflow-y-auto whitespace-pre-line p-3"
+                            className={`rounded-lg text-sm bg-gray-50 max-h-40 overflow-y-auto whitespace-pre-line p-3 transition-colors duration-300
+                            ${typingDone ? "text-black" : "text-blue-600"}
+                            `}
                         >
                             {animatedText}
                             {!typingDone && (

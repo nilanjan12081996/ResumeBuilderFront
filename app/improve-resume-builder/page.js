@@ -93,6 +93,7 @@ import DragIcon from './DragIcon';
 import DynamicTemplate from '../temp/DynamicTemplate';
 import GenerateWithAiModal from '../modal/GenerateWithAiModal';
 import { HiDocumentText, HiArrowPath } from "react-icons/hi2";
+import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 
 const page = () => {
@@ -1247,7 +1248,7 @@ const page = () => {
                 <div className='mb-4'>
                   <div className='flex items-center gap-2 mb-2'>
                     <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>100%</span>
-                    <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume Ats Score</span>
+                    <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume ATS Score</span>
                   </div>
                   <div className="flex flex-col gap-2">
                     <Progress progress={45} size="sm" className="[&>div]:bg-[#800080]" />
@@ -1997,6 +1998,7 @@ const page = () => {
                                                     type="button"
                                                     onClick={() => {
                                                       setActiveExpId(exp.id);
+                                                      console.log("hello")
                                                     }}
                                                     className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080]"
                                                   >
@@ -2599,6 +2601,7 @@ const page = () => {
               sections={sections}
               data={formValues}
             />
+            {/* <CorporateTemplate/> */}
 
 
 

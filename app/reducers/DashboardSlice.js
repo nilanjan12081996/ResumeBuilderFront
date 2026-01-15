@@ -758,7 +758,14 @@ const DashboardSlice = createSlice(
     {
         name: "dashboard",
         initialState,
-        reducers: {},
+        reducers: {
+            resetImpSummary(state) {
+                state.generateImpSummaryData = null;
+            },
+            resetImpExperience(state) {
+                state.generateImpExperienceData = null;
+            },
+        },
         extraReducers: (builder) => {
             builder.addCase(improveResume.pending, (state, { payload }) => {
                 state.loading = true
@@ -1235,4 +1242,5 @@ const DashboardSlice = createSlice(
         }
     }
 )
+export const {resetImpSummary,resetImpExperience,} = DashboardSlice.actions;
 export default DashboardSlice.reducer;
