@@ -95,7 +95,7 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move }
 
                         <span className="font-bold text-sm text-gray-700">
                           {watchedSchool || watchedDegree 
-                            ? `${watchedDegree || ''}${watchedDegree ? ' at ' + watchedSchool : ''}` 
+                            ? `${watchedDegree || ''}${watchedSchool ? ' at ' + watchedSchool : ''}` 
                             : "(Not specified)"}
                         </span>
                       </div>
