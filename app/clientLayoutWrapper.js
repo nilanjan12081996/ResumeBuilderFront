@@ -6,12 +6,13 @@ import Sidebar from "./ui/sidebar";
 import Insideheader from "./ui/insideheader";
 import Header from "./ui/header";
 import Footer from "./ui/footer";
-
+import { TabsProvider } from "./context/TabsContext";
 export default function ClientLayoutWrapper({ children }) {
     const [hasToken, setHasToken] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const pathname = usePathname();
     const router = useRouter();
+
 
     // Define public routes that don't require authentication
     const publicRoutes = ['/', '/about-us', '/contact', '/privacy-policy', '/support', '/cancellation-policy', '/pricing', '/how-it-works', '/features', '/privacy', '/faqs', '/featured-jobs', '/featured-jobs-details', '/resume-builder', '/linkedIn-rewrite', '/invite-students', '/loading-page', '/google-redirect', '/terms-conditions', '/forgot-password', '/reset-password'];
@@ -108,11 +109,12 @@ export default function ClientLayoutWrapper({ children }) {
                         <Sidebar />
                     </div>
                     <div className="content_area w-full lg:w-[100%]">
-                        <Insideheader />
-                        <div className="py-1 bg-[#eff2f9]">
-                            {children}
-                        </div>
-
+                        <TabsProvider>
+                            <Insideheader />
+                            <div className="py-1 bg-[#eff2f9]">
+                                {children}
+                            </div>
+                        </TabsProvider>
                     </div>
                 </div>
             </main>

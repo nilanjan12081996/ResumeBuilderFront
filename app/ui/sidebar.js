@@ -551,7 +551,7 @@ const Sidebar = () => {
                     onClick={() => setShowCancelModal(true)}
                     className="flex items-center justify-center gap-1 py-1 cursor-pointer px-3 rounded-lg bg-red-500 hover:bg-red-600 text-sm font-semibold text-white transition-all duration-200 transform hover:scale-105"
                   >
-                    Cancel
+                    Cancel Subscription
                   </button>
                 )}
               </div>

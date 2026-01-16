@@ -26,7 +26,7 @@ import {
     FiLink,
 } from "react-icons/fi";
 import { AiOutlineFontColors } from "react-icons/ai";
-import { FaStrikethrough } from "react-icons/fa";
+import { AiOutlineStrikethrough } from "react-icons/ai";
 import { TfiListOl } from "react-icons/tfi";
 import { AiOutlineBgColors } from "react-icons/ai";
 
@@ -44,21 +44,28 @@ export default function TipTapEditor({ value, onChange }) {
             Strike,
             TextStyle,
             Color,
-            Link.configure({ openOnClick: false }),
-            TextAlign.configure({ types: ["paragraph"] }),
-            Placeholder.configure({
-                placeholder: "Click here and start typing",
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: "text-blue-600 underline",
+                    target: "_blank"
+                }
             }),
+
+            TextAlign.configure({ types: ["paragraph"] }),
+            // Placeholder.configure({
+            //     placeholder: "Click here and start typing",
+            // }),
         ],
         content: value?.trim() ? value : "<p><br /></p>",
         immediatelyRender: false,
         onUpdate({ editor }) {
-            onChange(editor.getText());
+            onChange(editor.getHTML());
         },
     });
 
     useEffect(() => {
-        if (editor && value !== editor.getText()) {
+        if (editor && value !== editor.getHTML()) {
             editor.commands.setContent(value?.trim() ? value : "<p><br /></p>");
         }
     }, [value, editor]);
@@ -105,7 +112,7 @@ export default function TipTapEditor({ value, onChange }) {
 
                 <button className={btn(editor.isActive("strike"))}
                     onClick={() => editor.chain().focus().toggleStrike().run()}>
-                    <FaStrikethrough />
+                    <AiOutlineStrikethrough className="text-[18px]" />
                     <Tooltip text="Strikethrough" />
                 </button>
 
@@ -147,14 +154,30 @@ export default function TipTapEditor({ value, onChange }) {
                     <Tooltip text="Align right" />
                 </button>
 
-                <button className={btn(editor.isActive("link"))}
+                <button
+                    className={btn(editor.isActive("link"))}
                     onClick={() => {
-                        const url = prompt("Enter URL");
-                        if (url) editor.chain().focus().setLink({ href: url }).run();
-                    }}>
+                        if (editor.isActive("link")) {
+                            editor.chain().focus().unsetLink().setColor("#000").run();
+                        } else {
+                            let url = prompt("Enter URL");
+                            if (!url) return;
+                            if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+
+                            editor
+                                .chain()
+                                .focus()
+                                .setLink({ href: url })
+                                .setColor("#2563eb")
+                                .run();
+                        }
+
+                    }}
+                >
                     <FiLink />
-                    <Tooltip text="Insert link" />
+                    <Tooltip text={editor.isActive("link") ? "Unlink" : "Insert link"} />
                 </button>
+
 
                 <span className="w-px h-4 bg-gray-500" />
 
@@ -163,7 +186,7 @@ export default function TipTapEditor({ value, onChange }) {
                     className={btn(false)}
                     onClick={() => colorInputRef.current?.click()}
                 >
-                    <AiOutlineFontColors />
+                    <AiOutlineFontColors className="text-[18px]" />
                     <Tooltip text="Text color" />
                 </button>
 
@@ -180,7 +203,7 @@ export default function TipTapEditor({ value, onChange }) {
                     className={btn(editor.isActive("highlight"))}
                     onClick={() => highlightInputRef.current?.click()}
                 >
-                    <AiOutlineBgColors />
+                    <AiOutlineBgColors className="text-[20px]" />
                     <Tooltip text="Highlight" />
                 </button>
 
@@ -211,14 +234,14 @@ export default function TipTapEditor({ value, onChange }) {
                     onClick={() => editor.chain().focus().redo().run()}
                 >
                     <FiCornerUpRight />
-                     <Tooltip text="Redo" />
+                    <Tooltip text="Redo" />
                 </button>
 
             </div>
 
             {/* Editor */}
             <div
-                className="editor-wrapper p-3 min-h-[250px] text-sm font-medium text-gray-500 bg-[#eff2f9] cursor-text"
+                className="editor-wrapper p-3 min-h-[250px] text-sm font-medium text-[#000] bg-[#eff2f9] cursor-text"
                 onClick={() => editor.commands.focus()}
             >
                 <EditorContent editor={editor} spellCheck={true} />
