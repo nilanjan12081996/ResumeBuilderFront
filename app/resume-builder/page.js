@@ -76,6 +76,7 @@ import isEqual from 'lodash.isequal';
 import { RiDraggable } from "react-icons/ri";
 import Professional from '../TemplateNew/Professional';
 import PrimeATS from '../TemplateNew/PrimeATS';
+import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 import EmpHistory from './EmpHistory';
 import EducationNew from './EducationNew';
 import SkillsNew from './SkillsNew';
@@ -90,6 +91,7 @@ import CustomSection from './CustomSection';
 import CleanTemplate from '../TemplateNew/CleanTemplate';
 import ClearTemplate from '../TemplateNew/ClearTemplate';
 import VividTemplate from '../TemplateNew/VividTemplate';
+import CustomizeSection from './CustomizeSection';
 
 
 const page = () => {
@@ -106,7 +108,19 @@ const page = () => {
   const [isCreated, setIsCreated] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const lastSavedData = useRef(null); // Ref to track last saved state
-
+ const [selectedTemplate, setSelectedTemplate] = useState('clear');
+ const templateMap = {
+    professional: Professional,
+    ats: PrimeATS,
+    clean: CleanTemplate,
+    clear: ClearTemplate,
+    vivid: VividTemplate,
+    corporate: CorporateTemplate,
+  };
+const handleSelectTemplate = (id) => {
+    setSelectedTemplate(id);
+  };
+const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
 
   const dispatch = useDispatch()
@@ -926,7 +940,7 @@ const page = () => {
                 </form>
               </FormProvider>
             </TabPanel>
-            <TabPanel>Customize</TabPanel>
+            <TabPanel><CustomizeSection selectedTemplate={selectedTemplate} onSelectTemplate={handleSelectTemplate}/></TabPanel>
           </div>
 
           <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
@@ -956,22 +970,13 @@ const page = () => {
               </div>
             </div>
             <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-              {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-              {/* {
-                  template == 1 && (
-                    <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-                  )
-                }
-                {
-                  template == 2 && (
-                    <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-                  )
-                } */}
+        
               {/* <Professional formData={formValues} empHistory={empHistory} /> */}
               {/* <PrimeATS formData={formValues} empHistory={empHistory} /> */}
               {/* <CleanTemplate formData={formValues} empHistory={empHistory} /> */}
               {/* <ClearTemplate formData={formValues} empHistory={empHistory} /> */}
-               <VividTemplate formData={formValues} empHistory={empHistory} />
+               {/* <VividTemplate formData={formValues} empHistory={empHistory} /> */}
+               <ActiveResume formData={formValues} empHistory={empHistory} />
 
 
 
