@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import TipTapEditor from "../editor/TipTapEditor.jsx"
 import { HiClipboardList } from "react-icons/hi";
-import { MdPreview } from "react-icons/md";
+import { MdOutlinePublishedWithChanges, MdPreview } from "react-icons/md";
 import { IoStatsChart } from "react-icons/io5";
 import { IoMdDownload } from "react-icons/io";
 import { AiOutlineArrowRight } from "react-icons/ai";
@@ -94,6 +94,9 @@ import DynamicTemplate from '../temp/DynamicTemplate';
 import GenerateWithAiModal from '../modal/GenerateWithAiModal';
 import { HiDocumentText, HiArrowPath } from "react-icons/hi2";
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
+import { PiReadCvLogoDuotone } from 'react-icons/pi';
+import { useTabs } from '../context/TabsContext.js';
+import CustomizeResume from '../ui/CustomizeResume.jsx';
 
 
 const page = () => {
@@ -1234,14 +1237,14 @@ const page = () => {
 
 
 
-
+  const { activeTab } = useTabs();
 
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
 
       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        {activeTab === 'edit' ? <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <div className='mb-10'>
               <div className='bg-white rounded-sm p-5 mb-[4px]'>
@@ -1256,32 +1259,35 @@ const page = () => {
                 </div>
 
 
-                <div className="flex items-center gap-3">
-                  {/* Existing Resume */}
+                <div className="flex items-center">
                   <button
                     className="
-                      w-6/12 flex items-center justify-center gap-2
-                      text-sm font-medium
-                      text-[#800080] hover:text-[#e799e7]
-                      transition-all duration-200
-                      cursor-pointer"
+                    flex items-center gap-1
+                    text-sm font-thin
+                    text-[#800080] hover:text-[#e799e7]
+                    transition-all duration-200
+                    cursor-pointer
+                  "
                   >
-                    <HiDocumentText className="text-lg" />
+                    <PiReadCvLogoDuotone className='text-lg' />
                     Existing Resume
                   </button>
 
-                  {/* Changed Resume */}
-                  <button
-                    className="
-                    w-6/12 flex items-center justify-center gap-2
-                    text-sm font-medium
-                    text-[#800080] hover:text-[#e799e7]
-                    transition-all duration-200 cursor-pointer"
-                  >
-                    <HiArrowPath className="text-lg" />
-                    Changed Resume
-                  </button>
+                  <div className="flex-1 flex justify-center">
+                    <button
+                      className="
+                        flex items-center gap-1
+                        text-sm font-thin
+                        text-[#800080] hover:text-[#e799e7]
+                        transition-all duration-200 cursor-pointer
+                      "
+                    >
+                      <MdOutlinePublishedWithChanges className="text-lg" />
+                      Changed Resume
+                    </button>
+                  </div>
                 </div>
+
 
               </div>
 
@@ -1614,7 +1620,7 @@ const page = () => {
                                   </>
                                 )
                               }
-                             
+
                               {section.type === "summary" && (
                                 <div className="space-y-2">
                                   <div className="flex justify-between items-center">
@@ -1628,7 +1634,7 @@ const page = () => {
                                     onChange={(text) => setValue("goal", text)}
                                   />
 
-                                  <div className="relative flex justify-end">
+                                  <div className="relative flex justify-end mt-1">
                                     <button
                                       type="button"
                                       onClick={() => setAiModalOpen(true)}
@@ -1979,14 +1985,21 @@ const page = () => {
 
                                               <div>
                                                 <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                                <textarea
+                                                <TipTapEditor
+                                                  value={exp.description}
+                                                  onChange={(html) =>
+                                                    handleExpUpdate(index, exp.id, "description", html)
+                                                  }
+                                                />
+
+                                                {/* <textarea
                                                   value={exp.description}
                                                   onChange={(e) =>
                                                     handleExpUpdate(index, exp.id, "description", e.target.value)
                                                   }
                                                   className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
-                                                />
-                                                <div className="relative flex justify-end">
+                                                /> */}
+                                                <div className="relative flex justify-end mt-1">
                                                   <button
                                                     type="button"
                                                     onClick={() => {
@@ -2573,6 +2586,12 @@ const page = () => {
             </div>
           </div>
         </form>
+          :
+          <div>
+            <CustomizeResume/>
+          </div>
+        }
+
       </div>
 
 

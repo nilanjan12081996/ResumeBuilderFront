@@ -182,6 +182,7 @@ import { getIpData, currentSubscription, cancelSubscription } from '../reducers/
 import userFace from "../assets/imagesource/user_face.png";
 import logoAdmin from "../assets/imagesource/logo_admin.png";
 import { toast } from 'react-toastify';
+import { useTabs } from '../context/TabsContext';
 
 const Insideheader = () => {
   const pathname = usePathname();
@@ -192,7 +193,9 @@ const Insideheader = () => {
 
   const [open, setOpen] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("edit");
+
+  const { activeTab, setActiveTab } = useTabs();
+
 
 
   useEffect(() => {
