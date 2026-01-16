@@ -91,7 +91,7 @@ import CustomSection from './CustomSection';
 import CleanTemplate from '../TemplateNew/CleanTemplate';
 import ClearTemplate from '../TemplateNew/ClearTemplate';
 import VividTemplate from '../TemplateNew/VividTemplate';
-import CustomizeSection from './CustomizeSection';
+import CustomizeSection from '../ui/CustomizeSection';
 
 
 const page = () => {
@@ -108,8 +108,9 @@ const page = () => {
   const [isCreated, setIsCreated] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const lastSavedData = useRef(null); // Ref to track last saved state
- const [selectedTemplate, setSelectedTemplate] = useState('clear');
- const templateMap = {
+  const [selectedTemplate, setSelectedTemplate] = useState('clear');
+  const [themeColor, setThemeColor] = useState('#000000');
+  const templateMap = {
     professional: Professional,
     ats: PrimeATS,
     clean: CleanTemplate,
@@ -117,10 +118,10 @@ const page = () => {
     vivid: VividTemplate,
     corporate: CorporateTemplate,
   };
-const handleSelectTemplate = (id) => {
+  const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
   };
-const ActiveResume = templateMap[selectedTemplate] || Professional;
+  const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
 
   const dispatch = useDispatch()
@@ -940,7 +941,14 @@ const ActiveResume = templateMap[selectedTemplate] || Professional;
                 </form>
               </FormProvider>
             </TabPanel>
-            <TabPanel><CustomizeSection selectedTemplate={selectedTemplate} onSelectTemplate={handleSelectTemplate}/></TabPanel>
+            <TabPanel>
+              <CustomizeSection
+                selectedTemplate={selectedTemplate}
+                onSelectTemplate={handleSelectTemplate}
+                themeColor={themeColor}
+                setThemeColor={setThemeColor}
+              />
+            </TabPanel>
           </div>
 
           <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
@@ -970,13 +978,13 @@ const ActiveResume = templateMap[selectedTemplate] || Professional;
               </div>
             </div>
             <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-        
+
               {/* <Professional formData={formValues} empHistory={empHistory} /> */}
               {/* <PrimeATS formData={formValues} empHistory={empHistory} /> */}
               {/* <CleanTemplate formData={formValues} empHistory={empHistory} /> */}
               {/* <ClearTemplate formData={formValues} empHistory={empHistory} /> */}
-               {/* <VividTemplate formData={formValues} empHistory={empHistory} /> */}
-               <ActiveResume formData={formValues} empHistory={empHistory} />
+              {/* <VividTemplate formData={formValues} empHistory={empHistory} /> */}
+              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor}/>
 
 
 

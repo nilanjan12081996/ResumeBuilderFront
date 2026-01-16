@@ -12,6 +12,7 @@ import ClientLayoutWrapper from "./clientLayoutWrapper";
 import Sidebar from "./ui/sidebar";
 import Insideheader from "./ui/insideheader";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ThemeColorProvider } from './ui/ThemeColorProvider';
 
 
 const poppins = Poppins({
@@ -38,14 +39,16 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.variable} antialiased`}
       >
-<GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 
 
-        <Providers>
-          <ClientLayoutWrapper>
-            {children}
-          </ClientLayoutWrapper>
-        </Providers>
+          <Providers>
+            <ClientLayoutWrapper>
+              <ThemeColorProvider>
+                {children}
+              </ThemeColorProvider>
+            </ClientLayoutWrapper>
+          </Providers>
         </GoogleOAuthProvider>
 
         {/* <Providers>
