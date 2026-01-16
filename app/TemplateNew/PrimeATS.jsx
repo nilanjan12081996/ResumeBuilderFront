@@ -9,6 +9,16 @@ const PrimeATS = ({ formData }) => {
     return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
   };
 
+  const hasContactInfo = 
+    formData.email || 
+    formData.phone || 
+    formData.address || 
+    formData.city_state || 
+    formData.postal_code || 
+    formData.driving_licence || 
+    formData.nationality||
+    formData.country;
+
   const hasEmployment = formData.employmentHistory?.some(job => job.job_title || job.employer);
   const hasEducation = formData.educationHistory?.some(edu => edu.school || edu.degree);
   const hasSkills = formData.newSkillHistory?.some(s => s.skill);
@@ -39,15 +49,19 @@ const PrimeATS = ({ formData }) => {
             {formData.phone && <span>| {formData.phone}</span>}
             {formData.linkedin && <span>| LinkedIn</span>}
           </div>
-
-          {/* Secondary Details (DOB, Nationality etc) */}
-          <div className="mt-1 text-[11px] text-gray-600">
+            {
+              hasContactInfo&&(
+                   <div className="mt-1 text-[11px] text-gray-600">
             <span className="font-bold">Personal Details: </span>
             {formData.dob && <span>{formData.dob} | </span>}
             {formData.city_state && <span>{formData.city_state} | </span>}
             {formData.nationality && <span>{formData.nationality} | </span>}
             {formData.postal_code && <span>{formData.postal_code}</span>}
           </div>
+              )
+            }
+          {/* Secondary Details (DOB, Nationality etc) */}
+       
         </div>
 
         {/* Profile Image - Top Right */}
@@ -162,7 +176,7 @@ const PrimeATS = ({ formData }) => {
           </section>
         )}
         
-        {formData.languageHistory?.length > 0 && (
+        {formData.languageHistory?.some(l => l.language)&&formData.languageHistory?.length > 0 && (
           <section>
             <h3 className="text-[#2b6cb0] font-bold text-sm border-b-2 border-[#2b6cb0] mb-2 pb-1 uppercase tracking-wider">
               Languages
