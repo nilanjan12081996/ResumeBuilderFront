@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-
+import TipTapEditor from "../editor/TipTapEditor.jsx"
 import { HiClipboardList } from "react-icons/hi";
 import { MdPreview } from "react-icons/md";
 import { IoStatsChart } from "react-icons/io5";
@@ -1505,16 +1505,14 @@ const page = () => {
                             ${draggedIndex === index
                             ? "opacity-20 border-cyan-500 scale-95" // The "hole" left behind
                             : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
-                          }
-                            cursor-grab active:cursor-grabbing
-                          `}
+                          }`}
                       >
                         <Accordion flush={true}>
 
                           <AccordionPanel>
                             <AccordionTitle className='font-bold text-xl'>
                               <span
-                                className="drag-wrapper"
+                                className="drag-wrapper cursor-grab active:cursor-grabbing"
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, index)}
                                 onDragEnd={handleDragEnd}
@@ -1546,7 +1544,7 @@ const page = () => {
                                             }`}>
                                           <div className="flex items-start gap-2">
                                             <span
-                                              className="drag-wrapper mt-5"
+                                              className="drag-wrapper mt-5 cursor-grab active:cursor-grabbing"
                                               draggable
                                               onDragStart={(e) => handleSkillDragStart(e, sIndex)}
                                               onDragEnd={() => setDraggedSkillIndex(null)}
@@ -1616,46 +1614,41 @@ const page = () => {
                                   </>
                                 )
                               }
-                              {
-                                section.type === 'summary' && (
-                                  <div className="space-y-2">
-                                    <div className='flex justify-between items-center'>
-                                      <p className="!text-sm !font-medium !text-gray-500 mb-4">
-                                        Write 2-4 short, energetic sentences about how great you are. Mention the role and what you did. What were the big achievements? Describe your motivation and list your skills.
-                                      </p>
-                                    </div>
-                                    <textarea
-                                      placeholder="Write a brief professional summary..."
-                                      className="mt-1 w-ful text-sm h-32 resize-none"
-                                      /* Use the watched value from useForm to make it a controlled input */
-                                      value={watch("goal") || ""}
-                                      onChange={(e) => {
-                                        // Manually update the react-hook-form state
-                                        setValue("goal", e.target.value);
-                                      }}
-                                    />
-                                    <div className="relative flex justify-end">
-                                      <button
-                                        type="button"
-                                        onClick={() => setAiModalOpen(true)}
-                                        className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] font-medium !transition-all !duration-200 hover:!bg-[#800080] hover:!text-white"
-                                      >
-                                        <HiSparkles className="text-md" />
-                                        Get help with writing
-                                      </button>
-                                      <GenerateWithAiModal
-                                        open={aiModalOpen}
-                                        onClose={() => setAiModalOpen(false)}
-                                        aiType="imp_summary"
-                                        initialText={watch("goal") || ""}
-                                        onApply={(text) => {
-                                          setValue("goal", text);
-                                        }}
-                                      />
-                                    </div>
+                             
+                              {section.type === "summary" && (
+                                <div className="space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <p className="!text-sm !font-medium !text-gray-500 mb-4">
+                                      Write 2-4 short, energetic sentences about how great you are...
+                                    </p>
                                   </div>
-                                )
-                              }
+
+                                  <TipTapEditor
+                                    value={watch("goal") || ""}
+                                    onChange={(text) => setValue("goal", text)}
+                                  />
+
+                                  <div className="relative flex justify-end">
+                                    <button
+                                      type="button"
+                                      onClick={() => setAiModalOpen(true)}
+                                      className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] font-medium hover:!bg-[#800080] hover:!text-white"
+                                    >
+                                      <HiSparkles />
+                                      Get help with writing
+                                    </button>
+
+                                    <GenerateWithAiModal
+                                      open={aiModalOpen}
+                                      onClose={() => setAiModalOpen(false)}
+                                      aiType="imp_summary"
+                                      initialText={watch("goal") || ""}
+                                      onApply={(text) => setValue("goal", text)}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+
 
                               {
                                 section.type === "education" && (
@@ -1675,7 +1668,7 @@ const page = () => {
                                       >
                                         <div className="flex items-start gap-2">
                                           <span
-                                            className="drag-wrapper mt-5"
+                                            className="drag-wrapper mt-5 cursor-grab active:cursor-grabbing"
                                             draggable
                                             onDragStart={(e) => handleEducationDragStart(e, eIndex)}
                                             onDragEnd={handleDragEnd}
@@ -1792,7 +1785,7 @@ const page = () => {
 
                                         {/* Drag icon */}
                                         <span
-                                          className="drag-wrapper mt-5"
+                                          className="drag-wrapper mt-5 cursor-grab active:cursor-grabbing"
                                           draggable
                                           onDragStart={(e) => handleCertDragStart(e, cIndex)}
                                           onDragEnd={handleDragEnd}
@@ -1904,7 +1897,7 @@ const page = () => {
 
                                         {/* Drag icon ONLY */}
                                         <span
-                                          className="drag-wrapper mt-5"
+                                          className="drag-wrapper mt-5 cursor-grab active:cursor-grabbing"
                                           draggable
                                           onDragStart={(e) => handleExpDragStart(e, eIndex)}
                                           onDragEnd={handleDragEnd}
@@ -2584,7 +2577,7 @@ const page = () => {
 
 
       <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] py-5 px-0'>
-        
+
         <div className='h-screen overflow-y-scroll rounded-[8px]'>
           <div ref={componentRef} className=''>
             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
