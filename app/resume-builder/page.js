@@ -87,6 +87,9 @@ import Activities from './Activities';
 import Languages from './newLanguage';
 import Internships from './Internships';
 import CustomSection from './CustomSection';
+import CleanTemplate from '../TemplateNew/CleanTemplate';
+import ClearTemplate from '../TemplateNew/ClearTemplate';
+import VividTemplate from '../TemplateNew/VividTemplate';
 
 
 const page = () => {
@@ -965,7 +968,12 @@ const page = () => {
                   )
                 } */}
               {/* <Professional formData={formValues} empHistory={empHistory} /> */}
-              <PrimeATS formData={formValues} empHistory={empHistory} />
+              {/* <PrimeATS formData={formValues} empHistory={empHistory} /> */}
+              {/* <CleanTemplate formData={formValues} empHistory={empHistory} /> */}
+              {/* <ClearTemplate formData={formValues} empHistory={empHistory} /> */}
+               <VividTemplate formData={formValues} empHistory={empHistory} />
+
+
 
             </div>
             {/* <div className='flex items-center justify-between mb-0'>
