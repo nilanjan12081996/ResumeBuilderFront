@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 
 const templates = [
-  { id: 1, name: 'Classic', type: ['PDF', 'DOCX'], img: '/path/to/classic.png' },
-  { id: 2, name: 'Traditional', type: ['PDF', 'DOCX'], img: '/path/to/traditional.png' },
-  { id: 3, name: 'Professional', type: ['PDF', 'DOCX'], img: '/path/to/professional.png' },
-  { id: 4, name: 'Prime ATS', type: ['PDF', 'DOCX'], img: '/path/to/prime_ats.png' },
+  { id: 1, name: 'Professional', type: ['PDF', 'DOCX'], img: '/path/to/Professional.png' },
+  { id: 2, name: 'Prime ATS', type: ['PDF', 'DOCX'], img: '/path/to/Prime ATS.png' },
+  { id: 3, name: 'Clean', type: ['PDF', 'DOCX'], img: '/path/to/professional.png' },
+  { id: 4, name: 'Corporate', type: ['PDF', 'DOCX'], img: '/path/to/Corporate.png' },
+  { id: 5, name: 'Clear', type: ['PDF', 'DOCX'], img: '/path/to/Clear.png' },
+  { id: 6, name: 'Vivid', type: ['PDF', 'DOCX'], img: '/path/to/Vivid.png' },
   // Add more templates as needed
 ];
 

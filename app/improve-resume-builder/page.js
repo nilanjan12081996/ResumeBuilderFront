@@ -1746,14 +1746,13 @@ const page = () => {
                                                 </div>
                                                 <div>
                                                   <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                                  <textarea
+                                                  <TipTapEditor
                                                     placeholder="e.g. Graduated with High Honors."
                                                     value={edu.description}
                                                     onChange={(e) =>
                                                       handleEducationUpdate(index, edu.id, "description", e.target.value)
-                                                    }
-                                                    className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
-                                                  />
+                                                    } 
+                                                  /> 
                                                 </div>
 
                                               </AccordionContent>
@@ -1862,12 +1861,11 @@ const page = () => {
 
                                               <div>
                                                 <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                                <textarea
+                                                <TipTapEditor
                                                   value={cert.description}
                                                   onChange={(e) =>
                                                     handleCertUpdate(index, cert.id, "description", e.target.value)
                                                   }
-                                                  className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
                                                 />
                                               </div>
 
