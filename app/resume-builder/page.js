@@ -92,6 +92,7 @@ import CleanTemplate from '../TemplateNew/CleanTemplate';
 import ClearTemplate from '../TemplateNew/ClearTemplate';
 import VividTemplate from '../TemplateNew/VividTemplate';
 import CustomizeSection from '../ui/CustomizeSection';
+import { useTabs } from '../context/TabsContext';
 
 
 const page = () => {
@@ -360,31 +361,21 @@ const page = () => {
     setValue("profileImage", "");
   };
 
-
-
-
-
-
-
-
-
-
-
-
+  const { activeTab } = useTabs();
 
   return (
     <div>
       <Tabs>
         <div className='resume_tab_scrach mb-4 px-8'>
 
-          <div className='p-0'>
+          {/* <div className='p-0'>
             <div className='tab_point'>
               <TabList>
                 <Tab>Edit</Tab>
                 <Tab>Customize</Tab>
               </TabList>
             </div>
-          </div>
+          </div> */}
 
 
         </div>
@@ -393,7 +384,7 @@ const page = () => {
           <ToastContainer />
           <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
 
-            <TabPanel>
+            {activeTab === 'edit' ?
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                   <div className='mb-10'>
@@ -940,15 +931,15 @@ const page = () => {
                   </div>
                 </form>
               </FormProvider>
-            </TabPanel>
-            <TabPanel>
+              :
+
               <CustomizeSection
                 selectedTemplate={selectedTemplate}
                 onSelectTemplate={handleSelectTemplate}
                 themeColor={themeColor}
                 setThemeColor={setThemeColor}
               />
-            </TabPanel>
+            }
           </div>
 
           <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
@@ -984,7 +975,7 @@ const page = () => {
               {/* <CleanTemplate formData={formValues} empHistory={empHistory} /> */}
               {/* <ClearTemplate formData={formValues} empHistory={empHistory} /> */}
               {/* <VividTemplate formData={formValues} empHistory={empHistory} /> */}
-              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor}/>
+              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} />
 
 
 

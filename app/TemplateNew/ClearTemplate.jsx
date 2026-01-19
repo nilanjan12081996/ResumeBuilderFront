@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, Phone, Mail, MapPin, Calendar } from 'lucide-react'; // Assuming you have lucide-react or similar icons
 
-const ClearTemplate = ({ formData }) => {
+const ClearTemplate = ({ formData, themeColor }) => {
 
   // --- Helpers ---
   const formatDate = (dateValue) => {
@@ -37,7 +37,7 @@ const ClearTemplate = ({ formData }) => {
     <div className="min-h-[297mm] bg-white text-gray-800 font-sans shadow-xl">
       
       {/* ----------------- HEADER (TEAL BLOCK) ----------------- */}
-      <div className="bg-[#4fffa3] p-10 flex items-center gap-6">
+      <div className=" p-10 flex items-center gap-6"  style={{ backgroundColor: themeColor }}>
         
         {/* Optional: Profile Image (Hidden if not provided, per design thumbnail) */}
         {formData.profileImage && (

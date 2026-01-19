@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-const Professional = ({ formData ,empHistory}) => {
+const Professional = ({ formData ,empHistory, themeColor}) => {
   // 1. Match the snake_case logic from your form's register calls
 
   console.log("formData",formData);
@@ -23,7 +23,7 @@ const Professional = ({ formData ,empHistory}) => {
     <div className="min-h-[297mm] bg-white shadow-xl flex text-sm font-sans">
       
       {/* ----------------- LEFT SIDEBAR ----------------- */}
-      <div className="w-[35%] bg-[#0e3f36] text-white p-8 flex flex-col gap-6 items-center text-center">
+      <div className="w-[35%] text-white p-8 flex flex-col gap-6 items-center text-center" style={{ backgroundColor: themeColor}}>
         
         {/* Profile Image */}
         {formData.profileImage && (
