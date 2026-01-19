@@ -59,9 +59,6 @@ import ImpAtsScoreAnalyzeModal from '../modal/ImpAtsScoreAnalyzeModal';
 import { addCountResume, addCountResumeOrg } from '../reducers/ResumeSlice';
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-// import htmlDocx from "html-docx-js/dist/html-docx";
-// import juice from 'juice';
-// import html2docx from "html2docx";
 import {
   DndContext,
   closestCenter,
@@ -79,11 +76,15 @@ import { HiDocumentText, HiArrowPath } from "react-icons/hi2";
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 import { PiReadCvLogoDuotone } from 'react-icons/pi';
 import { useTabs } from '../context/TabsContext.js';
-import CustomizeResume from '../ui/CustomizeResume.jsx';
-
+import CustomizeSection from '../ui/CustomizeSection.jsx';
+import Professional from "../TemplateNew/Professional";
+import PrimeATS from "../TemplateNew/PrimeATS";
+import CleanTemplate from "../TemplateNew/CleanTemplate";
+import ClearTemplate from "../TemplateNew/ClearTemplate";
+import VividTemplate from "../TemplateNew/VividTemplate";
 
 const page = () => {
-  // const { improveResumeData } = useSelector((state) => state?.dash)
+  const { improveResumeData } = useSelector((state) => state?.dash)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
@@ -102,17 +103,6 @@ const page = () => {
   const [activeExpId, setActiveExpId] = useState(null);
 
 
-  // useEffect(() => {
-  //   dispatch(jdBasedResumeDetails({ jd_resume_id: id }))
-  // }, [id])
-
-  const { error, improveResumeData, loading, getUpdateResumeInfoData, atsScoreAnalyzeData, impEnUsageInfo } = useSelector((state) => state?.dash)
-
-
-  // console.log("improveResumeData", improveResumeData);
-  console.log("getUpdateResumeInfoData", getUpdateResumeInfoData);
-
- 
   const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
   const [atsData, setAtsData] = useState(null)
   const [enhancing, setEnhancing] = useState(false);
@@ -120,6 +110,21 @@ const page = () => {
 
   // const [resumeid, setResumeid] = useState();
   const { profileData } = useSelector((state) => state?.profile)
+  const [selectedTemplate, setSelectedTemplate] = useState('Professional');
+  const [themeColor, setThemeColor] = useState('#000000');
+  const templateMap = {
+    professional: Professional,
+    ats: PrimeATS,
+    clean: CleanTemplate,
+    clear: ClearTemplate,
+    vivid: VividTemplate,
+    corporate: CorporateTemplate,
+  };
+  const handleSelectTemplate = (id) => {
+    setSelectedTemplate(id);
+  };
+  const ActiveResume = templateMap[selectedTemplate] || Professional;
+  console.log('improveResumeData', improveResumeData)
 
   const tabColors = [
     "#ffeaec", // 1st tab
@@ -152,88 +157,7 @@ const page = () => {
     formState: { errors },
   } = useForm();
 
-
-
-
-
-
-
-
-  // Dynamic ATS Score Component
-  const ATSScoreComponent = ({ score, label = "Resume Score" }) => {
-    const clamped = Math.min(Math.max(score || 0, 0), 100);
-    const max = 100;
-    const circumference = 2 * Math.PI * 60; // radius = 60
-    const progress = (clamped / max) * circumference;
-
-    // Color based on score
-    let ringColor = "#ef4444"; // red
-    let badgeBg = "bg-red-100 text-red-800";
-
-    if (clamped >= 80) {
-      ringColor = "#22c55e"; // green
-      badgeBg = "bg-green-100 text-green-800";
-    } else if (clamped >= 60) {
-      ringColor = "#f59e0b"; // yellow
-      badgeBg = "bg-yellow-100 text-yellow-800";
-    }
-
-    return (
-      <div className="flex justify-center">
-        <div
-          className="flex flex-col items-center rounded-2xl bg-white p-4 shadow-lg"
-          aria-label={`${label}: ${clamped} out of ${max}`}
-          role="img"
-        >
-          <div style={{ width: 140, height: 140 }} className="relative">
-            <svg
-              width={140}
-              height={140}
-              viewBox="0 0 140 140"
-              className="block"
-            >
-              {/* Track */}
-              <circle
-                cx={70}
-                cy={70}
-                r={60}
-                fill="none"
-                stroke="#e5e7eb"
-                strokeWidth={12}
-              />
-              {/* Progress */}
-              <circle
-                cx={70}
-                cy={70}
-                r={60}
-                fill="none"
-                stroke={ringColor}
-                strokeWidth={12}
-                strokeLinecap="round"
-                strokeDasharray={`${progress} ${circumference - progress
-                  }`}
-                transform="rotate(-90 70 70)"
-              />
-            </svg>
-
-            {/* Center value */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xl font-semibold text-gray-700">
-                {clamped}/{max}
-              </span>
-            </div>
-          </div>
-
-          {/* Label badge */}
-          <div
-            className={`mt-3 rounded-lg px-3 py-1 text-sm font-semibold ${badgeBg}`}
-          >
-            {label}
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const formValues = watch();
 
   const onSubmit = async (data) => {
     console.log("data", data);
@@ -241,107 +165,177 @@ const page = () => {
 
   }
 
-  const [sections, setSections] = useState([
+  const [sections, setSections] = useState([]);
+  const mapImproveResumeDataToSections = (resumeData) => {
+    if (!resumeData) return [];
 
-    {
-      id: 0,
-      title: 'Skills',
-      type: 'skills',
-      skills: [
-        { id: 's1', name: 'Java', level: 3 },
-        { id: 's2', name: 'Python', level: 4 }
-      ]
-    },
-    { id: 1, title: 'Professional Summary', type: 'summary' },
-    {
-      id: 2,
-      title: 'Education',
-      type: 'education',
-      educations: [
-        {
-          id: 'e1',
-          institute: 'Webskitters Academy',
-          degree: 'Frontend Developer Training',
-          startDate: '',
-          endDate: '',
-          city: 'Kolkata',
-          description: ''
-        },
-        {
-          id: 'e2',
-          institute: 'Netaji Subhas Open University',
-          degree: 'Bachelor of Arts',
-          startDate: '',
-          endDate: '',
-          city: 'Bagnan, Howrah',
-          description: ''
-        }
-      ]
-    },
-    {
-      id: 3,
-      title: "Certifications",
-      type: "certifications",
-      certifications: [
-        {
-          id: "c1",
-          name: "Frontend Developer (React JS)",
-          organization: "Webskitters Academy",
-          city: "",
-          startYear: "2024",
-          endYear: "2025",
-          description: ""
-        },
-        {
-          id: "c2",
-          name: "Code With Puja Contest Award",
-          organization: "Webskitters Academy",
-          city: "",
-          startYear: "2024",
-          endYear: "2025",
-          description: ""
-        }
-      ]
-    },
-    {
-      id: 4,
-      title: "Experience",
-      type: "experience",
-      experiences: [
-        {
-          id: "x1",
-          jobTitle: "Freelance HTML Developer",
-          company: "Self-employed",
-          city: "",
-          startDate: "Sept, 2023",
-          endDate: "May, 2024",
-          description: "Developed responsive and user-friendly websites using HTML, CSS, JavaScript, and modern frontend best practices while converting Figma and PSD designs into pixel-perfect web pages with full cross-browser compatibility. Improved website performance and accessibility by optimizing layouts, images, and reusable components and worked directly with clients to understand requirements, implement revisions, and deliver high-quality projects within deadlines."
-        },
-        {
-          id: "x2",
-          jobTitle: "Frontend Developer (Trainee)",
-          company: "Webskitters Technology Solutions",
-          city: "",
-          startDate: "Jun, 2024",
-          endDate: "Apr, 2025",
-          description: "Worked on real-world frontend applications using React.js, JavaScript, HTML, CSS, and Bootstrap by building reusable UI components and implementing dynamic features based on project requirements. Integrated REST APIs using Axios and React hooks, collaborated with designers and backend developers, fixed UI bugs, improved performance, and followed clean coding and best development practices."
-        }
-      ]
+    const sections = [];
+    let id = 0;
+
+    /* ================= TECHNICAL SKILLS ================= */
+    const techCategories = resumeData?.technical_skills?.categories || {};
+    const techSkills = Object.values(techCategories).flat();
+
+    if (techSkills.length > 0) {
+      sections.push({
+        id: id++,
+        title:
+          (resumeData?.soft_skills || []).length > 0
+            ? "Technical Skills"
+            : "Skills",
+        type: "skills",
+        skills: techSkills.map((skill, i) => ({
+          id: `ts_${i}_${Date.now()}`,
+          name: skill,
+          level: 3,
+        })),
+      });
     }
-  ]);
+
+    /* ================= SOFT SKILLS ================= */
+    if ((resumeData?.soft_skills || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Soft Skills",
+        type: "skills",
+        skills: resumeData.soft_skills.map((skill, i) => ({
+          id: `ss_${i}_${Date.now()}`,
+          name: skill,
+          level: 3,
+        })),
+      });
+    }
+
+    /* ================= SUMMARY ================= */
+    if (resumeData?.professional_summary?.summary_text) {
+      sections.push({
+        id: id++,
+        title: "Professional Summary",
+        type: "summary",
+        summary: resumeData.professional_summary.summary_text,
+      });
+    }
+
+    /* ================= EDUCATION ================= */
+    if ((resumeData?.education || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Education",
+        type: "education",
+        educations: resumeData.education.map((edu, i) => ({
+          id: `e_${i}_${Date.now()}`,
+          institute: edu.institution || "",
+          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`,
+          startDate: "",
+          endDate: edu.graduation_date || "",
+          city: edu.location || "",
+          description: "",
+        })),
+      });
+    }
+
+    /* ================= CERTIFICATIONS ================= */
+    if ((resumeData?.certifications || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Certifications",
+        type: "certifications",
+        certifications: resumeData.certifications.map((c, i) => ({
+          id: `c_${i}_${Date.now()}`,
+          name: c.name || "",
+          organization: c.organization || "",
+          city: "",
+          startYear: "",
+          endYear: "",
+          description: "",
+        })),
+      });
+    }
+
+    /* ================= EXPERIENCE ================= */
+    if ((resumeData?.work_experience || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Experience",
+        type: "experience",
+        experiences: resumeData.work_experience.map((exp, i) => ({
+          id: `x_${i}_${Date.now()}`,
+          jobTitle: exp.job_title || "",
+          company: exp.company_name || "",
+          city: exp.location || "",
+          startDate: exp.start_date || "",
+          endDate: exp.end_date || "",
+          description: (exp.responsibilities || []).join("<br/>"),
+        })),
+      });
+    }
+
+    return sections;
+  };
+
+
+  useEffect(() => {
+    if (!improveResumeData?.resume_data) return;
+
+    const resumeData = improveResumeData.resume_data;
+
+    const personal = resumeData.personal_information || {};
+    const meta = resumeData.metadata || {};
+
+    /* -------- SUMMARY LOGIC -------- */
+    const profileSummaryFromAdditional =
+      resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
+
+    const summaryPoints =
+      Array.isArray(profileSummaryFromAdditional) &&
+        profileSummaryFromAdditional.length > 0
+        ? profileSummaryFromAdditional
+        : resumeData?.professional_summary?.summary_text
+          ? [resumeData.professional_summary.summary_text]
+          : [];
+
+    const formattedSummary =
+      summaryPoints.length > 1
+        ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : summaryPoints[0] || "";
+
+    /* -------- NAME -------- */
+    const fullName = personal.full_name || "";
+    const nameParts = fullName.split(" ");
+
+    /* -------- FORM FIELDS -------- */
+    setValue("job_target", meta.current_role || "");
+    setValue("first_name", nameParts[0] || "");
+    setValue("last_name", nameParts.slice(1).join(" ") || "");
+    setValue("email", personal.email || "");
+    setValue("phone", personal.phone || "");
+    setValue(
+      "city_state",
+      [personal.location?.city, personal.location?.state]
+        .filter(Boolean)
+        .join(", ")
+    );
+    setValue("country", personal.location?.country || "");
+    setValue("address", personal.location?.full_address || "");
+    setValue("summary", formattedSummary);
+
+    /* -------- SECTIONS -------- */
+    const mappedSections = mapImproveResumeDataToSections(resumeData);
+    setSections(mappedSections);
+    const skillSections = mappedSections.filter(sec => sec.type === "skills");
+    const mergedSkills = skillSections.flatMap(sec =>
+      (sec.skills || []).map(skill => ({
+        skill: skill.name,
+        level: skill.level ?? 3
+      }))
+    );
+
+    setValue("newSkillHistory", mergedSkills);
+
+  }, [improveResumeData, setValue]);
+
   const [draggedIndex, setDraggedIndex] = useState(null);
 
-
-
-
-  // const handleDragStart = (e, index) => {
-  //   setDraggedIndex(index);
-
-
-  //   const dragTarget = e.currentTarget;
-  //   e.dataTransfer.setDragImage(dragTarget, 20, 20);
-  //   e.dataTransfer.effectAllowed = "move";
-  // };
 
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
@@ -352,8 +346,6 @@ const page = () => {
       e.dataTransfer.setDragImage(sectionEl, 20, 20);
     }
   };
-
-
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
@@ -371,22 +363,17 @@ const page = () => {
     if (draggedIndex === targetIndex) return;
 
     const updatedSections = [...sections];
-    // 1. Remove the dragged item
     const [draggedItem] = updatedSections.splice(draggedIndex, 1);
-    // 2. Insert it at the new target position
     updatedSections.splice(targetIndex, 0, draggedItem);
 
     setSections(updatedSections);
     setDraggedIndex(null);
   };
 
-
-  // Add state to track which sub-skill is being dragged
   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
 
-  // --- Skill Drag Handlers ---
   const handleSkillDragStart = (e, index) => {
-    e.stopPropagation(); // Stops the parent section from dragging
+    e.stopPropagation();
     setDraggedSkillIndex(index);
   };
 
@@ -399,7 +386,6 @@ const page = () => {
     const updatedSections = [...sections];
     const skillsList = [...updatedSections[sectionIndex].skills];
 
-    // Reorder the skills array
     const [movedSkill] = skillsList.splice(draggedSkillIndex, 1);
     skillsList.splice(targetSkillIndex, 0, movedSkill);
 
@@ -418,7 +404,6 @@ const page = () => {
   };
 
 
-  // for Education 
   const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
   const handleEducationDragStart = (e, index) => {
     e.stopPropagation();
@@ -458,7 +443,7 @@ const page = () => {
     const updatedSections = [...sections];
 
     const newEducation = {
-      id: `e${Date.now()}`, // temporary unique id
+      id: `e${Date.now()}`,
       institute: "",
       degree: "",
       startDate: "",
@@ -657,7 +642,7 @@ const page = () => {
                             type="text"
                             placeholder="Enter Your Job Title"
                             className="mt-1 w-full rounded-lg"
-                            {...register("job_title")}
+                            {...register("job_target")}
                           />
                         </div>
 
@@ -696,7 +681,7 @@ const page = () => {
                             type="text"
                             placeholder="Email"
                             className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                            {...register("email_add")}
+                            {...register("email")}
                           />
                         </div>
 
@@ -709,7 +694,7 @@ const page = () => {
                             type="text"
                             placeholder="Phone No."
                             className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                            {...register("phone_no")}
+                            {...register("phone")}
                           />
                         </div>
 
@@ -980,8 +965,8 @@ const page = () => {
                                   </div>
 
                                   <TipTapEditor
-                                    value={watch("goal") || ""}
-                                    onChange={(text) => setValue("goal", text)}
+                                    value={watch("summary") || ""}
+                                    onChange={(text) => setValue("summary", text)}
                                   />
 
                                   <div className="relative flex justify-end mt-1">
@@ -998,8 +983,8 @@ const page = () => {
                                       open={aiModalOpen}
                                       onClose={() => setAiModalOpen(false)}
                                       aiType="imp_summary"
-                                      initialText={watch("goal") || ""}
-                                      onApply={(text) => setValue("goal", text)}
+                                      initialText={watch("summary") || ""}
+                                      onApply={(text) => setValue("summary", text)}
                                     />
                                   </div>
                                 </div>
@@ -1339,14 +1324,6 @@ const page = () => {
                                                     handleExpUpdate(index, exp.id, "description", html)
                                                   }
                                                 />
-
-                                                {/* <textarea
-                                                  value={exp.description}
-                                                  onChange={(e) =>
-                                                    handleExpUpdate(index, exp.id, "description", e.target.value)
-                                                  }
-                                                  className="w-full h-28 rounded-md border border-gray-300 p-2 text-sm resize-none"
-                                                /> */}
                                                 <div className="relative flex justify-end mt-1">
                                                   <button
                                                     type="button"
@@ -1404,7 +1381,12 @@ const page = () => {
         </form>
           :
           <div>
-            <CustomizeResume />
+            <CustomizeSection
+              selectedTemplate={selectedTemplate}
+              onSelectTemplate={handleSelectTemplate}
+              themeColor={themeColor}
+              setThemeColor={setThemeColor}
+            />
           </div>
         }
 
@@ -1412,12 +1394,12 @@ const page = () => {
       <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] py-5 px-0'>
         <div className='h-screen overflow-y-scroll rounded-[8px]'>
           <div ref={componentRef} className=''>
-            <DynamicTemplate
+            {/* <DynamicTemplate
               levels={levels}
               sections={sections}
-            // data={formValues}
-            />
+            /> */}
             {/* <CorporateTemplate/> */}
+            <ActiveResume formData={formValues} themeColor={themeColor} />
           </div>
         </div>
       </div>
@@ -1426,7 +1408,7 @@ const page = () => {
         show={openJdAtsModal}
         setShow={setOpenJdAtsModal}
         atsData={atsData}
-      />     
+      />
     </div>
   )
 }

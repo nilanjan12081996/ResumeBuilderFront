@@ -77,16 +77,6 @@ import LinkedInChooseModal from "./LinkedInChooseModal";
 import ImproveResumeChooseModal from "./ImproveResumeChooseModal";
 import { addCountResume, addCountResumeOrg } from "../reducers/ResumeSlice";
 
-// import ActivateNewSubscriber from "../assets/imagesource/Activate_New_Subscriber.png";
-// import BalanceInfo from "../assets/imagesource/Balance_Info.png";
-// import QuerySim from "../assets/imagesource/Query Sim.png";
-// import DeactivateSim from "../assets/imagesource/Deactivate_Sim.png";
-// import ReactivateSim from "../assets/imagesource/Reactivate_Sim.png";
-// import AddWFC from "../assets/imagesource/Add_WFC.png";
-// import E911Address from "../assets/imagesource/E911_Address.png";
-// import GetCoverageInfo from "../assets/imagesource/Get_Coverage-Info.png";
-// import purchasePlan from "../assets/imagesource/purchase_plan.png";
-// import changePlan from "../assets/imagesource/change_plan.png";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -140,29 +130,18 @@ const Page = () => {
   const [openATSmodal, setopenATSmodal] = useState(false);
   const [ATSscore, setATSscore] = useState(0);
 
-  const [selectedResume, setSelectedResume] = useState(null);
 
   const alertContinueHandler = () => {
     setOpenModalImproveexistingResume(false);
     setOpenModalAlertModal(true);
   };
 
-  const resumeBuilderHandler = () => {
-    if (!selectedResume) {
-      toast.error("Please select a resume first!");
-      return;
-    }
-    router.push(`/resume-builder?template=${selectedResume}`);
-  };
 
   const HandlerLinkedInRewrite = (id) => {
     const encodedId = btoa(id);
     router.push(`/linkedIn-rewrite?id=${encodedId}`);
   };
 
-  const handleSelect = (id) => {
-    setSelectedResume(id);
-  };
 
   // clear file input
   const clearFileInput = () => {
@@ -172,12 +151,8 @@ const Page = () => {
       fileInput1.value = "";
     }
 
-    // clear state variables if you are tracking them
   };
-  const handleNavigate = () => {
-    console.log("selectedResume", selectedResume);
-    setOpenImproveResumeChooseModal(true);
-  };
+
 
   const {
     register,
@@ -196,494 +171,226 @@ const Page = () => {
     }
   }, [resumeFile]);
 
-  const handleResumeImprove = (data) => {
-    console.log("Form data received:", data);
-    console.log("Resume file:", data.resume_file);
+  // const handleResumeImprove = (data) => {
+  //   console.log("Form data received:", data);
+  //   console.log("Resume file:", data.resume_file);
 
-    const formData = new FormData();
+  //   const formData = new FormData();
 
-    // Check if linkedin_profile_file exists and append it
-    // if (data.linkedin_profile_file && data.linkedin_profile_file[0]) {
-    //   formData.append("linkedin_profile_file", data.linkedin_profile_file[0] || null);
-    // } else{
-    //   formData.append("linkedin_profile_file", null);
-    // }
-
-    // Check if resume_file exists and append it
-    if (data.resume_file && data.resume_file[0]) {
-      console.log("Appending resume file:", data.resume_file[0]);
-      formData.append("resume_file", data.resume_file[0]);
-    } else {
-      console.error("No resume file selected");
-      // alert("Please select a resume file to upload");
-      toast.error("Please select a resume file to upload");
-      return;
-    }
-    data.linkedin_profile &&
-      formData.append("linkedin_profile", data.linkedin_profile);
-    data.portfolio_link &&
-      formData.append("portfolio_link", data.portfolio_link);
-    data.github_profile &&
-      formData.append("github_profile", data.github_profile);
-    data.other_link && formData.append("other_link", data.other_link);
-
-    // Log FormData contents for debugging
-    console.log("FormData contents:");
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    // dispatch(improveResume(formData))
-    //   .then((res) => {
-    //     console.log("res?.payload?.data?.id", res?.payload?.data?.id);
-    //     setImproveResumeId(res?.payload?.data?.id);
-    //     const userData = {
-    //       imp_resume_id: res?.payload?.data?.id,
-    //       raw_data: res?.payload?.raw_data,
-    //     };
-    //     const rawDataExperience = res?.payload?.raw_data?.experience?.steps?.[0]?.Experience;
-    //     if (rawDataExperience) {
-    //       localStorage.setItem('imp_resume_raw_experience', JSON.stringify(rawDataExperience));
-    //     }
-    //     const questionPayload = {
-    //       imp_resume_id: res?.payload?.data?.id,
-    //       generated_questions: res?.payload?.generated_questions,
-    //     }
-
-    //     dispatch(checkATS(userData))
-    //       .then((res) => {
-    //         // toast.success(res?.payload?.message || "ATS score");
-    //         console.log("ATSresponse", res);
-    //         setATSscore(res?.payload?.data?.old_ats);
-    //         setopenATSmodal(true);
-    //       })
-    //       .catch((err) => {
-    //         console.log("err", err);
-    //       });
-    //     // add questions 
-    //     dispatch(addImpQuestions(questionPayload))
-    //       .then((res) => {
-    //         console.log("addImpQuestions", res);
-    //       })
-    //       .catch((err) => {
-    //         console.log("err", err);
-    //       });
-
-    //   })
-    //   .catch((err) => {
-    //     console.log("err", err);
-    //     toast.error(
-    //       err?.message || "An error occurred while improving the resume."
-    //     );
-    //   });
-    // clearFileInput();
-
-    // dispatch(improveResume(formData))
-    //   .then(async (res) => {
-    //     const payload = res?.payload;
-    //     console.log('payload',payload)
-
-    //     // ❌ Stop everything if improveResume failed
-    //     if (payload?.status_code !== 201) {
-    //       toast.error(payload?.message || "Resume extraction failed", {
-    //         autoClose: false,
-    //       });
-    //       return;
-    //     }
-
-    //     /* ===================== BASIC DATA ===================== */
-    //     const resumeid = payload?.data?.id;
-    //     setImproveResumeId(resumeid);
-
-    //     const rawDataExperience =
-    //       payload?.raw_data?.experience?.steps?.[0]?.Experience;
-
-    //     if (rawDataExperience) {
-    //       localStorage.setItem(
-    //         "imp_resume_raw_experience",
-    //         JSON.stringify(rawDataExperience)
-    //       );
-    //     }
-
-    //     /* ===================== UPDATE BASIC INFO ===================== */
-    //     console.log("sp")
-    //     await dispatch(
-    //       updateBasicInfo({
-    //         basic_info_id: basicInfoId,
-    //         SuggestedRole: data.title || "",
-    //         CandidateFullName: data.full_name || "",
-    //         EmailAddress: data.email || "",
-    //         PhoneNumber: data.phone || "",
-    //         ProfessionalTitle: data.title || "",
-    //         Summary: data.goal || "",
-    //         location: data.location || "",
-    //       })
-    //     );
-
-    //     /* ===================== EXPERIENCE ===================== */
-    //     const experiencePayload = experiences.map((exp) => ({
-    //       id: exp.id && exp.id.toString().includes("exp-") ? null : exp.id,
-    //       CompanyName: exp.company_name || null,
-    //       Position: exp.position || null,
-    //       Duration: {
-    //         StartDate: exp.start_date
-    //           ? convertToSubmitFormat(exp.start_date)
-    //           : null,
-    //         EndDate: exp.current_work
-    //           ? "Present"
-    //           : exp.end_date
-    //             ? convertToSubmitFormat(exp.end_date)
-    //             : null,
-    //       },
-    //       Location: exp.location || null,
-    //       SkillSet: exp.skill
-    //         ? exp.skill.split(",").map((s) => s.trim()).filter(Boolean)
-    //         : [],
-    //       Projects: Array.isArray(exp.projects)
-    //         ? exp.projects.map((proj) => ({
-    //           id:
-    //             proj.id && proj.id.toString().includes("proj-")
-    //               ? null
-    //               : proj.id,
-    //           Project_title: proj.title || null,
-    //           Role: proj.role || null,
-    //           Description: proj.description || null,
-    //         }))
-    //         : [],
-    //     }));
-
-    //     await dispatch(updateExperience({ resumeid, data: experiencePayload }));
-
-    //     /* ===================== EDUCATION ===================== */
-    //     const educationPayload = educationEntries.map((edu) => ({
-    //       id: edu.id && edu.id.toString().includes("edu-") ? null : edu.id,
-    //       CollegeUniversity: edu.institution || "",
-    //       Location: edu.location || "",
-    //       CourseDegree: edu.degree || "",
-    //       GraduationYear: edu.end_time
-    //         ? new Date(edu.end_time).getFullYear().toString()
-    //         : "",
-    //       GPAorGrade:
-    //         edu.cgpa && Number(edu.cgpa) !== 0 ? String(edu.cgpa) : "",
-    //       AdditionalInformation: edu.additionalInfo || "",
-    //     }));
-
-    //     await dispatch(updateEducation({ resumeid, data: educationPayload }));
-
-    //     /* ===================== SKILLS ===================== */
-    //     await dispatch(
-    //       updateSkills({
-    //         resumeid,
-    //         data: skills.map((sk) => ({
-    //           id:
-    //             sk.id && sk.id.toString().includes("skill-") ? null : sk.id,
-    //           Skill_Category: sk.skill_category || "",
-    //           Skills: sk.skill
-    //             ? sk.skill.split(",").map((s) => s.trim()).filter(Boolean)
-    //             : [],
-    //         })),
-    //       })
-    //     );
-
-    //     /* ===================== LANGUAGES ===================== */
-    //     await dispatch(
-    //       updateLanguage({
-    //         resumeid,
-    //         data: languages.map((lang) => ({
-    //           id:
-    //             lang.id && lang.id.toString().includes("lang-") ? null : lang.id,
-    //           Language: lang.language_name || "",
-    //           proficiency: lang.proficiency || "",
-    //         })),
-    //       })
-    //     );
-
-    //     /* ===================== EXTRA PROJECTS ===================== */
-    //     await dispatch(
-    //       updateExtraProject({
-    //         resumeid,
-    //         data: personalPro.map((p) => ({
-    //           id: p.id && p.id.toString().includes("proj-") ? null : p.id,
-    //           ProjectName: p.project_title || "",
-    //           Description: p.description || "",
-    //           Technologies: p.skill
-    //             ? p.skill.split(",").map((t) => t.trim()).filter(Boolean)
-    //             : [],
-    //           YourRole: p.role || "",
-    //           Duration: {
-    //             StartDate: p.start_time
-    //               ? convertToSubmitFormat(p.start_time)
-    //               : "",
-    //             EndDate: p.end_time
-    //               ? convertToSubmitFormat(p.end_time)
-    //               : "",
-    //           },
-    //         })),
-    //       })
-    //     );
-
-    //     /* ===================== CERTIFICATIONS ===================== */
-    //     await dispatch(
-    //       updateCertification({
-    //         resumeid,
-    //         data: certificates.map((cer) => ({
-    //           id:
-    //             cer.id && cer.id.toString().includes("cert-")
-    //               ? null
-    //               : cer.id,
-    //           CertificationName: cer.certification_name || "",
-    //           Issuing_Organization: cer.issuing_organization || "",
-    //           DateObtained: cer.obtained_date
-    //             ? convertToSubmitFormat(cer.obtained_date)
-    //             : "",
-    //           Certification_ID: cer.certification_id || "",
-    //           Description: "",
-    //         })),
-    //       })
-    //     );
-
-    //     /* ===================== ACHIEVEMENTS ===================== */
-    //     await dispatch(
-    //       updateAchievements({
-    //         resumeid,
-    //         data: achivments.map((ach) => ({
-    //           id:
-    //             ach.id && ach.id.toString().includes("ach-") ? null : ach.id,
-    //           Achievement_Titlee: ach.achievement_title || "",
-    //           Issuing_Organization: ach.organization || "",
-    //           Date_Received: ach.receive_date
-    //             ? convertToSubmitFormat(ach.receive_date)
-    //             : "",
-    //           Description: ach.description || "",
-    //         })),
-    //       })
-    //     );
-
-    //     /* ===================== ATS ===================== */
-    //     dispatch(
-    //       checkATS({
-    //         imp_resume_id: resumeid,
-    //         raw_data: payload?.raw_data,
-    //       })
-    //     ).then((atsRes) => {
-    //       if (atsRes?.payload?.status_code === 200) {
-    //         setATSscore(atsRes?.payload?.data?.old_ats);
-    //         setopenATSmodal(true);
-    //       }
-    //     });
-
-    //     /* ===================== QUESTIONS ===================== */
-    //     dispatch(
-    //       addImpQuestions({
-    //         imp_resume_id: resumeid,
-    //         generated_questions: payload?.generated_questions,
-    //       })
-    //     );
-
-
-    //     await dispatch(getUpdateResumeInfo({ id: resumeid }));
-
-    //     console.log("✅ All updates completed successfully");
-    //   })
-    //   .catch(() => {
-    //     toast.error("Something went wrong while improving resume");
-    //   })
-    //   .finally(() => {
-    //     clearFileInput();
-    //   });
-
-    dispatch(improveResume(formData))
-      .then(async (res) => {
-        const payload = res?.payload;
-        console.log("payload", payload);
-
-        // ✅ Only success case
-        if (payload?.status_code !== 201) return;
-
-        /* ===================== RESUME ID ===================== */
-        const resumeid = payload?.data?.id;
-        setImproveResumeId(resumeid);
-
-        /* ===================== RAW EXPERIENCE (LOCAL STORAGE) ===================== */
-        const rawDataExperience =
-          payload?.raw_data?.experience?.steps?.[0]?.Experience;
-
-        if (rawDataExperience) {
-          localStorage.setItem(
-            "imp_resume_raw_experience",
-            JSON.stringify(rawDataExperience)
-          );
-        }
-
-        const raw = payload?.raw_data || {};
-        /* ===================== BASIC INFO ===================== */
-        const basicInfoData = {
-          SuggestedRole: raw?.suggested_role || "",
-          CandidateFullName: raw?.full_name || "",
-          EmailAddress: raw?.email || "",
-          PhoneNumber: raw?.phone || "",
-          ProfessionalTitle: raw?.professional_title || "",
-          Summary: raw?.summary || "",
-          location: raw?.location || "",
-        };
-
-        await dispatch(
-          updateBasicInfo({
-            resumeid: resumeid,  
-            data: basicInfoData       
-          })
-        );
-
-        /* ===================== EXPERIENCE ===================== */
-        const experiencePayload =
-          raw?.experience?.steps?.[0]?.Experience?.map((exp) => ({
-            id: null,
-            CompanyName: exp?.CompanyName || "",
-            Position: exp?.Position || "",
-            Duration: {
-              StartDate: exp?.Duration?.StartDate || "",
-              EndDate: exp?.Duration?.EndDate || "",
-            },
-            Location: exp?.Location || "",
-            SkillSet: exp?.SkillSet || [],
-            Projects: exp?.Projects?.map((proj) => ({
-              id: null,
-              Project_title: proj?.Project_title || "",
-              Role: proj?.Role || "",
-              Description: proj?.Description || "",
-            })) || [],
-          })) || [];
-
-        if (experiencePayload.length) {
-          await dispatch(updateExperience({ resumeid, data: experiencePayload }));
-        }
-
-        /* ===================== EDUCATION ===================== */
-        const educationPayload =
-          raw?.education?.map((edu) => ({
-            id: null,
-            CollegeUniversity: edu?.CollegeUniversity || "",
-            Location: edu?.Location || "",
-            CourseDegree: edu?.CourseDegree || "",
-            GraduationYear: edu?.GraduationYear
-              ? String(edu.GraduationYear)
-              : "",
-            GPAorGrade:
-              edu?.GPAorGrade && Number(edu.GPAorGrade) !== 0
-                ? String(edu.GPAorGrade)
-                : "",
-            AdditionalInformation: edu?.AdditionalInformation || "",
-          })) || [];
-
-        if (educationPayload.length) {
-          await dispatch(updateEducation({ resumeid, data: educationPayload }));
-        }
-
-        /* ===================== SKILLS ===================== */
-        const skillsPayload =
-          raw?.skills?.map((sk) => ({
-            id: null,
-            Skill_Category: sk?.Skill_Category || "",
-            Skills: sk?.Skills || [],
-          })) || [];
-
-        if (skillsPayload.length) {
-          await dispatch(updateSkills({ resumeid, data: skillsPayload }));
-        }
-
-        /* ===================== LANGUAGES ===================== */
-        const languagePayload =
-          raw?.languages?.map((lang) => ({
-            id: null,
-            Language: lang?.Language || "",
-            proficiency: lang?.Proficiency || "",
-          })) || [];
-
-        if (languagePayload.length) {
-          await dispatch(updateLanguage({ resumeid, data: languagePayload }));
-        }
-
-        /* ===================== ACHIEVEMENTS ===================== */
-        const achievementPayload =
-          raw?.achievements?.map((ach) => ({
-            id: null,
-            Achievement_Titlee: ach?.Achievement_Titlee || "",
-            Issuing_Organization: ach?.Issuing_Organization || "",
-            Date_Received: ach?.Date_Received || "",
-            Description: ach?.Description || "",
-          })) || [];
-
-        if (achievementPayload.length) {
-          await dispatch(
-            updateAchievements({ resumeid, data: achievementPayload })
-          );
-        }
-
-        /* ===================== ATS CHECK ===================== */
-        const atsRes = await dispatch(
-          checkATS({
-            imp_resume_id: resumeid,
-            raw_data: raw,
-          })
-        );
-
-        if (atsRes?.payload?.status_code === 200) {
-          setATSscore(atsRes?.payload?.data?.old_ats);
-          setopenATSmodal(true);
-        }
-
-        /* ===================== QUESTIONS ===================== */
-        if (payload?.generated_questions) {
-          await dispatch(
-            addImpQuestions({
-              imp_resume_id: resumeid,
-              generated_questions: payload.generated_questions,
-            })
-          );
-        }
-
-        /* ===================== FINAL FETCH ===================== */
-        await dispatch(getUpdateResumeInfo({ id: resumeid }));
-
-        console.log("✅ Resume improve flow completed successfully");
-      })
-      .catch(() => {
-        toast.error("Something went wrong while improving resume");
-      })
-      .finally(() => {
-        clearFileInput();
-      });
-
-
-
-  };
-
-  // const onSubmit = (data) => {
-  //   if (profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1) {
-  //     dispatch(addCountResume({ ref_type: "improve_resume" })).then((res) => {
-  //       if (res?.payload?.status_code === 200) {
-  //         handleResumeImprove(data);
-  //       } else if (res?.payload?.response?.data?.status_code === 400) {
-  //         // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-  //         toast.error(res?.payload?.response?.data?.message, {
-  //           autoClose: false,
-  //         });
-  //       }
-  //     });
+  //   if (data.resume_file && data.resume_file[0]) {
+  //     console.log("Appending resume file:", data.resume_file[0]);
+  //     formData.append("resume_file", data.resume_file[0]);
   //   } else {
-  //     dispatch(addCountResumeOrg({ ref_type: "improve_resume" })).then((res) => {
-  //       if (res?.payload?.status_code === 200) {
-  //         handleResumeImprove(data);
-  //       } else if (res?.payload?.response?.data?.status_code === 400) {
-  //         // alert("Your Plan Limit is Expired,Please Upgrade Your Plan!");
-  //         toast.error(res?.payload?.response?.data?.message, {
-  //           autoClose: false,
-  //         });
-  //       }
-  //     });
+  //     console.error("No resume file selected");
+  //     // alert("Please select a resume file to upload");
+  //     toast.error("Please select a resume file to upload");
+  //     return;
+  //   }
+  //   data.linkedin_profile &&
+  //     formData.append("linkedin_profile", data.linkedin_profile);
+  //   data.portfolio_link &&
+  //     formData.append("portfolio_link", data.portfolio_link);
+  //   data.github_profile &&
+  //     formData.append("github_profile", data.github_profile);
+  //   data.other_link && formData.append("other_link", data.other_link);
+
+  //   console.log("FormData contents:");
+  //   for (let [key, value] of formData.entries()) {
+  //     console.log(key, value);
   //   }
 
+  //   dispatch(improveResume(formData))
+  //     .then(async (res) => {
+  //       const payload = res?.payload;
+  //       console.log("payload", payload);
+
+  //       // ✅ Only success case
+  //       if (payload?.status_code !== 201) return;
+
+  //       /* ===================== RESUME ID ===================== */
+  //       const resumeid = payload?.data?.id;
+  //       setImproveResumeId(resumeid);
+
+  //       /* ===================== RAW EXPERIENCE (LOCAL STORAGE) ===================== */
+  //       const rawDataExperience =
+  //         payload?.raw_data?.experience?.steps?.[0]?.Experience;
+
+  //       if (rawDataExperience) {
+  //         localStorage.setItem(
+  //           "imp_resume_raw_experience",
+  //           JSON.stringify(rawDataExperience)
+  //         );
+  //       }
+
+  //       const raw = payload?.raw_data || {};
+  //       /* ===================== BASIC INFO ===================== */
+  //       const basicInfoData = {
+  //         SuggestedRole: raw?.suggested_role || "",
+  //         CandidateFullName: raw?.full_name || "",
+  //         EmailAddress: raw?.email || "",
+  //         PhoneNumber: raw?.phone || "",
+  //         ProfessionalTitle: raw?.professional_title || "",
+  //         Summary: raw?.summary || "",
+  //         location: raw?.location || "",
+  //       };
+
+  //       await dispatch(
+  //         updateBasicInfo({
+  //           resumeid: resumeid,  
+  //           data: basicInfoData       
+  //         })
+  //       );
+
+  //       /* ===================== EXPERIENCE ===================== */
+  //       const experiencePayload =
+  //         raw?.experience?.steps?.[0]?.Experience?.map((exp) => ({
+  //           id: null,
+  //           CompanyName: exp?.CompanyName || "",
+  //           Position: exp?.Position || "",
+  //           Duration: {
+  //             StartDate: exp?.Duration?.StartDate || "",
+  //             EndDate: exp?.Duration?.EndDate || "",
+  //           },
+  //           Location: exp?.Location || "",
+  //           SkillSet: exp?.SkillSet || [],
+  //           Projects: exp?.Projects?.map((proj) => ({
+  //             id: null,
+  //             Project_title: proj?.Project_title || "",
+  //             Role: proj?.Role || "",
+  //             Description: proj?.Description || "",
+  //           })) || [],
+  //         })) || [];
+
+  //       if (experiencePayload.length) {
+  //         await dispatch(updateExperience({ resumeid, data: experiencePayload }));
+  //       }
+
+  //       /* ===================== EDUCATION ===================== */
+  //       const educationPayload =
+  //         raw?.education?.map((edu) => ({
+  //           id: null,
+  //           CollegeUniversity: edu?.CollegeUniversity || "",
+  //           Location: edu?.Location || "",
+  //           CourseDegree: edu?.CourseDegree || "",
+  //           GraduationYear: edu?.GraduationYear
+  //             ? String(edu.GraduationYear)
+  //             : "",
+  //           GPAorGrade:
+  //             edu?.GPAorGrade && Number(edu.GPAorGrade) !== 0
+  //               ? String(edu.GPAorGrade)
+  //               : "",
+  //           AdditionalInformation: edu?.AdditionalInformation || "",
+  //         })) || [];
+
+  //       if (educationPayload.length) {
+  //         await dispatch(updateEducation({ resumeid, data: educationPayload }));
+  //       }
+
+  //       /* ===================== SKILLS ===================== */
+  //       const skillsPayload =
+  //         raw?.skills?.map((sk) => ({
+  //           id: null,
+  //           Skill_Category: sk?.Skill_Category || "",
+  //           Skills: sk?.Skills || [],
+  //         })) || [];
+
+  //       if (skillsPayload.length) {
+  //         await dispatch(updateSkills({ resumeid, data: skillsPayload }));
+  //       }
+
+  //       /* ===================== LANGUAGES ===================== */
+  //       const languagePayload =
+  //         raw?.languages?.map((lang) => ({
+  //           id: null,
+  //           Language: lang?.Language || "",
+  //           proficiency: lang?.Proficiency || "",
+  //         })) || [];
+
+  //       if (languagePayload.length) {
+  //         await dispatch(updateLanguage({ resumeid, data: languagePayload }));
+  //       }
+
+  //       /* ===================== ACHIEVEMENTS ===================== */
+  //       const achievementPayload =
+  //         raw?.achievements?.map((ach) => ({
+  //           id: null,
+  //           Achievement_Titlee: ach?.Achievement_Titlee || "",
+  //           Issuing_Organization: ach?.Issuing_Organization || "",
+  //           Date_Received: ach?.Date_Received || "",
+  //           Description: ach?.Description || "",
+  //         })) || [];
+
+  //       if (achievementPayload.length) {
+  //         await dispatch(
+  //           updateAchievements({ resumeid, data: achievementPayload })
+  //         );
+  //       }
+
+  //       /* ===================== ATS CHECK ===================== */
+  //       const atsRes = await dispatch(
+  //         checkATS({
+  //           imp_resume_id: resumeid,
+  //           raw_data: raw,
+  //         })
+  //       );
+
+  //       if (atsRes?.payload?.status_code === 200) {
+  //         setATSscore(atsRes?.payload?.data?.old_ats);
+  //         setopenATSmodal(true);
+  //       }
+
+  //       /* ===================== QUESTIONS ===================== */
+  //       if (payload?.generated_questions) {
+  //         await dispatch(
+  //           addImpQuestions({
+  //             imp_resume_id: resumeid,
+  //             generated_questions: payload.generated_questions,
+  //           })
+  //         );
+  //       }
+
+  //       /* ===================== FINAL FETCH ===================== */
+  //       await dispatch(getUpdateResumeInfo({ id: resumeid }));
+
+  //       console.log("✅ Resume improve flow completed successfully");
+  //     })
+  //     .catch(() => {
+  //       toast.error("Something went wrong while improving resume");
+  //     })
+  //     .finally(() => {
+  //       clearFileInput();
+  //     });
+
+
+
   // };
+
+const handleResumeImprove = (data) => {
+  if (!data.resume_file || !data.resume_file[0]) {
+    toast.error("Please select resume PDF");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("resume_pdf", data.resume_file[0]);
+
+ dispatch(improveResume(formData))
+  .then((res) => {
+    console.log("spres", res);
+
+    const payload = res?.payload;
+    if (!payload || payload.status !== "success") {
+      toast.error("Resume improve failed");
+      return;
+    }
+
+    router.push("/improve-resume-builder");
+  })
+  .catch(() => {
+    toast.error("Resume improve failed");
+  });
+};
+
 
   const onSubmit = (data) => {
     handleResumeImprove(data);
@@ -897,144 +604,10 @@ const Page = () => {
                 </ul>
               </div>
             </div>
-
-            {/* <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
-              <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                Resume Writing Tips
-              </h3>
-              <ul className="pl-4.5">
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Keep your resume to 1-2 pages maximum
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Use action verbs to describe your achievements
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Tailor your resume for each job application
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Include relevant keywords from the job posting
-                </li>
-                <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                  Preview carefully before submitting
-                </li>
-              </ul>
-            </div> */}
           </div>
         </div>
       </div>
-      {/* add modal for apply job start here */}
-      <Modal
-        size="7xl"
-        className="apply_modal_area"
-        show={openModalCreateResume}
-        onClose={() => setOpenModalCreateResume(false)}
-      >
-        <ModalHeader className="bg-white text-black modal_header">
-          Upload Resume or Select Resume
-        </ModalHeader>
-        <ModalBody className="bg-white p-0 rounded-b-[4px]">
-          <div className="lg:flex justify-center items-center gap-5 p-5">
-            <div className="lg:w-6/12 border border-[#DADADA] rounded-[7px] p-4 pr-0 mb-4 lg:mb-0">
-              <h3 className="text-[#151515] text-base font-medium pb-4">
-                Select resume from the list
-              </h3>
-              <ul className="grid grid-cols-2 gap-2 lg:gap-5 resume_list_area">
-                <li>
-                  <input
-                    type="radio"
-                    name="test"
-                    id="cb1"
-                    onChange={() => handleSelect(1)}
-                  />
-                  <label
-                    for="cb1"
-                    className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
-                  >
-                    <Image src={resume1} alt="resume01" className="h-[400px]" />
-                  </label>
-                  <p className="text-[#000000] text-sm lg:text-base font-semibold text-center pt-1">
-                    Modern Template
-                  </p>
-                </li>
-                <li>
-                  <input
-                    type="radio"
-                    name="test"
-                    id="cb2"
-                    onChange={() => handleSelect(2)}
-                  />
-                  <label
-                    for="cb2"
-                    className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
-                  >
-                    {/* <Image src={resume2} alt="resume01" className="h-[400px]" /> */}
-                    <Image src={resume2} alt="resume01" className="h-[400px]" />
-                  </label>
-                  <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
-                    Professional Template
-                  </p>
-                </li>
-                {/* <li>
-                  <input type="radio" name="test" id="cb3" />
-                  <label
-                    for="cb3"
-                    className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
-                  >
-                    <Image src={resume1} alt="resume01" className="" />
-                  </label>
-                  <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
-                    Technical Template
-                  </p>
-                </li>
-                <li>
-                  <input type="radio" name="test" id="cb4" />
-                  <label
-                    for="cb4"
-                    className="bg-white border border-[#D5D5D5] p-4 rounded-[8px] mb-2"
-                  >
-                    <Image src={resume1} alt="resume01" className="" />
-                  </label>
-                  <p className="text-[#000000] text-sm lg:text-base font-semibold text-center">
-                    Modern Template
-                  </p>
-                </li> */}
-              </ul>
-            </div>
-            <div className="lg:w-5/12 border border-[#DADADA] rounded-[7px] overflow-hidden">
-              {selectedResume === 1 && (
-                <Image
-                  src={resume1}
-                  alt="resume01"
-                  className="h-[600px] w-[500px]"
-                />
-              )}
-              {selectedResume === 2 && (
-                // <Image
-                //   src={resume2}
-                //   alt="resume01"
-                //   className="h-[600px] w-[500px]"
-                // />
-                <Image
-                  src={resume2}
-                  alt="resume01"
-                  className="h-[600px] w-[500px]"
-                />
-              )}
-              {/* <Image src={view_full_resume} alt="view_full_resume" className='' /> */}
-            </div>
-          </div>
-          <div className="p-5 inset-shadow-xs">
-            <button
-              onClick={resumeBuilderHandler}
-              className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
-            >
-              Continue
-            </button>
-          </div>
-        </ModalBody>
-      </Modal>
-
+     
       {openModalCreateResumeJd && (
         <JdBasedChooseModal
           openModalCreateResumeJd={openModalCreateResumeJd}
@@ -1115,39 +688,10 @@ const Page = () => {
               <div className="lg:w-6/12 p-0 pr-0">
                 <div className="resume_form_area">
                   <div className="">
-                    {/* <div className="w-full resume_form_box mb-3">
-                      <div className="mb-1 block">
-                        <Label htmlFor="base">
-                          LinkedIn Profile Link <span>*</span>
-                        </Label>
-                      </div>
-                      <div className="field_box flex items-center">
-                        <div className="p-3">
-                          <BiLogoLinkedinSquare className="text-[#928F8F]" />
-                        </div>
-                        <TextInput
-                          id="base"
-                          type="text"
-                          sizing="md"
-                          placeholder="https://www.linkedin.com/in/johndoe"
-                          {...register("linkedinProfile", { required: true })}
-                          aria-invalid={errors.linkedinProfile ? "true" : "false"}
-                        />
-                       
-                      </div>
-                       {errors.linkedinProfile?.type === "required" && (
-                          <p className="text-red-700 text-sm" role="alert">Linkedin link is required</p>
-                        )}
-                    </div> */}
                     <div className="w-full resume_form_box mb-3">
                       <Label className="mb-2 block" htmlFor="file-upload">
                         LinkedIn Profile PDF
                       </Label>
-                      {/* <div className="field_box flex items-center">
-                        <div className="p-3">
-                          <FaLinkedin className="text-[#928F8F]" />
-                        </div> */}
-
                       <div>
                         <FileInput
                           id="file-upload"
@@ -1293,74 +837,6 @@ const Page = () => {
           </form>
         </ModalBody>
       </Modal>
-      {/* add modal for apply job ends here */}
-
-      {/* add modal for apply job start here */}
-      {/* <Modal
-        size="4xl"
-        className="apply_modal_area"
-        show={openModalLinkedInRewrite}
-        onClose={() => setOpenModalLinkedInRewrite(false)}
-      >
-        <ModalHeader className="bg-white text-black modal_header">
-          <div className="flex items-center gap-1">
-            <HiClipboardList className="text-[#800080] text-3xl" />
-            LinkedIn Rewrite
-          </div>
-        </ModalHeader>
-        <ModalBody className="bg-white p-0 rounded-b-[4px]">
-          <div className="lg:flex gap-5 p-5">
-            <div className="lg:w-6/12 p-0 pr-0">
-              <div className="resume_form_area">
-                <div className="">
-                  <div className="w-full resume_form_box mb-3">
-                    <div className="mb-1 block">
-                      <Label htmlFor="base">
-                        LinkedIn Profile Link <span>*</span>
-                      </Label>
-                    </div>
-                    <div className="field_box flex items-center">
-                      <div className="p-3">
-                        <BiLogoLinkedinSquare className="text-[#928F8F]" />
-                      </div>
-                      <TextInput
-                        id="base"
-                        type="text"
-                        sizing="md"
-                        placeholder="https://www.linkedin.com/in/johndoe"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="lg:w-6/12">
-              <div className="flex w-full items-center justify-center">
-                <Label
-                  htmlFor="dropzone-file"
-                  className="resume_upload_box_small flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-                >
-                  <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                    <BiImport className="text-[70px] text-[#92278F]" />
-                    <p className="mb-2 text-xl text-[#92278F]">
-                      Import your Resume
-                    </p>
-                  </div>
-                  <FileInput id="dropzone-file" className="hidden" />
-                </Label>
-              </div>
-            </div>
-          </div>
-          <div className="p-5 inset-shadow-xs">
-            <button
-              onClick={() => HandlerLinkedInRewrite(true)}
-              className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
-            >
-              Continue
-            </button>
-          </div>
-        </ModalBody>
-      </Modal> */}
       {openModalLinkedInRewrite && (
         <LinkedInReWriteModal
           openModalLinkedInRewrite={openModalLinkedInRewrite}
@@ -1379,93 +855,6 @@ const Page = () => {
           improveResumeId={improveResumeId}
         />
       )}
-
-      {/* add modal for apply job ends here */}
-      {/* ATS score modal */}
-      <Modal
-        show={openATSmodal}
-        onClose={() => setopenATSmodal(false)}
-        size="md"
-        popup
-        className="apply_modal_area"
-      >
-        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-          {/* Header with Close */}
-          <div className="flex items-center justify-between px-5 py-3 border-b">
-            <h3 className="text-base font-semibold text-gray-800">Current Resume ATS Score</h3>
-            <button
-              type="button"
-              onClick={() => setopenATSmodal(false)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Body */}
-          <ModalBody className="bg-white p-6">
-            <div className="flex justify-center">
-              <div
-                className="flex flex-col items-center rounded-2xl bg-white p-4 shadow-lg"
-                aria-label={`${label}: ${clamped} out of ${max}`}
-                role="img"
-              >
-                <div style={{ width: 140, height: 140 }} className="relative">
-                  <svg
-                    width={140}
-                    height={140}
-                    viewBox="0 0 140 140"
-                    className="block"
-                  >
-                    {/* Track */}
-                    <circle
-                      cx={70}
-                      cy={70}
-                      r={60}
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth={12}
-                    />
-                    {/* Progress */}
-                    <circle
-                      cx={70}
-                      cy={70}
-                      r={60}
-                      fill="none"
-                      stroke={ringColor}
-                      strokeWidth={12}
-                      strokeLinecap="round"
-                      strokeDasharray={`${progress} ${circumference - progress
-                        }`}
-                      transform="rotate(-90 70 70)"
-                    />
-                  </svg>
-
-                  {/* Center value */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-semibold text-gray-700">
-                      {clamped}/{max}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Label badge */}
-                <div
-                  className={`mt-3 rounded-lg px-3 py-1 text-sm font-semibold ${badgeBg}`}
-                >
-                  {label}
-                </div>
-              </div>
-            </div>
-            <Button
-              onClick={handleNavigate}
-              className="bg-[#800080] hover:bg-[#151515] mt-6 cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
-            >
-              Continue
-            </Button>
-          </ModalBody>
-        </div>
-      </Modal>
     </div>
   );
 };

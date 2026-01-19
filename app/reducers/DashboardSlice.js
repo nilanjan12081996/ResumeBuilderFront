@@ -2,28 +2,40 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from './api';
 import axios from 'axios';
+import aiApi from './aiApi';
 
 
 export const improveResume = createAsyncThunk(
-    'improveResume',
-    async (userInput, { rejectWithValue }) => {
-        try {
-            // const response = await api.post('/api/improve-resume/improve-resume', userInput);
-            const response = await api.post('/api/improve-resume/extract-imp-resume', userInput);
-            if (response?.data?.status_code === 201) {
-                return response.data;
-            } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue('Something went wrong.');
-                }
-            }
-        } catch (err) {
-            return rejectWithValue(err);
+  "improveResume",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await aiApi.post(
+        "/agent/resume/upload",
+        formData,
+        {
+          params: {
+            security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+          },
         }
+      );
+
+      if (response?.data?.status === "success") {
+        return response.data;
+      } else {
+        if (response?.data?.errors) {
+          return rejectWithValue(response.data.errors);
+        }
+        return rejectWithValue("Something went wrong.");
+      }
+    } catch (err) {
+      return rejectWithValue(
+        err?.response?.data || "Server error occurred"
+      );
     }
-)
+  }
+);
+
+
 export const checkATS = createAsyncThunk(
     'checkATS',
     async (userInput, { rejectWithValue }) => {
@@ -661,12 +673,8 @@ export const generateImpSummary = createAsyncThunk(
     "dashboard/generateImpSummary",
     async (payload, { rejectWithValue }) => {
         try {
-            // const res = await api.post(
-            //     "/agent/professional/summary",
-            //     payload
-            // );
-            const res = await axios.post(
-                "https://resumebuilderai.hiringeye.ai/agent/professional/summary",
+            const res = await aiApi.post(
+                "/agent/professional/summary",
                 payload
             );
             if (res?.status === 200) {
@@ -683,12 +691,8 @@ export const generateImpExperience = createAsyncThunk(
     "dashboard/generateImpExperience",
     async (payload, { rejectWithValue }) => {
         try {
-            // const res = await api.post(
-            //     "/agent/Experience/Description",
-            //     payload
-            // );
-            const res = await axios.post(
-                "https://resumebuilderai.hiringeye.ai/agent/Experience/Description",
+            const res = await aiApi.post(
+                "/agent/Experience/Description",
                 payload
             );
 
