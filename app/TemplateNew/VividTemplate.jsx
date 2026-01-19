@@ -291,6 +291,45 @@ const VividTemplate = ({ formData }) => {
         )}
 
       </div>
+      
+      {/* --- CUSTOM SECTIONS --- */}
+      {Object.keys(formData)
+        .filter(key => key.startsWith('customSectionHistory_'))
+        .map(key => {
+          const sectionId = key.replace('customSectionHistory_', '');
+          const history = formData[key];
+          const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
+
+          if (!history?.some(item => item.activity || item.city)) return null;
+
+          return (
+            <section key={sectionId}>
+              <SectionHeader title={title} />
+              <div className="flex flex-col gap-6">
+                {history.map((item, idx) => (
+                  <div key={idx}>
+                    <h3 className="text-[12px] font-bold text-gray-900">
+                      {item.activity}
+                      <span className="font-normal text-gray-600">
+                          {item.city ? `, ${item.city}` : ''}
+                      </span>
+                    </h3>
+                    
+                    <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
+                        {formatDate(item.startDate)} — {formatDate(item.endDate)}
+                    </div>
+                    
+                    {item.description && (
+                      <p className="text-[11px] text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
     </div>
   );
 };

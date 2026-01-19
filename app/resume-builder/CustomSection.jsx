@@ -2,15 +2,30 @@
 import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
 import { MdDelete } from "react-icons/md";
 import { RiDraggable } from "react-icons/ri";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaPlus, FaPen } from "react-icons/fa6";
-import { Controller } from "react-hook-form";
+import { Controller, useFieldArray } from "react-hook-form";
 import Datepicker from "../utils/Datepicker";
 
-const CustomSection = ({ register, watch, control, fields, append, remove, move, removeSection }) => {
+const CustomSection = ({ register, watch, control, sectionId, removeSection }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+
+  // Initialize useFieldArray with a dynamic name based on sectionId
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: `customSectionHistory_${sectionId}`,
+  });
+
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (!initialized.current && fields.length === 0) {
+      append({});
+      initialized.current = true;
+    }
+  }, [fields, append]);
 
   const handleDragStart = (e, index) => {
     if (!isHandleHovered) {
@@ -46,7 +61,9 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
       remove(index);
   };
 
-  const sectionTitle = watch('customSectionTitle');
+  // Dynamic title field name
+  const titleFieldName = `customSectionTitle_${sectionId}`;
+  const sectionTitle = watch(titleFieldName);
 
   return (
     <>
@@ -56,7 +73,7 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
                 {isEditingTitle ? (
                     <input
                         type="text"
-                        {...register('customSectionTitle')}
+                        {...register(titleFieldName)}
                         className="text-xl font-bold text-black border-b border-gray-300 focus:border-cyan-500 outline-none bg-transparent px-1"
                         autoFocus
                         onBlur={() => setIsEditingTitle(false)}
@@ -89,8 +106,8 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
       <div className='acco_section'>
         <div className="space-y-3">
           {fields.map((item, index) => {
-            const watchedActivity = watch(`customSectionHistory.${index}.activity`);
-            const watchedCity = watch(`customSectionHistory.${index}.city`);
+            const watchedActivity = watch(`customSectionHistory_${sectionId}.${index}.activity`);
+            const watchedCity = watch(`customSectionHistory_${sectionId}.${index}.city`);
 
             return (
               <div
@@ -136,7 +153,7 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
                             type="text"
                             placeholder="e.g. Project Lead"
                             className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                            {...register(`customSectionHistory.${index}.activity`)}
+                            {...register(`customSectionHistory_${sectionId}.${index}.activity`)}
                           />
                         </div>
 
@@ -147,7 +164,7 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
                             type="text"
                             placeholder="e.g. New York"
                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                            {...register(`customSectionHistory.${index}.city`)}
+                            {...register(`customSectionHistory_${sectionId}.${index}.city`)}
                           />
                         </div>
 
@@ -159,14 +176,14 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
                           <div className='flex gap-2 mt-1'>
                             <Controller
                               control={control}
-                              name={`customSectionHistory.${index}.startDate`}
+                              name={`customSectionHistory_${sectionId}.${index}.startDate`}
                               render={({ field }) => (
                                 <Datepicker selectedDate={field.value} onChange={(date) => field.onChange(date)} />
                               )}
                             />
                             <Controller
                               control={control}
-                              name={`customSectionHistory.${index}.endDate`}
+                              name={`customSectionHistory_${sectionId}.${index}.endDate`}
                               render={({ field }) => (
                                 <Datepicker selectedDate={field.value} onChange={(date) => field.onChange(date)} />
                               )}
@@ -181,7 +198,7 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
                             rows="4" 
                             className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                             placeholder="Describe details..."
-                            {...register(`customSectionHistory.${index}.description`)}
+                            {...register(`customSectionHistory_${sectionId}.${index}.description`)}
                           />
                         </div>
 

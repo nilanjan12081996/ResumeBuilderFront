@@ -37,7 +37,7 @@ const CleanTemplate = ({ formData }) => {
   const hasActivities = formData.activityHistory?.some(a => a.functionTitle || a.employer) && formData.activityHistory.length > 0;
   const hasInternships = formData.internshipHistory?.some(i => i.jobTitle || i.employer) && formData.internshipHistory.length > 0;
   const hasCourses = formData.coursesHistory?.some(c => c.course || c.institution) && formData.coursesHistory.length > 0;
-  const hasCustom = formData.customSectionHistory?.some(c => c.activity) && formData.customSectionHistory.length > 0;
+
 
   return (
     <div className="min-h-[297mm] bg-white text-gray-900 font-sans p-10 shadow-xl">
@@ -348,35 +348,45 @@ const CleanTemplate = ({ formData }) => {
             </section>
           )}
           
-          {/* CUSTOM SECTION */}
-          {hasCustom && (
-              <section>
-              <h2 className="text-sm font-bold uppercase tracking-[0.15em] text-black mb-4">
-                  {formData.customSectionTitle || "Custom Section"}
-              </h2>
-              <div className="flex flex-col gap-4">
-                {formData.customSectionHistory.map((item, idx) => (
-                   <div key={idx}>
-                   <div className="flex justify-between items-start mb-1">
-                     <h3 className="text-xs font-bold text-gray-900 uppercase">
-                        {item.activity}, {item.city}
-                     </h3>
-                   </div>
-                   
-                   <div className="text-[10px] text-gray-400 mb-2">
-                      {formatDate(item.startDate)} — {formatDate(item.endDate)}
-                   </div>
+          {/* CUSTOM SECTIONS */}
+          {Object.keys(formData)
+            .filter(key => key.startsWith('customSectionHistory_'))
+            .map(key => {
+              const sectionId = key.replace('customSectionHistory_', '');
+              const history = formData[key];
+              const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
 
-                   {item.description && (
-                     <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
-                       {item.description}
-                     </p>
-                   )}
-                 </div>
-                ))}
-              </div>
-            </section>
-          )}
+              if (!history?.some(item => item.activity || item.city)) return null;
+
+              return (
+                <section key={sectionId}>
+                  <h2 className="text-sm font-bold uppercase tracking-[0.15em] text-black mb-4">
+                      {title}
+                  </h2>
+                  <div className="flex flex-col gap-4">
+                    {history.map((item, idx) => (
+                       <div key={idx}>
+                       <div className="flex justify-between items-start mb-1">
+                         <h3 className="text-xs font-bold text-gray-900 uppercase">
+                            {item.activity}{item.city ? `, ${item.city}` : ""}
+                         </h3>
+                       </div>
+                       
+                       <div className="text-[10px] text-gray-400 mb-2">
+                          {formatDate(item.startDate)} — {formatDate(item.endDate)}
+                       </div>
+
+                       {item.description && (
+                         <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                           {item.description}
+                         </p>
+                       )}
+                     </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
 
         </div>
       </div>

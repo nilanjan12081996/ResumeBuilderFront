@@ -192,6 +192,8 @@ const page = () => {
       const config = OPTIONAL_SECTIONS_CONFIG.find(c => c.id === sectionId);
       if (config) {
         steps.push({ id: steps.length + 1, title: config.title, sectionId: sectionId });
+      } else if (typeof sectionId === 'string' && sectionId.startsWith('custom_')) {
+        steps.push({ id: steps.length + 1, title: watch(`customSectionTitle_${sectionId}`) || 'Custom Section', sectionId: sectionId });
       }
     });
 
@@ -818,10 +820,12 @@ const page = () => {
                           );
                         }
 
-                        if (currentStepObj && currentStepObj.sectionId === 'custom') {
+                        if (currentStepObj && (currentStepObj.sectionId === 'custom' || (typeof currentStepObj.sectionId === 'string' && currentStepObj.sectionId.startsWith('custom_')))) {
                           return (
                             <div>
                               <CustomSection
+                                key={currentStepObj.sectionId}
+                                sectionId={currentStepObj.sectionId}
                                 register={register}
                                 watch={watch}
                                 control={control}
@@ -829,7 +833,7 @@ const page = () => {
                                 append={customAppend}
                                 remove={customRemove}
                                 move={customMove}
-                                removeSection={() => setActiveSections(prev => prev.filter(s => s !== 'custom'))}
+                                removeSection={() => setActiveSections(prev => prev.filter(s => s !== currentStepObj.sectionId))}
                               />
                             </div>
                           );
@@ -874,11 +878,9 @@ const page = () => {
                                     toast.info("Section already added!");
                                   }
                                 } else if (sectionId === 'custom') {
-                                  if (!activeSections.includes('custom')) {
-                                    setActiveSections([...activeSections, 'custom']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
+                                  const newId = `custom_${Date.now()}`;
+                                  setActiveSections([...activeSections, newId]);
+                                  toast.success("Custom Section Added!");
                                 } else {
                                   console.log("Selected section:", sectionId);
                                   toast.info(`Clicked ${sectionId} - Feature coming soon!`);

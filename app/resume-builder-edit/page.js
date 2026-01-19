@@ -49,30 +49,14 @@ import resume_score from "../assets/imagesource/resume_score.png";
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import PersonalInfo from './PersonalSummaryEdit';
-import Education from './EducationNewEdit';
-import WorkExp from './WorkExp';
-import Language from './Language';
-import Skills from './SkillsNewEdit';
-import PersonalProject from './PersonalProject';
-import Certificates from './Certificates';
-import Achivments from './Achivments';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { addCountResume, addCountResumeOrg, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
-import { useReactToPrint } from 'react-to-print';
 import { useSearchParams } from 'next/navigation';
 import Template2 from '../temp/Template2';
-import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
-import { saveAs } from "file-saver";
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import Link from 'next/link';
-
-import { RiDraggable } from "react-icons/ri";
 import Professional from '../TemplateNew/Professional';
 import EmpHistoryEdit from './EmpHistoryEdit';
 import EducationNewEdit from './EducationNewEdit';
@@ -837,7 +821,7 @@ const page = () => {
                 {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
                 {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
                 <button
-                  onClick={handleDownloadClick}
+                  //  onClick={handleDownloadClick}
                   className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
         bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
                 >

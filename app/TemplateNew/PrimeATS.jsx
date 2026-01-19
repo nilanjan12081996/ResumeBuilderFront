@@ -192,6 +192,44 @@ const PrimeATS = ({ formData }) => {
         )}
       </div>
 
+      {/* ----------------- CUSTOM SECTIONS ----------------- */}
+      {Object.keys(formData)
+        .filter(key => key.startsWith('customSectionHistory_'))
+        .map(key => {
+          const sectionId = key.replace('customSectionHistory_', '');
+          const history = formData[key];
+          const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
+
+          if (!history?.some(item => item.activity || item.city)) return null;
+
+          return (
+            <section key={sectionId} className="mb-6 mt-6">
+              <h3 className="text-[#2b6cb0] font-bold text-sm border-b-2 border-[#2b6cb0] mb-3 pb-1 uppercase tracking-wider">
+                {title}
+              </h3>
+              <div className="flex flex-col gap-4">
+                {history.map((item, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between items-baseline">
+                      <h4 className="text-xs font-bold text-black">
+                        {item.activity}{item.city ? `, ${item.city}` : ''}
+                      </h4>
+                      <span className="text-[10px] font-bold text-black">
+                        {formatDate(item.startDate)} — {formatDate(item.endDate)}
+                      </span>
+                    </div>
+                    {item.description && (
+                      <p className="text-[11px] mt-1 text-gray-700 whitespace-pre-wrap leading-normal">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+
     </div>
   );
 };
