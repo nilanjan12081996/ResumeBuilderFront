@@ -25,7 +25,7 @@ const ClearTemplate = ({ formData, themeColor }) => {
   const hasActivities = formData.activityHistory?.some(a => a.functionTitle || a.employer) && formData.activityHistory.length > 0;
   const hasInternships = formData.internshipHistory?.some(i => i.jobTitle || i.employer) && formData.internshipHistory.length > 0;
   const hasCourses = formData.coursesHistory?.some(c => c.course || c.institution) && formData.coursesHistory.length > 0;
-  const hasCustom = formData.customSectionHistory?.some(c => c.activity) && formData.customSectionHistory.length > 0;
+
 
   // Combine links for the sidebar
   const links = [];
@@ -313,31 +313,41 @@ const ClearTemplate = ({ formData, themeColor }) => {
             </section>
           )}
 
-          {/* CUSTOM SECTION */}
-          {hasCustom && (
-              <section>
-              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">
-                  {formData.customSectionTitle || "Custom Section"}
-              </h2>
-              <div className="flex flex-col gap-4">
-                {formData.customSectionHistory.map((item, idx) => (
-                   <div key={idx}>
-                    <h3 className="text-xs font-bold text-gray-900">
-                        {item.activity} {item.city ? `, ${item.city}` : ""}
-                    </h3>
-                     <div className="text-xs text-gray-500 mb-1 mt-0.5">
-                      {formatDate(item.startDate)} — {formatDate(item.endDate)}
-                   </div>
-                   {item.description && (
-                     <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
-                       {item.description}
-                     </p>
-                   )}
-                 </div>
-                ))}
-              </div>
-            </section>
-          )}
+          {/* CUSTOM SECTIONS */}
+          {Object.keys(formData)
+            .filter(key => key.startsWith('customSectionHistory_'))
+            .map(key => {
+              const sectionId = key.replace('customSectionHistory_', '');
+              const history = formData[key];
+              const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
+
+              if (!history?.some(item => item.activity || item.city)) return null;
+
+              return (
+                <section key={sectionId}>
+                  <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">
+                      {title}
+                  </h2>
+                  <div className="flex flex-col gap-4">
+                    {history.map((item, idx) => (
+                       <div key={idx}>
+                        <h3 className="text-xs font-bold text-gray-900">
+                            {item.activity} {item.city ? `, ${item.city}` : ""}
+                        </h3>
+                         <div className="text-xs text-gray-500 mb-1 mt-0.5">
+                          {formatDate(item.startDate)} — {formatDate(item.endDate)}
+                       </div>
+                       {item.description && (
+                         <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                           {item.description}
+                         </p>
+                       )}
+                     </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
 
         </div>
       </div>

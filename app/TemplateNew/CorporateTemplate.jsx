@@ -13,7 +13,7 @@ const TITLE_ICON_MAP = {
     Certifications: FaStar,
 };
 
-const CorporateTemplate = () => {
+const CorporateTemplate = ({ formData }) => {
     const resumeData = {
         personalInfo: {
             name: 'SOUVICK PANJA',
@@ -226,6 +226,29 @@ const CorporateTemplate = () => {
                             points: p.points,
                         }))}
                     />
+
+                    {/* CUSTOM SECTIONS */}
+                    {formData && Object.keys(formData)
+                        .filter(key => key.startsWith('customSectionHistory_'))
+                        .map(key => {
+                            const sectionId = key.replace('customSectionHistory_', '');
+                            const history = formData[key];
+                            const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
+
+                            if (!history?.some(item => item.activity || item.city)) return null;
+
+                            return (
+                                <TimelineSection
+                                    key={sectionId}
+                                    title={title}
+                                    items={history.map(item => ({
+                                        heading: `${item.activity}${item.city ? `, ${item.city}` : ''}`,
+                                        period: `${item.startDate ? new Date(item.startDate).toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : ''} ${item.startDate && item.endDate ? '—' : ''} ${item.endDate ? new Date(item.endDate).toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : ''}`,
+                                        points: item.description ? [item.description] : [],
+                                    }))}
+                                />
+                            );
+                        })}
 
                 </main>
             </div>

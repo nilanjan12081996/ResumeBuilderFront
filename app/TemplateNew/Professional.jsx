@@ -419,46 +419,58 @@ const Professional = ({ formData ,empHistory, themeColor}) => {
 )}
 
 {/* Custom Section */}
-  {formData.customSectionHistory?.some(item => item.activity || item.city) && formData.customSectionHistory.length > 0 && (
-    <section>
-      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1">
-        {formData.customSectionTitle || "Custom Section"}
-      </h2>
-      <div className="flex flex-col gap-4">
-        {formData.customSectionHistory.map((item, index) => {
-          const formatDate = (dateValue) => {
-            if (!dateValue) return "";
-            const d = new Date(dateValue);
-            return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
-          };
+{/* Custom Sections */}
+  {Object.keys(formData)
+    .filter(key => key.startsWith('customSectionHistory_'))
+    .map(key => {
+      const sectionId = key.replace('customSectionHistory_', '');
+      const history = formData[key];
+      const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
 
-          const displayStart = formatDate(item.startDate);
-          const displayEnd = formatDate(item.endDate);
+      if (!history?.some(item => item.activity || item.city)) return null;
 
-          return (
-            <div key={index} className="mb-2">
-              <h3 className="text-[12px] font-bold text-black">
-                {item.activity}
-                {item.city ? `, ${item.city}` : ''}
-              </h3>
-              
-              {(displayStart || displayEnd) && (
-                <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
-                  {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+      return (
+        <section key={sectionId}>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-1 pb-1">
+            {title}
+          </h2>
+          <div className="flex flex-col gap-4">
+            {history.map((item, index) => {
+              const formatDate = (dateValue) => {
+                if (!dateValue) return "";
+                const d = new Date(dateValue);
+                // Returns format: JAN 2026
+                return d.toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+              };
+
+              const displayStart = formatDate(item.startDate);
+              const displayEnd = formatDate(item.endDate);
+
+              return (
+                <div key={index} className="mb-2">
+                  <h3 className="text-[12px] font-bold text-black">
+                    {item.activity}
+                    {item.city ? `, ${item.city}` : ''}
+                  </h3>
+                  
+                  {(displayStart || displayEnd) && (
+                    <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
+                      {displayStart} {displayStart && displayEnd ? ' — ' : ''} {displayEnd}
+                    </div>
+                  )}
+                  
+                  {item.description && (
+                    <p className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      {item.description}
+                    </p>
+                  )}
                 </div>
-              )}
-              
-              {item.description && (
-                <p className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">
-                  {item.description}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  )}
+              );
+            })}
+          </div>
+        </section>
+      );
+    })}
       </div>
     </div>
   );
