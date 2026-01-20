@@ -1007,7 +1007,7 @@ const { profileData } = useSelector((state) => state?.profile)
 
 
       <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
-        <div className='flex items-center justify-between mb-4'>
+        <div className='flex items-center justify-between'>
           <div className='flex items-center gap-1 mb-2 lg:mb-0'>
             <button
               onClick={() => setOpenPreviewModal(true)}

@@ -57,7 +57,6 @@ import { useSearchParams } from 'next/navigation';
 import Template2 from '../temp/Template2';
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import Professional from '../TemplateNew/Professional';
 import EmpHistoryEdit from './EmpHistoryEdit';
 import EducationNewEdit from './EducationNewEdit';
 import SkillsNewEdit from './SkillsNewEdit';
@@ -69,6 +68,14 @@ import ActivitiesEdit from './ActivitiesEdit';
 import LanguagesEdit from './newLanguageEdit';
 import InternshipsEdit from './InternshipsEdit';
 import CustomSectionEdit from './CustomSectionEdit';
+import CustomizeSection from '../ui/CustomizeSection';
+import { useTabs } from '../context/TabsContext';
+import CleanTemplate from '../TemplateNew/CleanTemplate';
+import ClearTemplate from '../TemplateNew/ClearTemplate';
+import VividTemplate from '../TemplateNew/VividTemplate';
+import Professional from '../TemplateNew/Professional';
+import PrimeATS from '../TemplateNew/PrimeATS';
+import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 
 const page = () => {
@@ -84,7 +91,20 @@ const page = () => {
   const [type, setType] = useState()
   const [isCreated, setIsCreated] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-
+  const [selectedTemplate, setSelectedTemplate] = useState('clear');
+  const [themeColor, setThemeColor] = useState('#000000');
+  const templateMap = {
+    professional: Professional,
+    ats: PrimeATS,
+    clean: CleanTemplate,
+    clear: ClearTemplate,
+    vivid: VividTemplate,
+    corporate: CorporateTemplate,
+  };
+  const handleSelectTemplate = (id) => {
+    setSelectedTemplate(id);
+  };
+  const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
   const dispatch = useDispatch()
   console.log("profileData", profileData);
@@ -121,46 +141,7 @@ const page = () => {
   // Track which optional sections are active
   const [activeSections, setActiveSections] = useState([]);
 
-  // Base Steps
-  const BASE_STEPS = [
-    { id: 1, title: "Personal Details" },
-    { id: 2, title: "Employment History" },
-    { id: 3, title: "Education" },
-    { id: 4, title: "Skills" },
-    { id: 5, title: "Professional Summary" }
-  ];
 
-  // SECTION CONFIG
-  const OPTIONAL_SECTIONS_CONFIG = [
-    { id: 'courses', title: 'Courses', component: CoursesEdit },
-    { id: 'hobbies', title: 'Hobbies', component: HobbiesEdit },
-    { id: 'extra_curricular', title: 'Extra-curricular Activities', component: ActivitiesEdit },
-    { id: 'languages', title: 'Languages', component: LanguagesEdit },
-    { id: 'internships', title: 'Internships', component: InternshipsEdit },
-    { id: 'custom', title: watch('customSectionTitle') || 'Custom Section', component: CustomSectionEdit }
-  ];
-
-  // Dynamic Steps generation
-  const getSteps = () => {
-    let steps = [...BASE_STEPS];
-
-    // Add active optional sections
-    activeSections.forEach((sectionId) => {
-      const config = OPTIONAL_SECTIONS_CONFIG.find(c => c.id === sectionId);
-      if (config) {
-        steps.push({ id: steps.length + 1, title: config.title, sectionId: sectionId });
-      }
-    });
-
-    // Always add "Add Section" at the end
-    steps.push({ id: steps.length + 1, title: "Add Section", isAddSectionStep: true });
-
-    return steps;
-  };
-
-  const STEPS = getSteps();
-
-  const [step, setStep] = useState(1);
 
   // Employment History Field Array
   const { fields: empFields, append: empAppend, remove: empRemove, move: empMove } = useFieldArray({
@@ -210,17 +191,11 @@ const page = () => {
     name: "customSectionHistory",
   });
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
 
   const onSubmit = (data) => {
-    // If we're not at the last step, go next
-    if (step < STEPS.length) {
-      nextStep();
-    } else {
-      console.log("Final Submission:", data);
-    }
+    console.log("Auto save / Final data:", data);
   };
+
   const formValues = watch();
 
   const [selectedImage, setSelectedImage] = useState(null);
@@ -242,598 +217,456 @@ const page = () => {
     setValue("profileImage", "");
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
+  const { activeTab } = useTabs();
   return (
     <div>
-      <Tabs>
-        <div className='resume_tab_scrach mb-4 px-8'>
+      <div className='resume_tab_scrach'>
+      </div>
+      <div className='lg:flex gap-1'>
 
-          <div className='p-0'>
-            <div className='tab_point'>
-              <TabList>
-                <Tab>Edit</Tab>
-                <Tab>Customize</Tab>
-              </TabList>
-            </div>
-          </div>
-
-
-        </div>
-        <div className='lg:flex gap-5 pb-5'>
-
-          <ToastContainer />
-          <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
-
-            <TabPanel>
-              <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)}>
-                  <div className='mb-10'>
-
-                    <div className='mb-4 px-8 py-4 border-b border-[#e7e8ec]'>
-                      <div className='flex justify-between items-center'>
-                        <div className='flex items-center gap-2 mb-2'>
-                          <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
-                          <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
-                        </div>
-                        <div className='flex items-center gap-2 mb-2'>
-                          <span className='bg-[#e7f4ed] rounded-[5px] px-2 py-1 text-[14px] text-[#477d62] font-bold'>+10%</span>
-                          <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Add job title</span>
-                        </div>
+        <ToastContainer />
+        <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
+          {activeTab === 'edit' ?
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit(onSubmit)}>
+                <div>
+                  <div className='bg-white rounded-sm p-5 mb-[4px]'>
+                    <div className='flex justify-between items-center'>
+                      <div className='flex items-center gap-2 mb-2'>
+                        <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
+                        <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <Progress progress={10} size="sm" />
+                      <div className='flex items-center gap-2 mb-2'>
+                        <span className='bg-[#e7f4ed] rounded-[5px] px-2 py-1 text-[14px] text-[#477d62] font-bold'>+10%</span>
+                        <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Add job title</span>
                       </div>
                     </div>
-
-                    <div className='px-8 h-[430px] overflow-y-scroll pb-4'>
-                      {
-                        step === 1 && (
-                          <div className=''>
-                            <div className='mb-4'>
-                              <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
-                              <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
-                            </div>
-
-                            <div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Job Target and Image Upload */}
-                                <div className="md:col-span-2 flex gap-4">
-                                  <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Job Target
-                                    </label>
-                                    <input
-                                      type="text"
-                                      placeholder="SENIOR SOFTWARE ENGINEER"
-                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
-                                      {...register("job_target")}
-                                    />
-                                  </div>
-
-                                  {/* Image Upload */}
-                                  <div className="flex items-center gap-4">
-                                    <div className="relative w-14 h-14 bg-gray-100 rounded flex items-center justify-center overflow-hidden border border-gray-200">
-                                      {selectedImage ? (
-                                        <img src={selectedImage} alt="Profile" className="w-full h-full object-cover" />
-                                      ) : (
-                                        <FaUser className="text-gray-400 text-2xl" />
-                                      )}
-                                    </div>
-                                    <div>
-                                      {selectedImage ? (
-                                        <div className="flex flex-col gap-1">
-                                          <label
-                                            htmlFor="profile-upload"
-                                            className="flex items-center gap-1 text-cyan-600 text-xs font-medium cursor-pointer hover:underline"
-                                          >
-                                            <FaPen /> Edit photo
-                                          </label>
-                                          <button
-                                            type="button"
-                                            onClick={handleDeleteImage}
-                                            className="flex items-center gap-1 text-gray-500 text-xs font-medium cursor-pointer hover:text-red-500"
-                                          >
-                                            <MdDelete /> Delete
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <label
-                                          htmlFor="profile-upload"
-                                          className="text-cyan-600 text-sm font-medium cursor-pointer hover:underline"
-                                        >
-                                          Upload photo
-                                        </label>
-                                      )}
-                                      <input
-                                        type="file"
-                                        id="profile-upload"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleImageChange}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* First Name */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    First Name
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="First Name"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                    {...register("first_name")}
-                                  />
-                                </div>
-
-                                {/* Last Name */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Last Name
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Last Name"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                    {...register("last_name")}
-                                  />
-                                </div>
-
-                                {/* Email */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Email
-                                  </label>
-                                  <input
-                                    type="email"
-                                    placeholder="Email"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                    {...register("email")}
-                                  />
-                                </div>
-
-                                {/* Phone */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Phone
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Phone"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                    {...register("phone")}
-                                  />
-                                </div>
-
-                                {/* Address */}
-                                <div className="md:col-span-2">
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Address
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="Enter your address"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                    {...register("address")}
-                                  />
-                                </div>
-
-                                {/* City */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    City, State
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="City,State"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                    {...register("city_state")}
-                                  />
-                                </div>
-
-                                {/* Country */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Country
-                                  </label>
-                                  <input
-                                    type="text"
-                                    placeholder="India"
-                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                                    {...register("country")}
-                                  />
-                                </div>
-
-
-
-                                <div className="md:col-span-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
-                                    className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
-                                  >
-                                    {showAdditionalDetails ? (
-                                      <>
-                                        Hide additional details
-                                        <ChevronUp size={20} />
-
-                                      </>
-                                    ) : (
-                                      <>
-                                        Add more details
-                                        <ChevronDown size={20} />
-
-                                      </>
-                                    )}
-                                  </button>
-                                </div>
-
-                                {/* Additional Details - Conditionally Rendered */}
-                                {showAdditionalDetails && (
-                                  <>
-                                    {/* Postal Code */}
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Postal Code
-                                      </label>
-                                      <input
-                                        type="text"
-                                        placeholder="Postal Code"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register("postal_code")}
-                                      />
-                                    </div>
-
-                                    {/* Driving License */}
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Driving License
-                                      </label>
-                                      <input
-                                        type="text"
-                                        placeholder="License Number"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register("driving_licence")}
-                                      />
-                                    </div>
-
-                                    {/* Date of Birth */}
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Date of Birth
-                                      </label>
-                                      <input
-                                        type="text"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register("dob")}
-                                      />
-                                    </div>
-
-                                    {/* Place of Birth */}
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Place of Birth
-                                      </label>
-                                      <input
-                                        type="text"
-                                        placeholder="City, Country"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register("birth_place")}
-                                      />
-                                    </div>
-
-                                    {/* Nationality */}
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Nationality
-                                      </label>
-                                      <input
-                                        type="text"
-                                        placeholder="Nationality"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register("nationality")}
-
-                                      />
-                                    </div>
-
-
-                                  </>
-                                )}
-
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      }
-                      {
-                        step === 2 && (
-                          <div>
-                            <EmpHistoryEdit
-                              register={register}
-                              empHistory={empHistory}
-                              setEmpHistory={setEmpHistory}
-                              watch={watch}
-                              control={control}
-                              fields={empFields}
-                              append={empAppend}
-                              remove={empRemove}
-                              move={empMove}
-                            />
-                          </div>
-                        )
-                      }
-                      {
-                        step === 3 && (
-                          <div>
-                            <EducationNewEdit
-                              register={register}
-                              education={education}
-                              setEducation={setEducation}
-                              watch={watch}
-                              control={control}
-                              fields={eduFields}
-                              append={eduAppend}
-                              remove={eduRemove}
-                              move={eduMove}
-                            />
-                          </div>
-                        )
-                      }
-                      {
-                        step === 4 && (
-                          <div>
-                            <SkillsNewEdit
-                              register={register}
-                              newskill={newskill}
-                              setNewSkill={setNewSkill}
-                              watch={watch}
-                              setValue={setValue}
-                              control={control}
-                              fields={skillFields}
-                              append={skillAppend}
-                              remove={skillRemove}
-                              move={skillMove}
-                            />
-                          </div>
-                        )
-                      }
-                      {
-                        step === 5 && (
-                          <div>
-                            <PersonalSummaryEdit
-                              register={register}
-                              watch={watch}
-                            />
-                          </div>
-                        )
-                      }
-
-                      {/* Dynamic Sections Rendering */}
-                      {(() => {
-                        const currentStepObj = STEPS.find(s => s.id === step);
-                        if (currentStepObj && currentStepObj.sectionId === 'courses') {
-                          return (
-                            <div>
-                              <CoursesEdit
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={coursesFields}
-                                append={coursesAppend}
-                                remove={coursesRemove}
-                                move={coursesMove}
-                              />
-                            </div>
-                          );
-                        }
-                        if (currentStepObj && currentStepObj.sectionId === 'hobbies') {
-                          return (
-                            <div>
-                              <HobbiesEdit register={register} />
-                            </div>
-                          );
-                        }
-                        if (currentStepObj && currentStepObj.sectionId === 'extra_curricular') {
-                          return (
-                            <div>
-                              <ActivitiesEdit
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={activitiesFields}
-                                append={activitiesAppend}
-                                remove={activitiesRemove}
-                                move={activitiesMove}
-                              />
-                            </div>
-                          );
-                        }
-
-                        if (currentStepObj && currentStepObj.sectionId === 'languages') {
-                          return (
-                            <div>
-                              <Languages
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={languageFields}
-                                append={languageAppend}
-                                remove={languageRemove}
-                                move={languageMove}
-                              />
-                            </div>
-                          );
-                        }
-
-                        if (currentStepObj && currentStepObj.sectionId === 'internships') {
-                          return (
-                            <div>
-                              <InternshipsEdit
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={internshipFields}
-                                append={internshipAppend}
-                                remove={internshipRemove}
-                                move={internshipMove}
-                              />
-                            </div>
-                          );
-                        }
-
-                        if (currentStepObj && currentStepObj.sectionId === 'custom') {
-                          return (
-                            <div>
-                              <CustomSectionEdit
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={customFields}
-                                append={customAppend}
-                                remove={customRemove}
-                                move={customMove}
-                                removeSection={() => setActiveSections(prev => prev.filter(s => s !== 'custom'))}
-                              />
-                            </div>
-                          );
-                        }
-                        return null;
-                      })()}
-
-                      {
-                        // Check if current step is the "Add Section" step
-                        STEPS.find(s => s.id === step)?.isAddSectionStep && (
-                          <div>
-                            <AddSectionEdit
-                              onSelectSection={(sectionId) => {
-                                if (sectionId === 'courses') {
-                                  if (!activeSections.includes('courses')) {
-                                    setActiveSections([...activeSections, 'courses']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
-                                } else if (sectionId === 'hobbies') {
-                                  if (!activeSections.includes('hobbies')) {
-                                    setActiveSections([...activeSections, 'hobbies']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
-                                } else if (sectionId === 'extra_curricular') {
-                                  if (!activeSections.includes('extra_curricular')) {
-                                    setActiveSections([...activeSections, 'extra_curricular']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
-                                } else if (sectionId === 'languages') {
-                                  if (!activeSections.includes('languages')) {
-                                    setActiveSections([...activeSections, 'languages']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
-                                } else if (sectionId === 'internships') {
-                                  if (!activeSections.includes('internships')) {
-                                    setActiveSections([...activeSections, 'internships']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
-                                } else if (sectionId === 'custom') {
-                                  if (!activeSections.includes('custom')) {
-                                    setActiveSections([...activeSections, 'custom']);
-                                  } else {
-                                    toast.info("Section already added!");
-                                  }
-                                } else {
-                                  console.log("Selected section:", sectionId);
-                                  toast.info(`Clicked ${sectionId} - Feature coming soon!`);
-                                }
-                              }}
-                            />
-                          </div>
-                        )
-                      }
-
-
-
+                    <div className="flex flex-col gap-2">
+                      <Progress progress={10} size="sm" />
                     </div>
-
-                    <div className='flex justify-between items-center px-8 py-3 border-t border-[#e7e8ec]'>
-
-                      <div className='w-3/12'>
-                        <button
-                          type="button"
-                          onClick={prevStep}
-                          disabled={step === 1}
-                          className={`text-sm font-medium ${step === 1 ? 'invisible' : 'text-gray-500'} rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700`}
-                        >
-                          Back
-                        </button>
-                      </div>
-
-
-                      <div className='w-5/12'>
-
-                        <button
-                          type="submit"
-                          className='rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700'
-                        >
-                          {step === STEPS.length ? (
-                            "Finish"
-                          ) : (
-                            `Next: ${STEPS.find(s => s.id === step + 1)?.title}`
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
                   </div>
-                </form>
-              </FormProvider>
-            </TabPanel>
-            <TabPanel>Customize</TabPanel>
-          </div>
 
-          <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-                <button
-                  onClick={() => setOpenPreviewModal(true)}
-                  className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
-                >
-                  <MdPreview className='text-[#800080] text-2xl' />
-                  Preview
-                </button>
+                  <div className='h-[430px] overflow-y-scroll bg-white p-5 rounded-lg'>
 
-              </div>
-              <div className='lg:flex items-center gap-3'>
-                {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
-                {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-                <button
-                  //  onClick={handleDownloadClick}
-                  className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
-        bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
-                >
-                  <IoMdDownload className='text-[18px]' />
-                  Download PDF
-                </button>
+                    <div className=''>
+                      <div className='mb-4'>
+                        <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
+                        <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
+                      </div>
 
-              </div>
+                      <div className='acco_section'>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
+                            <div className="flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg bg-gray-50">
+                              <label
+                                htmlFor="profile-upload"
+                                className="cursor-pointer flex flex-col items-center gap-2"
+                              >
+                                <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                                  {selectedImage ? (
+                                    <img
+                                      src={selectedImage}
+                                      alt="Profile"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <FaUser className="text-[30px] text-[#800080]" />
+                                  )}
+                                </div>
+                                <span className="text-sm font-medium text-[#800080] hover:underline">
+                                  Upload photo
+                                </span>
+                              </label>
+                              {selectedImage && (
+                                <button
+                                  type="button"
+                                  onClick={handleDeleteImage}
+                                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500"
+                                >
+                                  <MdDelete size={12} /> Remove
+                                </button>
+                              )}
+
+                              <span className="text-[10px] text-gray-400">
+                                JPG / PNG • Max 2MB
+                              </span>
+
+                              <input
+                                type="file"
+                                id="profile-upload"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImageChange}
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <label className="block text-sm font-medium text-gray-700">
+                                Job Target
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="SENIOR SOFTWARE ENGINEER"
+                                className="mt-1 w-full rounded-lg"
+                                {...register("job_target")}
+                              />
+                            </div>
+                          </div>
+
+                          {/* First Name */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              First Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="First Name"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("first_name")}
+                            />
+                          </div>
+
+                          {/* Last Name */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Last Name"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("last_name")}
+                            />
+                          </div>
+
+                          {/* Email */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              placeholder="Email"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("email")}
+                            />
+                          </div>
+
+                          {/* Phone */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Phone
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Phone"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("phone")}
+                            />
+                          </div>
+
+                          {/* Address */}
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Address
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Enter your address"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                              {...register("address")}
+                            />
+                          </div>
+
+                          {/* City */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              City, State
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="City,State"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("city_state")}
+                            />
+                          </div>
+
+                          {/* Country */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Country
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="India"
+                              className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                              {...register("country")}
+                            />
+                          </div>
+
+
+
+                          <div className="md:col-span-2">
+                            <button
+                              type="button"
+                              onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                              className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                            >
+                              {showAdditionalDetails ? (
+                                <>
+                                  Hide additional details
+                                  <ChevronUp size={20} />
+
+                                </>
+                              ) : (
+                                <>
+                                  Add more details
+                                  <ChevronDown size={20} />
+
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Additional Details - Conditionally Rendered */}
+                          {showAdditionalDetails && (
+                            <>
+                              {/* Postal Code */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Postal Code
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Postal Code"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  {...register("postal_code")}
+                                />
+                              </div>
+
+                              {/* Driving License */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Driving License
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="License Number"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  {...register("driving_licence")}
+                                />
+                              </div>
+
+                              {/* Date of Birth */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Date of Birth
+                                </label>
+                                <input
+                                  type="text"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  {...register("dob")}
+                                />
+                              </div>
+
+                              {/* Place of Birth */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Place of Birth
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="City, Country"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  {...register("birth_place")}
+                                />
+                              </div>
+
+                              {/* Nationality */}
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Nationality
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="Nationality"
+                                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                  {...register("nationality")}
+
+                                />
+                              </div>
+
+
+                            </>
+                          )}
+
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <EmpHistoryEdit
+                        register={register}
+                        empHistory={empHistory}
+                        setEmpHistory={setEmpHistory}
+                        watch={watch}
+                        control={control}
+                        fields={empFields}
+                        append={empAppend}
+                        remove={empRemove}
+                        move={empMove}
+                      />
+                    </div>
+                    <div>
+                      <EducationNewEdit
+                        register={register}
+                        education={education}
+                        setEducation={setEducation}
+                        watch={watch}
+                        control={control}
+                        fields={eduFields}
+                        append={eduAppend}
+                        remove={eduRemove}
+                        move={eduMove}
+                      />
+                    </div>
+                    <div>
+                      <SkillsNewEdit
+                        register={register}
+                        newskill={newskill}
+                        setNewSkill={setNewSkill}
+                        watch={watch}
+                        setValue={setValue}
+                        control={control}
+                        fields={skillFields}
+                        append={skillAppend}
+                        remove={skillRemove}
+                        move={skillMove}
+                      />
+                    </div>
+                    <div>
+                      <PersonalSummaryEdit
+                        register={register}
+                        watch={watch}
+                      />
+                    </div>
+                    {/* COURSES */}
+                    <div id="courses">
+                      <CoursesEdit
+                        register={register}
+                        watch={watch}
+                        control={control}
+                        fields={coursesFields}
+                        append={coursesAppend}
+                        remove={coursesRemove}
+                        move={coursesMove}
+                      />
+                    </div>
+
+                    {/* HOBBIES */}
+                    <div id="hobbies">
+                      <HobbiesEdit register={register} />
+                    </div>
+
+                    {/* EXTRA CURRICULAR / ACTIVITIES */}
+                    <div id="extra_curricular">
+                      <ActivitiesEdit
+                        register={register}
+                        watch={watch}
+                        control={control}
+                        fields={activitiesFields}
+                        append={activitiesAppend}
+                        remove={activitiesRemove}
+                        move={activitiesMove}
+                      />
+                    </div>
+
+                    {/* LANGUAGES */}
+                    <div id="languages">
+                      <newLanguageEdit
+                        register={register}
+                        watch={watch}
+                        control={control}
+                        fields={languageFields}
+                        append={languageAppend}
+                        remove={languageRemove}
+                        move={languageMove}
+                      />
+                    </div>
+
+                    {/* INTERNSHIPS */}
+                    <div id="internships">
+                      <InternshipsEdit
+                        register={register}
+                        watch={watch}
+                        control={control}
+                        fields={internshipFields}
+                        append={internshipAppend}
+                        remove={internshipRemove}
+                        move={internshipMove}
+                      />
+                    </div>
+
+                    {/* CUSTOM SECTION */}
+                    {activeSections.includes('custom') && (
+                      <div id="custom">
+                        <CustomSectionEdit
+                          register={register}
+                          watch={watch}
+                          control={control}
+                          fields={customFields}
+                          append={customAppend}
+                          remove={customRemove}
+                          move={customMove}
+                          removeSection={() =>
+                            setActiveSections(prev => prev.filter(s => s !== 'custom'))
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </form>
+            </FormProvider>
+            :
+            <CustomizeSection
+              selectedTemplate={selectedTemplate}
+              onSelectTemplate={handleSelectTemplate}
+              themeColor={themeColor}
+              setThemeColor={setThemeColor}
+            />
+          }
+        </div>
+
+        <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px]'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-1 mb-2 lg:mb-0'>
+              {/* <button
+                onClick={() => setOpenPreviewModal(true)}
+                className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
+              >
+                <MdPreview className='text-[#800080] text-2xl' />
+                Preview
+              </button> */}
+
             </div>
-            <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-              {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-              {/* {
+            <div className='lg:flex items-center gap-3'>
+              {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
+              {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
+              {/* <button
+                //  onClick={handleDownloadClick}
+                className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
+        bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
+              >
+                <IoMdDownload className='text-[18px]' />
+                Download PDF
+              </button> */}
+
+            </div>
+          </div>
+          <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+            <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} />
+            {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
+            {/* {
                   template == 1 && (
                     <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
@@ -843,10 +676,10 @@ const page = () => {
                     <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
                   )
                 } */}
-              <Professional formData={formValues} empHistory={empHistory} />
+            {/* <Professional formData={formValues} empHistory={empHistory} /> */}
 
-            </div>
-            {/* <div className='flex items-center justify-between mb-0'>
+          </div>
+          {/* <div className='flex items-center justify-between mb-0'>
                   <div className='flex items-center gap-1'>
                     <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
                   </div>
@@ -854,31 +687,31 @@ const page = () => {
                     <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
                   </div>
                 </div> */}
-          </div>
+        </div>
 
-          {/* add modal for apply job start here */}
-          <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
-            <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
-            <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
-              <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
-                <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-                <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                  <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-                </div>
-                <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
-                  <Image src={resume_score} alt="resume_score" className='mb-0' />
-                </div>
+        {/* add modal for apply job start here */}
+        <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
+          <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
+          <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
+            <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
+              <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
+              <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+                <Image src={resume_sections_view} alt="resume_sections_view" className='' />
               </div>
-              <div>
-                <p className='text-[14px] text-[#DF1B35] font-semibold pb-0'>Important Note: </p>
-                <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
+              <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
+                <Image src={resume_score} alt="resume_score" className='mb-0' />
               </div>
-            </ModalBody>
-          </Modal>
-          {/* add modal for apply job ends here */}
+            </div>
+            <div>
+              <p className='text-[14px] text-[#DF1B35] font-semibold pb-0'>Important Note: </p>
+              <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
+            </div>
+          </ModalBody>
+        </Modal>
+        {/* add modal for apply job ends here */}
 
-          {/* add modal for apply job start here */}
-          {/* <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
+        {/* add modal for apply job start here */}
+        {/* <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
             <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
             <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
               <div className='flex gap-4'>
@@ -903,48 +736,47 @@ const page = () => {
               </div>
             </ModalBody>
           </Modal> */}
-          {/* add modal for apply job ends here */}
-          <Modal
-            show={openPreviewModal}
-            size="6xl"
-            onClose={() => setOpenPreviewModal(false)}
-          >
-            <ModalHeader className='text-black border-0 pt-2 pr-2'>
-              Preview
-            </ModalHeader>
-            <ModalBody className='bg-white p-5 rounded-b-[4px]'>
-              <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
-                {template == 1 && (
-                  <Template1
-                    data={formValues}
-                    education={educationEntries}
-                    experiences={experiences}
-                    skills={skills}
-                    languages={languages}
-                    personalPro={personalPro}
-                    achivments={achivments}
-                    certificates={certificates}
-                  />
-                )}
-                {template == 2 && (
-                  <Template2
-                    data={formValues}
-                    education={educationEntries}
-                    experiences={experiences}
-                    skills={skills}
-                    languages={languages}
-                    personalPro={personalPro}
-                    achivments={achivments}
-                    certificates={certificates}
-                  />
-                )}
-              </div>
-            </ModalBody>
-          </Modal>
+        {/* add modal for apply job ends here */}
+        <Modal
+          show={openPreviewModal}
+          size="6xl"
+          onClose={() => setOpenPreviewModal(false)}
+        >
+          <ModalHeader className='text-black border-0 pt-2 pr-2'>
+            Preview
+          </ModalHeader>
+          <ModalBody className='bg-white p-5 rounded-b-[4px]'>
+            <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
+              {template == 1 && (
+                <Template1
+                  data={formValues}
+                  education={educationEntries}
+                  experiences={experiences}
+                  skills={skills}
+                  languages={languages}
+                  personalPro={personalPro}
+                  achivments={achivments}
+                  certificates={certificates}
+                />
+              )}
+              {template == 2 && (
+                <Template2
+                  data={formValues}
+                  education={educationEntries}
+                  experiences={experiences}
+                  skills={skills}
+                  languages={languages}
+                  personalPro={personalPro}
+                  achivments={achivments}
+                  certificates={certificates}
+                />
+              )}
+            </div>
+          </ModalBody>
+        </Modal>
 
-        </div>
-      </Tabs>
-    </div>
+      </div>
+    </div >
   )
 }
 

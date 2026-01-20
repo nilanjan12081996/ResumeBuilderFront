@@ -126,7 +126,7 @@ const page = () => {
   const componentRef = useRef();
 
   const dispatch = useDispatch()
-  // const router = useRouter(); // Router not needed for this flow anymore
+  const router = useRouter();
   const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
   const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
   console.log("profileData", profileData);
@@ -286,6 +286,7 @@ const page = () => {
               nextStep();
             }
           } else {
+            router.push('/resume-builder-edit');
             setSavingStatus('error');
             toast.error("Error saving resume: Missing IDs");
           }
@@ -299,6 +300,7 @@ const page = () => {
       if (step < STEPS.length) {
         nextStep();
       } else {
+        router.push('/resume-builder-edit');
         console.log("Final Submission:", data);
       }
     }
@@ -368,30 +370,26 @@ const page = () => {
   return (
     <div>
       <Tabs>
-        <div className='resume_tab_scrach mb-4 px-8'>
-
-          {/* <div className='p-0'>
+        {/* <div className='resume_tab_scrach mb-4 px-8'>
+          <div className='p-0'>
             <div className='tab_point'>
               <TabList>
                 <Tab>Edit</Tab>
                 <Tab>Customize</Tab>
               </TabList>
             </div>
-          </div> */}
-
-
-        </div>
-        <div className='lg:flex gap-5 pb-5'>
+          </div>
+        </div> */}
+        <div className='lg:flex gap-1 pb-0'>
 
           <ToastContainer />
-          <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
+          <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
 
             {activeTab === 'edit' ?
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
-                  <div className='mb-10'>
-
-                    <div className='mb-4 px-8 py-4 border-b border-[#e7e8ec]'>
+                  <div className=''>
+                    <div className='bg-white rounded-sm p-5 mb-[4px]'>
                       <div className='flex justify-between items-center'>
                         <div className='flex items-center gap-2 mb-2'>
                           <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
@@ -407,7 +405,7 @@ const page = () => {
                       </div>
                     </div>
 
-                    <div className='px-8 h-[430px] overflow-y-scroll pb-4'>
+                    <div className='h-[430px] overflow-y-scroll bg-white p-5 rounded-lg'>
                       {
                         step === 1 && (
                           <div className=''>
@@ -416,10 +414,9 @@ const page = () => {
                               <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
                             </div>
 
-                            <div>
+                            <div className='acco_section'>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Job Target and Image Upload */}
-                                <div className="md:col-span-2 flex gap-4">
+                                {/* <div className="md:col-span-2 flex gap-4">
                                   <div className="flex-1">
                                     <label className="block text-sm font-medium text-gray-700">
                                       Job Target
@@ -427,12 +424,10 @@ const page = () => {
                                     <input
                                       type="text"
                                       placeholder="SENIOR SOFTWARE ENGINEER"
-                                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-cyan-500 text-sm"
+                                      className="mt-1 w-full rounded-lg"
                                       {...register("job_target")}
                                     />
                                   </div>
-
-                                  {/* Image Upload */}
                                   <div className="flex items-center gap-4">
                                     <div className="relative w-14 h-14 bg-gray-100 rounded flex items-center justify-center overflow-hidden border border-gray-200">
                                       {selectedImage ? (
@@ -474,6 +469,61 @@ const page = () => {
                                         onChange={handleImageChange}
                                       />
                                     </div>
+                                  </div>
+                                </div> */}
+                                <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
+                                  <div className="flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg bg-gray-50">
+                                    <label
+                                      htmlFor="profile-upload"
+                                      className="cursor-pointer flex flex-col items-center gap-2"
+                                    >
+                                      <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                                        {selectedImage ? (
+                                          <img
+                                            src={selectedImage}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                          />
+                                        ) : (
+                                          <FaUser className="text-[30px] text-[#800080]" />
+                                        )}
+                                      </div>
+                                      <span className="text-sm font-medium text-[#800080] hover:underline">
+                                        Upload photo
+                                      </span>
+                                    </label>
+                                    {selectedImage && (
+                                      <button
+                                        type="button"
+                                        onClick={handleDeleteImage}
+                                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500"
+                                      >
+                                        <MdDelete size={12} /> Remove
+                                      </button>
+                                    )}
+
+                                    <span className="text-[10px] text-gray-400">
+                                      JPG / PNG • Max 2MB
+                                    </span>
+
+                                    <input
+                                      type="file"
+                                      id="profile-upload"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={handleImageChange}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                      Job Target
+                                    </label>
+                                    <input
+                                      type="text"
+                                      placeholder="SENIOR SOFTWARE ENGINEER"
+                                      className="mt-1 w-full rounded-lg"
+                                      {...register("job_target")}
+                                    />
                                   </div>
                                 </div>
 
@@ -574,7 +624,7 @@ const page = () => {
                                   <button
                                     type="button"
                                     onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
-                                    className="flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-medium transition-colors"
+                                    className="flex items-center gap-2 !text-[#800080] hover:!text-[#b98ab9] font-medium transition-colors"
                                   >
                                     {showAdditionalDetails ? (
                                       <>
@@ -902,7 +952,7 @@ const page = () => {
                           type="button"
                           onClick={prevStep}
                           disabled={step === 1}
-                          className={`text-sm font-medium ${step === 1 ? 'invisible' : 'text-gray-500'} rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700`}
+                          className={`text-sm font-medium ${step === 1 ? 'invisible' : 'text-gray-500'} rounded-4xl bg-[#800080] px-4 py-2 text-white font-sm text-sm hover:bg-[#df8cdf]`}
                         >
                           Back
                         </button>
@@ -915,11 +965,10 @@ const page = () => {
                       </div>
 
 
-                      <div className='w-5/12'>
-
+                      <div className=''>
                         <button
                           type="submit"
-                          className='rounded-lg bg-[#800080] px-6 py-2 text-white font-medium hover:bg-purple-700'
+                          className='rounded-4xl cursor-pointer bg-[#800080] px-4 py-2 text-white font-sm text-sm hover:bg-[#df8cdf]'
                         >
                           {step === STEPS.length ? (
                             "Finish"
@@ -944,9 +993,9 @@ const page = () => {
             }
           </div>
 
-          <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='flex items-center gap-1 mb-2 lg:mb-0'>
+          <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px]'>
+            <div className='flex items-center justify-between'>
+              {/* <div className='flex items-center gap-1 mb-2 lg:mb-0'>
                 <button
                   onClick={() => setOpenPreviewModal(true)}
                   className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
@@ -955,18 +1004,18 @@ const page = () => {
                   Preview
                 </button>
 
-              </div>
+              </div> */}
               <div className='lg:flex items-center gap-3'>
                 {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
                 {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-                <button
+                {/* <button
 
                   className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
         bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
                 >
                   <IoMdDownload className='text-[18px]' />
                   Download PDF
-                </button>
+                </button> */}
 
               </div>
             </div>
