@@ -83,7 +83,8 @@ import VividTemplate from '../TemplateNew/VividTemplate';
 import Professional from '../TemplateNew/Professional';
 import PrimeATS from '../TemplateNew/PrimeATS';
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
-import { getSingleResume } from '../reducers/ResumeSlice';
+import { getSingleResume, saveResumeNew } from '../reducers/ResumeSlice';
+import isEqual from 'lodash.isequal';
 
 
 const page = () => {
@@ -132,6 +133,11 @@ const page = () => {
   const [sectionOrder, setSectionOrder] = useState([
     'summary', 'employment', 'education', 'skills', 'courses', 'hobbies', 'activities', 'languages', 'internships', 'custom'
   ]);
+
+  // Auto-Save State
+  const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
+  const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
+  const lastSavedData = useRef(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -235,7 +241,27 @@ const page = () => {
 
 
   const onSubmit = (data) => {
-    console.log("Auto save / Final data:", data);
+    console.log("Manual Save / Final data:", data);
+    // Optional: Trigger immediate save on submit if needed, 
+    // but auto-save handles it. We can force a save here too.
+    setSavingStatus('saving');
+    const dataToSave = {
+      ...data,
+      resume_type: resume_type || "scratch",
+      mongo_id: resumeIds.mongo_id,
+      mysql_id: resumeIds.mysql_id
+    };
+
+    dispatch(saveResumeNew(dataToSave)).then((res) => {
+      if (res.payload && res.payload.status_code === 200) {
+        setSavingStatus('saved');
+        lastSavedData.current = JSON.parse(JSON.stringify(data));
+        toast.success("Resume saved successfully!");
+      } else {
+        setSavingStatus('error');
+        toast.error("Failed to save resume.");
+      }
+    });
   };
 
   const formValues = watch();
@@ -307,6 +333,19 @@ const page = () => {
       if (resumeData.hobbies && resumeData.hobbies.trim() !== "") newActiveSections.push('hobbies');
       if (resumeData.summary && resumeData.summary.trim() !== "") newActiveSections.push('summary'); // Assuming 'summary' field exists
 
+      // Set IDs for Auto-Save
+      if (resumeData._id || resumeData.mongo_id || resumeData.id || resumeData.mysql_id) {
+        setResumeIds({
+          mongo_id: resumeData.mongo_id || resumeData._id,
+          mysql_id: resumeData.mysql_id || resumeData.id
+        });
+        // Set initial status to 'saved' since we just loaded from server
+        setSavingStatus('saved');
+      }
+
+      // Initialize lastSavedData to match the loaded data
+      lastSavedData.current = resumeData;
+
       // Check for dynamic custom section keys (e.g., customSectionHistory_custom_...)
       const customKeys = Object.keys(resumeData).filter(key => key.startsWith('customSectionHistory_custom_'));
       if (resumeData.customSectionHistory?.length > 0) {
@@ -336,6 +375,84 @@ const page = () => {
       });
     }
   }, [singleResumeInfo, reset, setValue]);
+
+  // --- Auto-Save Effect ---
+  useEffect(() => {
+    // We want to auto-save even if we don't have IDs yet (initial creation), 
+    // BUT we must avoid saving empty/default forms immediately on load unless user has typed something (dirty).
+    // Ideally, we check formstate.isDirty, but we are using `watch` values.
+
+    // Normalization
+    const currentDataNormalized = JSON.parse(JSON.stringify(formValues));
+
+    // Check if data is essentially empty (default state) to prevent empty creation?
+    // Or just rely on equality check against lastSavedData.
+
+    // Logic:
+    // 1. If we have IDs: Check if data changed. If yes, UPDATE.
+    // 2. If we DON'T have IDs: Check if data changed from "initial default". If yes, CREATE.
+
+    // Since lastSavedData.current might be null initially (if new resume).
+    // If lastSavedData is null, and currentData is just default form values, we might skip?
+    // But how do we know default?
+
+    // Improved Logic:
+    // If lastSavedData is set, compare.
+    // If lastSavedData is NOT set (first run or new resume):
+    //    If we have IDs (loaded resume), we set lastSavedData in previous effect, so this shouldn't be null unless race condition.
+    //    If we Don't have IDs (new resume), lastSavedData is null. We should probably set it to currentData on mount to establish baseline?
+    //    OR we just let the first save happen after 2s if user typed?
+
+    if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
+      return; // Data hasn't changed
+    }
+
+    // If it's a new resume (no IDs) and lastSavedData is null (never saved), 
+    // we might want to ensure user actually entered something.
+    // But `formValues` will differ from `null`.
+
+    // Let's use a flag or simple check:
+    // If no IDs and form is default checks? 
+    // Simply: Proceed to save. The debounce handles rapid typing. 
+    // If it's strictly empty, backend might handle it or we create empty resume. 
+    // Most users start typing immediately.
+
+    setSavingStatus('saving');
+    const timeoutId = setTimeout(() => {
+      const currentData = JSON.parse(JSON.stringify(formValues));
+
+      const dataToSave = {
+        ...currentData,
+        resume_type: resume_type || "scratch",
+        mongo_id: resumeIds.mongo_id,
+        mysql_id: resumeIds.mysql_id
+      };
+
+      dispatch(saveResumeNew(dataToSave)).then((res) => {
+        if (res.payload && res.payload.status_code === 200) {
+          setSavingStatus('saved');
+          lastSavedData.current = currentData;
+
+          // If we just created it (didn't have IDs), update IDs now
+          if (!resumeIds.mongo_id) {
+            const newMongoId = res.payload.sectionsdata?.mongo_id;
+            const newMysqlId = res.payload.sectionsdata?.mysql_id;
+            if (newMongoId && newMysqlId) {
+              setResumeIds({
+                mongo_id: newMongoId,
+                mysql_id: newMysqlId
+              });
+            }
+          }
+        } else {
+          console.error("Auto-save failed:", res);
+          setSavingStatus('error');
+        }
+      });
+    }, 2000); // 2 second debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formValues, resumeIds, resume_type, dispatch]);
   return (
     <div>
       <div className='resume_tab_scrach'>
@@ -361,6 +478,11 @@ const page = () => {
                     </div>
                     <div className="flex flex-col gap-2">
                       <Progress progress={10} size="sm" />
+                    </div>
+                    <div className='flex items-center gap-2 mt-2'>
+                      {savingStatus === 'saving' && <span className="text-gray-500 text-xs font-medium italic flex items-center gap-1">💾 Saving...</span>}
+                      {savingStatus === 'saved' && <span className="text-green-600 text-xs font-medium flex items-center gap-1"><AiFillSave /> Saved</span>}
+                      {savingStatus === 'error' && <span className="text-red-500 text-xs font-medium">❌ Save Error</span>}
                     </div>
                   </div>
 
@@ -789,53 +911,27 @@ const page = () => {
         <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px]'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-              {/* <button
-                onClick={() => setOpenPreviewModal(true)}
-                className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
-              >
-                <MdPreview className='text-[#800080] text-2xl' />
-                Preview
-              </button> */}
+
 
             </div>
             <div className='lg:flex items-center gap-3'>
-              {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
-              {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-              {/* <button
-                //  onClick={handleDownloadClick}
-                className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
-        bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
-              >
-                <IoMdDownload className='text-[18px]' />
-                Download PDF
-              </button> */}
+              <div className='flex items-center gap-2 mr-4'>
+                {console.log(savingStatus, "savingStatus")}
+                {savingStatus === 'saving' && <span className="text-gray-500 text-sm font-medium italic">Saving...</span>}
+                {savingStatus === 'saved' && <span className="text-green-600 text-sm font-medium flex items-center gap-1"><AiFillSave /> Saved</span>}
+                {savingStatus === 'error' && <span className="text-red-500 text-sm font-medium">Save Error</span>}
+              </div>
+
 
             </div>
           </div>
           <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
             <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} />
-            {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
-            {/* {
-                  template == 1 && (
-                    <Template1 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-                  )
-                }
-                {
-                  template == 2 && (
-                    <Template2 ref={componentRef} data={formValues} education={educationEntries} experiences={experiences} skills={skills} languages={languages} personalPro={personalPro} achivments={achivments} certificates={certificates} />
-                  )
-                } */}
-            {/* <Professional formData={formValues} empHistory={empHistory} /> */}
+
+
 
           </div>
-          {/* <div className='flex items-center justify-between mb-0'>
-                  <div className='flex items-center gap-1'>
-                    <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
-                  </div>
-                  <div className='flex items-center gap-3'>
-                    <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
-                  </div>
-                </div> */}
+
         </div>
 
         {/* add modal for apply job start here */}

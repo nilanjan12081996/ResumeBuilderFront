@@ -13,242 +13,283 @@ const TITLE_ICON_MAP = {
     Certifications: FaStar,
 };
 
-const CorporateTemplate = ({ formData }) => {
-    const resumeData = {
-        personalInfo: {
-            name: 'SOUVICK PANJA',
-            title: 'Frontend Developer',
-            location: 'Kolkata, West Bengal, India',
-            phone: '8327611187',
-            email: 'souvick1@gmail.com',
-            links: ['GitHub', 'LinkedIn', 'Personal Website'],
-        },
-
-        summary: {
-            title: 'Profile',
-            description:
-                'A highly motivated and passionate Frontend Developer with strong expertise in React.js, Next.js, TypeScript, and UI/UX design principles. Skilled in building responsive, user-focused web applications and integrating RESTful APIs.',
-        },
-
-        skills: {
-            title: 'Skills Summary',
-            items: [
-                'JavaScript',
-                'TypeScript',
-                'HTML',
-                'CSS',
-                'React.js',
-                'Next.js',
-                'Redux',
-                'TanStack Query',
-                'MUI',
-                'Tailwind CSS',
-                'Bootstrap',
-                'Supabase',
-                'Firebase',
-                'REST APIs',
-                'Git',
-            ],
-        },
-
-        experience: {
-            title: 'Experience',
-            items: [
-                {
-                    role: 'Freelance HTML Developer',
-                    company: 'Self-employed',
-                    start: '2023',
-                    end: '2024',
-                    points: [
-                        'Worked on multiple static and responsive websites using HTML, CSS, and JavaScript.',
-                        'Improved semantic HTML structure and cross-browser compatibility.',
-                    ],
-                },
-                {
-                    role: 'Frontend Developer (Trainee)',
-                    company: 'Webskitters Technology Solutions, Kolkata',
-                    start: '2024',
-                    end: '2025',
-                    points: [
-                        'Built optimized responsive UIs using React.js, Next.js, and Material UI.',
-                        'Integrated APIs with React Query, improving performance by 30%.',
-                        'Refactored legacy code and implemented Redux for scalability.',
-                    ],
-                },
-            ],
-        },
-
-        education: {
-            title: 'Education',
-            items: [
-                {
-                    degree: 'Frontend Developer Training',
-                    institute: 'Webskitters Academy',
-                    location: 'Kolkata, India',
-                    start: '2024',
-                    end: '2025',
-                },
-                {
-                    degree: 'Bachelor of Arts',
-                    institute: 'Netaji Subhas Open University',
-                    location: 'Bagnan, Howrah',
-                    start: '2020',
-                    end: '2023',
-                },
-            ],
-        },
-
-        certifications: {
-            title: 'Certifications',
-            items: [
-                {
-                    name: 'Frontend Developer (React JS)',
-                    start: '2024',
-                    end: '2025',
-                },
-                {
-                    name: 'Code With Puja Contest Award',
-                    start: '2024',
-                    end: '2025',
-                },
-            ],
-        },
-
-        projects: {
-            title: 'Projects',
-            items: [
-                {
-                    name: 'Task Management System – Taskify',
-                    points: [
-                        'Developed a full task management system using Next.js and Supabase.',
-                        'Implemented authentication, task priority, deadlines, and reporting.',
-                        'Used Tailwind CSS and TanStack Query.',
-                    ],
-                },
-                {
-                    name: 'Fresh Bazar – Grocery Platform',
-                    points: [
-                        'Built a responsive grocery e-commerce platform.',
-                        'Implemented category filtering, search, and checkout.',
-                        'Used React.js, Redux, Material UI, and REST APIs.',
-                    ],
-                },
-            ],
-        },
+const CorporateTemplate = ({ formData, sectionOrder }) => {
+    
+    // --- Helpers ---
+    const formatDate = (dateValue) => {
+        if (!dateValue) return "";
+        const d = new Date(dateValue);
+        return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
     };
+
+    // --- Data Existence Checks ---
+    const hasEmployment = formData.employmentHistory?.some(job => job.job_title || job.employer);
+    const hasEducation = formData.educationHistory?.some(edu => edu.school || edu.degree);
+    const hasSkills = formData.newSkillHistory?.some(s => s.skill);
+    const hasLanguages = formData.languageHistory?.some(l => l.language);
+    const hasActivities = formData.activityHistory?.some(act => act.functionTitle || act.employer);
+    const hasInternships = formData.internshipHistory?.some(i => i.jobTitle || i.employer);
+    const hasCourses = formData.coursesHistory?.some(c => c.course || c.institution);
+    
+    // --- Render Functions (Main Content) ---
+
+    const renderSummary = () => (
+        formData.summary && (
+            <section key="summary">
+                <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-2">
+                    <IoMdContact className="text-md" />
+                    Profile
+                </h2>
+                <p className="text-xs text-gray-700 text-justify leading-relaxed whitespace-pre-wrap">
+                    {formData.summary}
+                </p>
+            </section>
+        )
+    );
+
+    const renderEmployment = () => (
+        hasEmployment && (
+            <TimelineSection
+                key="employment"
+                title="Experience"
+                icon={BsBagFill}
+                items={formData.employmentHistory.map(e => ({
+                    heading: `${e.job_title}${e.employer ? `, ${e.employer}` : ''}${e.city_state ? `, ${e.city_state}` : ''}`,
+                    period: `${formatDate(e.startDate)} — ${formatDate(e.endDate)}`,
+                    points: e.description ? [e.description] : [],
+                }))}
+            />
+        )
+    );
+
+    const renderEducation = () => (
+        hasEducation && (
+            <TimelineSection
+                key="education"
+                title="Education"
+                icon={HiAcademicCap}
+                items={formData.educationHistory.map(e => ({
+                    heading: `${e.degree}, ${e.school}, ${e.city_state}`,
+                    period: `${formatDate(e.startDate)} — ${formatDate(e.endDate)}`,
+                    points: e.description ? [e.description] : [],
+                }))}
+            />
+        )
+    );
+
+    const renderInternships = () => (
+        hasInternships && (
+            <TimelineSection
+                key="internships"
+                title="Internships"
+                icon={BsBagFill}
+                items={formData.internshipHistory.map(e => ({
+                    heading: `${e.jobTitle}${e.employer ? `, ${e.employer}` : ''}${e.city ? `, ${e.city}` : ''}`,
+                    period: `${formatDate(e.startDate)} — ${formatDate(e.endDate)}`,
+                    points: e.description ? [e.description] : [],
+                }))}
+            />
+        )
+    );
+
+    const renderActivities = () => (
+        hasActivities && (
+            <TimelineSection
+                key="activities"
+                title="Activities"
+                icon={FaStar}
+                items={formData.activityHistory.map(e => ({
+                    heading: `${e.functionTitle}${e.employer ? `, ${e.employer}` : ''}${e.city ? `, ${e.city}` : ''}`,
+                    period: `${formatDate(e.startDate)} — ${formatDate(e.endDate)}`,
+                    points: e.description ? [e.description] : [],
+                }))}
+            />
+        )
+    );
+
+    const renderCourses = () => (
+        hasCourses && (
+            <TimelineSection
+                key="courses"
+                title="Courses"
+                icon={HiAcademicCap}
+                items={formData.coursesHistory.map(e => ({
+                    heading: `${e.course}${e.institution ? `, ${e.institution}` : ''}`,
+                    period: `${formatDate(e.startDate)} — ${formatDate(e.endDate)}`,
+                    points: [],
+                }))}
+            />
+        )
+    );
+
+    const renderCustom = () => (
+        <>
+            {Object.keys(formData)
+                .filter(key => key.startsWith('customSectionHistory_'))
+                .map(key => {
+                    const sectionId = key.replace('customSectionHistory_', '');
+                    const history = formData[key];
+                    const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
+
+                    if (!history?.some(item => item.activity || item.city)) return null;
+
+                    return (
+                        <TimelineSection
+                            key={sectionId}
+                            title={title}
+                            icon={FaStar}
+                            items={history.map(item => ({
+                                heading: `${item.activity}${item.city ? `, ${item.city}` : ''}`,
+                                period: `${formatDate(item.startDate)} — ${formatDate(item.endDate)}`,
+                                points: item.description ? [item.description] : [],
+                            }))}
+                        />
+                    );
+                })}
+             {formData.customSectionHistory?.some(item => item.activity || item.city) && (
+                <TimelineSection
+                    key="custom-default"
+                    title={formData.customSectionTitle || 'Custom Section'}
+                    icon={FaStar}
+                     items={formData.customSectionHistory.map(item => ({
+                        heading: `${item.activity}${item.city ? `, ${item.city}` : ''}`,
+                        period: `${formatDate(item.startDate)} — ${formatDate(item.endDate)}`,
+                        points: item.description ? [item.description] : [],
+                    }))}
+                />
+            )}
+        </>
+    );
+
+
+    // --- Render Functions (Sidebar) ---
+    const renderSkills = () => (
+        hasSkills && (
+            <section key="skills">
+                <h3 className="text-xs font-bold uppercase mb-2">Skills</h3>
+                <ul className="space-y-1">
+                    {formData.newSkillHistory.map((s, i) => (
+                        <li key={i} className="text-xs text-gray-700">
+                            {s.skill}
+                             {!formData.hideExperienceLevel && s.level ? ` (${["Novice","Beginner", "Skillful", "Experienced", "Expert"][s.level]})` : ''}
+                        </li>
+                    ))}
+                </ul>
+            </section>
+        )
+    );
+
+    const renderLanguages = () => (
+        hasLanguages && (
+            <section key="languages">
+                <h3 className="text-xs font-bold uppercase mb-2">Languages</h3>
+                 <ul className="space-y-1">
+                    {formData.languageHistory.map((l, i) => (
+                        <li key={i} className="text-xs text-gray-700">
+                            {l.language} {l.level ? `- ${l.level}` : ''}
+                        </li>
+                    ))}
+                </ul>
+            </section>
+        )
+    );
+
+    const renderHobbies = () => (
+        formData.hobbies && (
+            <section key="hobbies">
+                <h3 className="text-xs font-bold uppercase mb-2">Hobbies</h3>
+                <p className="text-xs text-gray-700 whitespace-pre-wrap">
+                    {formData.hobbies}
+                </p>
+            </section>
+        )
+    );
+
+
+    // --- Section Mapping ---
+    const mainSectionRenderers = {
+        'summary': renderSummary,
+        'employment': renderEmployment,
+        'education': renderEducation,
+        'internships': renderInternships,
+        'activities': renderActivities,
+        'courses': renderCourses,
+        'custom': renderCustom
+    };
+
+    const sidebarSectionRenderers = {
+        'skills': renderSkills,
+        'languages': renderLanguages,
+        'hobbies': renderHobbies
+    };
+
+    const order = sectionOrder || ['summary', 'employment', 'education', 'activities', 'skills', 'languages', 'hobbies', 'internships', 'courses', 'custom'];
+
 
     return (
         <div className="min-h-[297mm] bg-white shadow-xl font-sans text-sm">
 
-            <div className="text-center py-6">
-                <h1 className="text-2xl font-bold tracking-wide">
-                    {resumeData.personalInfo.name}
+            <div className="text-center py-6 border-b border-gray-100">
+                <h1 className="text-2xl font-bold tracking-wide text-gray-900 uppercase">
+                    {formData.first_name} {formData.last_name}
                 </h1>
-                <p className="uppercase text-[10px] text-gray-600 mt-1">
-                    {resumeData.personalInfo.title} • {resumeData.personalInfo.location} •{' '}
-                    {resumeData.personalInfo.phone}
+                <p className="uppercase text-[10px] text-gray-500 mt-1 font-semibold tracking-widest">
+                    {formData.job_target}
+                </p>
+                <p className="text-[10px] text-gray-400 mt-1">
+                     {formData.city_state} {formData.country}
                 </p>
             </div>
 
-            <div className="flex">
+            <div className="flex min-h-[800px]">
 
-                <aside className="w-[32%] px-6 py-6 space-y-6 text-center">
+                <aside className="w-[32%] px-6 py-8 space-y-6 text-center border-r border-gray-100 bg-gray-50/50">
 
-                    <section>
-                        <h3 className="text-xs font-bold uppercase mb-2">Details</h3>
-                        <p className="text-xs">{resumeData.personalInfo.location}</p>
-                        <p className="text-xs">{resumeData.personalInfo.phone}</p>
-                        <p className="text-xs break-all">{resumeData.personalInfo.email}</p>
-                    </section>
+                    {/* DETAILS */}
+                    {(formData.address || formData.phone || formData.email || formData.dob) && (
+                         <section>
+                            <h3 className="text-xs font-bold uppercase mb-3 text-gray-800 tracking-wider">Details</h3>
+                            <div className="flex flex-col gap-1.5 text-xs text-gray-600">
+                                {formData.address && <p>{formData.address}</p>}
+                                {formData.city_state && <p>{formData.city_state}, {formData.country}</p>}
+                                {formData.phone && <p>{formData.phone}</p>}
+                                {formData.email && <p className="break-all">{formData.email}</p>}
+                                {formData.dob && <p>{formData.dob}</p>}
+                            </div>
+                        </section>
+                    )}
 
-                    <section>
-                        <h3 className="text-xs font-bold uppercase mb-2">Links</h3>
-                        {resumeData.personalInfo.links.map((l, i) => (
-                            <p key={i} className="text-xs">{l}</p>
-                        ))}
-                    </section>
+                    {/* LINKS */}
+                    {(formData.linkedin || formData.github || formData.website) && (
+                        <section>
+                            <h3 className="text-xs font-bold uppercase mb-3 text-gray-800 tracking-wider">Links</h3>
+                            <div className="flex flex-col gap-1.5 text-xs text-gray-600">
+                                {formData.linkedin && <a href={formData.linkedin} className="hover:underline">LinkedIn</a>}
+                                {formData.github && <a href={formData.github} className="hover:underline">GitHub</a>}
+                                {formData.website && <a href={formData.website} className="hover:underline">Portfolio</a>}
+                            </div>
+                        </section>
+                    )}
+                    
+                    {/* SIDEBAR DYNAMIC SECTIONS */}
+                     {order.map(sectionId => {
+                        if (sidebarSectionRenderers[sectionId]) {
+                            return sidebarSectionRenderers[sectionId]();
+                        }
+                        return null;
+                    })}
 
-                    <section>
-                        <h3 className="text-xs font-bold uppercase mb-2">
-                            {resumeData.skills.title}
-                        </h3>
-                        <ul className="space-y-1">
-                            {resumeData.skills.items.map((s, i) => (
-                                <li key={i} className="text-xs">{s}</li>
-                            ))}
-                        </ul>
-                    </section>
                 </aside>
 
-                <main className="w-[68%] px-8 py-6 space-y-8">
-
-                    <section>
-                        <h2 className="text-sm font-bold uppercase mb-2">
-                            {resumeData.summary.title}
-                        </h2>
-                        <p className="text-xs text-gray-700 text-justify">
-                            {resumeData.summary.description}
-                        </p>
-                    </section>
-
-                    <TimelineSection
-                        title={resumeData.experience.title}
-                        items={resumeData.experience.items.map(e => ({
-                            heading: `${e.role}, ${e.company}`,
-                            period: `${e.start} — ${e.end}`,
-                            points: e.points,
-                        }))}
-                    />
-
-                    {/* EDUCATION */}
-                    <TimelineSection
-                        title={resumeData.education.title}
-                        items={resumeData.education.items.map(e => ({
-                            heading: `${e.degree}, ${e.institute}, ${e.location}`,
-                            period: `${e.start} — ${e.end}`,
-                        }))}
-                    />
-
-                    {/* CERTIFICATIONS */}
-                    <TimelineSection
-                        title={resumeData.certifications.title}
-                        items={resumeData.certifications.items.map(c => ({
-                            heading: c.name,
-                            period: `${c.start} — ${c.end}`,
-                        }))}
-                    />
-
-
-                    <TimelineSection
-                        title={resumeData.projects.title}
-                        items={resumeData.projects.items.map(p => ({
-                            heading: p.name,
-                            points: p.points,
-                        }))}
-                    />
-
-                    {/* CUSTOM SECTIONS */}
-                    {formData && Object.keys(formData)
-                        .filter(key => key.startsWith('customSectionHistory_'))
-                        .map(key => {
-                            const sectionId = key.replace('customSectionHistory_', '');
-                            const history = formData[key];
-                            const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
-
-                            if (!history?.some(item => item.activity || item.city)) return null;
-
-                            return (
-                                <TimelineSection
-                                    key={sectionId}
-                                    title={title}
-                                    items={history.map(item => ({
-                                        heading: `${item.activity}${item.city ? `, ${item.city}` : ''}`,
-                                        period: `${item.startDate ? new Date(item.startDate).toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : ''} ${item.startDate && item.endDate ? '—' : ''} ${item.endDate ? new Date(item.endDate).toLocaleString('en-US', { month: 'short', year: 'numeric' }).toUpperCase() : ''}`,
-                                        points: item.description ? [item.description] : [],
-                                    }))}
-                                />
-                            );
-                        })}
+                <main className="w-[68%] px-8 py-8 space-y-8">
+                    
+                     {/* MAIN DYNAMIC SECTIONS */}
+                     {order.map(sectionId => {
+                        if (mainSectionRenderers[sectionId]) {
+                            return mainSectionRenderers[sectionId]();
+                        }
+                        return null;
+                    })}
 
                 </main>
             </div>
@@ -256,39 +297,45 @@ const CorporateTemplate = ({ formData }) => {
     );
 };
 
-const TimelineSection = ({ title, items }) => {
-    const Icon = TITLE_ICON_MAP[title];
-
+const TimelineSection = ({ title, items, icon: Icon }) => {
     return (
         <section>
-            <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4">
-                {Icon && <Icon className="text-md" />}
+            <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4 text-gray-900">
+                {Icon && <Icon className="text-lg text-gray-700" />}
                 {title}
             </h2>
 
-            <div className="relative border-l border-gray-400 pl-4 space-y-6 left-[6px]">
+            <div className="relative border-l-2 border-gray-200 pl-5 space-y-6 ml-2">
                 {items.map((item, i) => (
                     <div key={i} className="relative">
+                        {/* Dot */}
+                        <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-gray-200 border-2 border-white"></div>
 
                         {/* HEADING */}
-                        <h4 className="text-xs font-bold leading-snug">
+                        <h4 className="text-xs font-bold leading-snug text-gray-800">
                             {item.heading}
                         </h4>
 
                         {/* PERIOD */}
                         {item.period && (
-                            <p className="text-[10px] text-gray-500 mt-1">
+                            <p className="text-[10px] text-gray-500 mt-0.5 font-medium mb-1">
                                 {item.period}
                             </p>
                         )}
 
                         {/* BULLETS */}
-                        {item.points && (
-                            <ul className="list-disc pl-4 mt-2 space-y-1 text-xs text-gray-700">
-                                {item.points.map((p, idx) => (
-                                    <li key={idx}>{p}</li>
-                                ))}
-                            </ul>
+                        {item.points && item.points.length > 0 && (
+                            <div className="text-xs text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
+                                {item.points.length === 1 ? (
+                                    <p>{item.points[0]}</p>
+                                ) : (
+                                    <ul className="list-disc pl-4 space-y-0.5">
+                                        {item.points.map((p, idx) => (
+                                            <li key={idx}>{p}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
                         )}
                     </div>
                 ))}

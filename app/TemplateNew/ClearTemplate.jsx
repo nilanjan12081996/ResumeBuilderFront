@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, Phone, Mail, MapPin, Calendar } from 'lucide-react'; // Assuming you have lucide-react or similar icons
 
-const ClearTemplate = ({ formData, themeColor }) => {
+const ClearTemplate = ({ formData, themeColor, sectionOrder }) => {
 
   // --- Helpers ---
   const formatDate = (dateValue) => {
@@ -26,12 +26,273 @@ const ClearTemplate = ({ formData, themeColor }) => {
   const hasInternships = formData.internshipHistory?.some(i => i.jobTitle || i.employer) && formData.internshipHistory.length > 0;
   const hasCourses = formData.coursesHistory?.some(c => c.course || c.institution) && formData.coursesHistory.length > 0;
 
-
   // Combine links for the sidebar
   const links = [];
   if (formData.linkedin) links.push({ label: "LinkedIn", url: formData.linkedin });
   if (formData.website) links.push({ label: "Portfolio", url: formData.website });
   if (formData.github) links.push({ label: "GitHub", url: formData.github });
+
+  // --- RENDER FUNCTIONS ---
+  const renderSummary = () => (
+      formData.summary && (
+        <section key="summary">
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Profile</h2>
+          <p className="text-xs leading-relaxed text-gray-700 text-justify whitespace-pre-wrap">
+            {formData.summary}
+          </p>
+        </section>
+      )
+  );
+
+  const renderEducation = () => (
+      hasEducation && (
+        <section key="education">
+          <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Education</h2>
+          <div className="flex flex-col gap-6">
+            {formData.educationHistory.map((edu, idx) => (
+              <div key={idx}>
+                <h3 className="text-xs font-bold text-gray-900 uppercase">
+                  {edu.degree}{edu.school ? `, ${edu.school}` : ''}
+                </h3>
+                <div className="text-xs text-gray-500 mb-1 mt-0.5">
+                   {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
+                </div>
+                {edu.description && (
+                  <p className="text-xs text-gray-600 mt-1 whitespace-pre-wrap">
+                    {edu.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+  );
+
+  const renderEmployment = () => (
+      hasEmployment && (
+        <section key="employment">
+          <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Experience</h2>
+          <div className="flex flex-col gap-6">
+            {formData.employmentHistory.map((job, idx) => (
+              <div key={idx}>
+                <h3 className="text-xs font-bold text-gray-900">
+                  {job.job_title}{job.employer ? `, ${job.employer}` : ''}{job.city_state ? `, ${job.city_state}` : ''}
+                </h3>
+                <div className="text-xs text-gray-500 mb-2 mt-0.5">
+                   {formatDate(job.startDate)} — {formatDate(job.endDate)}
+                </div>
+                {job.description && (
+                  <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {job.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+  );
+  
+  const renderSkills = () => (
+       hasSkills && (
+        <div className="mb-2" key="skills">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-1">Skills</h3>
+          <div className="flex flex-col gap-2">
+             {formData.newSkillHistory.map((skill, idx) => (
+                <span key={idx} className="block">
+                <span className="text-xs text-gray-700">
+                  {skill.skill}
+                </span>
+                     {!formData.hideExperienceLevel && (
+                    <span className="text-[10px] text-gray-400 uppercase ml-2">
+                        {[ "Novice","Beginner", "Skillful", "Experienced", "Expert"][(skill.level || 0)]}
+                    </span>
+                )}
+                </span>
+             ))}
+          </div>
+        </div>
+      )
+  );
+
+  const renderInternships = () => (
+      hasInternships && (
+        <section key="internships">
+          <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Internships</h2>
+          <div className="flex flex-col gap-6">
+            {formData.internshipHistory.map((job, idx) => (
+              <div key={idx}>
+                <h3 className="text-xs font-bold text-gray-900">
+                  {job.jobTitle}{job.employer ? `, ${job.employer}` : ''}{job.city ? `, ${job.city}` : ''}
+                </h3>
+                <div className="text-xs text-gray-500 mb-2 mt-0.5">
+                   {getYear(job.startDate)} — {getYear(job.endDate)}
+                </div>
+                {job.description && (
+                  <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {job.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+  );
+
+  const renderActivities = () => (
+      hasActivities && (
+        <section key="activities">
+          <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Activities</h2>
+          <div className="flex flex-col gap-5">
+            {formData.activityHistory.map((act, idx) => (
+              <div key={idx}>
+                <h3 className="text-xs font-bold text-gray-900">
+                    {act.functionTitle} {act.employer ? `- ${act.employer}` : ""}
+                </h3>
+                <div className="text-xs text-gray-500 mb-1 mt-0.5">
+                    {formatDate(act.startDate)} — {formatDate(act.endDate)}
+                </div>
+                {act.description && (
+                   <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                     {act.description}
+                   </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+  );
+
+  const renderCourses = () => (
+      hasCourses && (
+        <section key="courses">
+          <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Courses</h2>
+          <div className="flex flex-col gap-4">
+            {formData.coursesHistory.map((course, idx) => (
+              <div key={idx}>
+                 <h3 className="text-xs font-bold text-gray-900">
+                    {course.course} {course.institution ? `- ${course.institution}` : ""}
+                </h3>
+                <div className="text-xs text-gray-500 mt-0.5">
+                     {formatDate(course.startDate)} — {formatDate(course.endDate)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+  );
+
+  const renderLanguages = () => (
+       hasLanguages && (
+        <div className="mb-8 mt-2" key="languages">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-2">Languages</h3>
+          <div className="flex flex-col gap-2">
+            {formData.languageHistory.map((lang, idx) => (
+              <div key={idx} className="text-xs">
+                <span className="block text-gray-800 font-medium">{lang.language}</span>
+                <span className="block text-gray-500 text-[10px]">{lang.level}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+  );
+
+  const renderHobbies = () => (
+      formData.hobbies && (
+        <div className="mb-8" key="hobbies">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-3">Hobbies</h3>
+        <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">
+            {formData.hobbies}
+        </p>
+        </div>
+      )
+  );
+
+  const renderCustom = () => (
+    <>
+      {Object.keys(formData)
+        .filter(key => key.startsWith('customSectionHistory_'))
+        .map(key => {
+          const sectionId = key.replace('customSectionHistory_', '');
+          const history = formData[key];
+          const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
+
+          if (!history?.some(item => item.activity || item.city)) return null;
+
+          return (
+            <section key={sectionId}>
+              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">
+                  {title}
+              </h2>
+              <div className="flex flex-col gap-4">
+                {history.map((item, idx) => (
+                   <div key={idx}>
+                    <h3 className="text-xs font-bold text-gray-900">
+                        {item.activity} {item.city ? `, ${item.city}` : ""}
+                    </h3>
+                     <div className="text-xs text-gray-500 mb-1 mt-0.5">
+                      {formatDate(item.startDate)} — {formatDate(item.endDate)}
+                   </div>
+                   {item.description && (
+                     <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                       {item.description}
+                     </p>
+                   )}
+                 </div>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+        {formData.customSectionHistory?.some(item => item.activity || item.city) && (
+             <section key="custom-default">
+              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">
+                  {formData.customSectionTitle || 'Custom Section'}
+              </h2>
+              <div className="flex flex-col gap-4">
+                {formData.customSectionHistory.map((item, idx) => (
+                   <div key={idx}>
+                    <h3 className="text-xs font-bold text-gray-900">
+                        {item.activity} {item.city ? `, ${item.city}` : ""}
+                    </h3>
+                     <div className="text-xs text-gray-500 mb-1 mt-0.5">
+                      {formatDate(item.startDate)} — {formatDate(item.endDate)}
+                   </div>
+                   {item.description && (
+                     <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                       {item.description}
+                     </p>
+                   )}
+                 </div>
+                ))}
+              </div>
+            </section>
+        )}
+    </>
+  );
+
+  const sidebarSections = {
+      'languages': renderLanguages,
+      'hobbies': renderHobbies
+  };
+
+  const mainSections = {
+      'summary': renderSummary,
+      'employment': renderEmployment,
+      'education': renderEducation,
+      'skills': renderSkills,
+      'internships': renderInternships,
+      'activities': renderActivities,
+      'courses': renderCourses,
+      'custom': renderCustom
+  };
+
+  const order = sectionOrder || ['summary', 'employment', 'education', 'skills', 'internships', 'activities', 'courses', 'custom', 'languages', 'hobbies'];
 
   return (
     <div className="min-h-[297mm] bg-white text-gray-800 font-sans shadow-xl">
@@ -109,7 +370,7 @@ const ClearTemplate = ({ formData, themeColor }) => {
           )}
 
           {(formData.dob || formData.birth_place || formData.nationality || formData.driving_licence) && (
-            <section className="flex flex-col gap-4">
+            <section className="flex flex-col gap-4 mb-4">
              
               
               {formData.dob && (
@@ -135,219 +396,26 @@ const ClearTemplate = ({ formData, themeColor }) => {
             </section>
           )}
 
-          {/* LANGUAGES */}
-          {hasLanguages && (
-            <div className="mb-8 mt-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-2">Languages</h3>
-              <div className="flex flex-col gap-2">
-                {formData.languageHistory.map((lang, idx) => (
-                  <div key={idx} className="text-xs">
-                    <span className="block text-gray-800 font-medium">{lang.language}</span>
-                    <span className="block text-gray-500 text-[10px]">{lang.level}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SKILLS (If space allows, or if they fit better here than main content) */}
-         
-          
-             {/* HOBBIES */}
-            {formData.hobbies && (
-                <div className="mb-8">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-3">Hobbies</h3>
-                <p className="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">
-                    {formData.hobbies}
-                </p>
-                </div>
-            )}
+          {/* SIDEBAR SECTIONS */}
+          {order.map(sectionId => {
+              if (sidebarSections[sectionId]) {
+                  return sidebarSections[sectionId]();
+              }
+              return null;
+          })}
 
         </div>
 
         {/* ================= RIGHT CONTENT (75%) ================= */}
         <div className="w-[75%] p-8 pr-10 pt-10 flex flex-col gap-8">
           
-          {/* PROFILE */}
-          {formData.summary && (
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Profile</h2>
-              <p className="text-xs leading-relaxed text-gray-700 text-justify whitespace-pre-wrap">
-                {formData.summary}
-              </p>
-            </section>
-          )}
-
-          {/* EDUCATION */}
-          {hasEducation && (
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Education</h2>
-              <div className="flex flex-col gap-6">
-                {formData.educationHistory.map((edu, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-xs font-bold text-gray-900 uppercase">
-                      {edu.degree}{edu.school ? `, ${edu.school}` : ''}
-                    </h3>
-                    <div className="text-xs text-gray-500 mb-1 mt-0.5">
-                       {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
-                    </div>
-                    {edu.description && (
-                      <p className="text-xs text-gray-600 mt-1 whitespace-pre-wrap">
-                        {edu.description}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* EXPERIENCE */}
-          {hasEmployment && (
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Experience</h2>
-              <div className="flex flex-col gap-6">
-                {formData.employmentHistory.map((job, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-xs font-bold text-gray-900">
-                      {job.job_title}{job.employer ? `, ${job.employer}` : ''}{job.city_state ? `, ${job.city_state}` : ''}
-                    </h3>
-                    <div className="text-xs text-gray-500 mb-2 mt-0.5">
-                       {formatDate(job.startDate)} — {formatDate(job.endDate)}
-                    </div>
-                    {job.description && (
-                      <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {job.description}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-           {hasSkills && (
-            <div className="mb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-900 mb-1">Skills</h3>
-              <div className="flex flex-col gap-2">
-                 {formData.newSkillHistory.map((skill, idx) => (
-                    <>
-                    <span key={idx} className="text-xs text-gray-700 block">
-                      {skill.skill}
-                    </span>
-                         {!formData.hideExperienceLevel && (
-                        <span className="text-[10px] text-gray-400 uppercase">
-                            {[ "Novice","Beginner", "Skillful", "Experienced", "Expert"][(skill.level || 0)]}
-                        </span>
-                    )}
-                    </>
-                 ))}
-              </div>
-            </div>
-          )}
-
-           {/* INTERNSHIPS */}
-           {hasInternships && (
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Internships</h2>
-              <div className="flex flex-col gap-6">
-                {formData.internshipHistory.map((job, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-xs font-bold text-gray-900">
-                      {job.jobTitle}{job.employer ? `, ${job.employer}` : ''}{job.city ? `, ${job.city}` : ''}
-                    </h3>
-                    <div className="text-xs text-gray-500 mb-2 mt-0.5">
-                       {getYear(job.startDate)} — {getYear(job.endDate)}
-                    </div>
-                    {job.description && (
-                      <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {job.description}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ACTIVITIES */}
-          {hasActivities && (
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Activities</h2>
-              <div className="flex flex-col gap-5">
-                {formData.activityHistory.map((act, idx) => (
-                  <div key={idx}>
-                    <h3 className="text-xs font-bold text-gray-900">
-                        {act.functionTitle} {act.employer ? `- ${act.employer}` : ""}
-                    </h3>
-                    <div className="text-xs text-gray-500 mb-1 mt-0.5">
-                        {formatDate(act.startDate)} — {formatDate(act.endDate)}
-                    </div>
-                    {act.description && (
-                       <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
-                         {act.description}
-                       </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-           {/* COURSES */}
-           {hasCourses && (
-            <section>
-              <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">Courses</h2>
-              <div className="flex flex-col gap-4">
-                {formData.coursesHistory.map((course, idx) => (
-                  <div key={idx}>
-                     <h3 className="text-xs font-bold text-gray-900">
-                        {course.course} {course.institution ? `- ${course.institution}` : ""}
-                    </h3>
-                    <div className="text-xs text-gray-500 mt-0.5">
-                         {formatDate(course.startDate)} — {formatDate(course.endDate)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* CUSTOM SECTIONS */}
-          {Object.keys(formData)
-            .filter(key => key.startsWith('customSectionHistory_'))
-            .map(key => {
-              const sectionId = key.replace('customSectionHistory_', '');
-              const history = formData[key];
-              const title = formData[`customSectionTitle_${sectionId}`] || 'Custom Section';
-
-              if (!history?.some(item => item.activity || item.city)) return null;
-
-              return (
-                <section key={sectionId}>
-                  <h2 className="text-lg font-bold text-gray-900 uppercase mb-4">
-                      {title}
-                  </h2>
-                  <div className="flex flex-col gap-4">
-                    {history.map((item, idx) => (
-                       <div key={idx}>
-                        <h3 className="text-xs font-bold text-gray-900">
-                            {item.activity} {item.city ? `, ${item.city}` : ""}
-                        </h3>
-                         <div className="text-xs text-gray-500 mb-1 mt-0.5">
-                          {formatDate(item.startDate)} — {formatDate(item.endDate)}
-                       </div>
-                       {item.description && (
-                         <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
-                           {item.description}
-                         </p>
-                       )}
-                     </div>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
+          {/* MAIN SECTIONS */}
+          {order.map(sectionId => {
+              if (mainSections[sectionId]) {
+                  return mainSections[sectionId]();
+              }
+              return null;
+          })}
 
         </div>
       </div>
