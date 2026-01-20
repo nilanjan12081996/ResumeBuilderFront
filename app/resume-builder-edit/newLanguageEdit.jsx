@@ -5,7 +5,7 @@ import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 
-const Languages = ({ register, watch, control, fields, append, remove, move }) => {
+const Languages = ({ register, watch, control, fields, append, remove, move, noHeader }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
 
@@ -56,12 +56,14 @@ const Languages = ({ register, watch, control, fields, append, remove, move }) =
 
   return (
     <>
-      <div className='mb-4'>
-        <h2 className='text-xl font-bold text-black pb-1'>Languages</h2>
-        <p className='text-sm text-[#808897] font-medium'>
-            Enter the languages you speak and your proficiency level.
-        </p>
-      </div>
+      {!noHeader && (
+          <div className='mb-4'>
+            <h2 className='text-xl font-bold text-black pb-1'>Languages</h2>
+            <p className='text-sm text-[#808897] font-medium'>
+                Enter the languages you speak and your proficiency level.
+            </p>
+          </div>
+      )}
 
       <div className='acco_section'>
         <div className="space-y-3">

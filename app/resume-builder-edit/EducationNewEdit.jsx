@@ -7,9 +7,11 @@ import { FaPlus } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../utils/Datepicker";
 
-const EducationNew = ({ register, watch, control, fields, append, remove, move }) => {
+const EducationNew = ({ register, watch, control, fields, append, remove, move, noHeader }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
+
+  // ... (handlers)
 
   const handleDragStart = (e, index) => {
     // Only allow drag if it started from our handle logic
@@ -51,12 +53,14 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move }
 
   return (
     <>
-      <div className='mb-4'>
-        <h2 className='text-xl font-bold text-black pb-1'>Education</h2>
-        <p className='text-sm text-[#808897] font-medium'>
-          A varied education on your resume sums up the value that your learnings and background will bring to job.
-        </p>
-      </div>
+      {!noHeader && (
+        <div className='mb-4'>
+          <h2 className='text-xl font-bold text-black pb-1'>Education</h2>
+          <p className='text-sm text-[#808897] font-medium'>
+            A varied education on your resume sums up the value that your learnings and background will bring to job.
+          </p>
+        </div>
+      )}
 
       <div className='acco_section'>
         <div className="space-y-3">

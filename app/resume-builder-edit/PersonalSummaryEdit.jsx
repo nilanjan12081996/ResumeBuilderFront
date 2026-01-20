@@ -6,16 +6,18 @@ import { FaLocationDot } from "react-icons/fa6"
 import { MdEmail } from "react-icons/md"
 import { TabPanel } from "react-tabs"
 
-const PersonalSummary=({register,watch})=>{
+const PersonalSummary=({register,watch, noHeader})=>{
     return(
         <>
    
-         <div className='mb-4'>
-              <h2 className='text-xl font-bold text-black pb-1'>Professional Summary</h2>
-              <p className='text-sm text-[#808897] font-medium'>
-              Write 2-4 short, energetic sentences about how great you are. Mention the role and what you did. What were the big achievements? Describe your motivation and list your skills.
-              </p>
-            </div>
+         {!noHeader && (
+             <div className='mb-4'>
+                  <h2 className='text-xl font-bold text-black pb-1'>Professional Summary</h2>
+                  <p className='text-sm text-[#808897] font-medium'>
+                  Write 2-4 short, energetic sentences about how great you are. Mention the role and what you did. What were the big achievements? Describe your motivation and list your skills.
+                  </p>
+                </div>
+         )}
             <div>
                <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">

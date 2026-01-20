@@ -1,4 +1,11 @@
 'use client';
+import { DndContext, closestCenter, TouchSensor, MouseSensor, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { SortableSection } from './SortableSection';
+
+// Fixing import if needed, assuming file is newLanguageEdit.js but export default is named or standard.
+
+// ... existing imports ...
 
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -81,21 +88,21 @@ import { getSingleResume } from '../reducers/ResumeSlice';
 
 const page = () => {
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
-  const { loading,singleResumeInfo } = useSelector((state) => state?.resume)
+  const { loading, singleResumeInfo } = useSelector((state) => state?.resume)
   const { profileData } = useSelector((state) => state?.profile)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
   // const template = searchParams.get("template");
-  console.log("searchParams",searchParams);
-  const resume_id=searchParams.get('id')
-  const resume_type=searchParams.get('fetch')
-  console.log("resume_id",resume_id);
-  console.log("resume_type",resume_type);
+  console.log("searchParams", searchParams);
+  const resume_id = searchParams.get('id')
+  const resume_type = searchParams.get('fetch')
+  console.log("resume_id", resume_id);
+  console.log("resume_type", resume_type);
 
 
-  
-  
+
+
   const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const [type, setType] = useState()
@@ -122,6 +129,29 @@ const page = () => {
   const [empHistory, setEmpHistory] = useState([{ id: 1 }])
   const [education, setEducation] = useState([{ id: 1 }])
   const [newskill, setNewSkill] = useState([{ id: 1 }])
+  const [sectionOrder, setSectionOrder] = useState([
+    'summary', 'employment', 'education', 'skills', 'courses', 'hobbies', 'activities', 'languages', 'internships', 'custom'
+  ]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setSectionOrder((items) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
@@ -144,6 +174,7 @@ const page = () => {
     register,
     handleSubmit,
     watch,
+    reset,
     setValue,
     control,
     formState: { errors },
@@ -230,17 +261,81 @@ const page = () => {
 
   const { activeTab } = useTabs();
 
-    useEffect(()=>{
-      dispatch(getSingleResume({
-        id:resume_id,
-        fetch:resume_type
-      }))
-  },[resume_id,resume_type])
-  console.log("singleResumeInfo",singleResumeInfo);
-  
-  useEffect(()=>{
-    setValue("job_target",singleResumeInfo?.data?.data?.job_target)
-  },[resume_id,resume_type,setValue])
+  useEffect(() => {
+    dispatch(getSingleResume({
+      id: resume_id,
+      fetch: resume_type
+    }))
+  }, [resume_id, resume_type])
+  console.log("singleResumeInfo", singleResumeInfo);
+
+  useEffect(() => {
+    if (singleResumeInfo?.data?.data) {
+      const resumeData = singleResumeInfo.data.data;
+      reset(resumeData);
+
+      // Update local states for accordion lists
+      if (resumeData.employmentHistory?.length > 0) {
+        setEmpHistory(resumeData.employmentHistory.map((_, i) => ({ id: i + 1 })));
+      }
+      if (resumeData.educationHistory?.length > 0) {
+        setEducation(resumeData.educationHistory.map((_, i) => ({ id: i + 1 })));
+      }
+      if (resumeData.newSkillHistory?.length > 0) {
+        setNewSkill(resumeData.newSkillHistory.map((_, i) => ({ id: i + 1 })));
+      }
+
+      // Update profile image preview
+      if (resumeData.profileImage) {
+        setSelectedImage(resumeData.profileImage);
+      }
+
+      // Show additional details section if relevant fields strictly exist
+      if (resumeData.postal_code || resumeData.driving_licence || resumeData.dob || resumeData.birth_place || resumeData.nationality) {
+        setShowAdditionalDetails(true);
+      }
+
+      // Determine active sections based on data
+      const newActiveSections = [];
+      if (resumeData.employmentHistory?.length > 0) newActiveSections.push('employment');
+      if (resumeData.educationHistory?.length > 0) newActiveSections.push('education');
+      if (resumeData.newSkillHistory?.length > 0) newActiveSections.push('skills');
+      if (resumeData.coursesHistory?.length > 0) newActiveSections.push('courses');
+      if (resumeData.activityHistory?.length > 0) newActiveSections.push('activities');
+      if (resumeData.languageHistory?.length > 0) newActiveSections.push('languages');
+      if (resumeData.internshipHistory?.length > 0) newActiveSections.push('internships');
+      if (resumeData.hobbies && resumeData.hobbies.trim() !== "") newActiveSections.push('hobbies');
+      if (resumeData.summary && resumeData.summary.trim() !== "") newActiveSections.push('summary'); // Assuming 'summary' field exists
+
+      // Check for dynamic custom section keys (e.g., customSectionHistory_custom_...)
+      const customKeys = Object.keys(resumeData).filter(key => key.startsWith('customSectionHistory_custom_'));
+      if (resumeData.customSectionHistory?.length > 0) {
+        newActiveSections.push('custom');
+      } else if (customKeys.length > 0) {
+        const dynamicKey = customKeys[0];
+        const timestamp = dynamicKey.split('customSectionHistory_custom_')[1];
+        const dynamicTitleKey = `customSectionTitle_custom_${timestamp}`;
+
+        const sectionData = resumeData[dynamicKey];
+        const sectionTitle = resumeData[dynamicTitleKey];
+
+        if (sectionData && sectionData.length > 0) {
+          setValue('customSectionHistory', sectionData);
+          if (sectionTitle) {
+            setValue('customSectionTitle', sectionTitle);
+          }
+          newActiveSections.push('custom');
+        }
+      }
+
+      setActiveSections(prev => {
+        // Merge with existing active sections to avoid removing ones user explicitly added in this session if any (though usually we reset on load)
+        // Actually, if we are loading data, we should probably set the base state.
+        const unique = new Set([...prev, ...newActiveSections]);
+        return Array.from(unique);
+      });
+    }
+  }, [singleResumeInfo, reset, setValue]);
   return (
     <div>
       <div className='resume_tab_scrach'>
@@ -506,7 +601,7 @@ const page = () => {
 
                               {/* Nationality */}
                               <div>
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700 mb-5">
                                   Nationality
                                 </label>
                                 <input
@@ -526,126 +621,157 @@ const page = () => {
                       </div>
                     </div>
 
-                    <div>
-                      <EmpHistoryEdit
-                        register={register}
-                        empHistory={empHistory}
-                        setEmpHistory={setEmpHistory}
-                        watch={watch}
-                        control={control}
-                        fields={empFields}
-                        append={empAppend}
-                        remove={empRemove}
-                        move={empMove}
-                      />
-                    </div>
-                    <div>
-                      <EducationNewEdit
-                        register={register}
-                        education={education}
-                        setEducation={setEducation}
-                        watch={watch}
-                        control={control}
-                        fields={eduFields}
-                        append={eduAppend}
-                        remove={eduRemove}
-                        move={eduMove}
-                      />
-                    </div>
-                    <div>
-                      <SkillsNewEdit
-                        register={register}
-                        newskill={newskill}
-                        setNewSkill={setNewSkill}
-                        watch={watch}
-                        setValue={setValue}
-                        control={control}
-                        fields={skillFields}
-                        append={skillAppend}
-                        remove={skillRemove}
-                        move={skillMove}
-                      />
-                    </div>
-                    <div>
-                      <PersonalSummaryEdit
-                        register={register}
-                        watch={watch}
-                      />
-                    </div>
-                    {/* COURSES */}
-                    <div id="courses">
-                      <CoursesEdit
-                        register={register}
-                        watch={watch}
-                        control={control}
-                        fields={coursesFields}
-                        append={coursesAppend}
-                        remove={coursesRemove}
-                        move={coursesMove}
-                      />
-                    </div>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={sectionOrder}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {sectionOrder.map((sectionId) => {
+                          if (!activeSections.includes(sectionId)) return null;
 
-                    {/* HOBBIES */}
-                    <div id="hobbies">
-                      <HobbiesEdit register={register} />
-                    </div>
-
-                    {/* EXTRA CURRICULAR / ACTIVITIES */}
-                    <div id="extra_curricular">
-                      <ActivitiesEdit
-                        register={register}
-                        watch={watch}
-                        control={control}
-                        fields={activitiesFields}
-                        append={activitiesAppend}
-                        remove={activitiesRemove}
-                        move={activitiesMove}
-                      />
-                    </div>
-
-                    {/* LANGUAGES */}
-                    <div id="languages">
-                      <newLanguageEdit
-                        register={register}
-                        watch={watch}
-                        control={control}
-                        fields={languageFields}
-                        append={languageAppend}
-                        remove={languageRemove}
-                        move={languageMove}
-                      />
-                    </div>
-
-                    {/* INTERNSHIPS */}
-                    <div id="internships">
-                      <InternshipsEdit
-                        register={register}
-                        watch={watch}
-                        control={control}
-                        fields={internshipFields}
-                        append={internshipAppend}
-                        remove={internshipRemove}
-                        move={internshipMove}
-                      />
-                    </div>
-
-                    {/* CUSTOM SECTION */}
-                    {activeSections.includes('custom') && (
-                      <div id="custom">
-                        <CustomSectionEdit
-                          register={register}
-                          watch={watch}
-                          control={control}
-                          fields={customFields}
-                          append={customAppend}
-                          remove={customRemove}
-                          move={customMove}
-                          removeSection={() =>
-                            setActiveSections(prev => prev.filter(s => s !== 'custom'))
-                          }
-                        />
-                      </div>
-                    )}
+                          return (
+                            <SortableSection
+                              key={sectionId}
+                              id={sectionId}
+                              title={
+                                sectionId === 'employment' ? "Employment History" :
+                                  sectionId === 'education' ? "Education" :
+                                    sectionId === 'skills' ? "Skills" :
+                                      sectionId === 'summary' ? "Personal Summary" :
+                                        sectionId === 'courses' ? "Courses" :
+                                          sectionId === 'hobbies' ? "Hobbies" :
+                                            sectionId === 'activities' ? "Activities" :
+                                              sectionId === 'languages' ? "Languages" :
+                                                sectionId === 'internships' ? "Internships" :
+                                                  sectionId === 'custom' ? (watch('customSectionTitle') || "Custom Section") :
+                                                    "Section"
+                              }
+                            >
+                              {sectionId === 'employment' && (
+                                <EmpHistoryEdit
+                                  register={register}
+                                  empHistory={empHistory}
+                                  setEmpHistory={setEmpHistory}
+                                  watch={watch}
+                                  control={control}
+                                  fields={empFields}
+                                  append={empAppend}
+                                  remove={empRemove}
+                                  move={empMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'education' && (
+                                <EducationNewEdit
+                                  register={register}
+                                  education={education}
+                                  setEducation={setEducation}
+                                  watch={watch}
+                                  control={control}
+                                  fields={eduFields}
+                                  append={eduAppend}
+                                  remove={eduRemove}
+                                  move={eduMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'skills' && (
+                                <SkillsNewEdit
+                                  register={register}
+                                  newskill={newskill}
+                                  setNewSkill={setNewSkill}
+                                  watch={watch}
+                                  setValue={setValue}
+                                  control={control}
+                                  fields={skillFields}
+                                  append={skillAppend}
+                                  remove={skillRemove}
+                                  move={skillMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'summary' && (
+                                <PersonalSummaryEdit
+                                  register={register}
+                                  watch={watch}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'courses' && (
+                                <CoursesEdit
+                                  register={register}
+                                  watch={watch}
+                                  control={control}
+                                  fields={coursesFields}
+                                  append={coursesAppend}
+                                  remove={coursesRemove}
+                                  move={coursesMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'hobbies' && (
+                                <HobbiesEdit register={register} noHeader={true} />
+                              )}
+                              {sectionId === 'activities' && (
+                                <ActivitiesEdit
+                                  register={register}
+                                  watch={watch}
+                                  control={control}
+                                  fields={activitiesFields}
+                                  append={activitiesAppend}
+                                  remove={activitiesRemove}
+                                  move={activitiesMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'languages' && (
+                                <LanguagesEdit
+                                  register={register}
+                                  watch={watch}
+                                  control={control}
+                                  fields={languageFields}
+                                  append={languageAppend}
+                                  remove={languageRemove}
+                                  move={languageMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'internships' && (
+                                <InternshipsEdit
+                                  register={register}
+                                  watch={watch}
+                                  control={control}
+                                  fields={internshipFields}
+                                  append={internshipAppend}
+                                  remove={internshipRemove}
+                                  move={internshipMove}
+                                  noHeader={true}
+                                />
+                              )}
+                              {sectionId === 'custom' && (
+                                <CustomSectionEdit
+                                  register={register}
+                                  watch={watch}
+                                  control={control}
+                                  fields={customFields}
+                                  append={customAppend}
+                                  remove={customRemove}
+                                  move={customMove}
+                                  removeSection={() =>
+                                    setActiveSections(prev => prev.filter(s => s !== 'custom'))
+                                  }
+                                  noHeader={true}
+                                />
+                              )}
+                            </SortableSection>
+                          );
+                        })}
+                      </SortableContext>
+                    </DndContext>
                   </div>
                 </div>
               </form>
@@ -687,7 +813,7 @@ const page = () => {
             </div>
           </div>
           <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-            <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} />
+            <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} />
             {/* <Image src={resume_sections_view} alt="resume_sections_view" className='' /> */}
             {/* {
                   template == 1 && (

@@ -7,9 +7,10 @@ import { FaPlus } from "react-icons/fa6";
 import { TfiHandDrag } from "react-icons/tfi";
 import { RiDraggable } from "react-icons/ri";
 
-const SkillsNew = ({ register, watch, setValue, control, fields, append, remove, move }) => {
+const SkillsNew = ({ register, watch, setValue, control, fields, append, remove, move, noHeader }) => {
     
     const tabColors = ["#ffeaec", "#feebe3", "#fff2cc", "#e7f4ed", "#f1f2ff"];
+
     const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
     const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
 
@@ -64,12 +65,14 @@ const SkillsNew = ({ register, watch, setValue, control, fields, append, remove,
 
     return (
         <>
-            <div className='mb-4'>
-                <h2 className='text-xl font-bold text-black pb-1'>Skills</h2>
-                <p className='text-sm text-[#808897] font-medium'>
-                    Choose 5 important skills that show you fit the position.
-                </p>
-            </div>
+            {!noHeader && (
+                <div className='mb-4'>
+                    <h2 className='text-xl font-bold text-black pb-1'>Skills</h2>
+                    <p className='text-sm text-[#808897] font-medium'>
+                        Choose 5 important skills that show you fit the position.
+                    </p>
+                </div>
+            )}
 
             {/* --- TOGGLE BUTTON SECTION --- */}
             <div className="flex items-center gap-2 mb-6 p-2">

@@ -1,15 +1,17 @@
 'use client';
 import React from 'react';
 
-const Hobbies = ({ register }) => {
+const Hobbies = ({ register, noHeader }) => {
     return (
         <>
-            <div className='mb-4'>
-                <h2 className='text-xl font-bold text-black pb-1'>Hobbies</h2>
-                <p className='text-sm text-[#808897] font-medium'>
-                    What do you like?
-                </p>
-            </div>
+            {!noHeader && (
+                <div className='mb-4'>
+                    <h2 className='text-xl font-bold text-black pb-1'>Hobbies</h2>
+                    <p className='text-sm text-[#808897] font-medium'>
+                        What do you like?
+                    </p>
+                </div>
+            )}
 
             <div className='bg-white rounded-xl border border-gray-200 p-4 shadow-sm'>
                 <textarea

@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../utils/Datepicker";
 
-const Activities = ({ register, watch, control, fields, append, remove, move }) => {
+const Activities = ({ register, watch, control, fields, append, remove, move, noHeader }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
 
@@ -50,12 +50,14 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
 
   return (
     <>
-      <div className='mb-4'>
-        <h2 className='text-xl font-bold text-black pb-1'>Extra-curricular Activities</h2>
-        <p className='text-sm text-[#808897] font-medium'>
-            Add activities like volunteering, clubs, or sports.
-        </p>
-      </div>
+      {!noHeader && (
+          <div className='mb-4'>
+            <h2 className='text-xl font-bold text-black pb-1'>Activities</h2>
+            <p className='text-sm text-[#808897] font-medium'>
+               Show your relevant experience (last 10 years). Use bullet points to note your achievements.
+            </p>
+          </div>
+      )}
 
       <div className='acco_section'>
         <div className="space-y-3">
