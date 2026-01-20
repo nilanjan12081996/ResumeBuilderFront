@@ -4,21 +4,23 @@ import api from './api';
 
 export const getResumeHistory=createAsyncThunk(
     'getResumeHistory',
-      async ({page,limit,searchQuery,statusFlag,sortByName}, { rejectWithValue }) => {
+      async (_, { rejectWithValue }) => {
         try {
-             let url = `/api/resume-history/list?page=${page}&limit=${limit}`;
-               if (searchQuery && searchQuery.trim() !== "") {
-                url += `&searchQuery=${encodeURIComponent(searchQuery.trim())}`;
-                }
-                if(statusFlag&&statusFlag.trim()!==""){
-                    url+=`&statusFlag=${encodeURIComponent(statusFlag.trim())}`
-                }
-                if(sortByName&&sortByName.trim()!==""){
-                    url+=`&sortByName=${encodeURIComponent(sortByName.trim())}`
-                }
-                const response = await api.get(url);
+            //  let url = `/api/resume-history/list?page=${page}&limit=${limit}`;
+            //    if (searchQuery && searchQuery.trim() !== "") {
+            //     url += `&searchQuery=${encodeURIComponent(searchQuery.trim())}`;
+            //     }
+            //     if(statusFlag&&statusFlag.trim()!==""){
+            //         url+=`&statusFlag=${encodeURIComponent(statusFlag.trim())}`
+            //     }
+            //     if(sortByName&&sortByName.trim()!==""){
+            //         url+=`&sortByName=${encodeURIComponent(sortByName.trim())}`
+            //     }
+            //     const response = await api.get(url);
            // const response = await api.get(`/api/resume-history/list?page=${page}&limit=${limit}&searchQuery=${searchQuery}`);
-            if (response?.data?.status_code === 200) {
+                const response = await api.get(`/api/resume/list`);
+           
+           if (response?.data?.statusCode === 200) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {
