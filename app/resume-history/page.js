@@ -23,6 +23,7 @@ import { getResumeHistory } from '../reducers/ResumeHistorySlice';
 import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
 import Link from "next/link";
 import ScratchResumeModal from '../previewmodal/ScratchResumeModal';
+import Loader from '../ui/Loader';
 
 
 const inter = Inter({
@@ -32,7 +33,7 @@ const inter = Inter({
 })
 
 const page = () => {
-  const{rHistory}=useSelector((state)=>state?.resHist)
+  const{rHistory,loading}=useSelector((state)=>state?.resHist)
   const dispatch=useDispatch()
     const [totalPage, setTotalPage] = useState(1);
     const [limit, setLimit] = useState(10);
@@ -57,56 +58,56 @@ const page = () => {
   }
 
   useEffect(()=>{
-    const payload = {
-    page: currentPage,
-    limit: limit,
-    sortByName: sortByName ? "true" : "false",
-  };
-  if (searchQuery && searchQuery.trim() !== "") {
-    payload.searchQuery = searchQuery.trim();
-  }
-  if (statusFlag && statusFlag !== "all") {
-    payload.statusFlag = statusFlag;
-  }
+  //   const payload = {
+  //   page: currentPage,
+  //   limit: limit,
+  //   sortByName: sortByName ? "true" : "false",
+  // };
+  // if (searchQuery && searchQuery.trim() !== "") {
+  //   payload.searchQuery = searchQuery.trim();
+  // }
+  // if (statusFlag && statusFlag !== "all") {
+  //   payload.statusFlag = statusFlag;
+  // }
 
-dispatch(getResumeHistory(payload)).then((res)=>{
+dispatch(getResumeHistory()).then((res)=>{
   console.log(res,"histRes");
-  const total=res?.payload?.pagination?.total_pages
-  setTotalPage(Number.isInteger(total) && total > 0 ? total : 1)
+  // const total=res?.payload?.pagination?.total_pages
+  // setTotalPage(Number.isInteger(total) && total > 0 ? total : 1)
 })
-  },[currentPage,limit,searchQuery,statusFlag,sortByName])
+  },[])
 
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-  };
+  // const onPageChange = (page) => {
+  //   setCurrentPage(page);
+  // };
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
+  // const handleSearchChange = (e) => {
+  //   const value = e.target.value;
+  //   setSearchQuery(value);
 
-    // Optional: delay API call while user is typing (debounce)
-    if (typingTimeout) clearTimeout(typingTimeout);
-    setTypingTimeout(
-      setTimeout(() => {
-        // Trigger new search only if value is not empty or after typing stops
-        dispatch(getResumeHistory({ page: 1, limit, searchQuery: value })).then((res) => {
-          const total = res?.payload?.pagination?.total_pages;
-          setTotalPage(Number.isInteger(total) && total > 0 ? total : 1);
-          setCurrentPage(1);
-        });
-      }, 600) // waits 600ms after typing stops
-    );
-  };
+  //   // Optional: delay API call while user is typing (debounce)
+  //   if (typingTimeout) clearTimeout(typingTimeout);
+  //   setTypingTimeout(
+  //     setTimeout(() => {
+  //       // Trigger new search only if value is not empty or after typing stops
+  //       dispatch(getResumeHistory({ page: 1, limit, searchQuery: value })).then((res) => {
+  //         const total = res?.payload?.pagination?.total_pages;
+  //         setTotalPage(Number.isInteger(total) && total > 0 ? total : 1);
+  //         setCurrentPage(1);
+  //       });
+  //     }, 600) // waits 600ms after typing stops
+  //   );
+  // };
 
-    const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter") {
-      dispatch(getResumeHistory({ page: 1, limit, searchQuery })).then((res) => {
-        const total = res?.payload?.pagination?.total_pages;
-        setTotalPage(Number.isInteger(total) && total > 0 ? total : 1);
-        setCurrentPage(1);
-      });
-    }
-  };
+  //   const handleSearchKeyDown = (e) => {
+  //   if (e.key === "Enter") {
+  //     dispatch(getResumeHistory({ page: 1, limit, searchQuery })).then((res) => {
+  //       const total = res?.payload?.pagination?.total_pages;
+  //       setTotalPage(Number.isInteger(total) && total > 0 ? total : 1);
+  //       setCurrentPage(1);
+  //     });
+  //   }
+  // };
   console.log("rHistory",rHistory);
   
   return (
@@ -121,9 +122,9 @@ dispatch(getResumeHistory(payload)).then((res)=>{
               <div className='bg-[#F3F4F6] rounded-[8px] flex gap-4 items-center'>
                  <button className='w-[42px] h-[42px] flex justify-center items-center cursor-pointer'><RiSearchLine className='text-xl text-[#999999]' /></button>
                  <TextInput
-                 value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyDown={handleSearchKeyDown}
+                // value={searchQuery}
+               // onChange={handleSearchChange}
+              //  onKeyDown={handleSearchKeyDown}
                  id="base" type="text" sizing="md" placeholder='Search resume...' className='w-full' />
               </div>
             </div>
@@ -159,17 +160,7 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                     </div>
                 </div>
             </div>
-            {/* <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-4 py-4'>
-                <div className='flex gap-3 items-center'>
-                    <div className='bg-[#FFE0D9] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
-                        <MdDataUsage className='text-[#F24822] text-3xl' />
-                    </div>
-                    <div>
-                        <p className='text-[#7D7D7D] text-[15px]'>Total Resume Usage</p>
-                        <h3 className='text-[#151515] text-[22px] font-medium mb-1'>200/500</h3>
-                    </div>
-                </div>
-            </div> */}
+      
             <div className='border bg-white border-[#D5D5D5] rounded-[10px] px-4 py-4'>
                 <div className='flex gap-3 items-center'>
                     <div className='bg-[#DEFFD5] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center'>
@@ -207,9 +198,16 @@ dispatch(getResumeHistory(payload)).then((res)=>{
       </div>
       <div className='border bg-white border-[#D5D5D5] rounded-[10px]'>
         <div className='lg:px-8 px-4 py-8'>
-           <p className='text-[#151515] text-[20px] leading-[20px] lg:mb-4'>Your Resumes ({rHistory?.statistics?.total_resume})</p>
+           <p className='text-[#151515] text-[20px] leading-[20px] lg:mb-4'>Your Resumes ({rHistory?.data?.length})</p>
         </div>
-        <div className='lg:px-8 px-4 py-0'>
+        {
+          loading?(
+            <>
+            <Loader/>
+            </>
+          ):(
+            <>
+            <div className='lg:px-8 px-4 py-0'>
           {
             rHistory?.data?.map((hist)=>(
               <div className='lg:flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] mb-12'>
@@ -218,9 +216,9 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                   <CgFileDocument className='text-[#ffffff] text-2xl' />
                 </div>
                 <div className='mb-2 lg:mb-0'>
-                  <h3 className='text-[#151515] text-base font-medium mb-1'>{hist?.resume_name}</h3>
+                  <h3 className='text-[#151515] text-base font-medium mb-1'>{hist?.name}</h3>
                   <div className='lg:flex items-center'>
-                    <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: {hist?.template_detail?.[0]?.templete_id==1?"Modern":"Proffessional"}</p>
+                    {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>Template: {hist?.template_detail?.[0]?.templete_id==1?"Modern":"Proffessional"}</p> */}
                     {/* <p className='text-[#7D7D7D] text-[13px] pr-8 software_point'>{Math.floor(
     (new Date() - new Date(convertToSubmitFormat(hist?.created_at))) / (1000 * 60 * 60 * 24)
   )}{" "} Days ago</p> */}
@@ -258,7 +256,7 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                 </Link>
                 <Link
                   href={
-                  hist.resume_type==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
+                  hist.name==="scratch_resume"?`/resume-builder-edit?id=${hist.id}&fetch=${hist?.name}`
                   :hist.resume_type==="linkedin_resume"?`/linkedIn-rewrite?id=${btoa(hist.id.toString())}`
                   :hist.resume_type==="jd_based_resume"?`/jd-resume-builder?id=${hist.id}&template=${hist?.template_detail?.[0]?.templete_id}`
                   :hist.resume_type==="improve_resume"?`/improve-resume-builder?id=${btoa(hist.id.toString())}&template=${hist?.template_detail?.[0]?.templete_id}`:""} 
@@ -275,7 +273,11 @@ dispatch(getResumeHistory(payload)).then((res)=>{
           }
           
         </div>
-        {
+            </>
+          )
+        }
+        
+        {/* {
         
           
           rHistory?.pagination?.total_pages>1&&(
@@ -292,7 +294,7 @@ dispatch(getResumeHistory(payload)).then((res)=>{
                 </div>
           )
           
-        }
+        } */}
              
       </div>
       {

@@ -76,16 +76,26 @@ import VividTemplate from '../TemplateNew/VividTemplate';
 import Professional from '../TemplateNew/Professional';
 import PrimeATS from '../TemplateNew/PrimeATS';
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
+import { getSingleResume } from '../reducers/ResumeSlice';
 
 
 const page = () => {
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
-  const { loading } = useSelector((state) => state?.resume)
+  const { loading,singleResumeInfo } = useSelector((state) => state?.resume)
   const { profileData } = useSelector((state) => state?.profile)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
   const [openModalAnalyzeResumeBig, setOpenModalAnalyzeResumeBig] = useState(false);
   const searchParams = useSearchParams();
-  const template = searchParams.get("template");
+  // const template = searchParams.get("template");
+  console.log("searchParams",searchParams);
+  const resume_id=searchParams.get('id')
+  const resume_type=searchParams.get('fetch')
+  console.log("resume_id",resume_id);
+  console.log("resume_type",resume_type);
+
+
+  
+  
   const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const [type, setType] = useState()
@@ -104,6 +114,7 @@ const page = () => {
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
   };
+
   const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
   const dispatch = useDispatch()
@@ -218,6 +229,18 @@ const page = () => {
   };
 
   const { activeTab } = useTabs();
+
+    useEffect(()=>{
+      dispatch(getSingleResume({
+        id:resume_id,
+        fetch:resume_type
+      }))
+  },[resume_id,resume_type])
+  console.log("singleResumeInfo",singleResumeInfo);
+  
+  useEffect(()=>{
+    setValue("job_target",singleResumeInfo?.data?.data?.job_target)
+  },[resume_id,resume_type,setValue])
   return (
     <div>
       <div className='resume_tab_scrach'>
@@ -737,7 +760,7 @@ const page = () => {
             </ModalBody>
           </Modal> */}
         {/* add modal for apply job ends here */}
-        <Modal
+        {/* <Modal
           show={openPreviewModal}
           size="6xl"
           onClose={() => setOpenPreviewModal(false)}
@@ -773,7 +796,7 @@ const page = () => {
               )}
             </div>
           </ModalBody>
-        </Modal>
+        </Modal> */}
 
       </div>
     </div >

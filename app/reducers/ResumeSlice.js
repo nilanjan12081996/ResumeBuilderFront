@@ -224,10 +224,10 @@ export const saveTemplate = createAsyncThunk(
 
 export const getSingleResume = createAsyncThunk(
     'getSingleResume',
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id ,fetch}, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/api/resume/personal-info/get-scratch-resume-info/${id}`);
-            if (response?.data?.status_code === 200) {
+            const response = await api.get(`/api/resume/single-data?id=${id}&fetch=${fetch}`);
+            if (response?.data?.statusCode === 200) {
                 return response.data;
             } else {
                 if (response?.data?.errors) {

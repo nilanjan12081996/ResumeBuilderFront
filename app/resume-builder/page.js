@@ -300,7 +300,7 @@ const page = () => {
       if (step < STEPS.length) {
         nextStep();
       } else {
-        router.push('/resume-builder-edit');
+        // router.push('/resume-builder-edit');
         console.log("Final Submission:", data);
       }
     }
