@@ -332,6 +332,25 @@ const page = () => {
 
     setValue("newSkillHistory", mergedSkills);
 
+    /* -------- EDUCATION SYNC -------- */
+    const educationSections = mappedSections.filter(
+      sec => sec.type === "education"
+    );
+
+    const educationHistory = educationSections.flatMap(sec =>
+      (sec.educations || []).map(edu => ({
+        school: edu.institute || "",
+        degree: edu.degree || "",
+        startDate: edu.startDate || "",
+        endDate: edu.endDate || "",
+        city_state: edu.city || "",
+        description: edu.description || ""
+      }))
+    );
+
+    setValue("educationHistory", educationHistory);
+
+
   }, [improveResumeData, setValue]);
 
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -581,7 +600,7 @@ const page = () => {
       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
         {activeTab === 'edit' ? <form onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <div className=''>
+            <div className='mb-10'>
               <div className='bg-white rounded-sm p-5 mb-[4px]'>
                 <div className='mb-4'>
                   <div className='flex items-center gap-2 mb-2'>
@@ -1391,7 +1410,7 @@ const page = () => {
         }
 
       </div>
-      <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] px-0'>
+      <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] py-5 px-0'>
         <div className='h-screen overflow-y-scroll rounded-[8px]'>
           <div ref={componentRef} className=''>
             {/* <DynamicTemplate
