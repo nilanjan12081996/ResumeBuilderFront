@@ -7,10 +7,12 @@ import { FaPlus, FaPen } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../utils/Datepicker";
 
-const CustomSection = ({ register, watch, control, fields, append, remove, move, removeSection }) => {
+const CustomSection = ({ register, watch, control, fields, append, remove, move, removeSection, noHeader }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+
+  // ... (handlers)
 
   const handleDragStart = (e, index) => {
     if (!isHandleHovered) {
@@ -48,43 +50,55 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
 
   const sectionTitle = watch('customSectionTitle');
 
+  const renderHeaderContent = () => (
+      <div className='group flex justify-between items-start'>
+          <div>
+              <div className="flex items-center gap-2 pb-1">
+                  {isEditingTitle ? (
+                      <input
+                          type="text"
+                          {...register('customSectionTitle')}
+                          className="text-xl font-bold text-black border-b border-gray-300 focus:border-cyan-500 outline-none bg-transparent px-1"
+                          autoFocus
+                          onBlur={() => setIsEditingTitle(false)}
+                          placeholder="Section Title"
+                      />
+                  ) : (
+                      <h2 
+                          className='text-xl font-bold text-black cursor-pointer hover:text-cyan-600 flex items-center gap-2'
+                          onClick={() => setIsEditingTitle(true)}
+                      >
+                          {sectionTitle || "Custom Section"}
+                          <FaPen className="text-sm opacity-0 group-hover:opacity-100 text-gray-400" />
+                      </h2>
+                  )}
+              </div>
+              <p className='text-sm text-[#808897] font-medium'>
+              Add your own custom activities, achievements, or experiences.
+              </p>
+          </div>
+          <button
+              type="button"
+              onClick={removeSection}
+              className="text-gray-400 hover:text-red-500 transition-colors p-1"
+              title="Delete Section"
+          >
+              <MdDelete size={20} />
+          </button>
+      </div>
+  );
+
   return (
     <>
-      <div className='mb-4 group flex justify-between items-start'>
-        <div>
-            <div className="flex items-center gap-2 pb-1">
-                {isEditingTitle ? (
-                    <input
-                        type="text"
-                        {...register('customSectionTitle')}
-                        className="text-xl font-bold text-black border-b border-gray-300 focus:border-cyan-500 outline-none bg-transparent px-1"
-                        autoFocus
-                        onBlur={() => setIsEditingTitle(false)}
-                        placeholder="Section Title"
-                    />
-                ) : (
-                    <h2 
-                        className='text-xl font-bold text-black cursor-pointer hover:text-cyan-600 flex items-center gap-2'
-                        onClick={() => setIsEditingTitle(true)}
-                    >
-                        {sectionTitle || "Custom Section"}
-                        <FaPen className="text-sm opacity-0 group-hover:opacity-100 text-gray-400" />
-                    </h2>
-                )}
-            </div>
-            <p className='text-sm text-[#808897] font-medium'>
-            Add your own custom activities, achievements, or experiences.
-            </p>
-        </div>
-        <button
-            type="button"
-            onClick={removeSection}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-            title="Delete Section"
-        >
-            <MdDelete size={20} />
-        </button>
-      </div>
+      {!noHeader ? (
+         <div className="mb-4">
+             {renderHeaderContent()}
+         </div>
+      ) : (
+         <div className="mb-4 border-b pb-4">
+             {renderHeaderContent()}
+         </div>
+      )}
 
       <div className='acco_section'>
         <div className="space-y-3">
