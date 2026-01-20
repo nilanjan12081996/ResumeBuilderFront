@@ -464,7 +464,7 @@ const GenerateWithAiModal = ({
 
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-            <div className="bg-white min-w-[360px] max-w-md rounded-2xl p-6 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
+            <div className="bg-white min-w-[500px] max-w-md rounded-2xl p-6 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
                 {/* Header */}
                 <div className="flex justify-between items-start">
                     <div>
