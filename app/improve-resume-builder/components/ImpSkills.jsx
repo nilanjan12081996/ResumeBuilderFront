@@ -162,7 +162,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                         key={skill.id}
                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onDrop={(e) => handleSkillDrop(e, sectionIndex, sIndex)}
-                        className={`flex items-center justify-between gap-4 transition-all duration-200 mb-2 
+                        className={`flex items-center justify-between gap-4 transition-all duration-200 mb-2 !border-b !border-gray-300 p-2    
                             ${draggedSkillIndex === sIndex ? "opacity-20  scale-95" : "bg-white"}
                         `}
                     >
@@ -206,7 +206,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                             </span>
 
                             {/* Level Circles */}
-                            <Tabs
+                            {/* <Tabs
                                 selectedIndex={skill.level}
                                 onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
                             >
@@ -226,7 +226,43 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                                         </Tab>
                                     ))}
                                 </TabList>
+                            </Tabs> */}
+                            <Tabs
+                                selectedIndex={skill.level}
+                                onSelect={(tabIndex) =>
+                                    handleSkillUpdate(sectionIndex, skill.id, "level", tabIndex)
+                                }
+                            >
+                                <TabList className="flex gap-1">
+                                    {levels.map((lvl, i) => {
+                                        const isActive = skill.level === i;
+
+                                        return (
+                                            <Tab
+                                                key={i}
+                                                className="outline-none !bg-transparent !border-0"
+                                                selectedClassName="!bg-transparent !border-0"
+                                            >
+                                                <div
+                                                    className={`
+              w-6 h-6 flex items-center justify-center rounded-full cursor-pointer
+              transition-all duration-300 text-xs font-medium
+              border
+              ${isActive
+                                                            ? "bg-[#800080] border-[#800080] text-white scale-110 shadow-md"
+                                                            : "bg-transparent border-black text-black hover:bg-gray-100"
+                                                        }
+            `}
+                                                    title={lvl}
+                                                >
+                                                    {i + 1}
+                                                </div>
+                                            </Tab>
+                                        );
+                                    })}
+                                </TabList>
                             </Tabs>
+
                         </div>
 
                     </div>

@@ -82,3 +82,18 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;             /* Chrome, Safari */
 }
+
+/* react-tabs default selected background remove */
+.react-tabs__tab {
+  background: transparent !important;
+  border: none !important;
+}
+
+.react-tabs__tab--selected {
+  background: transparent !important;
+  border: none !important;
+}
+
+.react-tabs__tab:focus {
+  box-shadow: none !important;
+}
