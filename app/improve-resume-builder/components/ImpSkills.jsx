@@ -136,7 +136,7 @@
 
 import React, { useState } from "react";
 import { Label } from "flowbite-react";
-import { RiDraggable } from "react-icons/ri";
+import { TbDragDrop } from "react-icons/tb";
 import { Tab, Tabs, TabList } from "react-tabs";
 import { FaPen } from "react-icons/fa";
 import 'react-tabs/style/react-tabs.css';
@@ -162,8 +162,8 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                         key={skill.id}
                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onDrop={(e) => handleSkillDrop(e, sectionIndex, sIndex)}
-                        className={`flex items-center justify-between gap-4 transition-all duration-200 rounded-lg border p-2 mb-2
-                            ${draggedSkillIndex === sIndex ? "opacity-20 border-cyan-500 scale-95" : "bg-white border-gray-200 shadow-sm"}
+                        className={`flex items-center justify-between gap-4 transition-all duration-200 mb-2 
+                            ${draggedSkillIndex === sIndex ? "opacity-20  scale-95" : "bg-white"}
                         `}
                     >
                         {/* Drag Handle */}
@@ -173,7 +173,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                             onDragStart={(e) => handleSkillDragStart(e, sIndex)}
                             onDragEnd={() => setDraggedSkillIndex(null)}
                         >
-                            <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                            <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
                         </span>
 
                         {/* Skill Name / Editable Input */}
@@ -185,11 +185,11 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                                     onChange={(e) => handleSkillUpdate(sectionIndex, skill.id, 'name', e.target.value)}
                                     onBlur={() => setEditingSkillIndex(null)}
                                     autoFocus
-                                    className="w-full text-sm font-medium border-b border-gray-300 focus:border-cyan-500 outline-none bg-transparent px-1"
+                                    className="w-full text-sm font-medium border-b outline-none bg-transparent px-1"
                                 />
                             ) : (
                                 <div
-                                    className="flex items-center gap-2 cursor-pointer hover:text-cyan-600"
+                                    className="flex items-center gap-2 cursor-pointe"
                                     onClick={() => setEditingSkillIndex(sIndex)}
                                 >
                                     <span className="text-sm font-medium">{skill.name || "Your Skill"}</span>
@@ -200,34 +200,34 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
 
                         {/* Skill Level */}
                         <div className="flex flex-col items-center gap-1">
-  {/* Level Label */}
-  <span className="text-xs font-medium text-gray-600">
-    {levels[skill.level]} {/* Shows current level like "Expert" */}
-  </span>
+                            {/* Level Label */}
+                            <span className="text-xs font-medium text-gray-600">
+                                {levels[skill.level]} {/* Shows current level like "Expert" */}
+                            </span>
 
-  {/* Level Circles */}
-  <Tabs
-    selectedIndex={skill.level}
-    onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
-  >
-    <TabList className="flex gap-1">
-      {levels.map((lvl, i) => (
-        <Tab key={i} className="outline-none">
-          <div
-            className={`
+                            {/* Level Circles */}
+                            <Tabs
+                                selectedIndex={skill.level}
+                                onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
+                            >
+                                <TabList className="flex gap-1">
+                                    {levels.map((lvl, i) => (
+                                        <Tab key={i} className="outline-none">
+                                            <div
+                                                className={`
               w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300
               ${skill.level === i ? "scale-110 border border-[#800080] shadow-md" : "opacity-60 hover:opacity-100"}
             `}
-            style={{ backgroundColor: tabColors[i], color: textColor[i] }}
-            title={lvl}
-          >
-            {i + 1}
-          </div>
-        </Tab>
-      ))}
-    </TabList>
-  </Tabs>
-</div>
+                                                style={{ backgroundColor: tabColors[i], color: textColor[i] }}
+                                                title={lvl}
+                                            >
+                                                {i + 1}
+                                            </div>
+                                        </Tab>
+                                    ))}
+                                </TabList>
+                            </Tabs>
+                        </div>
 
                     </div>
                 );

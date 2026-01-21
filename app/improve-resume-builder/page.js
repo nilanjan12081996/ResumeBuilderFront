@@ -1966,7 +1966,7 @@ const Page = () => {
       <ToastContainer />
 
       {/* Left Panel */}
-      <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
+      <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
         {activeTab === 'edit' ? (
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className='mb-10'>
@@ -2090,7 +2090,7 @@ const Page = () => {
       </div>
 
       {/* Right Panel - Resume Preview */}
-      <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] py-5 px-0'>
+      <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] px-0'>
         <div className='h-screen overflow-y-scroll rounded-[8px]'>
           <div ref={componentRef}>
             <ActiveResume formData={formValues} themeColor={themeColor} />

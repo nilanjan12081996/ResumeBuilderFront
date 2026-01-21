@@ -4,6 +4,8 @@ import { RiDraggable } from "react-icons/ri";
 import { HiSparkles } from "react-icons/hi2";
 import TipTapEditor from '../../editor/TipTapEditor';
 import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
+import { HiPlus, HiMinus } from "react-icons/hi";
+
 
 const ImpExperience = ({ 
   section, 

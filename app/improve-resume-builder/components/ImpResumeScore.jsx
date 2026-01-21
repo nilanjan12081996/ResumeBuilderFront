@@ -67,7 +67,7 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
                 "#ef4444";
 
     return (
-        <div className="bg-white rounded-lg p-5 mb-4 shadow-md max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg p-5 mb-2 mx-auto">
 
             <div className="">
                 <span className="text-[#828ba2] text-sm font-medium">
