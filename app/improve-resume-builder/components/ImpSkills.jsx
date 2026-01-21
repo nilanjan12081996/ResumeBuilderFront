@@ -206,7 +206,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                             </span>
 
                             {/* Level Circles */}
-                            {/* <Tabs
+                            <Tabs
                                 selectedIndex={skill.level}
                                 onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
                             >
@@ -226,8 +226,8 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                                         </Tab>
                                     ))}
                                 </TabList>
-                            </Tabs> */}
-                            <Tabs
+                            </Tabs>
+                            {/* <Tabs
                                 selectedIndex={skill.level}
                                 onSelect={(tabIndex) =>
                                     handleSkillUpdate(sectionIndex, skill.id, "level", tabIndex)
@@ -261,7 +261,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                                         );
                                     })}
                                 </TabList>
-                            </Tabs>
+                            </Tabs> */}
 
                         </div>
 
