@@ -103,7 +103,7 @@ const CustomSection = ({ register, watch, control, sectionId, removeSection }) =
         </button>
       </div>
 
-      <div className='acco_section'>
+      <div className=''>
         <div className="space-y-3">
           {fields.map((item, index) => {
             const watchedActivity = watch(`customSectionHistory_${sectionId}.${index}.activity`);

@@ -6,55 +6,52 @@ import aiApi from './aiApi';
 
 
 export const improveResume = createAsyncThunk(
-  "improveResume",
-  async (formData, { rejectWithValue }) => {
-    try {
-      const response = await aiApi.post(
-        "/agent/resume/upload",
-        formData,
-        {
-          params: {
-            security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-          },
-        }
-      );
+    "improveResume",
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await aiApi.post(
+                "/agent/resume/upload",
+                formData,
+                {
+                    params: {
+                        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+                    },
+                }
+            );
 
-      if (response?.data?.status === "success") {
-        return response.data;
-      } else {
-        if (response?.data?.errors) {
-          return rejectWithValue(response.data.errors);
+            if (response?.data?.status === "success") {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                }
+                return rejectWithValue("Something went wrong.");
+            }
+        } catch (err) {
+            return rejectWithValue(
+                err?.response?.data || "Server error occurred"
+            );
         }
-        return rejectWithValue("Something went wrong.");
-      }
+    }
+);
+
+
+export const checkATS = createAsyncThunk(
+  'checkATS',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await aiApi.post('/agent/ATS/Score', payload);
+      console.log('ATS API response:', response);
+      return response.data;
+
     } catch (err) {
-      return rejectWithValue(
-        err?.response?.data || "Server error occurred"
-      );
+      console.error('ATS API error:', err);
+      return rejectWithValue(err?.response?.data || err.message);
     }
   }
 );
 
 
-export const checkATS = createAsyncThunk(
-    'checkATS',
-    async (userInput, { rejectWithValue }) => {
-        try {
-            const response = await api.post('/api/improve-resume/check-ats-score', userInput);
-            if (response?.data?.status_code === 200) {
-                return response.data;
-            } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue('Something went wrong.');
-                }
-            }
-        } catch (err) {
-            return rejectWithValue(err);
-        }
-    }
-)
 
 export const jdBasedResume = createAsyncThunk(
     'jdBasedResume',
@@ -716,6 +713,7 @@ const initialState = {
     loading: false,
     improveResumeData: {},
     checkATSData: {},
+    atsLoading:false,
     jdBasedResumeData: {},
     basiInfo: {},
     eduInfo: {},
@@ -784,19 +782,22 @@ const DashboardSlice = createSlice(
                     state.loading = false
                 })
 
-            builder.addCase(checkATS.pending, (state, { payload }) => {
-                state.loading = true
-
-            })
-            builder.addCase(checkATS.fulfilled, (state, { payload }) => {
-                state.loading = false
-                state.error = false
-                state.checkATSData = payload
-            })
-                .addCase(checkATS.rejected, (state, { payload }) => {
-                    state.error = payload
-                    state.loading = false
+                .addCase(checkATS.pending, (state) => {
+                    state.atsLoading = true;
+                    state.error = null;
                 })
+
+                .addCase(checkATS.fulfilled, (state, { payload }) => {
+                    state.atsLoading = false;
+                    state.error = null;
+                    state.checkATSData = payload;
+                })
+
+                .addCase(checkATS.rejected, (state, { payload }) => {
+                    state.atsLoading = false;
+                    state.error = payload || 'ATS score check failed';
+                })
+
                 .addCase(jdBasedResume.pending, (state, { payload }) => {
                     state.loading = true
 
@@ -1246,5 +1247,5 @@ const DashboardSlice = createSlice(
         }
     }
 )
-export const {resetImpSummary,resetImpExperience,} = DashboardSlice.actions;
+export const { resetImpSummary, resetImpExperience, } = DashboardSlice.actions;
 export default DashboardSlice.reducer;

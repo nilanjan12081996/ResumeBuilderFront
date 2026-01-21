@@ -1465,21 +1465,31 @@ import VividTemplate from "../TemplateNew/VividTemplate";
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
+import { checkATS } from '../reducers/DashboardSlice';
 
 const Page = () => {
-  const { improveResumeData } = useSelector((state) => state?.dash);
-  const searchParams = useSearchParams();
-  const template = searchParams.get("template");
-  const id = atob(searchParams.get("id"));
-  const user_id = localStorage.getItem('user_id');
-  const parseUserId = JSON.parse(user_id);
-
   const componentRef = useRef();
   const dispatch = useDispatch();
+  const { improveResumeData } = useSelector((state) => state?.dash);
+  console.log('improveResumeData', improveResumeData)
+
+  useEffect(() => {
+    if (!improveResumeData?.resume_data) return;
+
+    const atsPayload = {
+      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+      resume_data: JSON.stringify(improveResumeData.resume_data),
+      Ats_score: 0
+    };
+
+    dispatch(checkATS(atsPayload));
+  }, [improveResumeData, dispatch]);
+
+  const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+
 
   // States
-  const [openJdAtsModal, setOpenJdAtsModal] = useState(false);
-  const [atsData, setAtsData] = useState(null);
+
   const [selectedTemplate, setSelectedTemplate] = useState('Professional');
   const [themeColor, setThemeColor] = useState('#000000');
   const [sections, setSections] = useState([]);
@@ -1962,7 +1972,12 @@ const Page = () => {
             <div className='mb-10'>
 
               {/* Resume Score */}
-              <ImpResumeScore score={100} />
+
+              <ImpResumeScore
+                score={checkATSData?.ATS_Score}
+                loading={atsLoading}
+                guide={checkATSData?.Improvment_Guide}
+              />
 
               {/* Personal Details */}
               <ImpPersonalDetails register={register} watch={watch} />
@@ -2082,13 +2097,6 @@ const Page = () => {
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <ImpAtsScoreAnalyzeModal
-        show={openJdAtsModal}
-        setShow={setOpenJdAtsModal}
-        atsData={atsData}
-      />
     </div>
   );
 };
