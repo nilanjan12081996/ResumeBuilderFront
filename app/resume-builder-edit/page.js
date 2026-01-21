@@ -453,6 +453,17 @@ const page = () => {
 
     return () => clearTimeout(timeoutId);
   }, [formValues, resumeIds, resume_type, dispatch]);
+
+  useEffect(() => {
+    if (savingStatus === 'saved') {
+      const timer = setTimeout(() => {
+        setSavingStatus('unsaved');
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [savingStatus]);
+
   return (
     <div>
       <div className='resume_tab_scrach'>
@@ -478,11 +489,6 @@ const page = () => {
                     </div>
                     <div className="flex flex-col gap-2">
                       <Progress progress={10} size="sm" />
-                    </div>
-                    <div className='flex items-center gap-2 mt-2'>
-                      {savingStatus === 'saving' && <span className="text-gray-500 text-xs font-medium italic flex items-center gap-1">💾 Saving...</span>}
-                      {savingStatus === 'saved' && <span className="text-green-600 text-xs font-medium flex items-center gap-1"><AiFillSave /> Saved</span>}
-                      {savingStatus === 'error' && <span className="text-red-500 text-xs font-medium">❌ Save Error</span>}
                     </div>
                   </div>
 
@@ -756,6 +762,7 @@ const page = () => {
                           if (!activeSections.includes(sectionId)) return null;
 
                           return (
+                             <div className='acco_section'>
                             <SortableSection
                               key={sectionId}
                               id={sectionId}
@@ -890,11 +897,36 @@ const page = () => {
                                 />
                               )}
                             </SortableSection>
+                            </div>
                           );
                         })}
                       </SortableContext>
                     </DndContext>
                   </div>
+
+                  <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
+                    {savingStatus === 'saving' && (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+                        <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        Saving changes...
+                      </div>
+                    )}
+
+                    {savingStatus === 'saved' && (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
+                        <AiFillSave className="text-sm" />
+                        Saved successfully
+                      </div>
+                    )}
+
+                    {savingStatus === 'error' && (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
+                        ❌ Save failed
+                      </div>
+                    )}
+                  </div>
+
+
                 </div>
               </form>
             </FormProvider>
@@ -915,12 +947,12 @@ const page = () => {
 
             </div>
             <div className='lg:flex items-center gap-3'>
-              <div className='flex items-center gap-2 mr-4'>
+              {/* <div className='flex items-center gap-2 mr-4'>
                 {console.log(savingStatus, "savingStatus")}
                 {savingStatus === 'saving' && <span className="text-gray-500 text-sm font-medium italic">Saving...</span>}
                 {savingStatus === 'saved' && <span className="text-green-600 text-sm font-medium flex items-center gap-1"><AiFillSave /> Saved</span>}
                 {savingStatus === 'error' && <span className="text-red-500 text-sm font-medium">Save Error</span>}
-              </div>
+              </div> */}
 
 
             </div>

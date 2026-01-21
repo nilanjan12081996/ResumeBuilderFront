@@ -87,7 +87,7 @@ const SkillsNew = ({ register, watch, setValue, control, fields, append, remove,
                 </label>
             </div>
 
-            <div className='acco_section'>
+            <div className=''>
                 <div className="space-y-3">
                     {fields.map((item, index) => {
                         const watchedSkill = watch(`newSkillHistory.${index}.skill`);

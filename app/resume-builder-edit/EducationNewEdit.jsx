@@ -62,7 +62,7 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move, 
         </div>
       )}
 
-      <div className='acco_section'>
+      <div className=''>
         <div className="space-y-3">
           {fields.map((item, index) => {
             const watchedSchool = watch(`educationHistory.${index}.school`);

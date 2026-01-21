@@ -65,7 +65,7 @@ const Languages = ({ register, watch, control, fields, append, remove, move, noH
           </div>
       )}
 
-      <div className='acco_section'>
+      <div className=''>
         <div className="space-y-3">
           {fields.map((item, index) => {
             const watchedLanguage = watch(`languageHistory.${index}.language`);

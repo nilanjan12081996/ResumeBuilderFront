@@ -100,7 +100,7 @@ const CustomSection = ({ register, watch, control, fields, append, remove, move,
          </div>
       )}
 
-      <div className='acco_section'>
+      <div className=''>
         <div className="space-y-3">
           {fields.map((item, index) => {
             const watchedActivity = watch(`customSectionHistory.${index}.activity`);

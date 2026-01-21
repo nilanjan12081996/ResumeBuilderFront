@@ -59,7 +59,7 @@ const Courses = ({ register, watch, control, fields, append, remove, move, noHea
           </div>
       )}
 
-      <div className='acco_section'>
+      <div className=''>
         <div className="space-y-3">
           {fields.map((item, index) => {
             const watchedCourse = watch(`coursesHistory.${index}.course`);

@@ -62,7 +62,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move, no
         </div>
       )}
 
-      <div className='acco_section'>
+      <div className=''>
         <div className="space-y-3">
           {fields.map((item, index) => {
             const watchedJob = watch(`employmentHistory.${index}.job_title`);

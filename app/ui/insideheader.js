@@ -195,6 +195,14 @@ const Insideheader = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const { activeTab, setActiveTab } = useTabs();
+  const TAB_VISIBLE_ROUTES = [
+    "/resume-builder",
+    "/resume-builder-edit",
+    "/improve-resume-builder",
+  ];
+  const showTabs = TAB_VISIBLE_ROUTES.some(route =>
+    pathname.startsWith(route)
+  );
 
 
 
@@ -270,29 +278,31 @@ const Insideheader = () => {
           </Link>
         </div>
 
-        <div className="flex justify-center">
-          <div className="flex bg-gray-100 rounded-full p-1">
-            <button
-              onClick={() => setActiveTab("edit")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition
+        {showTabs && (
+          <div className="flex justify-center">
+            <div className="flex bg-gray-100 rounded-full p-1">
+              <button
+                onClick={() => setActiveTab("edit")}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition
         ${activeTab === "edit"
-                  ? "bg-white shadow text-black"
-                  : "text-gray-500 hover:text-black"}`}
-            >
-              Edit
-            </button>
+                    ? "bg-white shadow text-black"
+                    : "text-gray-500 hover:text-black"}`}
+              >
+                Edit
+              </button>
 
-            <button
-              onClick={() => setActiveTab("customize")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition
+              <button
+                onClick={() => setActiveTab("customize")}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition
         ${activeTab === "customize"
-                  ? "bg-white shadow text-black"
-                  : "text-gray-500 hover:text-black"}`}
-            >
-              Customize
-            </button>
+                    ? "bg-white shadow text-black"
+                    : "text-gray-500 hover:text-black"}`}
+              >
+                Customize
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
 
 
