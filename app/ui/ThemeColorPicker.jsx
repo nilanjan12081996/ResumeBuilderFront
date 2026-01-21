@@ -1,15 +1,9 @@
-'use client';
-import React, { useState } from 'react';
-import { ChromePicker } from 'react-color';
-import { useThemeColor } from './ThemeColorProvider';
+"use client";
+import React, { useState } from "react";
+import { ChromePicker } from "react-color";
+import { useThemeColor } from "./ThemeColorProvider";
 
-const presetColors = [
-  '#2163CA',
-  '#7C3AED',
-  '#DC2626',
-  '#D97706',
-  '#111827'
-];
+const presetColors = ["#2163CA", "#7C3AED", "#DC2626", "#D97706", "#111827"];
 
 const ThemeColorPicker = () => {
   const { themeColor, setThemeColor } = useThemeColor();
@@ -26,7 +20,7 @@ const ThemeColorPicker = () => {
             onClick={() => setThemeColor(color)}
             style={{ backgroundColor: color }}
             className={`w-7 h-7 rounded-full border-2 ${
-              themeColor === color ? 'border-black' : 'border-transparent'
+              themeColor === color ? "border-black" : "border-transparent"
             }`}
           />
         ))}

@@ -685,7 +685,7 @@ const handleResumeImprove = (data) => {
         <ModalBody className="bg-white p-0 rounded-b-[4px]">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="lg:flex gap-5 p-5">
-              <div className="lg:w-6/12 p-0 pr-0">
+              {/* <div className="lg:w-6/12 p-0 pr-0">
                 <div className="resume_form_area">
                   <div className="">
                     <div className="w-full resume_form_box mb-3">
@@ -695,7 +695,7 @@ const handleResumeImprove = (data) => {
                       <div>
                         <FileInput
                           id="file-upload"
-                          accept=".pdf" // Optional: Hint to the browser for PDF only
+                          accept=".pdf"
                           helperText="Upload your PDF document (Max 5MB)"
                           {...register("linkedin_profile_file", {
                             required: false,
@@ -710,7 +710,6 @@ const handleResumeImprove = (data) => {
                           linkedin_profile_file is required
                         </p>
                       )}
-                      {/* </div> */}
                     </div>
                     <div className="w-full resume_form_box mb-3">
                       <div className="mb-1 block">
@@ -789,8 +788,8 @@ const handleResumeImprove = (data) => {
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="lg:w-6/12">
+              </div> */}
+              <div className="w-full">
                 <div className="flex w-full items-center justify-center">
                   <Label
                     htmlFor="dropzone-file"
