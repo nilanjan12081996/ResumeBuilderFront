@@ -37,18 +37,18 @@ export const improveResume = createAsyncThunk(
 
 
 export const checkATS = createAsyncThunk(
-  'checkATS',
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await aiApi.post('/agent/ATS/Score', payload);
-      console.log('ATS API response:', response);
-      return response.data;
+    'checkATS',
+    async (payload, { rejectWithValue }) => {
+        try {
+            const response = await aiApi.post('/agent/ATS/Score', payload);
+            console.log('ATS API response:', response);
+            return response.data;
 
-    } catch (err) {
-      console.error('ATS API error:', err);
-      return rejectWithValue(err?.response?.data || err.message);
+        } catch (err) {
+            console.error('ATS API error:', err);
+            return rejectWithValue(err?.response?.data || err.message);
+        }
     }
-  }
 );
 
 
@@ -704,6 +704,27 @@ export const generateImpExperience = createAsyncThunk(
 );
 
 
+export const checkGrammarlySentence = createAsyncThunk(
+    "grammarly/checkSentence",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const response = await aiApi.post(
+                "/Grammarly/sentence/Agent",
+                payload
+            );
+
+            console.log("Grammarly API response:", response);
+            return response.data;
+
+        } catch (err) {
+            console.error("Grammarly API error:", err);
+            return rejectWithValue(
+                err?.response?.data || err.message
+            );
+        }
+    }
+);
+
 
 
 
@@ -713,7 +734,7 @@ const initialState = {
     loading: false,
     improveResumeData: {},
     checkATSData: {},
-    atsLoading:false,
+    atsLoading: false,
     jdBasedResumeData: {},
     basiInfo: {},
     eduInfo: {},
@@ -754,6 +775,9 @@ const initialState = {
 
     generateImpExperienceLoading: false,
     generateImpExperienceData: {},
+
+    grammarlySentenceData:null,
+    grammarlySentenceLoading:false
 }
 
 const DashboardSlice = createSlice(
@@ -1241,7 +1265,23 @@ const DashboardSlice = createSlice(
                 .addCase(generateImpExperience.rejected, (state, { payload }) => {
                     state.generateImpExperienceLoading = false;
                     state.error = payload;
+                })
+
+                .addCase(checkGrammarlySentence.pending, (state) => {
+                    state.loading = true;
+                    state.error = null;
+                })
+
+                .addCase(checkGrammarlySentence.fulfilled, (state, action) => {
+                    state.loading = false;
+                    state.grammarlySentenceData = action.payload;
+                })
+
+                .addCase(checkGrammarlySentence.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error = action.payload;
                 });
+
 
 
         }
