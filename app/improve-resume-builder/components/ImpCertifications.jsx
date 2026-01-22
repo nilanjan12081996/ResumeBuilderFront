@@ -1,8 +1,8 @@
 'use client'
 import React from 'react';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
-import { RiDraggable } from "react-icons/ri";
 import TipTapEditor from '../../editor/TipTapEditor';
+import { TbDragDrop } from 'react-icons/tb';
 
 
 const ImpCertifications = ({ 
@@ -36,7 +36,7 @@ const ImpCertifications = ({
               onDragStart={(e) => handleCertDragStart(e, cIndex)}
               onDragEnd={handleDragEnd}
             >
-              <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+              <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
               <span className="tooltip">Click and drag to move</span>
             </span>
 

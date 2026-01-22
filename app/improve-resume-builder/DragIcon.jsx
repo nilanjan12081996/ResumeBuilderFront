@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { DragHandleContext } from "./DraggableWrapper";
-import { RiDraggable } from "react-icons/ri";
+import { TbDragDrop } from "react-icons/tb";
 const DragIcon = () => {
   const ctx = useContext(DragHandleContext);
   if (!ctx) return null;
@@ -11,7 +11,7 @@ const DragIcon = () => {
       {...ctx.listeners}
       className="inline-flex cursor-grab"
     >
-      <RiDraggable className="text-xl" />
+      <TbDragDrop className="text-xl" />
     </span>
   );
 };
