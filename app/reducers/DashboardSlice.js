@@ -1268,17 +1268,17 @@ const DashboardSlice = createSlice(
                 })
 
                 .addCase(checkGrammarlySentence.pending, (state) => {
-                    state.loading = true;
+                    state.grammarlySentenceLoading = true;
                     state.error = null;
                 })
 
                 .addCase(checkGrammarlySentence.fulfilled, (state, action) => {
-                    state.loading = false;
+                    state.grammarlySentenceLoading = false;
                     state.grammarlySentenceData = action.payload;
                 })
 
                 .addCase(checkGrammarlySentence.rejected, (state, action) => {
-                    state.loading = false;
+                    state.grammarlySentenceLoading = false;
                     state.error = action.payload;
                 });
 
