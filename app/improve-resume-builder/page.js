@@ -1443,7 +1443,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
-import { RiDraggable } from "react-icons/ri";
 
 // Import components
 import ImpResumeScore from './components/ImpResumeScore';
@@ -1453,8 +1452,8 @@ import ImpSummary from './components/ImpSummary';
 import ImpEducation from './components/ImpEducation';
 import ImpCertifications from './components/ImpCertifications';
 import ImpExperience from './components/ImpExperience';
-import ImpAtsScoreAnalyzeModal from '../modal/ImpAtsScoreAnalyzeModal';
 import CustomizeSection from '../ui/CustomizeSection.jsx';
+import ImpCoreCompetencies from "./components/ImpCoreCompetencies";
 
 // Import templates
 import Professional from "../TemplateNew/Professional";
@@ -1466,6 +1465,8 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
 import { checkATS } from '../reducers/DashboardSlice';
+import { TbDragDrop } from 'react-icons/tb';
+import ImpCustomSection from './components/ImpCustomSection';
 
 const Page = () => {
   const componentRef = useRef();
@@ -1491,13 +1492,14 @@ const Page = () => {
   // States
 
   const [selectedTemplate, setSelectedTemplate] = useState('Professional');
-  const [themeColor, setThemeColor] = useState('#000000');
   const [sections, setSections] = useState([]);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
   const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
+  const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+
 
   const { activeTab } = useTabs();
 
@@ -1510,6 +1512,19 @@ const Page = () => {
     vivid: VividTemplate,
     corporate: CorporateTemplate,
   };
+
+  const templateColors = {
+    professional: "#2E86C1",
+    ats: "#2E86C1",
+    clean: "#1C1C1C",
+    clear: "#4B0082",
+    vivid: "#FF6F61",
+    corporate: "#0B3D91",
+  };
+  const [themeColor, setThemeColor] = useState(
+    templateColors[selectedTemplate.toLowerCase()] || "#2E86C1"
+  );
+
 
   const ActiveResume = templateMap[selectedTemplate] || Professional;
 
@@ -1535,7 +1550,7 @@ const Page = () => {
     const sections = [];
     let id = 0;
 
-    // Technical Skills
+    // ----------------- TECHNICAL SKILLS -----------------
     const techCategories = resumeData?.technical_skills?.categories || {};
     const techSkills = Object.values(techCategories).flat();
 
@@ -1552,7 +1567,7 @@ const Page = () => {
       });
     }
 
-    // Soft Skills
+    // ----------------- SOFT SKILLS -----------------
     if ((resumeData?.soft_skills || []).length > 0) {
       sections.push({
         id: id++,
@@ -1566,7 +1581,7 @@ const Page = () => {
       });
     }
 
-    // Summary
+    // ----------------- SUMMARY -----------------
     if (resumeData?.professional_summary?.summary_text) {
       sections.push({
         id: id++,
@@ -1576,7 +1591,7 @@ const Page = () => {
       });
     }
 
-    // Education
+    // ----------------- EDUCATION -----------------
     if ((resumeData?.education || []).length > 0) {
       sections.push({
         id: id++,
@@ -1585,7 +1600,7 @@ const Page = () => {
         educations: resumeData.education.map((edu, i) => ({
           id: `e_${i}_${Date.now()}`,
           institute: edu.institution || "",
-          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`,
+          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
           startDate: edu.start_date || "",
           endDate: edu.graduation_date || "",
           city: edu.location || "",
@@ -1594,7 +1609,7 @@ const Page = () => {
       });
     }
 
-    // Certifications
+    // ----------------- CERTIFICATIONS -----------------
     if ((resumeData?.certifications || []).length > 0) {
       sections.push({
         id: id++,
@@ -1612,7 +1627,7 @@ const Page = () => {
       });
     }
 
-    // Experience
+    // ----------------- EXPERIENCE -----------------
     if ((resumeData?.work_experience || []).length > 0) {
       sections.push({
         id: id++,
@@ -1630,11 +1645,79 @@ const Page = () => {
       });
     }
 
+    // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
+    const additionalSections = resumeData?.additional_sections || {};
+    const hasMainExperience = (resumeData?.work_experience || []).length > 0;
+
+    Object.entries(additionalSections).forEach(([key, value]) => {
+      if (!value?.content || value.content.length === 0) return;
+
+      const normalizedKey = key.toLowerCase().trim();
+
+      // Skip summary, personal info, profile, header
+      if (
+        normalizedKey.includes("summary") ||
+        normalizedKey.includes("personal") ||
+        normalizedKey.includes("profile") ||
+        normalizedKey.includes("header")
+      ) return;
+
+      // Skip experience if main experience exists
+      if (
+        hasMainExperience &&
+        (
+          normalizedKey.includes("experience") ||
+          normalizedKey.includes("employment") ||
+          normalizedKey.includes("career") ||
+          normalizedKey.includes("timeline")
+        )
+      ) return;
+
+      // Core competencies
+      if (
+        normalizedKey.includes("core competencies") ||
+        normalizedKey.includes("competencies")
+      ) {
+        sections.push({
+          id: id++,
+          title: key,
+          type: "core_competencies",
+          items: value.content,
+        });
+        return;
+      }
+
+      // Everything else (including achievements) → custom
+      sections.push({
+        id: id++,
+        title: key,
+        type: "custom",
+        items: Array.isArray(value.content)
+          ? value.content.map((item, i) => ({
+            id: `custom_${i}_${Date.now()}`,
+            title: typeof item === "string" ? item : item.title || item.name || "",
+            city: item.city || "",
+            startDate: item.start_date || "",
+            endDate: item.end_date || "",
+            description: item.description || "",
+          }))
+          : [
+            {
+              id: `custom_0_${Date.now()}`,
+              title: typeof value.content === "string" ? value.content : "",
+              city: "",
+              startDate: "",
+              endDate: "",
+              description: "",
+            },
+          ],
+      });
+    });
+
     return sections;
   };
 
-
-  // (name, contact info, summary, job target)
+  // ----------------- SETTING FORM VALUES -----------------
   useEffect(() => {
     if (!improveResumeData?.resume_data) return;
 
@@ -1642,7 +1725,7 @@ const Page = () => {
     const personal = resumeData.personal_information || {};
     const meta = resumeData.metadata || {};
 
-    // ---------- SUMMARY ----------
+    // Profile summary
     const profileSummaryFromAdditional =
       resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
 
@@ -1658,11 +1741,10 @@ const Page = () => {
         ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
         : summaryPoints[0] || "";
 
-    // ---------- NAME ----------
+    // Name
     const fullName = personal.full_name || "";
     const nameParts = fullName.split(" ");
 
-    // ---------- SET FORM VALUES ----------
     setValue("job_target", meta.current_role || "");
     setValue("first_name", nameParts[0] || "");
     setValue("last_name", nameParts.slice(1).join(" ") || "");
@@ -1675,44 +1757,28 @@ const Page = () => {
     setValue("country", personal.location?.country || "");
     setValue("address", personal.location?.full_address || "");
     setValue("summary", formattedSummary);
-
   }, [improveResumeData, setValue]);
 
-
-  // (skills, education, experience, certifications)
+  // ----------------- MAP SECTIONS -----------------
   useEffect(() => {
     if (!improveResumeData?.resume_data) return;
 
-    const mappedSections = mapImproveResumeDataToSections(
-      improveResumeData.resume_data
-    );
-
+    const mappedSections = mapImproveResumeDataToSections(improveResumeData.resume_data);
     setSections(mappedSections);
   }, [improveResumeData]);
 
-
-  //  Sync skill sections 
+  // ----------------- SYNC SKILLS -----------------
   useEffect(() => {
     const skillSections = sections.filter(sec => sec.type === "skills");
-
     const mergedSkills = skillSections.flatMap(sec =>
-      (sec.skills || []).map(skill => ({
-        skill: skill.name,
-        level: skill.level ?? 3
-      }))
+      (sec.skills || []).map(skill => ({ skill: skill.name, level: skill.level ?? 3 }))
     );
-
     setValue("newSkillHistory", mergedSkills);
   }, [sections, setValue]);
 
-
-  // Sync education sections 
-
+  // ----------------- SYNC EDUCATION -----------------
   useEffect(() => {
-    const educationSections = sections.filter(
-      sec => sec.type === "education"
-    );
-
+    const educationSections = sections.filter(sec => sec.type === "education");
     const educationHistory = educationSections.flatMap(sec =>
       (sec.educations || []).map(edu => ({
         school: edu.institute || "",
@@ -1720,19 +1786,15 @@ const Page = () => {
         startDate: edu.startDate || "",
         endDate: edu.endDate || "",
         city_state: edu.city || "",
-        description: edu.description || ""
+        description: edu.description || "",
       }))
     );
-
     setValue("educationHistory", educationHistory);
   }, [sections, setValue]);
 
-  // Sync experince sections 
+  // ----------------- SYNC EXPERIENCE -----------------
   useEffect(() => {
-    const expSections = sections.filter(
-      sec => sec.type === "experience"
-    );
-
+    const expSections = sections.filter(sec => sec.type === "experience");
     const employmentHistory = expSections.flatMap(sec =>
       (sec.experiences || []).map(exp => ({
         job_title: exp.jobTitle || "",
@@ -1740,14 +1802,11 @@ const Page = () => {
         city_state: exp.city || "",
         startDate: exp.startDate || "",
         endDate: exp.endDate || "",
-        description: exp.description || ""
+        description: exp.description || "",
       }))
     );
-
     setValue("employmentHistory", employmentHistory);
   }, [sections, setValue]);
-
-
 
 
   // Drag handlers for sections
@@ -1957,8 +2016,54 @@ const Page = () => {
     setSections(updatedSections);
   };
 
+  const handleCustomDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedCustomIndex(index);
+  };
+
+  const handleCustomDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedCustomIndex === null || draggedCustomIndex === targetIndex) return;
+
+    const updatedSections = [...sections];
+    const itemsList = [...updatedSections[sectionIndex].items];
+
+    const [movedItem] = itemsList.splice(draggedCustomIndex, 1);
+    itemsList.splice(targetIndex, 0, movedItem);
+
+    updatedSections[sectionIndex].items = itemsList;
+    setSections(updatedSections);
+    setDraggedCustomIndex(null);
+  };
+
+  const handleCustomUpdate = (sectionIndex, itemId, field, value) => {
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex].items = updatedSections[sectionIndex].items.map(item =>
+      item.id === itemId ? { ...item, [field]: value } : item
+    );
+    setSections(updatedSections);
+  };
+
+  const handleAddCustomItem = (sectionIndex) => {
+    const updatedSections = [...sections];
+    const newItem = {
+      id: `custom_${Date.now()}`,
+      title: "",
+      city: "",
+      startDate: "",
+      endDate: "",
+      description: "",
+    };
+    updatedSections[sectionIndex].items = [...updatedSections[sectionIndex].items, newItem];
+    setSections(updatedSections);
+  };
+
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
+    const defaultColor = templateColors[id.toLowerCase()] || "#2E86C1";
+    setThemeColor(defaultColor);
   };
 
   return (
@@ -2006,7 +2111,7 @@ const Page = () => {
                               onDragStart={(e) => handleDragStart(e, index)}
                               onDragEnd={handleDragEnd}
                             >
-                              <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+                              <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
                               <span className="tooltip">Click and drag to move</span>
                             </span>
                             {section.title}
@@ -2067,6 +2172,27 @@ const Page = () => {
                                 handleDragEnd={handleDragEnd}
                               />
                             )}
+                            {section.type === "core_competencies" && (
+                              <ImpCoreCompetencies
+                                section={section}
+                                sectionIndex={index}
+                              />
+                            )}
+
+                            {section.type === "custom" && (
+                              <ImpCustomSection
+                                section={section}
+                                sectionIndex={index}
+                                handleCustomUpdate={handleCustomUpdate}
+                                handleCustomDragStart={handleCustomDragStart}
+                                handleCustomDrop={handleCustomDrop}
+                                handleAddCustomItem={handleAddCustomItem}
+                                draggedIndex={draggedCustomIndex}
+                                handleDragEnd={handleDragEnd}
+                              />
+                            )}
+
+
 
                           </AccordionContent>
                         </AccordionPanel>

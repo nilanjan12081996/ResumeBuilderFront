@@ -1,11 +1,11 @@
 'use client';
 import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
 import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../utils/Datepicker";
+import { TbDragDrop } from "react-icons/tb";
 
 const Activities = ({ register, watch, control, fields, append, remove, move }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -90,7 +90,7 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
                           onMouseEnter={() => setIsHandleHovered(true)}
                           onMouseLeave={() => setIsHandleHovered(false)}
                         >
-                          <RiDraggable className="text-xl text-gray-400" />
+                          <TbDragDrop className="text-xl text-gray-400" />
                         </button>
 
                         <div className="flex flex-col text-left">
