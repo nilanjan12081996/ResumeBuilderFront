@@ -501,7 +501,6 @@ body {
   align-items: center;
 }
 
-
 .user_face {
   position: relative;
 }
@@ -1064,9 +1063,6 @@ body {
   transform-origin: 50% 50%;
 } */
 
-
-
-
 .resume_list_area :checked + label {
   border-color: #92278f;
 }
@@ -1299,38 +1295,35 @@ body {
   border: none;
 }
 
-
 svg[data-testid="flowbite-accordion-arrow"] {
   color: #ccc;
   width: 25px;
   height: 25px;
 }
 
-
-.acco_section input, .acco_section textarea{
+.acco_section input,
+.acco_section textarea {
   width: 100%;
   padding: 12px 14px;
   font-size: 14px;
   border-radius: 6px;
-  border:none;
-  background-color: #EFF2F9;
+  border: none;
+  background-color: #eff2f9;
   outline: none;
   transition: all 0.2s ease;
 }
 
-.acco_section input:focus, .acco_section textarea:focus {
-  border-radius: 6px 6px 0 0; 
+.acco_section input:focus,
+.acco_section textarea:focus {
+  border-radius: 6px 6px 0 0;
   border-bottom: 2px solid #800080;
 }
-
-
-
 
 .drag-wrapper {
   position: relative;
   display: inline-flex;
   align-items: center;
-  border:none;
+  border: none;
 }
 
 .tooltip {
@@ -1365,8 +1358,6 @@ svg[data-testid="flowbite-accordion-arrow"] {
   opacity: 1;
   visibility: visible;
 }
-
-
 
 .label_tab_area ul {
   /* background: #ffffff; */
@@ -1466,24 +1457,23 @@ svg[data-testid="flowbite-accordion-arrow"] {
   border-bottom: #9ca3af 1px solid !important;
 }
 
-
 .react-datepicker-wrapper {
   display: block !important;
   width: 100% !important;
 }
 
-
 .react-datepicker__input-container {
   display: block !important;
 }
-
 
 .react-datepicker--month-text--selected {
   background-color: #3b82f6 !important; /* Tailwind blue-500 */
   border-radius: 0.375rem;
 }
 
-
+button [data-testid="flowbite-accordion-arrow"] svg {
+  display: none !important;
+}
 
 @media only screen and (max-width: 767px) {
   .invited_students_table_wrap table tr td:first-child,
