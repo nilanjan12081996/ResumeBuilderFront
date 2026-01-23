@@ -80,16 +80,16 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
             <div className="flex items-center gap-6">
                 <div className="w-24 h-24">
                     <CircularProgressbar
-                        value={loading ? 100 : progress}
+                        value={loading ? 25 : progress}
                         maxValue={100}
                         text={loading ? "Checking…" : `${progress}%`}
+                        className={loading ? "loading-spinner" : ""}
                         styles={buildStyles({
                             pathColor: loading ? "#c084fc" : progressColor,
                             textColor: "#800080",
                             trailColor: "#f0f0f0",
-                            textSize: "18px",
+                            textSize: loading ? "12px" : "20px",
                             strokeLinecap: "round",
-                            fontWeight: "bold",
                         })}
                     />
                 </div>

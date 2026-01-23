@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { TbDragDrop } from "react-icons/tb";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaTrash } from "react-icons/fa";
 import { Tabs, Tab, TabList } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 
 const ImpCoreCompetencies = ({
   section,
   sectionIndex,
-  handleUpdate,        // (optional future)
+  handleUpdate,
   handleDragStart,
   handleDrop,
   draggedIndex,
@@ -18,13 +18,15 @@ const ImpCoreCompetencies = ({
   const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
 
   const [editingIndex, setEditingIndex] = useState(null);
+  const [deletingIndex, setDeletingIndex] = useState(null);
 
-  // 🔥 convert string → object locally
-  const competencies = section.items.map((item, i) => ({
-    id: i,
-    name: item,
-    level: 3 // default = Experienced
-  }));
+  const handleDelete = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
+      handleUpdate(sectionIndex, index, "delete");
+      setDeletingIndex(null);
+    }, 400);
+  };
 
   return (
     <>
@@ -32,7 +34,7 @@ const ImpCoreCompetencies = ({
         Highlight your strongest competencies relevant to the role.
       </p>
 
-      {competencies.map((item, i) => {
+      {section.items.map((item, i) => {
         const isEditing = editingIndex === i;
 
         return (
@@ -40,8 +42,12 @@ const ImpCoreCompetencies = ({
             key={i}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => handleDrop?.(e, sectionIndex, i)}
-            className={`flex items-center justify-between gap-4 !border-b p-2 !border-gray-300
+            className={`
+              group
+              flex items-center justify-between gap-4 p-2 !border-b !border-gray-300
+              transition-all duration-300
               ${draggedIndex === i ? "opacity-20 scale-95" : ""}
+              ${deletingIndex === i ? "-translate-x-6 opacity-0 bg-red-400" : "bg-white"}
             `}
           >
             {/* Drag */}
@@ -58,42 +64,56 @@ const ImpCoreCompetencies = ({
             <div className="flex-1">
               {isEditing ? (
                 <input
-                  value={item.name}
+                  value={item}
                   autoFocus
-                  onBlur={() => setEditingIndex(null)}
+                  onChange={(e) =>
+                    handleUpdate(sectionIndex, i, "value", e.target.value)
+                  }
+                  onBlur={() => {
+                    setEditingIndex(null);
+                    if (!item.trim()) handleDelete(i);
+                  }}
                   className="w-full text-sm border-b outline-none bg-transparent"
                 />
               ) : (
-                <div
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={() => setEditingIndex(i)}
-                >
+                <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">
-                    {item.name || "Your Competency"}
+                    {item || "Your Competency"}
                   </span>
-                  <FaPen className="text-xs text-gray-400" />
+
+                  <div className="flex items-center gap-2
+                    opacity-0
+                    translate-x-2
+                    group-hover:opacity-100
+                    group-hover:translate-x-0
+                    transition-all duration-200">
+                    <FaPen
+                      className="text-sm text-gray-400 cursor-pointer hover:text-purple-600"
+                      onClick={() => setEditingIndex(i)}
+                    />
+
+                    <FaTrash
+                      className="text-sm text-gray-400 cursor-pointer hover:text-red-500"
+                      onClick={() => handleDelete(i)}
+                    />
+                  </div>
+
                 </div>
               )}
             </div>
 
-            {/* 🔥 Skill Level (same as Skills) */}
+            {/* Level */}
             <div className="flex flex-col items-center gap-1">
               <span className="text-xs font-medium text-gray-600">
-                {levels[item.level]}
+                {levels[3]}
               </span>
 
-              <Tabs selectedIndex={item.level}>
+              <Tabs selectedIndex={3}>
                 <TabList className="flex gap-1">
                   {levels.map((lvl, idx) => (
                     <Tab key={idx} className="outline-none">
                       <div
-                        className={`
-                          w-6 h-6 flex items-center justify-center rounded-full
-                          cursor-pointer transition-all duration-300
-                          ${item.level === idx
-                            ? "scale-110 border border-[#800080] shadow-md"
-                            : "opacity-60 hover:opacity-100"}
-                        `}
+                        className="w-6 h-6 flex items-center justify-center rounded-full opacity-60"
                         style={{
                           backgroundColor: tabColors[idx],
                           color: textColor[idx]

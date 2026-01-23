@@ -139,6 +139,7 @@ import { Label } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
 import { Tab, Tabs, TabList } from "react-tabs";
 import { FaPen } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import 'react-tabs/style/react-tabs.css';
 
 const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragStart, handleSkillDrop, draggedSkillIndex, setDraggedSkillIndex }) => {
@@ -147,6 +148,18 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
     const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
 
     const [editingSkillIndex, setEditingSkillIndex] = useState(null);
+    const [deletingSkillIndex, setDeletingSkillIndex] = useState(null);
+
+    const handleDelete = (sIndex, skillId) => {
+        setDeletingSkillIndex(sIndex);
+
+        setTimeout(() => {
+            handleSkillUpdate(sectionIndex, skillId, "delete");
+            setDeletingSkillIndex(null);
+        }, 500);
+    };
+
+
 
     return (
         <>
@@ -162,9 +175,14 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                         key={skill.id}
                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         onDrop={(e) => handleSkillDrop(e, sectionIndex, sIndex)}
-                        className={`flex items-center justify-between gap-4 transition-all duration-200 mb-2 !border-b !border-gray-300 p-2    
-                            ${draggedSkillIndex === sIndex ? "opacity-20  scale-95" : "bg-white"}
-                        `}
+                        className={`
+                            group
+                            flex items-center justify-between gap-4 mb-2 p-2 !border-b !border-gray-300
+                            transition-all duration-300 ease-in-out
+                            ${draggedSkillIndex === sIndex ? "opacity-20 scale-95" : ""}
+                            ${deletingSkillIndex === sIndex ? "-translate-x-6 opacity-0 bg-red-400" : "bg-white"}
+                            `}
+
                     >
                         {/* Drag Handle */}
                         <span
@@ -183,18 +201,43 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                                     type="text"
                                     value={skill.name}
                                     onChange={(e) => handleSkillUpdate(sectionIndex, skill.id, 'name', e.target.value)}
-                                    onBlur={() => setEditingSkillIndex(null)}
+                                    onBlur={() => {
+                                        setEditingSkillIndex(null);
+
+                                        if (!skill.name.trim()) {
+                                            handleDelete(sIndex, skill.id);
+                                        }
+                                    }}
                                     autoFocus
-                                    className="w-full text-sm font-medium border-b outline-none bg-transparent px-1"
+                                    className="w-full text-sm font-medium !border-b outline-none bg-transparent px-1"
                                 />
                             ) : (
-                                <div
-                                    className="flex items-center gap-2 cursor-pointe"
-                                    onClick={() => setEditingSkillIndex(sIndex)}
-                                >
-                                    <span className="text-sm font-medium">{skill.name || "Your Skill"}</span>
-                                    <FaPen className="text-sm text-gray-400" />
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">
+                                        {skill.name || "Your Skill"}
+                                    </span>
+
+                                    <div className="flex items-center gap-2
+                                        opacity-0
+                                        translate-x-2
+                                        group-hover:opacity-100
+                                        group-hover:translate-x-0
+                                        transition-all duration-200">
+                                        <FaPen
+                                            className="text-sm text-gray-400 cursor-pointer hover:text-purple-600"
+                                            onClick={() => setEditingSkillIndex(sIndex)}
+                                        />
+
+                                        <FaTrash
+                                            className="text-sm text-gray-400 cursor-pointer hover:text-red-500"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(sIndex, skill.id);
+                                            }}
+                                        />
+                                    </div>
                                 </div>
+
                             )}
                         </div>
 
@@ -227,42 +270,6 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                                     ))}
                                 </TabList>
                             </Tabs>
-                            {/* <Tabs
-                                selectedIndex={skill.level}
-                                onSelect={(tabIndex) =>
-                                    handleSkillUpdate(sectionIndex, skill.id, "level", tabIndex)
-                                }
-                            >
-                                <TabList className="flex gap-1">
-                                    {levels.map((lvl, i) => {
-                                        const isActive = skill.level === i;
-
-                                        return (
-                                            <Tab
-                                                key={i}
-                                                className="outline-none !bg-transparent !border-0"
-                                                selectedClassName="!bg-transparent !border-0"
-                                            >
-                                                <div
-                                                    className={`
-              w-6 h-6 flex items-center justify-center rounded-full cursor-pointer
-              transition-all duration-300 text-xs font-medium
-              border
-              ${isActive
-                                                            ? "bg-[#800080] border-[#800080] text-white scale-110 shadow-md"
-                                                            : "bg-transparent border-black text-black hover:bg-gray-100"
-                                                        }
-            `}
-                                                    title={lvl}
-                                                >
-                                                    {i + 1}
-                                                </div>
-                                            </Tab>
-                                        );
-                                    })}
-                                </TabList>
-                            </Tabs> */}
-
                         </div>
 
                     </div>

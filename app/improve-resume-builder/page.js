@@ -1443,6 +1443,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
+import isEqual from 'lodash.isequal';
+import { AiFillSave } from "react-icons/ai";
 
 // Import components
 import ImpResumeScore from './components/ImpResumeScore';
@@ -1465,14 +1467,25 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
 import { checkATS } from '../reducers/DashboardSlice';
+import { saveResumeNew } from '../reducers/ResumeSlice';
 import { TbDragDrop } from 'react-icons/tb';
 import ImpCustomSection from './components/ImpCustomSection';
+import AddSectionButton from './components/AddSectionButton';
+import { FaPen, FaTrash } from 'react-icons/fa';
 
 const Page = () => {
   const componentRef = useRef();
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
   const { improveResumeData } = useSelector((state) => state?.dash);
-  console.log('improveResumeData', improveResumeData)
+
+  // Resume ID tracking
+  const resume_id = searchParams.get('id');
+  const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
+
+  // Auto-Save State
+  const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
+  const lastSavedData = useRef(null);
 
   useEffect(() => {
     if (!improveResumeData?.resume_data) return;
@@ -1499,6 +1512,8 @@ const Page = () => {
   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
   const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+
 
 
   const { activeTab } = useTabs();
@@ -1540,8 +1555,105 @@ const Page = () => {
   const formValues = watch();
 
   const onSubmit = async (data) => {
-    console.log("data", data);
+    console.log("Manual Save:", data);
+    // Force save on submit
+    setSavingStatus('saving');
+    const dataToSave = {
+      ...data,
+      sections: sections,
+      mongo_id: resumeIds.mongo_id,
+      mysql_id: resumeIds.mysql_id
+    };
+
+    dispatch(saveResumeNew(dataToSave)).then((res) => {
+      if (res.payload && res.payload.status_code === 200) {
+        setSavingStatus('saved');
+        lastSavedData.current = JSON.parse(JSON.stringify({ ...data, sections }));
+        toast.success("Resume saved successfully!");
+      } else {
+        setSavingStatus('error');
+        toast.error("Failed to save resume.");
+      }
+    });
   };
+
+  useEffect(() => {
+    if (improveResumeData?.data?.data) {
+      const resumeData = improveResumeData.data.data;
+
+      // Set IDs for Auto-Save
+      if (resumeData._id || resumeData.mongo_id || resumeData.id || resumeData.mysql_id) {
+        setResumeIds({
+          mongo_id: resumeData.mongo_id || resumeData._id,
+          mysql_id: resumeData.mysql_id || resumeData.id
+        });
+        setSavingStatus('saved');
+      }
+
+      // Initialize lastSavedData
+      lastSavedData.current = resumeData;
+    }
+  }, [improveResumeData]);
+
+  // --- AUTO-SAVE EFFECT ---
+  useEffect(() => {
+    // Combine form values and sections for comparison
+    const currentData = {
+      ...formValues,
+      sections: sections
+    };
+
+    const currentDataNormalized = JSON.parse(JSON.stringify(currentData));
+
+    // Check if data changed
+    if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
+      return; // No changes
+    }
+
+    setSavingStatus('saving');
+
+    const timeoutId = setTimeout(() => {
+      const dataToSave = {
+        ...currentData,
+        mongo_id: resumeIds.mongo_id,
+        mysql_id: resumeIds.mysql_id
+      };
+
+      dispatch(saveResumeNew(dataToSave)).then((res) => {
+        if (res.payload && res.payload.status_code === 200) {
+          setSavingStatus('saved');
+          lastSavedData.current = currentDataNormalized;
+
+          // Update IDs if new resume created
+          if (!resumeIds.mongo_id) {
+            const newMongoId = res.payload.data?.mongo_id;
+            const newMysqlId = res.payload.data?.mysql_id;
+            if (newMongoId && newMysqlId) {
+              setResumeIds({
+                mongo_id: newMongoId,
+                mysql_id: newMysqlId
+              });
+            }
+          }
+        } else {
+          console.error("Auto-save failed:", res);
+          setSavingStatus('error');
+        }
+      });
+    }, 2000); // 2 second debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formValues, sections, resumeIds, dispatch]);
+
+  // Auto-hide saved status after 2 seconds
+  useEffect(() => {
+    if (savingStatus === 'saved') {
+      const timer = setTimeout(() => {
+        setSavingStatus('unsaved');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [savingStatus]);
 
   // Helper function to map resume data to sections
   const mapImproveResumeDataToSections = (resumeData) => {
@@ -1864,11 +1976,27 @@ const Page = () => {
 
   const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
     const updatedSections = [...sections];
-    updatedSections[sectionIndex].skills = updatedSections[sectionIndex].skills.map(sk =>
-      sk.id === skillId ? { ...sk, [field]: value } : sk
-    );
+
+    //  DELETE CASE
+    if (field === "delete") {
+      updatedSections[sectionIndex].skills =
+        updatedSections[sectionIndex].skills.filter(
+          skill => skill.id !== skillId
+        );
+
+      setSections(updatedSections);
+      return;
+    }
+
+    //  NORMAL UPDATE
+    updatedSections[sectionIndex].skills =
+      updatedSections[sectionIndex].skills.map(skill =>
+        skill.id === skillId ? { ...skill, [field]: value } : skill
+      );
+
     setSections(updatedSections);
   };
+
 
   // Education handlers
   const handleEducationDragStart = (e, index) => {
@@ -2060,11 +2188,55 @@ const Page = () => {
     setSections(updatedSections);
   };
 
+  const handleCoreCompetencyUpdate = (sectionIndex, itemIndex, field, value) => {
+    const updatedSections = [...sections];
+
+    if (field === "delete") {
+      updatedSections[sectionIndex].items =
+        updatedSections[sectionIndex].items.filter((_, i) => i !== itemIndex);
+
+      setSections(updatedSections);
+      return;
+    }
+
+    updatedSections[sectionIndex].items =
+      updatedSections[sectionIndex].items.map((item, i) =>
+        i === itemIndex ? value : item
+      );
+
+    setSections(updatedSections);
+  };
+
+
+
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
     const defaultColor = templateColors[id.toLowerCase()] || "#2E86C1";
     setThemeColor(defaultColor);
   };
+
+  const handleAddNewSection = (newSection) => {
+    const newId = Math.max(...sections.map(s => s.id), -1) + 1;
+    const sectionToAdd = {
+      id: newId,
+      ...newSection
+    };
+    setSections([...sections, sectionToAdd]);
+  };
+  const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex] = {
+      ...updatedSections[sectionIndex],
+      title: newTitle
+    };
+    setSections(updatedSections);
+  };
+
+  const handleDeleteSection = (sectionIndex) => {
+    const updatedSections = sections.filter((_, i) => i !== sectionIndex);
+    setSections(updatedSections);
+  };
+
 
   return (
     <div className='lg:flex gap-1 pb-0'>
@@ -2104,18 +2276,68 @@ const Page = () => {
                     <div className='acco_section'>
                       <Accordion flush={true}>
                         <AccordionPanel>
-                          <AccordionTitle className='font-bold text-xl'>
-                            <span
-                              className="drag-wrapper cursor-grab active:cursor-grabbing"
-                              draggable
-                              onDragStart={(e) => handleDragStart(e, index)}
-                              onDragEnd={handleDragEnd}
+                          <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
+                            <div className="flex items-center gap-2 flex-1">
+
+                              <span
+                                className="drag-wrapper cursor-grab active:cursor-grabbing"
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, index)}
+                                onDragEnd={handleDragEnd}
+                              >
+                                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
+                              </span>
+
+                              {editingSectionIndex === index ? (
+                                <input
+                                  autoFocus
+                                  defaultValue={section.title}
+                                  onBlur={(e) => {
+                                    setEditingSectionIndex(null);
+                                    if (e.target.value.trim()) {
+                                      handleSectionTitleUpdate(index, e.target.value.trim());
+                                    }
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") e.target.blur();
+                                  }}
+                                  className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
+                                />
+                              ) : (
+                                <span
+                                  className="cursor-pointer"
+                                  onClick={() => setEditingSectionIndex(index)}
+                                >
+                                  {section.title}
+                                </span>
+                              )}
+                            </div>
+                            <div
+                              className="
+                                flex items-center gap-3
+                                opacity-0 translate-x-2
+                                group-hover:opacity-100 group-hover:translate-x-0
+                                transition-all duration-200
+                              "
                             >
-                              <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-                              <span className="tooltip">Click and drag to move</span>
-                            </span>
-                            {section.title}
+                              <FaPen
+                                className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingSectionIndex(index);
+                                }}
+                              />
+
+                              <FaTrash
+                                className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteSection(index);
+                                }}
+                              />
+                            </div>
                           </AccordionTitle>
+
                           <AccordionContent className='pt-0'>
 
                             {section.type === 'skills' && (
@@ -2176,6 +2398,11 @@ const Page = () => {
                               <ImpCoreCompetencies
                                 section={section}
                                 sectionIndex={index}
+                                handleUpdate={handleCoreCompetencyUpdate}
+                                handleDragStart={handleCustomDragStart}
+                                handleDrop={handleCustomDrop}
+                                draggedIndex={draggedCustomIndex}
+                                setDraggedIndex={setDraggedCustomIndex}
                               />
                             )}
 
@@ -2200,6 +2427,7 @@ const Page = () => {
                     </div>
                   </div>
                 ))}
+                <AddSectionButton onAddNewSection={handleAddNewSection} />
               </div>
             </div>
           </form>
@@ -2213,6 +2441,27 @@ const Page = () => {
             />
           </div>
         )}
+        <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
+          {savingStatus === 'saving' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+              <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              Saving changes...
+            </div>
+          )}
+
+          {savingStatus === 'saved' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
+              <AiFillSave className="text-sm" />
+              Saved successfully
+            </div>
+          )}
+
+          {savingStatus === 'error' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
+              ❌ Save failed
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Right Panel - Resume Preview */}

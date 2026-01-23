@@ -10,21 +10,26 @@ const CustomizeSection = ({
   setThemeColor,
 }) => {
   const [activeTab, setActiveTab] = useState("Template & Colors");
-
+  const [textSettings, setTextSettings] = useState({
+    font: "Arial",
+    headingSize: 24,
+    bodySize: 10,
+    lineHeight: 1.4,
+    headingWeight: "bold",
+  });
   return (
     <div className="w-full bg-slate-50 min-h-screen font-sans text-gray-700">
-      
+
       {/* TOP TABS – SAME DESIGN */}
       <div className="flex justify-center border-b bg-white">
         {["Template & Colors", "Text", "Layout"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-12 py-4 text-lg font-medium transition-all border-b-4 ${
-              activeTab === tab
-                ? "border-blue-500 text-slate-900"
-                : "border-transparent text-slate-400"
-            }`}
+            className={`px-12 py-4 text-lg font-medium transition-all border-b-4 ${activeTab === tab
+              ? "border-blue-500 text-slate-900"
+              : "border-transparent text-slate-400"
+              }`}
           >
             {tab}
           </button>
@@ -41,7 +46,12 @@ const CustomizeSection = ({
           />
         )}
 
-        {activeTab === "Text" && <TemplateText />}
+        {activeTab === "Text" && (
+          <TemplateText
+            textSettings={textSettings}
+            setTextSettings={setTextSettings}
+          />
+        )}
 
         {activeTab === "Layout" && <TemplateLayout />}
       </div>

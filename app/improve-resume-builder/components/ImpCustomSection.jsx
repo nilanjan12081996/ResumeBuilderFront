@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
+import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label, Modal } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
-import { HiSparkles } from "react-icons/hi2";
+import { BiCustomize, BiBriefcase, BiAward } from "react-icons/bi";
+import { MdLocalFlorist, MdVolunteerActivism, MdCardMembership } from "react-icons/md";
+import { FaChessKnight, FaLanguage, FaCertificate } from "react-icons/fa6";
+import { HiSpeakerphone, HiAcademicCap } from "react-icons/hi";
 import TipTapEditor from "../../editor/TipTapEditor";
 
 const ImpCustomSection = ({
@@ -16,6 +19,7 @@ const ImpCustomSection = ({
 }) => {
     return (
         <>
+            {/* Existing Items */}
             {section.items.map((item, idx) => (
                 <div
                     key={item.id}
@@ -24,7 +28,6 @@ const ImpCustomSection = ({
                     className="mb-3"
                 >
                     <div className="flex gap-2">
-
                         <span
                             draggable
                             onDragStart={(e) => handleCustomDragStart(e, idx)}
@@ -43,7 +46,6 @@ const ImpCustomSection = ({
 
                                 <AccordionContent>
                                     <div className="grid grid-cols-2 gap-4 mb-4">
-
                                         <div className="col-span-2">
                                             <Label className="!text-sm !font-medium !text-gray-500">Title</Label>
                                             <input
@@ -87,16 +89,17 @@ const ImpCustomSection = ({
                                                 }
                                             />
                                         </div>
+
+                                        <div className="col-span-2">
+                                            <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                                            <TipTapEditor
+                                                value={item.description}
+                                                onChange={(html) =>
+                                                    handleCustomUpdate(sectionIndex, item.id, "description", html)
+                                                }
+                                            />
+                                        </div>
                                     </div>
-
-                                    <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                    <TipTapEditor
-                                        value={item.description}
-                                        onChange={(html) =>
-                                            handleCustomUpdate(sectionIndex, item.id, "description", html)
-                                        }
-                                    />
-
                                 </AccordionContent>
                             </AccordionPanel>
                         </Accordion>
@@ -104,10 +107,11 @@ const ImpCustomSection = ({
                 </div>
             ))}
 
+            {/* Add Item Button */}
             <button
                 type="button"
                 onClick={() => handleAddCustomItem(sectionIndex)}
-                className="!text-sm !text-[#800080] mt-2"
+                className="!text-sm !text-[#800080] mt-2 hover:underline"
             >
                 + Add one more item
             </button>

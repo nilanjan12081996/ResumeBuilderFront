@@ -97,3 +97,30 @@
 .react-tabs__tab:focus {
   box-shadow: none !important;
 }
+
+
+@keyframes spinRing {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner .CircularProgressbar-path {
+  transform-origin: center;
+  animation: spinRing 1.2s linear infinite;
+}
+
+.loading-spinner .CircularProgressbar-text {
+  animation: none !important;
+}
+
+p[data-has-error="true"] {
+  text-decoration: underline;
+  text-decoration-color: red;
+  text-decoration-thickness: 2px;
+  cursor: pointer;
+}
+

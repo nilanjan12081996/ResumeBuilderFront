@@ -12,7 +12,7 @@ const ImpPersonalDetails = ({ register, watch }) => {
           <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
           <AccordionContent className='pt-0'>
             <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
+
               {/* Job Title */}
               <div className="md:col-span-2">
                 <label className="block !text-sm !font-medium !text-gray-500">
@@ -78,8 +78,8 @@ const ImpPersonalDetails = ({ register, watch }) => {
                 />
               </div>
 
-              {/* LinkedIn URL */}
-              <div className="md:col-span-2">
+              {/* LinkedIn */}
+              <div>
                 <label className="block !text-sm !font-medium !text-gray-500">
                   LinkedIn URL
                 </label>
@@ -90,7 +90,58 @@ const ImpPersonalDetails = ({ register, watch }) => {
                   {...register("linkedin")}
                 />
               </div>
+              {/* GitHub */}
+              <div>
+                <label className="block !text-sm !font-medium !text-gray-500">
+                  GitHub
+                </label>
+                <input
+                  type="url"
+                  placeholder="github.com/username"
+                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                  {...register("github")}
+                />
+              </div>
 
+              {/* Stack Overflow */}
+              <div>
+                <label className="block !text-sm !font-medium !text-gray-500">
+                  Stack Overflow
+                </label>
+                <input
+                  type="url"
+                  placeholder="stackoverflow.com/users/your-id"
+                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                  {...register("stackoverflow")}
+                />
+              </div>
+
+              {/* LeetCode */}
+              <div>
+                <label className="block !text-sm !font-medium !text-gray-500">
+                  LeetCode
+                </label>
+                <input
+                  type="url"
+                  placeholder="leetcode.com/username"
+                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                  {...register("leetcode")}
+                />
+              </div>
+
+              {/* City, State */}
+              <div>
+                <label className="block !text-sm !font-medium !text-gray-500">
+                  City, State
+                </label>
+                <input
+                  type="text"
+                  placeholder="City, State"
+                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                  {...register("city_state")}
+                />
+              </div>
+            
               {/* City, State */}
               <div>
                 <label className="block !text-sm !font-medium !text-gray-500">

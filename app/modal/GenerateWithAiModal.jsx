@@ -161,8 +161,8 @@ const GenerateWithAiModal = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-            <div className="bg-white min-w-[500px] max-w-md rounded-2xl p-6 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
+        <div className="fixed left-140 inset-0 z-[9999] flex items-center justify-center">
+            <div className="bg-white min-w-[550px] max-w-md rounded-2xl p-4 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
                 {/* Header */}
                 <div className="flex justify-between items-start">
                     <div>
@@ -214,7 +214,7 @@ const GenerateWithAiModal = ({
                     <div className="mt-6">
                         <div
                             ref={scrollRef}
-                            className={`rounded-lg text-sm bg-gray-50 max-h-40 overflow-y-auto whitespace-pre-line p-3 transition-colors duration-300
+                            className={`rounded-lg text-sm bg-gray-50 max-h-60 overflow-y-auto whitespace-pre-line p-3 transition-colors duration-300
                             ${typingDone ? "text-black" : "text-blue-600"}`}
                         >
                             {animatedText}
