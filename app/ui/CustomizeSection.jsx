@@ -8,15 +8,10 @@ const CustomizeSection = ({
   onSelectTemplate,
   themeColor,
   setThemeColor,
+  resumeSettings,
+  setResumeSettings,
 }) => {
   const [activeTab, setActiveTab] = useState("Template & Colors");
-  const [textSettings, setTextSettings] = useState({
-    font: "Arial",
-    headingSize: 24,
-    bodySize: 10,
-    lineHeight: 1.4,
-    headingWeight: "bold",
-  });
   return (
     <div className="w-full bg-slate-50 min-h-screen font-sans text-gray-700">
 
@@ -48,8 +43,14 @@ const CustomizeSection = ({
 
         {activeTab === "Text" && (
           <TemplateText
-            textSettings={textSettings}
-            setTextSettings={setTextSettings}
+            textSettings={resumeSettings.text}
+            setTextSettings={(text) =>
+              setResumeSettings((prev) => ({
+                ...prev,
+                text,
+              }))
+            }
+            isPrimeAtsTemp={selectedTemplate === "ats"}
           />
         )}
 

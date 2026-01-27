@@ -1,7 +1,9 @@
 'use client';
 import React from 'react';
 
-const Professional = ({ formData, empHistory, themeColor, sectionOrder }) => {
+const Professional = ({ formData, empHistory, themeColor, sectionOrder, resumeSettings }) => {
+  const { text, layout } = resumeSettings;
+
   const hasContactInfo =
     formData.email ||
     formData.phone ||
@@ -401,120 +403,126 @@ const Professional = ({ formData, empHistory, themeColor, sectionOrder }) => {
   return (
     <div className="h-screen overflow-y-auto hide-scrollbar">
 
-    <div className="min-h-[297mm] bg-white shadow-xl flex text-sm font-sans">
+      <div className="min-h-[297mm] bg-white shadow-xl flex resume-root"
+         style={{
+        fontFamily: text.primaryFont,
+        lineHeight: text.lineHeight,
+        fontSize: text.fontSize
+      }}
+      >
 
-      {/* ----------------- LEFT SIDEBAR ----------------- */}
-      <div className="w-[35%] text-white p-8 flex flex-col gap-6 items-center text-center" style={{ backgroundColor: themeColor }}>
+        {/* ----------------- LEFT SIDEBAR ----------------- */}
+        <div className="w-[35%] text-white p-8 flex flex-col gap-6 items-center text-center" style={{ backgroundColor: themeColor }}>
 
-        {/* Profile Image */}
-        {formData.profileImage && (
-          <div className="w-15 h-15 mb-1 rounded-full overflow-hidden border-4 border-white shadow-lg">
-            <img
-              src={formData.profileImage}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-
-        {/* Name Block */}
-        <div className="mt-1 w-full flex flex-col items-center">
-          <h1 className="text-xl font-serif font-bold leading-tight break-words">
-            {formData.first_name} <br />
-            {formData.last_name}
-          </h1>
-
-          <div className="w-8 h-[1px] bg-gray-400 my-4 opacity-50"></div>
-
-          {formData.job_target && (
-            <div className="">
-              <p className="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-300">
-                {formData.job_target}
-              </p>
+          {/* Profile Image */}
+          {formData.profileImage && (
+            <div className="w-15 h-15 mb-1 rounded-full overflow-hidden border-4 border-white shadow-lg">
+              <img
+                src={formData.profileImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
             </div>
           )}
+
+          {/* Name Block */}
+          <div className="mt-1 w-full flex flex-col items-center">
+            <h1 className="text-xl font-serif font-bold leading-tight break-words">
+              {formData.first_name} <br />
+              {formData.last_name}
+            </h1>
+
+            <div className="w-8 h-[1px] bg-gray-400 my-4 opacity-50"></div>
+
+            {formData.job_target && (
+              <div className="">
+                <p className="uppercase tracking-[0.2em] font-medium text-gray-300" >
+                  {formData.job_target}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Details Section */}
+          {hasContactInfo && (
+            <div className="w-full flex flex-col items-start">
+              <h3 className="text-xs font-serif font-bold mb-2">Details</h3>
+              <div className="flex flex-col gap-2 text-xs text-gray-300 font-light items-start">
+
+                {(formData.address || formData.city_state) && (
+                  <div className="mb-1">
+                    <span className="block text-start">{formData.address}</span>
+                    <span className="block text-start">{formData.city_state}{formData?.country && "," + formData.country}</span>
+                    {formData.postal_code && <span className="block text-start">{formData.postal_code}</span>}
+                  </div>
+                )}
+
+                {formData.email && (
+                  <a href={`mailto:${formData.email}`} className="break-all hover:text-white border-b border-gray-400 pb-0.5">
+                    {formData.email}
+                  </a>
+                )}
+
+                {formData.phone && (
+                  <div className="block text-start">{formData.phone}</div>
+                )}
+
+
+                {formData.driving_licence && (
+                  <div className="mt-2 text-start">
+                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Driving License</span>
+                    <span>{formData.driving_licence}</span>
+                  </div>
+                )}
+
+                {formData.nationality && (
+                  <div className="mt-1 text-start">
+                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Nationality</span>
+                    <span>{formData.nationality}</span>
+                  </div>
+                )}
+
+                {formData.birth_place && (
+                  <div className="mt-1 text-start">
+                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Place of Birth</span>
+                    <span>{formData.birth_place}</span>
+                  </div>
+                )}
+
+                {formData.dob && (
+                  <div className="mt-1 text-start">
+                    <span className="font-semibold text-gray-400 block text-[10px] uppercase">Date of Birth</span>
+                    <span>{formData.dob}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Render Sidebar Sections based on Order */}
+          {order.map(sectionId => {
+            if (sidebarSections[sectionId]) {
+              return sidebarSections[sectionId]();
+            }
+            return null;
+          })}
+
         </div>
 
-        {/* Details Section */}
-        {hasContactInfo && (
-          <div className="w-full flex flex-col items-start">
-            <h3 className="text-xs font-serif font-bold mb-2">Details</h3>
-            <div className="flex flex-col gap-2 text-xs text-gray-300 font-light items-start">
 
-              {(formData.address || formData.city_state) && (
-                <div className="mb-1">
-                  <span className="block text-start">{formData.address}</span>
-                  <span className="block text-start">{formData.city_state}{formData?.country && "," + formData.country}</span>
-                  {formData.postal_code && <span className="block text-start">{formData.postal_code}</span>}
-                </div>
-              )}
+        {/* ----------------- RIGHT CONTENT ----------------- */}
+        <div className="w-[65%] p-10 flex flex-col gap-8 text-gray-800">
 
-              {formData.email && (
-                <a href={`mailto:${formData.email}`} className="break-all hover:text-white border-b border-gray-400 pb-0.5">
-                  {formData.email}
-                </a>
-              )}
+          {/* Render Main Content Sections based on Order */}
+          {order.map(sectionId => {
+            if (mainSections[sectionId]) {
+              return mainSections[sectionId]();
+            }
+            return null;
+          })}
 
-              {formData.phone && (
-                <div className="block text-start">{formData.phone}</div>
-              )}
-
-
-              {formData.driving_licence && (
-                <div className="mt-2 text-start">
-                  <span className="font-semibold text-gray-400 block text-[10px] uppercase">Driving License</span>
-                  <span>{formData.driving_licence}</span>
-                </div>
-              )}
-
-              {formData.nationality && (
-                <div className="mt-1 text-start">
-                  <span className="font-semibold text-gray-400 block text-[10px] uppercase">Nationality</span>
-                  <span>{formData.nationality}</span>
-                </div>
-              )}
-
-              {formData.birth_place && (
-                <div className="mt-1 text-start">
-                  <span className="font-semibold text-gray-400 block text-[10px] uppercase">Place of Birth</span>
-                  <span>{formData.birth_place}</span>
-                </div>
-              )}
-
-              {formData.dob && (
-                <div className="mt-1 text-start">
-                  <span className="font-semibold text-gray-400 block text-[10px] uppercase">Date of Birth</span>
-                  <span>{formData.dob}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Render Sidebar Sections based on Order */}
-        {order.map(sectionId => {
-          if (sidebarSections[sectionId]) {
-            return sidebarSections[sectionId]();
-          }
-          return null;
-        })}
-
+        </div>
       </div>
-
-
-      {/* ----------------- RIGHT CONTENT ----------------- */}
-      <div className="w-[65%] p-10 flex flex-col gap-8 text-gray-800">
-
-        {/* Render Main Content Sections based on Order */}
-        {order.map(sectionId => {
-          if (mainSections[sectionId]) {
-            return mainSections[sectionId]();
-          }
-          return null;
-        })}
-
-      </div>
-    </div>
     </div>
   );
 };

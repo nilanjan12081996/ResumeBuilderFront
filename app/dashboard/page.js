@@ -671,7 +671,7 @@ const handleResumeImprove = (data) => {
 
       {/* add modal for apply job start here */}
       <Modal
-        size="4xl"
+        size="lg"
         className="apply_modal_area"
         show={openModalImproveExistingResumeTwo}
         onClose={() => setOpenModalImproveExistingResumeTwo(false)}

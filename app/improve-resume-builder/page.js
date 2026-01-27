@@ -1472,6 +1472,8 @@ import { TbDragDrop } from 'react-icons/tb';
 import ImpCustomSection from './components/ImpCustomSection';
 import AddSectionButton from './components/AddSectionButton';
 import { FaPen, FaTrash } from 'react-icons/fa';
+import { defaultResumeSettings } from "../config/defaultResumeSettings";
+
 
 const Page = () => {
   const componentRef = useRef();
@@ -1513,6 +1515,8 @@ const Page = () => {
   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
   const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+  const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
+
 
 
 
@@ -1569,7 +1573,7 @@ const Page = () => {
       if (res.payload && res.payload.status_code === 200) {
         setSavingStatus('saved');
         lastSavedData.current = JSON.parse(JSON.stringify({ ...data, sections }));
-        toast.success("Resume saved successfully!");
+        // toast.success("Resume saved successfully!");
       } else {
         setSavingStatus('error');
         toast.error("Failed to save resume.");
@@ -2438,6 +2442,8 @@ const Page = () => {
               onSelectTemplate={handleSelectTemplate}
               themeColor={themeColor}
               setThemeColor={setThemeColor}
+              resumeSettings={resumeSettings}
+              setResumeSettings={setResumeSettings}
             />
           </div>
         )}
@@ -2465,10 +2471,10 @@ const Page = () => {
       </div>
 
       {/* Right Panel - Resume Preview */}
-      <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px] px-0'>
-        <div className='h-screen overflow-y-scroll rounded-[8px]'>
+      <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+        <div className='h-screen overflow-y-scroll'>
           <div ref={componentRef}>
-            <ActiveResume formData={formValues} themeColor={themeColor} />
+            <ActiveResume formData={formValues} themeColor={themeColor}  resumeSettings={resumeSettings}/>
           </div>
         </div>
       </div>

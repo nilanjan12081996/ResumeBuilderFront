@@ -10,15 +10,15 @@ const AddSectionButton = ({ onAddNewSection }) => {
 
     const sectionTemplates = [
         { id: 'custom', label: 'Custom Section', icon: <BiCustomize />, isCustom: true },
-        { id: 'extra_curricular', label: 'Extra-curricular Activities', icon: <MdLocalFlorist />, isCustom: false },
         { id: 'courses', label: 'Courses', icon: <HiAcademicCap />, isCustom: false },
-        { id: 'internships', label: 'Internships', icon: <BiBriefcase />, isCustom: false },
         { id: 'hobbies', label: 'Hobbies', icon: <FaChessKnight />, isCustom: false },
         { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
+        { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
+        { id: 'internships', label: 'Internships', icon: <BiBriefcase />, isCustom: false },
+        { id: 'extra_curricular', label: 'Extra-curricular Activities', icon: <MdLocalFlorist />, isCustom: false },
         { id: 'references', label: 'References', icon: <HiSpeakerphone />, isCustom: false },
         { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
         { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
-        { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
         { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
         { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
     ];
@@ -85,8 +85,8 @@ const AddSectionButton = ({ onAddNewSection }) => {
                                 onClick={() => handleSelectSection(section.id)}
                                 disabled={section.isLocked}
                                 className={`flex items-center gap-3 p-4 rounded-lg border transition-all text-left group
-                                    ${section.isLocked 
-                                        ? 'bg-gray-50 border-gray-100 cursor-not-allowed opacity-60' 
+                                    ${section.isLocked
+                                        ? 'bg-gray-50 border-gray-100 cursor-not-allowed opacity-60'
                                         : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
                                     }`}
                             >

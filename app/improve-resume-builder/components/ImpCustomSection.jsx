@@ -111,7 +111,7 @@ const ImpCustomSection = ({
             <button
                 type="button"
                 onClick={() => handleAddCustomItem(sectionIndex)}
-                className="!text-sm !text-[#800080] mt-2 hover:underline"
+                className="text-sm !text-[#800080] font-medium mt-2"
             >
                 + Add one more item
             </button>
