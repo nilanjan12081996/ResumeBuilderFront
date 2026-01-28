@@ -24,9 +24,11 @@ export const defaultResumeSettings = {
   },
 
   layout: {
-    pagePadding: 24,
-    sectionSpacing: 16,
-    columnGap: 20,
-    headerAlignment: "left",
+    pageFormat: "A4",            // default page format
+    topBottom: 36,               // 0.50 in × 72 = 36pt
+    leftRight: 36,               // 0.50 in × 72 = 36pt
+    betweenSections: 16,         // pt
+    betweenTitlesContent: 3,     // pt
+    columnGap: 20,               // keep same as before
   },
 };

@@ -7,37 +7,95 @@ import { PiReadCvLogoDuotone } from 'react-icons/pi';
 import { MdOutlinePublishedWithChanges } from "react-icons/md";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 
-const formatGuide = (guideText) => {
-    if (!guideText) return [];
+const formatGuide = (text) => {
+    if (!text) return null;
 
-    // Split sections by double newlines
-    const sections = guideText.split('\n\n').map(s => s.trim());
-    return sections.map((section, idx) => {
-        // If it starts with a number or bullet, render as list item
-        if (/^\d+\./.test(section)) {
-            return <li key={idx} className="mb-2 text-gray-700">{section}</li>;
+    const lines = text.split('\n').filter(l => l.trim() !== '');
+
+    return lines.map((line, idx) => {
+        // Bold (**text**)
+        const bolded = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        // Numbered improvement line
+        if (/^\d+\./.test(line)) {
+            return (
+                <div key={idx} className="mt-3">
+                    <div className="flex gap-2">
+                        <span className="text-gray-800 font-medium">✔</span>
+                        <p
+                            className="text-gray-700 leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: bolded }}
+                        />
+                    </div>
+                </div>
+            );
         }
 
-        // If starts with **, render bold
-        if (section.startsWith('**')) {
-            const boldMatch = section.match(/\*\*(.*?)\*\*/g);
-            if (boldMatch) {
-                let formatted = section;
-                boldMatch.forEach(match => {
-                    formatted = formatted.replace(match, `<strong>${match.replace(/\*\*/g, '')}</strong>`);
-                });
-                return <p key={idx} className="mb-2 text-gray-700" dangerouslySetInnerHTML={{ __html: formatted }}></p>;
-            }
+        // 👉 Do this line (FORCED new line)
+        if (line.includes('Do this:')) {
+            return (
+                <div key={idx} className="ml-6 mt-1 flex gap-2">
+                    <span className="text-gray-800">👉</span>
+                    <p
+                        className="text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                            __html: bolded.replace('👉', '').replace('Do this:', '<strong>Do this:</strong>')
+                        }}
+                    />
+                </div>
+            );
         }
 
-        return <p key={idx} className="mb-2 text-gray-700">{section}</p>;
+        // Bullet points
+        if (line.startsWith('-') || line.startsWith('•')) {
+            return (
+                <div key={idx} className="flex gap-2 ml-4 mt-1">
+                    <span className="text-gray-800">•</span>
+                    <p
+                        className="text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{
+                            __html: bolded.replace(/^[-•]\s*/, '')
+                        }}
+                    />
+                </div>
+            );
+        }
+
+        // Section headings (**What's Missing:**)
+        if (line.startsWith('**') && line.endsWith('**')) {
+            return (
+                <h4 key={idx} className="mt-4 text-sm font-semibold text-gray-900">
+                    {line.replace(/\*\*/g, '')}
+                </h4>
+            );
+        }
+
+        // Key : Value
+        if (line.includes(':')) {
+            const [title, ...rest] = line.split(':');
+            return (
+                <p key={idx} className="mt-2 text-gray-700">
+                    <strong>{title}:</strong> {rest.join(':')}
+                </p>
+            );
+        }
+
+        // Normal text
+        return (
+            <p
+                key={idx}
+                className="mt-2 text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: bolded }}
+            />
+        );
     });
 };
+
+
 
 const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
     const safeScore = Math.min(100, Math.max(0, Number(score) || 0));
     const [progress, setProgress] = useState(0);
-    const [showGuide, setShowGuide] = useState(false);
 
     useEffect(() => {
         if (loading) {
@@ -95,37 +153,42 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
                 </div>
                 <div className="flex flex-col gap-2">
                     {guide && (
-                        <button
-                            onClick={() => setShowGuide(true)}
-                            className="flex items-center gap-2 text-[#800080] hover:text-[#e799e7] text-sm font-medium"
-                            title="View Improvement Guide"
-                        >
-                            <AiOutlineInfoCircle size={18} />
-                            How to improve your resume?
-                        </button>
+                       <div className="relative group w-fit">
+                            {/* HOVER BUTTON */}
+                            <div className="flex items-center gap-2 text-[#800080] hover:text-[#e799e7] text-sm font-medium cursor-pointer">
+                                <AiOutlineInfoCircle size={18} />
+                                How to improve your resume?
+                            </div>
 
-                    )}
-                    {/* GUIDE MODAL */}
-                    {showGuide && (
-                        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-                            <div className="bg-white max-w-3xl w-full rounded-lg p-6 relative overflow-y-auto max-h-[80vh]">
-                                <button
-                                    onClick={() => setShowGuide(false)}
-                                    className="absolute top-3 right-3 text-gray-500 hover:text-black text-lg font-bold"
-                                >
-                                    ✕
-                                </button>
 
-                                <h2 className="text-xl font-semibold mb-4 text-[#800080]">
+                            {/* HOVER GUIDE PANEL */}
+                            <div
+    className="
+        absolute top-full left-0 mt-2
+        w-[400px] max-h-[60vh] overflow-y-auto
+        bg-white rounded-lg shadow-xl border
+        p-4 text-sm
+        opacity-0 translate-y-2
+        group-hover:opacity-100 group-hover:translate-y-0
+        transition-all duration-200 ease-out
+        z-50
+    "
+>
+
+
+
+                                <h3 className="text-[#800080] font-semibold mb-2">
                                     ATS Improvement Guide
-                                </h2>
+                                </h3>
 
-                                <div className="text-sm space-y-3">
+                                <div className="space-y-2 text-gray-700">
                                     {formatGuide(guide)}
                                 </div>
                             </div>
                         </div>
                     )}
+
+                    {/* EXISTING / CHANGED RESUME */}
                     <div className="flex gap-10">
                         <button className="flex items-center gap-1 text-sm font-thin text-[#800080] hover:text-[#e799e7]">
                             <PiReadCvLogoDuotone className="text-lg" />
@@ -138,6 +201,7 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
                         </button>
                     </div>
                 </div>
+
             </div>
 
         </div>

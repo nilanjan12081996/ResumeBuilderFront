@@ -179,28 +179,29 @@ const GenerateWithAiModal = ({
                 </div>
 
                 {/* Tone Selector */}
-                <div className="mt-5">
-                    <p className="text-sm font-medium text-gray-600">Select Tone</p>
-                    <div className="flex border-b border-gray-200 w-full">
-                        {TONES.map(t => {
-                            const active = tone === t.value;
-                            return (
-                                <button
-                                    key={t.value}
-                                    type="button"
-                                    onClick={() => setTone(t.value)}
-                                    className={`flex-1 py-2 text-sm font-medium text-center relative transition-colors duration-200
+                {!animatedText && !isLoading && (
+                    <div className="mt-5">
+                        <p className="text-sm font-medium text-gray-600">Select Tone</p>
+                        <div className="flex border-b border-gray-200 w-full">
+                            {TONES.map(t => {
+                                const active = tone === t.value;
+                                return (
+                                    <button
+                                        key={t.value}
+                                        type="button"
+                                        onClick={() => setTone(t.value)}
+                                        className={`flex-1 py-2 text-sm font-medium text-center relative transition-colors duration-200
                                         ${active ? "text-[#800080] after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-1 after:bg-[#800080]"
-                                            : "text-gray-500 hover:text-[#800080]"}`
-                                    }
-                                >
-                                    {t.label}
-                                </button>
-                            );
-                        })}
+                                                : "text-gray-500 hover:text-[#800080]"}`
+                                        }
+                                    >
+                                        {t.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-
+                )}
                 {/* Loading */}
                 {isLoading && (
                     <div className="flex flex-col items-center justify-center py-16">

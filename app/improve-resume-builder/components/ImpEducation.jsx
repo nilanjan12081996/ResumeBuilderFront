@@ -185,7 +185,7 @@
 
 import { useState } from "react";
 import { Label } from "flowbite-react";
-import { RiDraggable } from "react-icons/ri";
+import { TbDragDrop } from 'react-icons/tb';;
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import TipTapEditor from "../../editor/TipTapEditor";
 
@@ -227,7 +227,7 @@ const ImpEducation = ({
               onDragStart={(e) => handleEducationDragStart(e, eIndex)}
               onDragEnd={handleDragEnd}
             >
-              <RiDraggable className="text-xl text-[#656e83] hover:text-[#800080]" />
+              <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
             </span>
 
             {/* ACCORDION */}

@@ -5,7 +5,6 @@ import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
 
 const ImpSummary = ({ watch, setValue }) => {
   const [aiModalOpen, setAiModalOpen] = useState(false);
-
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">

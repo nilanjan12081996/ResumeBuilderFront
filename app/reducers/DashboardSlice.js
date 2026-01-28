@@ -684,6 +684,23 @@ export const generateImpSummary = createAsyncThunk(
     }
 );
 
+export const generateNewSummary = createAsyncThunk(
+    "dashboard/generateNewSummary",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post(
+                "/agent/Generate/professional/summary",
+                payload
+            );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
 export const generateImpExperience = createAsyncThunk(
     "dashboard/generateImpExperience",
     async (payload, { rejectWithValue }) => {

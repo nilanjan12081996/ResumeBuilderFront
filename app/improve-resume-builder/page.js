@@ -1771,23 +1771,23 @@ const Page = () => {
       const normalizedKey = key.toLowerCase().trim();
 
       // Skip summary, personal info, profile, header
-      if (
-        normalizedKey.includes("summary") ||
-        normalizedKey.includes("personal") ||
-        normalizedKey.includes("profile") ||
-        normalizedKey.includes("header")
-      ) return;
+      // if (
+      //   normalizedKey.includes("summary") ||
+      //   normalizedKey.includes("personal") ||
+      //   normalizedKey.includes("profile") ||
+      //   normalizedKey.includes("header")
+      // ) return;
 
       // Skip experience if main experience exists
-      if (
-        hasMainExperience &&
-        (
-          normalizedKey.includes("experience") ||
-          normalizedKey.includes("employment") ||
-          normalizedKey.includes("career") ||
-          normalizedKey.includes("timeline")
-        )
-      ) return;
+      // if (
+      //   hasMainExperience &&
+      //   (
+      //     normalizedKey.includes("experience") ||
+      //     normalizedKey.includes("employment") ||
+      //     normalizedKey.includes("career") ||
+      //     normalizedKey.includes("timeline")
+      //   )
+      // ) return;
 
       // Core competencies
       if (
@@ -2474,7 +2474,7 @@ const Page = () => {
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
         <div className='h-screen overflow-y-scroll'>
           <div ref={componentRef}>
-            <ActiveResume formData={formValues} themeColor={themeColor}  resumeSettings={resumeSettings}/>
+            <ActiveResume formData={formValues}  sections={sections} themeColor={themeColor}  resumeSettings={resumeSettings}/>
           </div>
         </div>
       </div>

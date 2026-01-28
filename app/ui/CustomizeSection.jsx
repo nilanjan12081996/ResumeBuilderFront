@@ -54,7 +54,17 @@ const CustomizeSection = ({
           />
         )}
 
-        {activeTab === "Layout" && <TemplateLayout />}
+        {activeTab === "Layout" && (
+          <TemplateLayout
+            layoutSettings={resumeSettings.layout}
+            setLayoutSettings={(layout) =>
+              setResumeSettings((prev) => ({
+                ...prev,
+                layout,
+              }))
+            }
+          />
+        )}
       </div>
     </div>
   );

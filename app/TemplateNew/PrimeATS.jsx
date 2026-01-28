@@ -14,13 +14,20 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
 
+    // Handle PRESENT separately
+    if (typeof dateValue === "string" && dateValue.toLowerCase() === "present") {
+      return "Present";
+    }
+
     const d = new Date(dateValue);
     if (isNaN(d.getTime())) return null;
 
-    return d
-      .toLocaleString("en-US", { month: "short", year: "numeric" })
-      .toUpperCase();
+    return d.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
   };
+
 
 
   const hasContactInfo =
@@ -45,13 +52,17 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
 
   const renderSummary = () =>
     formData.summary && (
-      <section key="summary" className="mb-6">
-        <h3 className="font-bold text-sm mb-2 py-1 uppercase tracking-wider"
+      <section key="summary">
+        <h3 className="font-bold uppercase tracking-wider"
           style={{
             color: themeColor,
             borderBottom: `1px solid ${themeColor}`,
             borderTop: `1px solid ${themeColor}`,
+            marginTop: `${layout.betweenSections}pt`,
             fontFamily: text.secondaryFont,
+            fontSize: `${text.sectionTitle}pt`,
+            fontWeight: text.sectionTitleWeight,
+            marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
 
         >
@@ -69,6 +80,10 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
           [&_ol]:pl-4
           [&_li]:mb-1
         "
+          style={{
+            fontSize: `${text.body}pt`,
+            fontWeight: text.bodyWeight
+          }}
           dangerouslySetInnerHTML={{ __html: formData.summary }}
         />
       </section>
@@ -76,37 +91,50 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
 
   const renderEmployment = () =>
     hasEmployment && (
-      <section key="employment" className="mb-6">
-        <h3 className=" font-bold text-sm mb-3 py-1 uppercase tracking-wider"
+      <section key="employment">
+        <h3 className=" font-bold py-1 uppercase tracking-wider"
           style={{
             color: themeColor,
             borderBottom: `1px solid ${themeColor}`,
             borderTop: `1px solid ${themeColor}`,
             fontFamily: text.secondaryFont,
+            fontSize: `${text.sectionTitle}pt`,
+            fontWeight: text.sectionTitleWeight,
+            marginTop: `${layout.betweenSections}pt`,
+            marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
           Professional Experience
         </h3>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4"
+          style={{
+            fontSize: `${text.body}pt`,
+            fontWeight: text.bodyWeight
+          }}
+        >
           {formData.employmentHistory.map((job, index) => (
             <div key={index}>
               <div className="flex justify-between items-baseline">
-                <h4 className="text-xs font-bold text-black">
-                  {job.job_title}
-                  {job.employer ? `, ${job.employer}` : ""}
-                  <span className="font-normal text-gray-600 ml-1">
-                    {job.city_state ? `, ${job.city_state}` : ""}
+                <div className="w-1/2">
+                  <h4 className=" font-bold text-black">
+                    {job.job_title}
+                    {job.employer ? `, ${job.employer}` : ""}
+                    <span className="font-normal text-gray-600 ml-1">
+                      {job.city_state ? `, ${job.city_state}` : ""}
+                    </span>
+                  </h4>
+                </div>
+                <div className="w-1/2 text-right">
+                  <span className="font-bold text-black">
+                    {formatDate(job.startDate)} —{" "}
+                    {formatDate(job.endDate) || "PRESENT"}
                   </span>
-                </h4>
-                <span className="text-[10px] font-bold text-black">
-                  {formatDate(job.startDate)} —{" "}
-                  {formatDate(job.endDate) || "PRESENT"}
-                </span>
+                </div>
               </div>
               {job.description && (
                 <div
                   className="
-                      text-xs text-gray-700 mt-1 leading-relaxed
+                    text-gray-700 mt-1 leading-relaxed
                       [&_p]:mb-1
                       [&_ul]:list-disc [&_ul]:pl-4
                       [&_ol]:list-decimal [&_ol]:pl-4
@@ -125,32 +153,43 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
 
   const renderEducation = () =>
     hasEducation && (
-      <section key="education" className="mb-6">
-        <h3 className=" font-bold text-sm mb-3 py-1 uppercase tracking-wider"
+      <section key="education">
+        <h3 className=" font-bold mb-3 py-1 uppercase tracking-wider"
           style={{
             color: themeColor,
             borderBottom: `1px solid ${themeColor}`,
             borderTop: `1px solid ${themeColor}`,
             fontFamily: text.secondaryFont,
+            fontSize: `${text.sectionTitle}pt`,
+            fontWeight: text.sectionTitleWeight
           }}
         >
           Education
         </h3>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4"
+          style={{
+            fontSize: `${text.body}pt`,
+            fontWeight: text.bodyWeight
+          }}
+        >
           {formData.educationHistory.map((edu, index) => (
             <div key={index}>
               <div className="flex justify-between items-baseline">
-                <h4 className="text-xs font-bold text-black">
-                  {edu.degree}
-                  {edu.school ? `, ${edu.school}` : ""}
-                  <span className="font-normal text-gray-600 ml-1">
-                    {edu.city_state ? `, ${edu.city_state}` : ""}
+                <div className="w-1/2">
+                  <h4 className="font-bold text-black">
+                    {edu.degree}
+                    {edu.school ? `, ${edu.school}` : ""}
+                    <span className="font-normal text-gray-600 ml-1">
+                      {edu.city_state ? `, ${edu.city_state}` : ""}
+                    </span>
+                  </h4>
+                </div>
+                <div className="w-1/2 text-right">
+                  <span className="font-bold text-black">
+                    {formatDate(edu.startDate)} —{" "}
+                    {formatDate(edu.endDate) || "PRESENT"}
                   </span>
-                </h4>
-                <span className="text-[10px] font-bold text-black">
-                  {formatDate(edu.startDate)} —{" "}
-                  {formatDate(edu.endDate) || "PRESENT"}
-                </span>
+                </div>
               </div>
               {edu.description && (
                 <p className="text-[11px] mt-1 text-gray-700">
@@ -165,22 +204,31 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
 
   const renderSkills = () =>
     hasSkills && (
-      <section key="skills" className="mb-6">
-        <h3 className=" font-bold text-sm mb-2 py-1 uppercase tracking-wider"
+      <section key="skills">
+        <h3 className=" font-bold mb-2 py-1 uppercase tracking-wider"
           style={{
             color: themeColor,
             borderBottom: `1px solid ${themeColor}`,
             borderTop: `1px solid ${themeColor}`,
             fontFamily: text.secondaryFont,
+            fontSize: `${text.sectionTitle}pt`,
+            fontWeight: text.sectionTitleWeight,
+            marginTop: `${layout.betweenSections}pt`,
+            marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
           Technical Skills
         </h3>
-        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-2">
+        <div className="grid grid-cols-2 gap-x-8 mt-2"
+          style={{
+            fontSize: `${text.body}pt`,
+            fontWeight: text.bodyWeight
+          }}
+        >
           {formData.newSkillHistory.map((item, index) => (
             <div
               key={index}
-              className="text-xs flex justify-between border-b border-gray-100 pb-1"
+              className="flex justify-between border-b border-gray-100 pb-1"
             >
               <span className="text-gray-800">{item.skill}</span>
               {!formData.hideExperienceLevel && (
@@ -196,13 +244,17 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
 
   const renderHobbies = () =>
     formData.hobbies && (
-      <section key="hobbies" className="mb-6">
-        <h3 className="font-bold text-sm mb-2 py-1 uppercase tracking-wider"
+      <section key="hobbies">
+        <h3 className="font-bold mb-2 py-1 uppercase tracking-wider"
           style={{
             color: themeColor,
             borderBottom: `1px solid ${themeColor}`,
             borderTop: `1px solid ${themeColor}`,
             fontFamily: text.secondaryFont,
+            fontSize: `${text.sectionTitle}pt`,
+            fontWeight: text.sectionTitleWeight,
+            marginTop: `${layout.betweenSections}pt`,
+            marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
           Hobbies
@@ -215,12 +267,14 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
     formData.languageHistory?.some((l) => l.language) &&
     formData.languageHistory?.length > 0 && (
       <section key="languages" className="mb-6">
-        <h3 className="font-bold text-sm mb-2 py-1 uppercase tracking-wider"
+        <h3 className="font-bold mb-2 py-1 uppercase tracking-wider"
           style={{
             color: themeColor,
             borderBottom: `1px solid ${themeColor}`,
             borderTop: `1px solid ${themeColor}`,
             fontFamily: text.secondaryFont,
+            fontSize: `${text.sectionTitle}pt`,
+            fontWeight: text.sectionTitleWeight,
           }}
         >
           Languages
@@ -441,15 +495,16 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
     <div className="h-screen overflow-y-auto hide-scrollbar"
 
     >
-      <div className="min-h-[297mm] w-full bg-white p-12 text-gray-800 font-sans shadow-lg resume-root"
+      <div className="min-h-[297mm] w-full bg-white text-gray-800 font-sans shadow-lg resume-root"
         style={{
+          padding: `${layout.topBottom}pt ${layout.leftRight}pt`,
           fontFamily: text.primaryFont,
           lineHeight: text.lineHeight,
           fontSize: text.fontSize
         }}
       >
         {/* ----------------- HEADER SECTION ----------------- */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex justify-between items-start">
           <div className="flex-1">
             <h1 className="font-bold uppercase tracking-tight"
               style={{
@@ -471,7 +526,12 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
             </h2>
 
             {/* Contact Details Row */}
-            <div className="mt-2 text-[11px] text-gray-600 flex flex-wrap gap-x-2 items-center">
+            <div className="mt-2 text-gray-600 flex flex-wrap gap-x-2 items-center"
+              style={{
+                fontSize: `${text.body}pt`,
+                fontWeight: text.bodyWeight
+              }}
+            >
               <span>{formData.address}</span>
               {formData.city_state && (
                 <span>
@@ -493,12 +553,15 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
               {formData.linkedin && <span>| LinkedIn</span>}
             </div>
             {hasContactInfo && (
-              <div className="mt-1 text-[11px] text-gray-600">
+              <div className="mt-1 text-[11px] text-gray-600"
+                style={{
+                  fontSize: `${text.body}pt`,
+                  fontWeight: text.bodyWeight
+                }}
+              >
                 <span className="font-bold">Personal Details: </span>
                 {formData.dob && <span>{formData.dob} | </span>}
-                {formData.city_state && <span>{formData.city_state} | </span>}
                 {formData.nationality && <span>{formData.nationality} | </span>}
-                {formData.postal_code && <span>{formData.postal_code}</span>}
               </div>
             )}
             {/* Secondary Details (DOB, Nationality etc) */}

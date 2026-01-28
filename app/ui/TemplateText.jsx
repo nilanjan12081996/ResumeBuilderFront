@@ -1,4 +1,5 @@
 import React from "react";
+import { defaultResumeSettings } from "../config/defaultResumeSettings";
 
 const FONT_SIZE_LABELS = ["S", "M", "L"];
 const FONT_SIZE_MAP = {
@@ -24,11 +25,14 @@ const PRIME_ATS_FONT_CONTROLS = [
 ];
 
 const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
+  const defaultSettings = defaultResumeSettings.text;
   const lineHeightIndex = LINE_HEIGHT_STEPS.indexOf(textSettings.lineHeight);
 
   const getLineHeightPercent = (value) => {
     return Math.round(((value - 1) / (2 - 1)) * 100 + 50);
   };
+
+  const isDefault = (key, value) => defaultSettings[key] === value; // to check if current = default
 
   return (
     <div className="space-y-10">
@@ -162,10 +166,11 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
 
           {PRIME_ATS_FONT_CONTROLS.map((item) => {
             const value = textSettings[item.key];
+            const defaultValue = defaultSettings[item.key]; // get default
             const percent = ((value - item.min) / (item.max - item.min)) * 100;
 
             return (
-              <div key={item.key} className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
                 <label className="w-36 text-sm font-medium text-gray-600">
                   {item.label}
                 </label>
@@ -188,10 +193,32 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
                   />
                 </div>
 
+                {/* Value display */}
                 <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
                   {value} {item.unit}
                 </span>
+
+                {/* Set as Default button */}
+                <button
+                  type="button"
+                  className={`px-2 py-1 text-xs font-semibold rounded transition-colors
+    ${value === defaultSettings[item.key]
+                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      : "bg-green-500 text-white hover:bg-green-600"
+                    }`}
+                  onClick={() =>
+                    setTextSettings({
+                      ...textSettings,
+                      [item.key]: defaultSettings[item.key],
+                    })
+                  }
+                  disabled={value === defaultSettings[item.key]} // disable if already default
+                >
+                  Set as Default
+                </button>
+
               </div>
+
             );
           })}
         </div>
@@ -231,6 +258,10 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
                   </option>
                 ))}
               </select>
+              {/* Default breakpoint badge */}
+              <span className={`ml-2 text-xs px-1 rounded ${isDefault(item.key, textSettings[item.key]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
+                {isDefault(item.key, textSettings[item.key]) ? 'Default' : 'Changed'}
+              </span>
             </div>
           ))}
         </div>
