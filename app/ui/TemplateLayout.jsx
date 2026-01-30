@@ -8,7 +8,7 @@ const LAYOUT_CONTROLS = [
   { key: "betweenTitlesContent", label: "Between Titles & Content", min: 0, max: 50, step: 1, unit: "pt" },
 ];
 
-const TemplateLayout = ({ layoutSettings, setLayoutSettings }) => {
+const TemplateLayout = ({ layoutSettings, setLayoutSettings, selectedTemplate }) => {
   const defaultSettings = defaultResumeSettings.layout;
 
   const isDefault = (key, value) => defaultSettings[key] === value;
@@ -71,9 +71,9 @@ const TemplateLayout = ({ layoutSettings, setLayoutSettings }) => {
               type="button"
               className={`px-2 py-1 text-xs font-semibold rounded transition-colors
               ${isDefault(item.key, value)
-                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-green-500 text-white hover:bg-green-600"
-              }`}
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-green-500 text-white hover:bg-green-600"
+                }`}
               onClick={() =>
                 setLayoutSettings({ ...layoutSettings, [item.key]: defaultValue })
               }
@@ -84,7 +84,89 @@ const TemplateLayout = ({ layoutSettings, setLayoutSettings }) => {
           </div>
         );
       })}
+      {/* Header Alignment */}
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-4">
+          Header Alignment
+        </label>
+
+        <div className="grid grid-cols-3 gap-3">
+          {["left", "center", "right"].map((align) => {
+            const isActive = layoutSettings.headerAlignment === align;
+            const isDisabled = selectedTemplate !== "ats";
+
+            return (
+              <div key={align} className="relative group">
+                <button
+                  type="button"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (isDisabled) return;
+                    setLayoutSettings({
+                      ...layoutSettings,
+                      headerAlignment: align,
+                    });
+                  }}
+                  className={`
+              relative w-full rounded-xl border p-4 transition-all duration-200
+              ${isDisabled
+                      ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
+                      : isActive
+                        ? "border-[#800080] bg-[#800080]/10 ring-1 ring-[#800080]"
+                        : "border-gray-300 hover:border-[#800080]/60 bg-white"
+                    }
+            `}
+                >
+                  <div
+                    className={`flex flex-col space-y-2 ${align === "left"
+                      ? "items-start"
+                      : align === "center"
+                        ? "items-center"
+                        : "items-end"
+                      }`}
+                  >
+                    <div
+                      className={`h-2 w-16 rounded ${isActive && !isDisabled
+                        ? "bg-[#800080]"
+                        : "bg-gray-400"
+                        }`}
+                    />
+                    <div
+                      className={`h-2 w-10 rounded ${isActive && !isDisabled
+                        ? "bg-[#800080]/70"
+                        : "bg-gray-300"
+                        }`}
+                    />
+                  </div>
+
+                  <p
+                    className={`mt-3 text-xs font-semibold capitalize ${isActive && !isDisabled
+                      ? "text-[#800080]"
+                      : "text-gray-600"
+                      }`}
+                  >
+                    {align}
+                  </p>
+                </button>
+                {isDisabled && (
+                  <div className="
+              pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2
+              whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5
+              text-xs text-white opacity-0 group-hover:opacity-100
+              transition-opacity
+            ">
+                    This template does not support <br/>
+                    header alignment customization
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
     </div>
+
   );
 };
 

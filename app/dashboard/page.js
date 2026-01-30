@@ -7,60 +7,24 @@ import { League_Spartan } from "next/font/google";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { IoSearchOutline } from "react-icons/io5";
 import {
-  Select,
-  Table,
-  TextInput,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeadCell,
-  TableRow,
-  Pagination,
-  Button,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
   FileInput,
   Label,
-  Textarea,
 } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import {
-  checkAvilableSearch,
-  getCoins,
-  setIsClick,
-} from "../reducers/CoinSlice";
-import { FaArrowRightLong } from "react-icons/fa6";
-import { getSearchHistory } from "../reducers/SearchHistroySlice";
 import { toast, ToastContainer } from "react-toastify";
 
-import Create_Resume_plus from "../assets/imagesource/Create_Resume_plus.png";
-import Improve_existing_resume_icon from "../assets/imagesource/Improve_existing_resume_icon.png";
-import jd_based_resume from "../assets/imagesource/jd_based_resume.png";
-
-import resume1 from "../assets/imagesource/resum2.png";
-import resume2 from "../assets/imagesource/resum1.png";
-
-import view_full_resume from "../assets/imagesource/view_full_resume.png";
-
-import resume_sections_view from "../assets/imagesource/resume_sections_view.png";
 
 import { BiEdit } from "react-icons/bi";
 import { CgFileDocument } from "react-icons/cg";
 
-import { CgArrowLeft } from "react-icons/cg";
 import { BiImport } from "react-icons/bi";
 
 import { HiClipboardList } from "react-icons/hi";
-import { BsFillInfoCircleFill } from "react-icons/bs";
-import { BsGithub } from "react-icons/bs";
-import { FaGlobe, FaLinkedin } from "react-icons/fa";
-import { BiLogoLinkedinSquare } from "react-icons/bi";
-import { BiLink } from "react-icons/bi";
 
 import { BiPlus } from "react-icons/bi";
 import { RiExchange2Line } from "react-icons/ri";
@@ -72,10 +36,7 @@ import { useForm } from "react-hook-form";
 import { addImpQuestions, checkATS, getUpdateResumeInfo, improveResume, updateAchievements, updateBasicInfo, updateCertification, updateEducation, updateExperience, updateExtraProject, updateLanguage, updateSkills } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
-import LinkedInReWriteModal from "./LinkedInReWriteModal";
 import LinkedInChooseModal from "./LinkedInChooseModal";
-import ImproveResumeChooseModal from "./ImproveResumeChooseModal";
-import { addCountResume, addCountResumeOrg } from "../reducers/ResumeSlice";
 
 
 const poppins = Poppins({
@@ -99,7 +60,6 @@ const inter = Inter({
 const Page = () => {
   const { recentResume } = useSelector((state) => state?.resHist);
   const { profData } = useSelector((state) => state?.auth);
-  const { profileData } = useSelector((state) => state?.profile)
   console.log("profData", profData);
 
   const router = useRouter();
@@ -171,200 +131,7 @@ const Page = () => {
     }
   }, [resumeFile]);
 
-  // const handleResumeImprove = (data) => {
-  //   console.log("Form data received:", data);
-  //   console.log("Resume file:", data.resume_file);
-
-  //   const formData = new FormData();
-
-  //   if (data.resume_file && data.resume_file[0]) {
-  //     console.log("Appending resume file:", data.resume_file[0]);
-  //     formData.append("resume_file", data.resume_file[0]);
-  //   } else {
-  //     console.error("No resume file selected");
-  //     // alert("Please select a resume file to upload");
-  //     toast.error("Please select a resume file to upload");
-  //     return;
-  //   }
-  //   data.linkedin_profile &&
-  //     formData.append("linkedin_profile", data.linkedin_profile);
-  //   data.portfolio_link &&
-  //     formData.append("portfolio_link", data.portfolio_link);
-  //   data.github_profile &&
-  //     formData.append("github_profile", data.github_profile);
-  //   data.other_link && formData.append("other_link", data.other_link);
-
-  //   console.log("FormData contents:");
-  //   for (let [key, value] of formData.entries()) {
-  //     console.log(key, value);
-  //   }
-
-  //   dispatch(improveResume(formData))
-  //     .then(async (res) => {
-  //       const payload = res?.payload;
-  //       console.log("payload", payload);
-
-  //       // ✅ Only success case
-  //       if (payload?.status_code !== 201) return;
-
-  //       /* ===================== RESUME ID ===================== */
-  //       const resumeid = payload?.data?.id;
-  //       setImproveResumeId(resumeid);
-
-  //       /* ===================== RAW EXPERIENCE (LOCAL STORAGE) ===================== */
-  //       const rawDataExperience =
-  //         payload?.raw_data?.experience?.steps?.[0]?.Experience;
-
-  //       if (rawDataExperience) {
-  //         localStorage.setItem(
-  //           "imp_resume_raw_experience",
-  //           JSON.stringify(rawDataExperience)
-  //         );
-  //       }
-
-  //       const raw = payload?.raw_data || {};
-  //       /* ===================== BASIC INFO ===================== */
-  //       const basicInfoData = {
-  //         SuggestedRole: raw?.suggested_role || "",
-  //         CandidateFullName: raw?.full_name || "",
-  //         EmailAddress: raw?.email || "",
-  //         PhoneNumber: raw?.phone || "",
-  //         ProfessionalTitle: raw?.professional_title || "",
-  //         Summary: raw?.summary || "",
-  //         location: raw?.location || "",
-  //       };
-
-  //       await dispatch(
-  //         updateBasicInfo({
-  //           resumeid: resumeid,  
-  //           data: basicInfoData       
-  //         })
-  //       );
-
-  //       /* ===================== EXPERIENCE ===================== */
-  //       const experiencePayload =
-  //         raw?.experience?.steps?.[0]?.Experience?.map((exp) => ({
-  //           id: null,
-  //           CompanyName: exp?.CompanyName || "",
-  //           Position: exp?.Position || "",
-  //           Duration: {
-  //             StartDate: exp?.Duration?.StartDate || "",
-  //             EndDate: exp?.Duration?.EndDate || "",
-  //           },
-  //           Location: exp?.Location || "",
-  //           SkillSet: exp?.SkillSet || [],
-  //           Projects: exp?.Projects?.map((proj) => ({
-  //             id: null,
-  //             Project_title: proj?.Project_title || "",
-  //             Role: proj?.Role || "",
-  //             Description: proj?.Description || "",
-  //           })) || [],
-  //         })) || [];
-
-  //       if (experiencePayload.length) {
-  //         await dispatch(updateExperience({ resumeid, data: experiencePayload }));
-  //       }
-
-  //       /* ===================== EDUCATION ===================== */
-  //       const educationPayload =
-  //         raw?.education?.map((edu) => ({
-  //           id: null,
-  //           CollegeUniversity: edu?.CollegeUniversity || "",
-  //           Location: edu?.Location || "",
-  //           CourseDegree: edu?.CourseDegree || "",
-  //           GraduationYear: edu?.GraduationYear
-  //             ? String(edu.GraduationYear)
-  //             : "",
-  //           GPAorGrade:
-  //             edu?.GPAorGrade && Number(edu.GPAorGrade) !== 0
-  //               ? String(edu.GPAorGrade)
-  //               : "",
-  //           AdditionalInformation: edu?.AdditionalInformation || "",
-  //         })) || [];
-
-  //       if (educationPayload.length) {
-  //         await dispatch(updateEducation({ resumeid, data: educationPayload }));
-  //       }
-
-  //       /* ===================== SKILLS ===================== */
-  //       const skillsPayload =
-  //         raw?.skills?.map((sk) => ({
-  //           id: null,
-  //           Skill_Category: sk?.Skill_Category || "",
-  //           Skills: sk?.Skills || [],
-  //         })) || [];
-
-  //       if (skillsPayload.length) {
-  //         await dispatch(updateSkills({ resumeid, data: skillsPayload }));
-  //       }
-
-  //       /* ===================== LANGUAGES ===================== */
-  //       const languagePayload =
-  //         raw?.languages?.map((lang) => ({
-  //           id: null,
-  //           Language: lang?.Language || "",
-  //           proficiency: lang?.Proficiency || "",
-  //         })) || [];
-
-  //       if (languagePayload.length) {
-  //         await dispatch(updateLanguage({ resumeid, data: languagePayload }));
-  //       }
-
-  //       /* ===================== ACHIEVEMENTS ===================== */
-  //       const achievementPayload =
-  //         raw?.achievements?.map((ach) => ({
-  //           id: null,
-  //           Achievement_Titlee: ach?.Achievement_Titlee || "",
-  //           Issuing_Organization: ach?.Issuing_Organization || "",
-  //           Date_Received: ach?.Date_Received || "",
-  //           Description: ach?.Description || "",
-  //         })) || [];
-
-  //       if (achievementPayload.length) {
-  //         await dispatch(
-  //           updateAchievements({ resumeid, data: achievementPayload })
-  //         );
-  //       }
-
-  //       /* ===================== ATS CHECK ===================== */
-  //       const atsRes = await dispatch(
-  //         checkATS({
-  //           imp_resume_id: resumeid,
-  //           raw_data: raw,
-  //         })
-  //       );
-
-  //       if (atsRes?.payload?.status_code === 200) {
-  //         setATSscore(atsRes?.payload?.data?.old_ats);
-  //         setopenATSmodal(true);
-  //       }
-
-  //       /* ===================== QUESTIONS ===================== */
-  //       if (payload?.generated_questions) {
-  //         await dispatch(
-  //           addImpQuestions({
-  //             imp_resume_id: resumeid,
-  //             generated_questions: payload.generated_questions,
-  //           })
-  //         );
-  //       }
-
-  //       /* ===================== FINAL FETCH ===================== */
-  //       await dispatch(getUpdateResumeInfo({ id: resumeid }));
-
-  //       console.log("✅ Resume improve flow completed successfully");
-  //     })
-  //     .catch(() => {
-  //       toast.error("Something went wrong while improving resume");
-  //     })
-  //     .finally(() => {
-  //       clearFileInput();
-  //     });
-
-
-
-  // };
-
+  
 const handleResumeImprove = (data) => {
   if (!data.resume_file || !data.resume_file[0]) {
     toast.error("Please select resume PDF");
@@ -403,39 +170,7 @@ const handleResumeImprove = (data) => {
     });
   }, []);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
 
-    // Day
-    const day = date.getDate();
-
-    // Month (full name)
-    const month = date.toLocaleString("en-US", { month: "long" });
-
-    // Year
-    const year = date.getFullYear();
-
-    return `${day} ${month}, ${year}`;
-  };
-
-  // ATS data modal
-  const max = 100;
-  const size = 124;
-  const strokeWidth = 10;
-  const label = "Current Resume ATS Score";
-  const className = "";
-  const clamped = Math.max(0, Math.min(ATSscore, max));
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = (clamped / max) * circumference;
-
-  const isGood = clamped >= 70;
-  const ringColor = isGood
-    ? "#16a34a" /* tailwind green-600 */
-    : "#ef4444"; /* red-500 */
-  const badgeBg = isGood
-    ? "bg-green-50 text-green-700"
-    : "bg-red-50 text-red-700";
 
   return (
     <div className={`${inter.className} antialiased`}>
@@ -685,110 +420,6 @@ const handleResumeImprove = (data) => {
         <ModalBody className="bg-white p-0 rounded-b-[4px]">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="lg:flex gap-5 p-5">
-              {/* <div className="lg:w-6/12 p-0 pr-0">
-                <div className="resume_form_area">
-                  <div className="">
-                    <div className="w-full resume_form_box mb-3">
-                      <Label className="mb-2 block" htmlFor="file-upload">
-                        LinkedIn Profile PDF
-                      </Label>
-                      <div>
-                        <FileInput
-                          id="file-upload"
-                          accept=".pdf"
-                          helperText="Upload your PDF document (Max 5MB)"
-                          {...register("linkedin_profile_file", {
-                            required: false,
-                          })}
-                          aria-invalid={
-                            errors.linkedin_profile_file ? "true" : "false"
-                          }
-                        />
-                      </div>
-                      {errors.linkedin_profile_file?.type === "required" && (
-                        <p className="text-red-700 text-sm" role="alert">
-                          linkedin_profile_file is required
-                        </p>
-                      )}
-                    </div>
-                    <div className="w-full resume_form_box mb-3">
-                      <div className="mb-1 block">
-                        <Label htmlFor="base">Portfolio Link</Label>
-                      </div>
-                      <div className="field_box flex items-center">
-                        <div className="p-3">
-                          <FaGlobe className="text-[#928F8F]" />
-                        </div>
-                        <TextInput
-                          id="portfolio_link"
-                          type="url"
-                          sizing="md"
-                          placeholder="https://yourname.design"
-                          {...register("portfolio_link", { required: false })}
-                          aria-invalid={
-                            errors.portfolio_link ? "true" : "false"
-                          }
-                        />
-                      </div>
-                      {errors.portfolio_link?.type === "required" && (
-                        <p className="text-red-700 text-sm" role="alert">
-                          portfolio_link link is required
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="">
-                    <div className="w-full resume_form_box mb-3">
-                      <div className="mb-1 block">
-                        <Label htmlFor="base">GitHub Profile Link</Label>
-                      </div>
-                      <div className="field_box flex items-center">
-                        <div className="p-3">
-                          <BsGithub className="text-[#928F8F]" />
-                        </div>
-                        <TextInput
-                          id="github_profile"
-                          type="url"
-                          sizing="md"
-                          placeholder="https://github.com/johndoe"
-                          {...register("github_profile", { required: false })}
-                          aria-invalid={
-                            errors.github_profile ? "true" : "false"
-                          }
-                        />
-                      </div>
-                      {errors.github_profile?.type === "required" && (
-                        <p className="text-red-700 text-sm" role="alert">
-                          github_profile link is required
-                        </p>
-                      )}
-                    </div>
-                    <div className="w-full resume_form_box mb-3">
-                      <div className="mb-1 block">
-                        <Label htmlFor="base">More About Candidate</Label>
-                      </div>
-                      <div className="field_box flex items-center">
-                        <div className="p-3">
-                          <BiLink className="text-[#928F8F]" />
-                        </div>
-                        <TextInput
-                          id="base"
-                          type="url"
-                          sizing="md"
-                          placeholder="Additional Info Link"
-                          {...register("other_link", { required: false })}
-                          aria-invalid={errors.other_link ? "true" : "false"}
-                        />
-                      </div>
-                      {errors.other_link?.type === "required" && (
-                        <p className="text-red-700 text-sm" role="alert">
-                          other_link link is required
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div> */}
               <div className="w-full">
                 <div className="flex w-full items-center justify-center">
                   <Label
@@ -836,24 +467,6 @@ const handleResumeImprove = (data) => {
           </form>
         </ModalBody>
       </Modal>
-      {openModalLinkedInRewrite && (
-        <LinkedInReWriteModal
-          openModalLinkedInRewrite={openModalLinkedInRewrite}
-          setOpenModalLinkedInRewrite={setOpenModalLinkedInRewrite}
-          HandlerLinkedInRewrite={HandlerLinkedInRewrite}
-          setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
-          resumeIdLkdin={resumeIdLkdin}
-          setResumeIdLkdin={setResumeIdLkdin}
-        />
-      )}
-
-      {openImproveResumeChooseModal && (
-        <ImproveResumeChooseModal
-          openImproveResumeChooseModal={openImproveResumeChooseModal}
-          setOpenImproveResumeChooseModal={setOpenImproveResumeChooseModal}
-          improveResumeId={improveResumeId}
-        />
-      )}
     </div>
   );
 };

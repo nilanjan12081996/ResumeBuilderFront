@@ -1089,7 +1089,7 @@ const Page = () => {
   const dispatch = useDispatch();
   const { improveResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
-  console.log('singleResumeInfo',singleResumeInfo)
+  console.log('singleResumeInfo', singleResumeInfo)
   // console.log('singleResumeInfo', singleResumeInfo)
   const resumeSource =
     singleResumeInfo?.data?.data ||
@@ -1130,6 +1130,7 @@ const Page = () => {
   const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
+  const [deletingSectionIndex, setDeletingSectionIndex] = useState(null);
   const { activeTab } = useTabs();
   // Template mapping
   const templateMap = {
@@ -1647,27 +1648,29 @@ const Page = () => {
   };
 
   const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
-    const updatedSections = [...sections];
-
-    //  DELETE CASE
-    if (field === "delete") {
-      updatedSections[sectionIndex].skills =
-        updatedSections[sectionIndex].skills.filter(
-          skill => skill.id !== skillId
-        );
-
-      setSections(updatedSections);
-      return;
-    }
-
-    //  NORMAL UPDATE
-    updatedSections[sectionIndex].skills =
-      updatedSections[sectionIndex].skills.map(skill =>
-        skill.id === skillId ? { ...skill, [field]: value } : skill
-      );
-
-    setSections(updatedSections);
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            skills: section.skills.filter(
+              skill => skill.id !== skillId
+            ),
+          };
+        }
+        return {
+          ...section,
+          skills: section.skills.map(skill =>
+            skill.id === skillId
+              ? { ...skill, [field]: value }
+              : skill
+          ),
+        };
+      })
+    );
   };
+
 
 
   // Education handlers
@@ -1694,16 +1697,32 @@ const Page = () => {
   };
 
   const handleEducationUpdate = (sectionIndex, eduId, field, value) => {
-    const updatedSections = [...sections];
-    updatedSections[sectionIndex].educations =
-      updatedSections[sectionIndex].educations.map(edu =>
-        edu.id === eduId ? { ...edu, [field]: value } : edu
-      );
-    setSections(updatedSections);
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            educations: section.educations.filter(
+              edu => edu.id !== eduId
+            ),
+          };
+        }
+        return {
+          ...section,
+          educations: section.educations.map(edu =>
+            edu.id === eduId
+              ? { ...edu, [field]: value }
+              : edu
+          ),
+        };
+      })
+    );
   };
 
+
+
   const handleAddEducation = (sectionIndex) => {
-    const updatedSections = [...sections];
     const newEducation = {
       id: `e${Date.now()}`,
       institute: "",
@@ -1713,12 +1732,19 @@ const Page = () => {
       city: "",
       description: ""
     };
-    updatedSections[sectionIndex].educations = [
-      ...updatedSections[sectionIndex].educations,
-      newEducation
-    ];
-    setSections(updatedSections);
+
+    setSections(prev =>
+      prev.map((section, i) =>
+        i === sectionIndex
+          ? {
+            ...section,
+            educations: [...section.educations, newEducation]
+          }
+          : section
+      )
+    );
   };
+
 
   // Certification handlers
   const handleCertDragStart = (e, index) => {
@@ -1744,16 +1770,34 @@ const Page = () => {
   };
 
   const handleCertUpdate = (sectionIndex, certId, field, value) => {
-    const updatedSections = [...sections];
-    updatedSections[sectionIndex].certifications =
-      updatedSections[sectionIndex].certifications.map(cert =>
-        cert.id === certId ? { ...cert, [field]: value } : cert
-      );
-    setSections(updatedSections);
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+
+        if (field === "delete") {
+          return {
+            ...section,
+            certifications: section.certifications.filter(
+              cert => cert.id !== certId
+            ),
+          };
+        }
+
+        return {
+          ...section,
+          certifications: section.certifications.map(cert =>
+            cert.id === certId
+              ? { ...cert, [field]: value }
+              : cert
+          ),
+        };
+      })
+    );
   };
 
+
+
   const handleAddCertification = (sectionIndex) => {
-    const updatedSections = [...sections];
     const newCert = {
       id: `c${Date.now()}`,
       name: "",
@@ -1763,12 +1807,19 @@ const Page = () => {
       endYear: "",
       description: ""
     };
-    updatedSections[sectionIndex].certifications = [
-      ...updatedSections[sectionIndex].certifications,
-      newCert
-    ];
-    setSections(updatedSections);
+
+    setSections(prev =>
+      prev.map((section, i) =>
+        i === sectionIndex
+          ? {
+            ...section,
+            certifications: [...section.certifications, newCert]
+          }
+          : section
+      )
+    );
   };
+
 
   // Experience handlers
   const handleExpDragStart = (e, index) => {
@@ -1794,27 +1845,54 @@ const Page = () => {
   };
 
   const handleExpUpdate = (sectionIndex, expId, field, value) => {
-    const updatedSections = [...sections];
-    updatedSections[sectionIndex].experiences =
-      updatedSections[sectionIndex].experiences.map(exp =>
-        exp.id === expId ? { ...exp, [field]: value } : exp
-      );
-    setSections(updatedSections);
+    setSections(prevSections =>
+      prevSections.map((section, sIndex) => {
+        if (sIndex !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            experiences: section.experiences.filter(
+              exp => exp.id !== expId
+            ),
+          };
+        }
+
+        return {
+          ...section,
+          experiences: section.experiences.map(exp =>
+            exp.id === expId ? { ...exp, [field]: value } : exp
+          ),
+        };
+      })
+    );
   };
 
+
+
   const handleAddExperience = (sectionIndex) => {
-    const updatedSections = [...sections];
-    updatedSections[sectionIndex].experiences.push({
-      id: `x${Date.now()}`,
-      jobTitle: "",
-      company: "",
-      city: "",
-      startDate: "",
-      endDate: "",
-      description: ""
-    });
-    setSections(updatedSections);
+    setSections(prevSections =>
+      prevSections.map((section, sIndex) => {
+        if (sIndex !== sectionIndex) return section;
+
+        return {
+          ...section,
+          experiences: [
+            ...section.experiences,
+            {
+              id: `x${Date.now()}`,
+              jobTitle: "",
+              company: "",
+              city: "",
+              startDate: "",
+              endDate: "",
+              description: "",
+            },
+          ],
+        };
+      })
+    );
   };
+
 
   const handleCustomDragStart = (e, index) => {
     e.stopPropagation();
@@ -1839,15 +1917,31 @@ const Page = () => {
   };
 
   const handleCustomUpdate = (sectionIndex, itemId, field, value) => {
-    const updatedSections = [...sections];
-    updatedSections[sectionIndex].items = updatedSections[sectionIndex].items.map(item =>
-      item.id === itemId ? { ...item, [field]: value } : item
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            items: section.items.filter(
+              item => item.id !== itemId
+            ),
+          };
+        }
+        return {
+          ...section,
+          items: section.items.map(item =>
+            item.id === itemId
+              ? { ...item, [field]: value }
+              : item
+          ),
+        };
+      })
     );
-    setSections(updatedSections);
   };
 
+
   const handleAddCustomItem = (sectionIndex) => {
-    const updatedSections = [...sections];
     const newItem = {
       id: `custom_${Date.now()}`,
       title: "",
@@ -1856,28 +1950,40 @@ const Page = () => {
       endDate: "",
       description: "",
     };
-    updatedSections[sectionIndex].items = [...updatedSections[sectionIndex].items, newItem];
-    setSections(updatedSections);
+
+    setSections(prev =>
+      prev.map((section, i) =>
+        i === sectionIndex
+          ? {
+            ...section,
+            items: [...section.items, newItem]
+          }
+          : section
+      )
+    );
   };
+
 
   const handleCoreCompetencyUpdate = (sectionIndex, itemIndex, field, value) => {
-    const updatedSections = [...sections];
-
-    if (field === "delete") {
-      updatedSections[sectionIndex].items =
-        updatedSections[sectionIndex].items.filter((_, i) => i !== itemIndex);
-
-      setSections(updatedSections);
-      return;
-    }
-
-    updatedSections[sectionIndex].items =
-      updatedSections[sectionIndex].items.map((item, i) =>
-        i === itemIndex ? value : item
-      );
-
-    setSections(updatedSections);
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            items: section.items.filter((_, idx) => idx !== itemIndex),
+          };
+        }
+        return {
+          ...section,
+          items: section.items.map((item, idx) =>
+            idx === itemIndex ? value : item
+          ),
+        };
+      })
+    );
   };
+
 
 
 
@@ -1907,6 +2013,15 @@ const Page = () => {
   const handleDeleteSection = (sectionIndex) => {
     const updatedSections = sections.filter((_, i) => i !== sectionIndex);
     setSections(updatedSections);
+  };
+
+  const handleAnimatedDeleteSection = (index) => {
+    setDeletingSectionIndex(index);
+
+    setTimeout(() => {
+      handleDeleteSection(index);
+      setDeletingSectionIndex(null);
+    }, 500);
   };
 
 
@@ -1945,7 +2060,15 @@ const Page = () => {
                         : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
                       }`}
                   >
-                    <div className='acco_section'>
+                    <div
+                      className={`
+                      acco_section
+                      transition-all duration-300 ease-in-out
+                      ${deletingSectionIndex === index
+                          ? "!bg-red-400 !-translate-x-6 !opacity-0"
+                          : "!bg-white !opacity-100 !translate-x-0"}
+                      `}
+                    >
                       <Accordion flush={true}>
                         <AccordionPanel>
                           <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
@@ -2004,7 +2127,7 @@ const Page = () => {
                                 className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDeleteSection(index);
+                                  handleAnimatedDeleteSection(index);
                                 }}
                               />
                             </div>

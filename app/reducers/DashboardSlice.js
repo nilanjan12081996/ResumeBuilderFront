@@ -720,7 +720,6 @@ export const generateImpExperience = createAsyncThunk(
     }
 );
 
-
 export const checkGrammarlySentence = createAsyncThunk(
     "grammarly/checkSentence",
     async (payload, { rejectWithValue }) => {
@@ -738,6 +737,21 @@ export const checkGrammarlySentence = createAsyncThunk(
             return rejectWithValue(
                 err?.response?.data || err.message
             );
+        }
+    }
+);
+
+export const fetchMissingSkills = createAsyncThunk(
+    "dashboard/fetchMissingSkills",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post("/agent/JD/Missing/Skill", payload);
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
         }
     }
 );
@@ -793,8 +807,9 @@ const initialState = {
     generateImpExperienceLoading: false,
     generateImpExperienceData: {},
 
-    grammarlySentenceData:null,
-    grammarlySentenceLoading:false
+    grammarlySentenceData: null,
+    grammarlySentenceLoading: false,
+    missingSkills: [],
 }
 
 const DashboardSlice = createSlice(
@@ -1297,6 +1312,19 @@ const DashboardSlice = createSlice(
                 .addCase(checkGrammarlySentence.rejected, (state, action) => {
                     state.grammarlySentenceLoading = false;
                     state.error = action.payload;
+                })
+
+                .addCase(fetchMissingSkills.pending, (state) => {
+                    state.loading = true;
+                    state.error = null;
+                })
+                .addCase(fetchMissingSkills.fulfilled, (state, action) => {
+                    state.loading = false;
+                    state.missingSkills = action.payload;
+                })
+                .addCase(fetchMissingSkills.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error = action.payload || "Failed to fetch missing skills";
                 });
 
 

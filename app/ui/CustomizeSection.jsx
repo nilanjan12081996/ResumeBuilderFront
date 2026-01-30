@@ -50,12 +50,12 @@ const CustomizeSection = ({
                 text,
               }))
             }
-            isPrimeAtsTemp={selectedTemplate === "ats"}
           />
         )}
 
         {activeTab === "Layout" && (
           <TemplateLayout
+            selectedTemplate={selectedTemplate}
             layoutSettings={resumeSettings.layout}
             setLayoutSettings={(layout) =>
               setResumeSettings((prev) => ({

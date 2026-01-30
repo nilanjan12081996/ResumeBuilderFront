@@ -28,7 +28,8 @@ export const defaultResumeSettings = {
     topBottom: 36,               // 0.50 in × 72 = 36pt
     leftRight: 36,               // 0.50 in × 72 = 36pt
     betweenSections: 16,         // pt
-    betweenTitlesContent: 3,     // pt
+    betweenTitlesContent: 3,     // pt  
     columnGap: 20,               // keep same as before
+    headerAlignment: "left",
   },
 };

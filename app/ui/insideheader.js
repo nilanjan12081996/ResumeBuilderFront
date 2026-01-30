@@ -199,6 +199,7 @@ const Insideheader = () => {
     "/resume-builder",
     "/resume-builder-edit",
     "/improve-resume-builder",
+    "/jd-resume-builder"
   ];
   const showTabs = TAB_VISIBLE_ROUTES.some(route =>
     pathname.startsWith(route)

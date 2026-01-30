@@ -1,15 +1,9 @@
 "use client";
 import React from "react";
+import DynamicTempPage from "./DynamicTempPage";
 
 const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
-  // Helper to format dates to "JAN 2026"
-  // const formatDate = (dateValue) => {
-  //   if (!dateValue) return "";
-  //   const d = new Date(dateValue);
-  //   return d
-  //     .toLocaleString("en-US", { month: "short", year: "numeric" })
-  //     .toUpperCase();
-  // };
+  ;
   const { text, layout } = resumeSettings;
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
@@ -161,7 +155,9 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
             borderTop: `1px solid ${themeColor}`,
             fontFamily: text.secondaryFont,
             fontSize: `${text.sectionTitle}pt`,
-            fontWeight: text.sectionTitleWeight
+            fontWeight: text.sectionTitleWeight,
+            marginTop: `${layout.betweenSections}pt`,
+            marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
           Education
@@ -491,11 +487,25 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
     "custom",
   ];
 
-  return (
-    <div className="h-screen overflow-y-auto hide-scrollbar"
+  const headerAlign = layout.headerAlignment || "left";
 
-    >
-      <div className="min-h-[297mm] w-full bg-white text-gray-800 font-sans shadow-lg resume-root"
+  const alignmentClass =
+    headerAlign === "center"
+      ? "text-center items-center"
+      : headerAlign === "right"
+        ? "text-right items-end"
+        : "text-left items-start";
+
+  const containerJustify =
+    headerAlign === "center"
+      ? "justify-center"
+      : headerAlign === "right"
+        ? "justify-end"
+        : "justify-between";
+
+  return (
+    <div className="h-screen overflow-y-auto hide-scrollbar">
+      <div className="h-[297mm] w-full bg-white text-gray-800 font-sans shadow-lg resume-root"
         style={{
           padding: `${layout.topBottom}pt ${layout.leftRight}pt`,
           fontFamily: text.primaryFont,
@@ -504,8 +514,8 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
         }}
       >
         {/* ----------------- HEADER SECTION ----------------- */}
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
+        <div  className={`flex ${containerJustify} gap-4`}>
+          <div className={`flex-1 flex flex-col ${alignmentClass}`}>
             <h1 className="font-bold uppercase tracking-tight"
               style={{
                 color: themeColor,
@@ -591,4 +601,7 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
   );
 };
 
+
 export default PrimeATS;
+
+
