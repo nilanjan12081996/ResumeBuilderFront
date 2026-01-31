@@ -3,51 +3,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-
-import { HiClipboardList } from "react-icons/hi";
-import { MdPreview } from "react-icons/md";
-import { IoStatsChart } from "react-icons/io5";
-import { IoMdDownload } from "react-icons/io";
-import { AiOutlineArrowRight } from "react-icons/ai";
 import { AiFillSave } from "react-icons/ai";
-
-import { BiSolidUser } from "react-icons/bi";
-import { BiSolidBriefcase } from "react-icons/bi";
-import { FaGlobe } from "react-icons/fa";
-import { BiLogoLinkedinSquare } from "react-icons/bi";
-import { BsGithub } from "react-icons/bs";
-import { MdEmail } from "react-icons/md";
-import { FaLocationDot } from "react-icons/fa6";
-import { BiSolidPhone } from "react-icons/bi";
-
-import { HiAcademicCap } from "react-icons/hi2";
-
-import { FaLanguage, FaPen, FaUser } from "react-icons/fa6";
-import { MdSettingsSuggest } from "react-icons/md";
-import { FaDiagramProject } from "react-icons/fa6";
-import { FaCertificate } from "react-icons/fa";
-import { FaTrophy } from "react-icons/fa6";
-
-import { BiSolidBank } from "react-icons/bi";
-
-import { BsFillPlusCircleFill } from "react-icons/bs";
+import { FaUser } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
-
-import { FaTags } from "react-icons/fa";
-import { BiSolidBuilding } from "react-icons/bi";
-
-import { BiWorld } from "react-icons/bi";
-
-import { BsFillPersonVcardFill } from "react-icons/bs";
-import { BiCodeAlt } from "react-icons/bi";
-
-import { BiLink } from "react-icons/bi";
-
 import resume_sections_view from "../assets/imagesource/resume_sections_view.png";
 import resume_score2 from "../assets/imagesource/resume_score2.png";
 import resume_score from "../assets/imagesource/resume_score.png";
 
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Tab, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
 import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select, Toast, Progress, Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
@@ -93,6 +56,8 @@ import ClearTemplate from '../TemplateNew/ClearTemplate';
 import VividTemplate from '../TemplateNew/VividTemplate';
 import CustomizeSection from '../ui/CustomizeSection';
 import { useTabs } from '../context/TabsContext';
+import { defaultResumeSettings } from '../config/defaultResumeSettings';
+import { FaLock } from 'react-icons/fa';
 
 
 const page = () => {
@@ -108,9 +73,9 @@ const page = () => {
   const [type, setType] = useState()
   const [isCreated, setIsCreated] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const lastSavedData = useRef(null); // Ref to track last saved state
+  const lastSavedData = useRef(null);
   const [selectedTemplate, setSelectedTemplate] = useState('clear');
-  const [themeColor, setThemeColor] = useState('#000000');
+
   const templateMap = {
     professional: Professional,
     ats: PrimeATS,
@@ -119,8 +84,18 @@ const page = () => {
     vivid: VividTemplate,
     corporate: CorporateTemplate,
   };
+
+  const [themeColor, setThemeColor] = useState(
+    defaultResumeSettings.theme.defaultColor
+  );
+
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
+    const color =
+      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+      defaultResumeSettings.theme.defaultColor;
+
+    setThemeColor(color);
   };
   const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
@@ -365,21 +340,21 @@ const page = () => {
     setValue("profileImage", "");
   };
 
+    // -------------------- AUTO HIDE STATUS --------------------
+    useEffect(() => {
+      if (savingStatus === "saved") {
+        const timer = setTimeout(() => {
+          setSavingStatus("unsaved");
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }, [savingStatus]);
+
   const { activeTab } = useTabs();
 
   return (
     <div>
       <Tabs>
-        {/* <div className='resume_tab_scrach mb-4 px-8'>
-          <div className='p-0'>
-            <div className='tab_point'>
-              <TabList>
-                <Tab>Edit</Tab>
-                <Tab>Customize</Tab>
-              </TabList>
-            </div>
-          </div>
-        </div> */}
         <div className='lg:flex gap-1 pb-0'>
 
           <ToastContainer />
@@ -405,7 +380,7 @@ const page = () => {
                       </div>
                     </div>
 
-                    <div className='h-[430px] overflow-y-scroll bg-white p-5 rounded-lg'>
+                    <div className='h-full overflow-y-scroll bg-white p-5 rounded-lg'>
                       {
                         step === 1 && (
                           <div className=''>
@@ -416,104 +391,72 @@ const page = () => {
 
                             <div className='acco_section'>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* <div className="md:col-span-2 flex gap-4">
-                                  <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                      Job Target
-                                    </label>
-                                    <input
-                                      type="text"
-                                      placeholder="SENIOR SOFTWARE ENGINEER"
-                                      className="mt-1 w-full rounded-lg"
-                                      {...register("job_target")}
-                                    />
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <div className="relative w-14 h-14 bg-gray-100 rounded flex items-center justify-center overflow-hidden border border-gray-200">
-                                      {selectedImage ? (
-                                        <img src={selectedImage} alt="Profile" className="w-full h-full object-cover" />
-                                      ) : (
-                                        <FaUser className="text-gray-400 text-2xl" />
-                                      )}
-                                    </div>
-                                    <div>
-                                      {selectedImage ? (
-                                        <div className="flex flex-col gap-1">
-                                          <label
-                                            htmlFor="profile-upload"
-                                            className="flex items-center gap-1 text-cyan-600 text-xs font-medium cursor-pointer hover:underline"
-                                          >
-                                            <FaPen /> Edit photo
-                                          </label>
+                                <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
+                                  <div
+                                    className={`p-2 flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg 
+                                      ${selectedTemplate === "clean"
+                                        ? "bg-gray-100 opacity-60 cursor-not-allowed"
+                                        : "bg-gray-50"
+                                      }`}
+                                  >
+                                    {selectedTemplate === "clean" ? (
+                                      <>
+                                        <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                                          <FaLock className="text-[28px] text-gray-500" />
+                                        </div>
+
+                                        <span className="text-[12px] text-gray-400 text-center mt-2">
+                                          This template doesn’t support photo upload
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <label
+                                          htmlFor="profile-upload"
+                                          className="cursor-pointer flex flex-col items-center gap-2"
+                                        >
+                                          <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                                            {selectedImage ? (
+                                              <img
+                                                src={selectedImage}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover"
+                                              />
+                                            ) : (
+                                              <FaUser className="text-[30px] text-[#800080]" />
+                                            )}
+                                          </div>
+
+                                          <span className="text-sm font-medium text-[#800080] hover:underline">
+                                            Upload photo
+                                          </span>
+                                        </label>
+
+                                        {selectedImage && (
                                           <button
                                             type="button"
                                             onClick={handleDeleteImage}
-                                            className="flex items-center gap-1 text-gray-500 text-xs font-medium cursor-pointer hover:text-red-500"
+                                            className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500"
                                           >
-                                            <MdDelete /> Delete
+                                            <MdDelete size={12} /> Remove
                                           </button>
-                                        </div>
-                                      ) : (
-                                        <label
-                                          htmlFor="profile-upload"
-                                          className="text-cyan-600 text-sm font-medium cursor-pointer hover:underline"
-                                        >
-                                          Upload photo
-                                        </label>
-                                      )}
-                                      <input
-                                        type="file"
-                                        id="profile-upload"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleImageChange}
-                                      />
-                                    </div>
-                                  </div>
-                                </div> */}
-                                <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
-                                  <div className="flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg bg-gray-50">
-                                    <label
-                                      htmlFor="profile-upload"
-                                      className="cursor-pointer flex flex-col items-center gap-2"
-                                    >
-                                      <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
-                                        {selectedImage ? (
-                                          <img
-                                            src={selectedImage}
-                                            alt="Profile"
-                                            className="w-full h-full object-cover"
-                                          />
-                                        ) : (
-                                          <FaUser className="text-[30px] text-[#800080]" />
                                         )}
-                                      </div>
-                                      <span className="text-sm font-medium text-[#800080] hover:underline">
-                                        Upload photo
-                                      </span>
-                                    </label>
-                                    {selectedImage && (
-                                      <button
-                                        type="button"
-                                        onClick={handleDeleteImage}
-                                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500"
-                                      >
-                                        <MdDelete size={12} /> Remove
-                                      </button>
+
+                                        <span className="text-[10px] text-gray-400">
+                                          JPG / PNG • Max 2MB
+                                        </span>
+
+                                        <input
+                                          type="file"
+                                          id="profile-upload"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={handleImageChange}
+                                        />
+                                      </>
                                     )}
-
-                                    <span className="text-[10px] text-gray-400">
-                                      JPG / PNG • Max 2MB
-                                    </span>
-
-                                    <input
-                                      type="file"
-                                      id="profile-upload"
-                                      accept="image/*"
-                                      className="hidden"
-                                      onChange={handleImageChange}
-                                    />
                                   </div>
+
                                   <div className="flex-1">
                                     <label className="block text-sm font-medium text-gray-700">
                                       Job Target
@@ -958,13 +901,6 @@ const page = () => {
                         </button>
                       </div>
 
-                      <div className="w-4/12 flex justify-center">
-                        {savingStatus === 'saving' && <span className="text-gray-500 text-sm font-medium animate-pulse">Saving...</span>}
-                        {savingStatus === 'saved' && <span className="text-green-600 text-sm font-medium flex items-center gap-1"><AiFillSave /> Saved</span>}
-                        {savingStatus === 'error' && <span className="text-red-500 text-sm font-medium">Error saving</span>}
-                      </div>
-
-
                       <div className=''>
                         <button
                           type="submit"
@@ -991,54 +927,37 @@ const page = () => {
                 setThemeColor={setThemeColor}
               />
             }
+            <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
+              {savingStatus === 'saving' && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+                  <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Saving changes...
+                </div>
+              )}
+
+              {savingStatus === 'saved' && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
+                  <AiFillSave className="text-sm" />
+                  Saved successfully
+                </div>
+              )}
+
+              {savingStatus === 'error' && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
+                  ❌ Save failed
+                </div>
+              )}
+            </div>
           </div>
 
           <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px]'>
             <div className='flex items-center justify-between'>
-              {/* <div className='flex items-center gap-1 mb-2 lg:mb-0'>
-                <button
-                  onClick={() => setOpenPreviewModal(true)}
-                  className='flex items-center gap-1 text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
-                >
-                  <MdPreview className='text-[#800080] text-2xl' />
-                  Preview
-                </button>
-
-              </div> */}
               <div className='lg:flex items-center gap-3'>
-                {/* <button onClick={() => setOpenModalAnalyzeResume(true)} className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoStatsChart className='text-base' /> Analyze Resume</button> */}
-                {/* <button onClick={() => downloadDocx()} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'><IoMdDownload className='text-[18px]' /> Download DOCX</button> */}
-                {/* <button
-
-                  className='rounded-[7px] text-[12px] leading-[36px] font-medium px-4 flex items-center gap-1.5
-        bg-[#800080] hover:bg-[#F6EFFF] text-[#ffffff] hover:text-[#92278F]'
-                >
-                  <IoMdDownload className='text-[18px]' />
-                  Download PDF
-                </button> */}
-
               </div>
             </div>
-            <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-
-              {/* <Professional formData={formValues} empHistory={empHistory} /> */}
-              {/* <PrimeATS formData={formValues} empHistory={empHistory} /> */}
-              {/* <CleanTemplate formData={formValues} empHistory={empHistory} /> */}
-              {/* <ClearTemplate formData={formValues} empHistory={empHistory} /> */}
-              {/* <VividTemplate formData={formValues} empHistory={empHistory} /> */}
+            <div ref={componentRef} className=''>
               <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} />
-
-
-
             </div>
-            {/* <div className='flex items-center justify-between mb-0'>
-                  <div className='flex items-center gap-1'>
-                    <h3 className='text-[12px] text-[#060606] font-medium'>Template: <span className='text-[#6D6D6D]'>Modern</span></h3>
-                  </div>
-                  <div className='flex items-center gap-3'>
-                    <button className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5'> Change Template <AiOutlineArrowRight className='text-base' /></button>
-                  </div>
-                </div> */}
           </div>
 
           {/* add modal for apply job start here */}

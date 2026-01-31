@@ -92,25 +92,25 @@ export default function TipTapEditor({ value, onChange }) {
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-1 border-b px-2 py-1 bg-gray-50">
 
-                <button className={btn(editor.isActive("bold"))}
+                <button type="button" className={btn(editor.isActive("bold"))}
                     onClick={() => editor.chain().focus().toggleBold().run()}>
                     <FiBold />
                     <Tooltip text="Bold" />
                 </button>
 
-                <button className={btn(editor.isActive("italic"))}
+                <button type="button" className={btn(editor.isActive("italic"))}
                     onClick={() => editor.chain().focus().toggleItalic().run()}>
                     <FiItalic />
                     <Tooltip text="Italic" />
                 </button>
 
-                <button className={btn(editor.isActive("underline"))}
+                <button type="button" className={btn(editor.isActive("underline"))}
                     onClick={() => editor.chain().focus().toggleUnderline().run()}>
                     <FiUnderline />
                     <Tooltip text="Underline" />
                 </button>
 
-                <button className={btn(editor.isActive("strike"))}
+                <button type="button" className={btn(editor.isActive("strike"))}
                     onClick={() => editor.chain().focus().toggleStrike().run()}>
                     <AiOutlineStrikethrough className="text-[18px]" />
                     <Tooltip text="Strikethrough" />
@@ -120,6 +120,7 @@ export default function TipTapEditor({ value, onChange }) {
 
                 {/* Bullet list */}
                 <button
+                    type="button"
                     className={btn(editor.isActive("bulletList"))}
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                 >
@@ -129,6 +130,7 @@ export default function TipTapEditor({ value, onChange }) {
 
                 {/* Ordered list */}
                 <button
+                    type="button"
                     className={btn(editor.isActive("orderedList"))}
                     onClick={() => editor.chain().focus().toggleOrderedList().run()}
                 >
@@ -136,25 +138,26 @@ export default function TipTapEditor({ value, onChange }) {
                     <Tooltip text="Numbered list" />
                 </button>
                 <span className="w-px h-4 bg-gray-500" />
-                <button className={btn(editor.isActive({ textAlign: "left" }))}
+                <button type="button" className={btn(editor.isActive({ textAlign: "left" }))}
                     onClick={() => editor.chain().focus().setTextAlign("left").run()}>
                     <FiAlignLeft />
                     <Tooltip text="Align left" />
                 </button>
 
-                <button className={btn(editor.isActive({ textAlign: "center" }))}
+                <button type="button" className={btn(editor.isActive({ textAlign: "center" }))}
                     onClick={() => editor.chain().focus().setTextAlign("center").run()}>
                     <FiAlignCenter />
                     <Tooltip text="Align center" />
                 </button>
 
-                <button className={btn(editor.isActive({ textAlign: "right" }))}
+                <button type="button" className={btn(editor.isActive({ textAlign: "right" }))}
                     onClick={() => editor.chain().focus().setTextAlign("right").run()}>
                     <FiAlignRight />
                     <Tooltip text="Align right" />
                 </button>
 
                 <button
+                    type="button"
                     className={btn(editor.isActive("link"))}
                     onClick={() => {
                         if (editor.isActive("link")) {

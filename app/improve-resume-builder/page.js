@@ -1142,17 +1142,10 @@ const Page = () => {
     corporate: CorporateTemplate,
   };
 
-  const templateColors = {
-    professional: "#2E86C1",
-    ats: "#2E86C1",
-    clean: "#1C1C1C",
-    clear: "#4B0082",
-    vivid: "#FF6F61",
-    corporate: "#0B3D91",
-  };
   const [themeColor, setThemeColor] = useState(
-    templateColors[selectedTemplate.toLowerCase()] || "#2E86C1"
+    defaultResumeSettings.theme.defaultColor
   );
+
   const ActiveResume = templateMap[selectedTemplate] || Professional;
 
   // Form handling
@@ -1989,8 +1982,11 @@ const Page = () => {
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
-    const defaultColor = templateColors[id.toLowerCase()] || "#2E86C1";
-    setThemeColor(defaultColor);
+    const color =
+      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+      defaultResumeSettings.theme.defaultColor;
+
+    setThemeColor(color);
   };
 
   const handleAddNewSection = (newSection) => {
@@ -2044,7 +2040,7 @@ const Page = () => {
               />
 
               {/* Personal Details */}
-              <ImpPersonalDetails register={register} watch={watch} />
+              <ImpPersonalDetails register={register} watch={watch} selectedTemplate={selectedTemplate} setValue={setValue}/>
 
               {/* Dynamic Sections */}
               <div className="space-y-2">
@@ -2265,7 +2261,7 @@ const Page = () => {
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
         <div className='h-screen overflow-y-scroll'>
           <div ref={componentRef}>
-            <ActiveResume formData={formValues} sections={sections} themeColor={themeColor} resumeSettings={resumeSettings} />
+            <ActiveResume formData={formValues} sections={sections} themeColor={themeColor} setValue={setValue} resumeSettings={resumeSettings} />
           </div>
         </div>
       </div>

@@ -1,3 +1,1053 @@
+// 'use client';
+
+// import React, { useEffect, useRef, useState } from 'react';
+// import { useForm } from 'react-hook-form';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { useSearchParams } from 'next/navigation';
+// import { toast, ToastContainer } from 'react-toastify';
+// import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
+// import isEqual from 'lodash.isequal';
+// import { AiFillSave } from "react-icons/ai";
+
+// // Import components
+// import ImpResumeScore from './components/ImpResumeScore';
+// import ImpPersonalDetails from './components/ImpPersonalDetails';
+// import ImpSkills from './components/ImpSkills';
+// import ImpSummary from './components/ImpSummary';
+// import ImpEducation from './components/ImpEducation';
+// import ImpCertifications from './components/ImpCertifications';
+// import ImpExperience from './components/ImpExperience';
+// import CustomizeSection from '../ui/CustomizeSection.jsx';
+// import ImpCoreCompetencies from "./components/ImpCoreCompetencies";
+
+// // Import templates
+// import Professional from "../TemplateNew/Professional";
+// import PrimeATS from "../TemplateNew/PrimeATS";
+// import CleanTemplate from "../TemplateNew/CleanTemplate";
+// import ClearTemplate from "../TemplateNew/ClearTemplate";
+// import VividTemplate from "../TemplateNew/VividTemplate";
+// import CorporateTemplate from '../TemplateNew/CorporateTemplate';
+
+// import { useTabs } from '../context/TabsContext.js';
+// import { checkATS } from '../reducers/DashboardSlice';
+// import { saveResumeNew } from '../reducers/ResumeSlice';
+// import { TbDragDrop } from 'react-icons/tb';
+// import ImpCustomSection from './components/ImpCustomSection';
+// import AddSectionButton from './components/AddSectionButton';
+// import { FaPen, FaTrash } from 'react-icons/fa';
+// import { defaultResumeSettings } from "../config/defaultResumeSettings";
+
+
+// const Page = () => {
+//   const componentRef = useRef();
+//   const dispatch = useDispatch();
+//   const searchParams = useSearchParams();
+//   const { improveResumeData } = useSelector((state) => state?.dash);
+
+//   // Resume ID tracking
+//   const resume_id = searchParams.get('id');
+//   const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
+
+//   // Auto-Save State
+//   const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
+//   const lastSavedData = useRef(null);
+
+//   useEffect(() => {
+//     if (!improveResumeData?.resume_data) return;
+
+//     const atsPayload = {
+//       security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+//       resume_data: JSON.stringify(improveResumeData.resume_data),
+//       Ats_score: 0
+//     };
+
+//     dispatch(checkATS(atsPayload));
+//   }, [improveResumeData, dispatch]);
+
+//   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+
+
+//   // States
+
+//   const [selectedTemplate, setSelectedTemplate] = useState('Professional');
+//   const [sections, setSections] = useState([]);
+//   const [draggedIndex, setDraggedIndex] = useState(null);
+//   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
+//   const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
+//   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
+//   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
+//   const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+//   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+//   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
+
+
+
+
+//   const { activeTab } = useTabs();
+
+//   // Template mapping
+//   const templateMap = {
+//     professional: Professional,
+//     ats: PrimeATS,
+//     clean: CleanTemplate,
+//     clear: ClearTemplate,
+//     vivid: VividTemplate,
+//     corporate: CorporateTemplate,
+//   };
+
+//   const templateColors = {
+//     professional: "#2E86C1",
+//     ats: "#2E86C1",
+//     clean: "#1C1C1C",
+//     clear: "#4B0082",
+//     vivid: "#FF6F61",
+//     corporate: "#0B3D91",
+//   };
+//   const [themeColor, setThemeColor] = useState(
+//     templateColors[selectedTemplate.toLowerCase()] || "#2E86C1"
+//   );
+
+
+//   const ActiveResume = templateMap[selectedTemplate] || Professional;
+
+//   // Form handling
+//   const {
+//     register,
+//     handleSubmit,
+//     watch,
+//     setValue,
+//     formState: { errors },
+//   } = useForm();
+
+//   const formValues = watch();
+
+//   const onSubmit = async (data) => {
+//     console.log("Manual Save:", data);
+//     // Force save on submit
+//     setSavingStatus('saving');
+//     const dataToSave = {
+//       ...data,
+//       sections: sections,
+//       mongo_id: resumeIds.mongo_id,
+//       mysql_id: resumeIds.mysql_id
+//     };
+
+//     dispatch(saveResumeNew(dataToSave)).then((res) => {
+//       if (res.payload && res.payload.status_code === 200) {
+//         setSavingStatus('saved');
+//         lastSavedData.current = JSON.parse(JSON.stringify({ ...data, sections }));
+//         // toast.success("Resume saved successfully!");
+//       } else {
+//         setSavingStatus('error');
+//         toast.error("Failed to save resume.");
+//       }
+//     });
+//   };
+
+//   useEffect(() => {
+//     if (improveResumeData?.data?.data) {
+//       const resumeData = improveResumeData.data.data;
+
+//       // Set IDs for Auto-Save
+//       if (resumeData._id || resumeData.mongo_id || resumeData.id || resumeData.mysql_id) {
+//         setResumeIds({
+//           mongo_id: resumeData.mongo_id || resumeData._id,
+//           mysql_id: resumeData.mysql_id || resumeData.id
+//         });
+//         setSavingStatus('saved');
+//       }
+
+//       // Initialize lastSavedData
+//       lastSavedData.current = resumeData;
+//     }
+//   }, [improveResumeData]);
+
+//   // --- AUTO-SAVE EFFECT ---
+//   useEffect(() => {
+//     // Combine form values and sections for comparison
+//     const currentData = {
+//       ...formValues,
+//       sections: sections
+//     };
+
+//     const currentDataNormalized = JSON.parse(JSON.stringify(currentData));
+
+//     // Check if data changed
+//     if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
+//       return; // No changes
+//     }
+
+//     setSavingStatus('saving');
+
+//     const timeoutId = setTimeout(() => {
+//       const dataToSave = {
+//         ...currentData,
+//         mongo_id: resumeIds.mongo_id,
+//         mysql_id: resumeIds.mysql_id
+//       };
+
+//       dispatch(saveResumeNew(dataToSave)).then((res) => {
+//         if (res.payload && res.payload.status_code === 200) {
+//           setSavingStatus('saved');
+//           lastSavedData.current = currentDataNormalized;
+
+//           // Update IDs if new resume created
+//           if (!resumeIds.mongo_id) {
+//             const newMongoId = res.payload.data?.mongo_id;
+//             const newMysqlId = res.payload.data?.mysql_id;
+//             if (newMongoId && newMysqlId) {
+//               setResumeIds({
+//                 mongo_id: newMongoId,
+//                 mysql_id: newMysqlId
+//               });
+//             }
+//           }
+//         } else {
+//           console.error("Auto-save failed:", res);
+//           setSavingStatus('error');
+//         }
+//       });
+//     }, 2000); // 2 second debounce
+
+//     return () => clearTimeout(timeoutId);
+//   }, [formValues, sections, resumeIds, dispatch]);
+
+//   // Auto-hide saved status after 2 seconds
+//   useEffect(() => {
+//     if (savingStatus === 'saved') {
+//       const timer = setTimeout(() => {
+//         setSavingStatus('unsaved');
+//       }, 2000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, [savingStatus]);
+
+//   // Helper function to map resume data to sections
+//   const mapImproveResumeDataToSections = (resumeData) => {
+//     if (!resumeData) return [];
+
+//     const sections = [];
+//     let id = 0;
+
+//     // ----------------- TECHNICAL SKILLS -----------------
+//     const techCategories = resumeData?.technical_skills?.categories || {};
+//     const techSkills = Object.values(techCategories).flat();
+
+//     if (techSkills.length > 0) {
+//       sections.push({
+//         id: id++,
+//         title: (resumeData?.soft_skills || []).length > 0 ? "Technical Skills" : "Skills",
+//         type: "skills",
+//         skills: techSkills.map((skill, i) => ({
+//           id: `ts_${i}_${Date.now()}`,
+//           name: skill,
+//           level: 3,
+//         })),
+//       });
+//     }
+
+//     // ----------------- SOFT SKILLS -----------------
+//     if ((resumeData?.soft_skills || []).length > 0) {
+//       sections.push({
+//         id: id++,
+//         title: "Soft Skills",
+//         type: "skills",
+//         skills: resumeData.soft_skills.map((skill, i) => ({
+//           id: `ss_${i}_${Date.now()}`,
+//           name: skill,
+//           level: 3,
+//         })),
+//       });
+//     }
+
+//     // ----------------- SUMMARY -----------------
+//     if (resumeData?.professional_summary?.summary_text) {
+//       sections.push({
+//         id: id++,
+//         title: "Professional Summary",
+//         type: "summary",
+//         summary: resumeData.professional_summary.summary_text,
+//       });
+//     }
+
+//     // ----------------- EDUCATION -----------------
+//     if ((resumeData?.education || []).length > 0) {
+//       sections.push({
+//         id: id++,
+//         title: "Education",
+//         type: "education",
+//         educations: resumeData.education.map((edu, i) => ({
+//           id: `e_${i}_${Date.now()}`,
+//           institute: edu.institution || "",
+//           degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
+//           startDate: edu.start_date || "",
+//           endDate: edu.graduation_date || "",
+//           city: edu.location || "",
+//           description: edu.description || "",
+//         })),
+//       });
+//     }
+
+//     // ----------------- CERTIFICATIONS -----------------
+//     if ((resumeData?.certifications || []).length > 0) {
+//       sections.push({
+//         id: id++,
+//         title: "Certifications",
+//         type: "certifications",
+//         certifications: resumeData.certifications.map((c, i) => ({
+//           id: `c_${i}_${Date.now()}`,
+//           name: c.name || "",
+//           organization: c.organization || "",
+//           city: "",
+//           startYear: "",
+//           endYear: "",
+//           description: "",
+//         })),
+//       });
+//     }
+
+//     // ----------------- EXPERIENCE -----------------
+//     if ((resumeData?.work_experience || []).length > 0) {
+//       sections.push({
+//         id: id++,
+//         title: "Experience",
+//         type: "experience",
+//         experiences: resumeData.work_experience.map((exp, i) => ({
+//           id: `x_${i}_${Date.now()}`,
+//           jobTitle: exp.job_title || "",
+//           company: exp.company_name || "",
+//           city: exp.location || "",
+//           startDate: exp.start_date || "",
+//           endDate: exp.end_date || "",
+//           description: (exp.responsibilities || []).join("<br/>"),
+//         })),
+//       });
+//     }
+
+//     // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
+//     const additionalSections = resumeData?.additional_sections || {};
+//     const hasMainExperience = (resumeData?.work_experience || []).length > 0;
+
+//     Object.entries(additionalSections).forEach(([key, value]) => {
+//       if (!value?.content || value.content.length === 0) return;
+
+//       const normalizedKey = key.toLowerCase().trim();
+
+//       // Skip summary, personal info, profile, header
+//       // if (
+//       //   normalizedKey.includes("summary") ||
+//       //   normalizedKey.includes("personal") ||
+//       //   normalizedKey.includes("profile") ||
+//       //   normalizedKey.includes("header")
+//       // ) return;
+
+//       // Skip experience if main experience exists
+//       // if (
+//       //   hasMainExperience &&
+//       //   (
+//       //     normalizedKey.includes("experience") ||
+//       //     normalizedKey.includes("employment") ||
+//       //     normalizedKey.includes("career") ||
+//       //     normalizedKey.includes("timeline")
+//       //   )
+//       // ) return;
+
+//       // Core competencies
+//       if (
+//         normalizedKey.includes("core competencies") ||
+//         normalizedKey.includes("competencies")
+//       ) {
+//         sections.push({
+//           id: id++,
+//           title: key,
+//           type: "core_competencies",
+//           items: value.content,
+//         });
+//         return;
+//       }
+
+//       // Everything else (including achievements) → custom
+//       sections.push({
+//         id: id++,
+//         title: key,
+//         type: "custom",
+//         items: Array.isArray(value.content)
+//           ? value.content.map((item, i) => ({
+//             id: `custom_${i}_${Date.now()}`,
+//             title: typeof item === "string" ? item : item.title || item.name || "",
+//             city: item.city || "",
+//             startDate: item.start_date || "",
+//             endDate: item.end_date || "",
+//             description: item.description || "",
+//           }))
+//           : [
+//             {
+//               id: `custom_0_${Date.now()}`,
+//               title: typeof value.content === "string" ? value.content : "",
+//               city: "",
+//               startDate: "",
+//               endDate: "",
+//               description: "",
+//             },
+//           ],
+//       });
+//     });
+
+//     return sections;
+//   };
+
+//   // ----------------- SETTING FORM VALUES -----------------
+//   useEffect(() => {
+//     if (!improveResumeData?.resume_data) return;
+
+//     const resumeData = improveResumeData.resume_data;
+//     const personal = resumeData.personal_information || {};
+//     const meta = resumeData.metadata || {};
+
+//     // Profile summary
+//     const profileSummaryFromAdditional =
+//       resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
+
+//     const summaryPoints =
+//       Array.isArray(profileSummaryFromAdditional) && profileSummaryFromAdditional.length > 0
+//         ? profileSummaryFromAdditional
+//         : resumeData?.professional_summary?.summary_text
+//           ? [resumeData.professional_summary.summary_text]
+//           : [];
+
+//     const formattedSummary =
+//       summaryPoints.length > 1
+//         ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
+//         : summaryPoints[0] || "";
+
+//     // Name
+//     const fullName = personal.full_name || "";
+//     const nameParts = fullName.split(" ");
+
+//     setValue("job_target", meta.current_role || "");
+//     setValue("first_name", nameParts[0] || "");
+//     setValue("last_name", nameParts.slice(1).join(" ") || "");
+//     setValue("email", personal.email || "");
+//     setValue("phone", personal.phone || "");
+//     setValue(
+//       "city_state",
+//       [personal.location?.city, personal.location?.state].filter(Boolean).join(", ")
+//     );
+//     setValue("country", personal.location?.country || "");
+//     setValue("address", personal.location?.full_address || "");
+//     setValue("summary", formattedSummary);
+//   }, [improveResumeData, setValue]);
+
+//   // ----------------- MAP SECTIONS -----------------
+//   useEffect(() => {
+//     if (!improveResumeData?.resume_data) return;
+
+//     const mappedSections = mapImproveResumeDataToSections(improveResumeData.resume_data);
+//     setSections(mappedSections);
+//   }, [improveResumeData]);
+
+//   // ----------------- SYNC SKILLS -----------------
+//   useEffect(() => {
+//     const skillSections = sections.filter(sec => sec.type === "skills");
+//     const mergedSkills = skillSections.flatMap(sec =>
+//       (sec.skills || []).map(skill => ({ skill: skill.name, level: skill.level ?? 3 }))
+//     );
+//     setValue("newSkillHistory", mergedSkills);
+//   }, [sections, setValue]);
+
+//   // ----------------- SYNC EDUCATION -----------------
+//   useEffect(() => {
+//     const educationSections = sections.filter(sec => sec.type === "education");
+//     const educationHistory = educationSections.flatMap(sec =>
+//       (sec.educations || []).map(edu => ({
+//         school: edu.institute || "",
+//         degree: edu.degree || "",
+//         startDate: edu.startDate || "",
+//         endDate: edu.endDate || "",
+//         city_state: edu.city || "",
+//         description: edu.description || "",
+//       }))
+//     );
+//     setValue("educationHistory", educationHistory);
+//   }, [sections, setValue]);
+
+//   // ----------------- SYNC EXPERIENCE -----------------
+//   useEffect(() => {
+//     const expSections = sections.filter(sec => sec.type === "experience");
+//     const employmentHistory = expSections.flatMap(sec =>
+//       (sec.experiences || []).map(exp => ({
+//         job_title: exp.jobTitle || "",
+//         employer: exp.company || "",
+//         city_state: exp.city || "",
+//         startDate: exp.startDate || "",
+//         endDate: exp.endDate || "",
+//         description: exp.description || "",
+//       }))
+//     );
+//     setValue("employmentHistory", employmentHistory);
+//   }, [sections, setValue]);
+
+
+//   // Drag handlers for sections
+//   const handleDragStart = (e, index) => {
+//     setDraggedIndex(index);
+//     const sectionEl = e.currentTarget.closest(".section-item");
+//     if (sectionEl) {
+//       e.dataTransfer.setDragImage(sectionEl, 20, 20);
+//     }
+//   };
+
+//   const handleDragEnd = () => {
+//     setDraggedIndex(null);
+//   };
+
+//   const handleDragOver = (e) => {
+//     e.preventDefault();
+//     e.dataTransfer.dropEffect = "move";
+//   };
+
+//   const handleDrop = (e, targetIndex) => {
+//     e.preventDefault();
+//     if (draggedIndex === targetIndex) return;
+
+//     const updatedSections = [...sections];
+//     const [draggedItem] = updatedSections.splice(draggedIndex, 1);
+//     updatedSections.splice(targetIndex, 0, draggedItem);
+
+//     setSections(updatedSections);
+//     setDraggedIndex(null);
+//   };
+
+//   // Skill handlers
+//   const handleSkillDragStart = (e, index) => {
+//     e.stopPropagation();
+//     setDraggedSkillIndex(index);
+//   };
+
+//   const handleSkillDrop = (e, sectionIndex, targetSkillIndex) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (draggedSkillIndex === null || draggedSkillIndex === targetSkillIndex) return;
+
+//     const updatedSections = [...sections];
+//     const skillsList = [...updatedSections[sectionIndex].skills];
+
+//     const [movedSkill] = skillsList.splice(draggedSkillIndex, 1);
+//     skillsList.splice(targetSkillIndex, 0, movedSkill);
+
+//     updatedSections[sectionIndex].skills = skillsList;
+//     setSections(updatedSections);
+//     setDraggedSkillIndex(null);
+//   };
+
+//   const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
+//     const updatedSections = [...sections];
+
+//     //  DELETE CASE
+//     if (field === "delete") {
+//       updatedSections[sectionIndex].skills =
+//         updatedSections[sectionIndex].skills.filter(
+//           skill => skill.id !== skillId
+//         );
+
+//       setSections(updatedSections);
+//       return;
+//     }
+
+//     //  NORMAL UPDATE
+//     updatedSections[sectionIndex].skills =
+//       updatedSections[sectionIndex].skills.map(skill =>
+//         skill.id === skillId ? { ...skill, [field]: value } : skill
+//       );
+
+//     setSections(updatedSections);
+//   };
+
+
+//   // Education handlers
+//   const handleEducationDragStart = (e, index) => {
+//     e.stopPropagation();
+//     setDraggedEducationIndex(index);
+//   };
+
+//   const handleEducationDrop = (e, sectionIndex, targetEduIndex) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (draggedEducationIndex === null || draggedEducationIndex === targetEduIndex) return;
+
+//     const updatedSections = [...sections];
+//     const educationList = [...updatedSections[sectionIndex].educations];
+
+//     const [movedEdu] = educationList.splice(draggedEducationIndex, 1);
+//     educationList.splice(targetEduIndex, 0, movedEdu);
+
+//     updatedSections[sectionIndex].educations = educationList;
+//     setSections(updatedSections);
+//     setDraggedEducationIndex(null);
+//   };
+
+//   const handleEducationUpdate = (sectionIndex, eduId, field, value) => {
+//     const updatedSections = [...sections];
+//     updatedSections[sectionIndex].educations =
+//       updatedSections[sectionIndex].educations.map(edu =>
+//         edu.id === eduId ? { ...edu, [field]: value } : edu
+//       );
+//     setSections(updatedSections);
+//   };
+
+//   const handleAddEducation = (sectionIndex) => {
+//     const updatedSections = [...sections];
+//     const newEducation = {
+//       id: `e${Date.now()}`,
+//       institute: "",
+//       degree: "",
+//       startDate: "",
+//       endDate: "",
+//       city: "",
+//       description: ""
+//     };
+//     updatedSections[sectionIndex].educations = [
+//       ...updatedSections[sectionIndex].educations,
+//       newEducation
+//     ];
+//     setSections(updatedSections);
+//   };
+
+//   // Certification handlers
+//   const handleCertDragStart = (e, index) => {
+//     e.stopPropagation();
+//     setDraggedCertIndex(index);
+//   };
+
+//   const handleCertDrop = (e, sectionIndex, targetIndex) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (draggedCertIndex === null || draggedCertIndex === targetIndex) return;
+
+//     const updatedSections = [...sections];
+//     const certList = [...updatedSections[sectionIndex].certifications];
+
+//     const [movedCert] = certList.splice(draggedCertIndex, 1);
+//     certList.splice(targetIndex, 0, movedCert);
+
+//     updatedSections[sectionIndex].certifications = certList;
+//     setSections(updatedSections);
+//     setDraggedCertIndex(null);
+//   };
+
+//   const handleCertUpdate = (sectionIndex, certId, field, value) => {
+//     const updatedSections = [...sections];
+//     updatedSections[sectionIndex].certifications =
+//       updatedSections[sectionIndex].certifications.map(cert =>
+//         cert.id === certId ? { ...cert, [field]: value } : cert
+//       );
+//     setSections(updatedSections);
+//   };
+
+//   const handleAddCertification = (sectionIndex) => {
+//     const updatedSections = [...sections];
+//     const newCert = {
+//       id: `c${Date.now()}`,
+//       name: "",
+//       organization: "",
+//       city: "",
+//       startYear: "",
+//       endYear: "",
+//       description: ""
+//     };
+//     updatedSections[sectionIndex].certifications = [
+//       ...updatedSections[sectionIndex].certifications,
+//       newCert
+//     ];
+//     setSections(updatedSections);
+//   };
+
+//   // Experience handlers
+//   const handleExpDragStart = (e, index) => {
+//     e.stopPropagation();
+//     setDraggedExpIndex(index);
+//   };
+
+//   const handleExpDrop = (e, sectionIndex, targetIndex) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (draggedExpIndex === null || draggedExpIndex === targetIndex) return;
+
+//     const updatedSections = [...sections];
+//     const list = [...updatedSections[sectionIndex].experiences];
+
+//     const [moved] = list.splice(draggedExpIndex, 1);
+//     list.splice(targetIndex, 0, moved);
+
+//     updatedSections[sectionIndex].experiences = list;
+//     setSections(updatedSections);
+//     setDraggedExpIndex(null);
+//   };
+
+//   const handleExpUpdate = (sectionIndex, expId, field, value) => {
+//     const updatedSections = [...sections];
+//     updatedSections[sectionIndex].experiences =
+//       updatedSections[sectionIndex].experiences.map(exp =>
+//         exp.id === expId ? { ...exp, [field]: value } : exp
+//       );
+//     setSections(updatedSections);
+//   };
+
+//   const handleAddExperience = (sectionIndex) => {
+//     const updatedSections = [...sections];
+//     updatedSections[sectionIndex].experiences.push({
+//       id: `x${Date.now()}`,
+//       jobTitle: "",
+//       company: "",
+//       city: "",
+//       startDate: "",
+//       endDate: "",
+//       description: ""
+//     });
+//     setSections(updatedSections);
+//   };
+
+//   const handleCustomDragStart = (e, index) => {
+//     e.stopPropagation();
+//     setDraggedCustomIndex(index);
+//   };
+
+//   const handleCustomDrop = (e, sectionIndex, targetIndex) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     if (draggedCustomIndex === null || draggedCustomIndex === targetIndex) return;
+
+//     const updatedSections = [...sections];
+//     const itemsList = [...updatedSections[sectionIndex].items];
+
+//     const [movedItem] = itemsList.splice(draggedCustomIndex, 1);
+//     itemsList.splice(targetIndex, 0, movedItem);
+
+//     updatedSections[sectionIndex].items = itemsList;
+//     setSections(updatedSections);
+//     setDraggedCustomIndex(null);
+//   };
+
+//   const handleCustomUpdate = (sectionIndex, itemId, field, value) => {
+//     const updatedSections = [...sections];
+//     updatedSections[sectionIndex].items = updatedSections[sectionIndex].items.map(item =>
+//       item.id === itemId ? { ...item, [field]: value } : item
+//     );
+//     setSections(updatedSections);
+//   };
+
+//   const handleAddCustomItem = (sectionIndex) => {
+//     const updatedSections = [...sections];
+//     const newItem = {
+//       id: `custom_${Date.now()}`,
+//       title: "",
+//       city: "",
+//       startDate: "",
+//       endDate: "",
+//       description: "",
+//     };
+//     updatedSections[sectionIndex].items = [...updatedSections[sectionIndex].items, newItem];
+//     setSections(updatedSections);
+//   };
+
+//   const handleCoreCompetencyUpdate = (sectionIndex, itemIndex, field, value) => {
+//     const updatedSections = [...sections];
+
+//     if (field === "delete") {
+//       updatedSections[sectionIndex].items =
+//         updatedSections[sectionIndex].items.filter((_, i) => i !== itemIndex);
+
+//       setSections(updatedSections);
+//       return;
+//     }
+
+//     updatedSections[sectionIndex].items =
+//       updatedSections[sectionIndex].items.map((item, i) =>
+//         i === itemIndex ? value : item
+//       );
+
+//     setSections(updatedSections);
+//   };
+
+
+
+//   const handleSelectTemplate = (id) => {
+//     setSelectedTemplate(id);
+//     const defaultColor = templateColors[id.toLowerCase()] || "#2E86C1";
+//     setThemeColor(defaultColor);
+//   };
+
+//   const handleAddNewSection = (newSection) => {
+//     const newId = Math.max(...sections.map(s => s.id), -1) + 1;
+//     const sectionToAdd = {
+//       id: newId,
+//       ...newSection
+//     };
+//     setSections([...sections, sectionToAdd]);
+//   };
+//   const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
+//     const updatedSections = [...sections];
+//     updatedSections[sectionIndex] = {
+//       ...updatedSections[sectionIndex],
+//       title: newTitle
+//     };
+//     setSections(updatedSections);
+//   };
+
+//   const handleDeleteSection = (sectionIndex) => {
+//     const updatedSections = sections.filter((_, i) => i !== sectionIndex);
+//     setSections(updatedSections);
+//   };
+
+
+//   return (
+//     <div className='lg:flex gap-1 pb-0'>
+//       <ToastContainer />
+
+//       {/* Left Panel */}
+//       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
+//         {activeTab === 'edit' ? (
+//           <form onSubmit={handleSubmit(onSubmit)}>
+//             <div className='mb-10'>
+
+//               {/* Resume Score */}
+
+//               <ImpResumeScore
+//                 score={checkATSData?.ATS_Score}
+//                 loading={atsLoading}
+//                 guide={checkATSData?.Improvment_Guide}
+//               />
+
+//               {/* Personal Details */}
+//               <ImpPersonalDetails register={register} watch={watch} />
+
+//               {/* Dynamic Sections */}
+//               <div className="space-y-2">
+//                 {sections.map((section, index) => (
+//                   <div
+//                     key={section.id}
+//                     onDragOver={handleDragOver}
+//                     onDrop={(e) => handleDrop(e, index)}
+//                     className={`
+//                       mb-[4px] transition-all duration-200 bg-white rounded-xl section-item
+//                       ${draggedIndex === index
+//                         ? "opacity-20 border-cyan-500 scale-95"
+//                         : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
+//                       }`}
+//                   >
+//                     <div className='acco_section'>
+//                       <Accordion flush={true}>
+//                         <AccordionPanel>
+//                           <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
+//                             <div className="flex items-center gap-2 flex-1">
+
+//                               <span
+//                                 className="drag-wrapper cursor-grab active:cursor-grabbing"
+//                                 draggable
+//                                 onDragStart={(e) => handleDragStart(e, index)}
+//                                 onDragEnd={handleDragEnd}
+//                               >
+//                                 <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
+//                               </span>
+
+//                               {editingSectionIndex === index ? (
+//                                 <input
+//                                   autoFocus
+//                                   defaultValue={section.title}
+//                                   onBlur={(e) => {
+//                                     setEditingSectionIndex(null);
+//                                     if (e.target.value.trim()) {
+//                                       handleSectionTitleUpdate(index, e.target.value.trim());
+//                                     }
+//                                   }}
+//                                   onKeyDown={(e) => {
+//                                     if (e.key === "Enter") e.target.blur();
+//                                   }}
+//                                   className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
+//                                 />
+//                               ) : (
+//                                 <span
+//                                   className="cursor-pointer"
+//                                   onClick={() => setEditingSectionIndex(index)}
+//                                 >
+//                                   {section.title}
+//                                 </span>
+//                               )}
+//                             </div>
+//                             <div
+//                               className="
+//                                 flex items-center gap-3
+//                                 opacity-0 translate-x-2
+//                                 group-hover:opacity-100 group-hover:translate-x-0
+//                                 transition-all duration-200
+//                               "
+//                             >
+//                               <FaPen
+//                                 className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   setEditingSectionIndex(index);
+//                                 }}
+//                               />
+
+//                               <FaTrash
+//                                 className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
+//                                 onClick={(e) => {
+//                                   e.stopPropagation();
+//                                   handleDeleteSection(index);
+//                                 }}
+//                               />
+//                             </div>
+//                           </AccordionTitle>
+
+//                           <AccordionContent className='pt-0'>
+
+//                             {section.type === 'skills' && (
+//                               <ImpSkills
+//                                 section={section}
+//                                 sectionIndex={index}
+//                                 handleSkillUpdate={handleSkillUpdate}
+//                                 handleSkillDragStart={handleSkillDragStart}
+//                                 handleSkillDrop={handleSkillDrop}
+//                                 draggedSkillIndex={draggedSkillIndex}
+//                                 setDraggedSkillIndex={setDraggedSkillIndex}
+//                               />
+//                             )}
+
+//                             {section.type === "summary" && (
+//                               <ImpSummary watch={watch} setValue={setValue} />
+//                             )}
+
+//                             {section.type === "education" && (
+//                               <ImpEducation
+//                                 section={section}
+//                                 sectionIndex={index}
+//                                 handleEducationUpdate={handleEducationUpdate}
+//                                 handleEducationDragStart={handleEducationDragStart}
+//                                 handleEducationDrop={handleEducationDrop}
+//                                 handleAddEducation={handleAddEducation}
+//                                 draggedEducationIndex={draggedEducationIndex}
+//                                 handleDragEnd={handleDragEnd}
+//                               />
+//                             )}
+
+//                             {section.type === "certifications" && (
+//                               <ImpCertifications
+//                                 section={section}
+//                                 sectionIndex={index}
+//                                 handleCertUpdate={handleCertUpdate}
+//                                 handleCertDragStart={handleCertDragStart}
+//                                 handleCertDrop={handleCertDrop}
+//                                 handleAddCertification={handleAddCertification}
+//                                 draggedCertIndex={draggedCertIndex}
+//                                 handleDragEnd={handleDragEnd}
+//                               />
+//                             )}
+
+//                             {section.type === "experience" && (
+//                               <ImpExperience
+//                                 section={section}
+//                                 sectionIndex={index}
+//                                 handleExpUpdate={handleExpUpdate}
+//                                 handleExpDragStart={handleExpDragStart}
+//                                 handleExpDrop={handleExpDrop}
+//                                 handleAddExperience={handleAddExperience}
+//                                 draggedExpIndex={draggedExpIndex}
+//                                 handleDragEnd={handleDragEnd}
+//                               />
+//                             )}
+//                             {section.type === "core_competencies" && (
+//                               <ImpCoreCompetencies
+//                                 section={section}
+//                                 sectionIndex={index}
+//                                 handleUpdate={handleCoreCompetencyUpdate}
+//                                 handleDragStart={handleCustomDragStart}
+//                                 handleDrop={handleCustomDrop}
+//                                 draggedIndex={draggedCustomIndex}
+//                                 setDraggedIndex={setDraggedCustomIndex}
+//                               />
+//                             )}
+
+//                             {section.type === "custom" && (
+//                               <ImpCustomSection
+//                                 section={section}
+//                                 sectionIndex={index}
+//                                 handleCustomUpdate={handleCustomUpdate}
+//                                 handleCustomDragStart={handleCustomDragStart}
+//                                 handleCustomDrop={handleCustomDrop}
+//                                 handleAddCustomItem={handleAddCustomItem}
+//                                 draggedIndex={draggedCustomIndex}
+//                                 handleDragEnd={handleDragEnd}
+//                               />
+//                             )}
+
+
+
+//                           </AccordionContent>
+//                         </AccordionPanel>
+//                       </Accordion>
+//                     </div>
+//                   </div>
+//                 ))}
+//                 <AddSectionButton onAddNewSection={handleAddNewSection} />
+//               </div>
+//             </div>
+//           </form>
+//         ) : (
+//           <div>
+//             <CustomizeSection
+//               selectedTemplate={selectedTemplate}
+//               onSelectTemplate={handleSelectTemplate}
+//               themeColor={themeColor}
+//               setThemeColor={setThemeColor}
+//               resumeSettings={resumeSettings}
+//               setResumeSettings={setResumeSettings}
+//             />
+//           </div>
+//         )}
+//         <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
+//           {savingStatus === 'saving' && (
+//             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+//               <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+//               Saving changes...
+//             </div>
+//           )}
+
+//           {savingStatus === 'saved' && (
+//             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
+//               <AiFillSave className="text-sm" />
+//               Saved successfully
+//             </div>
+//           )}
+
+//           {savingStatus === 'error' && (
+//             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
+//               ❌ Save failed
+//             </div>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* Right Panel - Resume Preview */}
+//       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+//         <div className='h-screen overflow-y-scroll'>
+//           <div ref={componentRef}>
+//             <ActiveResume formData={formValues}  sections={sections} themeColor={themeColor}  resumeSettings={resumeSettings}/>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Page;
+
+
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -92,17 +1142,10 @@ const Page = () => {
     corporate: CorporateTemplate,
   };
 
-  const templateColors = {
-    professional: "#2E86C1",
-    ats: "#2E86C1",
-    clean: "#1C1C1C",
-    clear: "#4B0082",
-    vivid: "#FF6F61",
-    corporate: "#0B3D91",
-  };
   const [themeColor, setThemeColor] = useState(
-    templateColors[selectedTemplate.toLowerCase()] || "#2E86C1"
+    defaultResumeSettings.theme.defaultColor
   );
+
   const ActiveResume = templateMap[selectedTemplate] || Professional;
 
   // Form handling
@@ -189,7 +1232,7 @@ const Page = () => {
 
             setResumeIds({ mongo_id, mysql_id });
             router.replace(
-              `/jd-resume-builder?id=${mysql_id}&fetch=improve_resume`,
+              `/improve-resume-builder?id=${mysql_id}&fetch=improve_resume`,
               { scroll: false }
             );
 
@@ -939,8 +1982,11 @@ const Page = () => {
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
-    const defaultColor = templateColors[id.toLowerCase()] || "#2E86C1";
-    setThemeColor(defaultColor);
+    const color =
+      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+      defaultResumeSettings.theme.defaultColor;
+
+    setThemeColor(color);
   };
 
   const handleAddNewSection = (newSection) => {

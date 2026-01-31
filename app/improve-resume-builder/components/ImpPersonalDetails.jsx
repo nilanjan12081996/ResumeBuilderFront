@@ -1,9 +1,30 @@
 import React, { useState } from 'react';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { MdDelete } from 'react-icons/md';
+import { FaLock, FaUser } from 'react-icons/fa';
 
-const ImpPersonalDetails = ({ register, watch }) => {
+const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => {
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSelectedImage(reader.result);
+      setValue("profileImage", reader.result); // form data তে save
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const handleDeleteImage = () => {
+  setSelectedImage(null);
+  setValue("profileImage", "");
+};
+
 
   return (
     <div className='acco_section'>
@@ -14,17 +35,85 @@ const ImpPersonalDetails = ({ register, watch }) => {
             <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               {/* Job Title */}
-              <div className="md:col-span-2">
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  Job Title
-                </label>
-                <input
-                  type="text"
-                  placeholder="Enter Your Job Title"
-                  className="mt-1 w-full rounded-lg"
-                  {...register("job_target")}
-                />
+              <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
+                <div
+                  className={`p-2 flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg 
+                                                    ${selectedTemplate === "clean"
+                      ? "bg-gray-100 opacity-60 cursor-not-allowed"
+                      : "bg-gray-50"
+                    }`}
+                >
+                  {selectedTemplate === "clean" ? (
+                    <>
+                      <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                        <FaLock className="text-[28px] text-gray-500" />
+                      </div>
+
+                      <span className="text-[12px] text-gray-400 text-center mt-2">
+                        This template doesn’t support photo upload
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <label
+                        htmlFor="profile-upload"
+                        className="cursor-pointer flex flex-col items-center gap-2"
+                      >
+                        <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden">
+                          {selectedImage ? (
+                            <img
+                              src={selectedImage}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <FaUser className="text-[30px] text-[#800080]" />
+                          )}
+                        </div>
+
+                        <span className="text-sm font-medium text-[#800080] hover:underline">
+                          Upload photo
+                        </span>
+                      </label>
+
+                      {selectedImage && (
+                        <button
+                          type="button"
+                          onClick={handleDeleteImage}
+                          className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500"
+                        >
+                          <MdDelete size={12} /> Remove
+                        </button>
+                      )}
+
+                      <span className="text-[10px] text-gray-400">
+                        JPG / PNG • Max 2MB
+                      </span>
+
+                      <input
+                        type="file"
+                        id="profile-upload"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                      />
+                    </>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Job Target
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="SENIOR SOFTWARE ENGINEER"
+                    className="mt-1 w-full rounded-lg"
+                    {...register("job_target")}
+                  />
+                </div>
               </div>
+
+
 
               {/* First Name */}
               <div>
@@ -141,7 +230,7 @@ const ImpPersonalDetails = ({ register, watch }) => {
                   {...register("city_state")}
                 />
               </div> */}
-            
+
               {/* City, State */}
               <div>
                 <label className="block !text-sm !font-medium !text-gray-500">

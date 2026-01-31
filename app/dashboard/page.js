@@ -194,7 +194,8 @@ const handleResumeImprove = (data) => {
             <div className="flex gap-4">
               <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <div
-                  onClick={() => setOpenModalCreateResume(true)}
+                  // onClick={() => setOpenModalCreateResume(true)}
+                  onClick={() => router.push("/resume-builder")}
                   className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
                 >
                   <div className="bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">

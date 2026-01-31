@@ -32,4 +32,15 @@ export const defaultResumeSettings = {
     columnGap: 20,               // keep same as before
     headerAlignment: "left",
   },
+  theme: {
+    defaultColor: "#2E86C1",
+    templateColors: {
+      professional: "#2E86C1",
+      ats: "#2E86C1",
+      clean: "#1C1C1C",
+      clear: "#4B0082",
+      vivid: "#FF6F61",
+      corporate: "#0B3D91",
+    },
+  },
 };
