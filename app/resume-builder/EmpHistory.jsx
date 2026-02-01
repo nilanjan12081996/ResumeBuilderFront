@@ -1,20 +1,20 @@
 'use client';
 import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
-import { Controller } from "react-hook-form";
-import Datepicker from "../utils/Datepicker";
-import TipTapEditor from "../editor/TipTapEditor";
+import { Controller, useFormContext } from "react-hook-form";
 import { HiSparkles } from "react-icons/hi";
+import { TbDragDrop } from 'react-icons/tb';
+import { FaTrash } from 'react-icons/fa';
+import Datepicker from "../ui/Datepicker";
+import TipTapEditor from "../editor/TipTapEditor";
 
 const EmpHistory = ({ register, watch, control, fields, append, remove, move }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState(null);
+  const { setValue } = useFormContext();
 
   const handleDragStart = (e, index) => {
-    // Only allow drag if it started from our handle logic
     if (!isHandleHovered) {
       e.preventDefault();
       return;
@@ -28,27 +28,20 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
     setIsHandleHovered(false);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+  // Smooth Delete Function
+  const handleDelete = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
+      remove(index);
+      setDeletingIndex(null);
+    }, 500);
   };
 
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
-
     move(draggedIndex, targetIndex);
     setDraggedIndex(null);
-  };
-
-  const addMore = () => {
-    append({});
-  };
-
-  const deleteEmp = (index) => {
-    if (fields.length > 1) {
-      remove(index);
-    }
   };
 
   return (
@@ -65,44 +58,42 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
           {fields.map((item, index) => {
             const watchedJob = watch(`employmentHistory.${index}.job_title`);
             const watchedEmployer = watch(`employmentHistory.${index}.employer`);
+            const isCurrentlyWorking = watch(`employmentHistory.${index}.isCurrentlyWorking`);
 
             return (
               <div
                 key={item.id}
-                // Draggable is true on the container, but we gate it with mouse events
-                draggable={isHandleHovered}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
+                onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${draggedIndex === index
-                    ? "opacity-20 border-cyan-500 scale-95"
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                  } cursor-default`}
-              >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                  <Accordion flush={true}>
-                    <AccordionPanel>
-                      <AccordionTitle className="p-4">
-                        <div className="flex items-center gap-3">
-                          {/* THE HANDLE: Only this part triggers the drag */}
-                          <button
-                            type="button"
-                            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                            onMouseEnter={() => setIsHandleHovered(true)}
-                            onMouseLeave={() => setIsHandleHovered(false)}
-                          >
-                            <RiDraggable className="text-xl text-gray-400" />
-                          </button>
+                className={`flex items-start gap-2 transition-all duration-200 
+                  ${draggedIndex === index ? "opacity-20 scale-95" : "opacity-100"}
+                  ${deletingIndex === index ? "-translate-x-6 opacity-0" : ""} 
+                `}
 
-                          <span className="font-bold text-sm text-gray-700">
-                            {watchedJob || watchedEmployer
-                              ? `${watchedJob || ''}${watchedEmployer ? ' at ' + watchedEmployer : ''}`
-                              : "(Not specified)"}
-                          </span>
-                        </div>
+              >
+                {/* DRAG HANDLE - Border er baire placement */}
+                <div
+                  className="mt-5 cursor-grab active:cursor-grabbing group relative"
+                  draggable
+                  onMouseEnter={() => setIsHandleHovered(true)}
+                  onMouseLeave={() => setIsHandleHovered(false)}
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <TbDragDrop className="text-xl text-[#656e83] group-hover:text-[#800080]" />
+                  <span className="tooltip">Click and drag to move</span>
+                </div>
+
+                <div className="flex items-start gap-2 w-full">
+                  <Accordion collapseAll className="!border w-full !border-gray-300 rounded-lg !overflow-hidden bg-white shadow-sm">
+                    <AccordionPanel>
+                      <AccordionTitle className="p-4 font-semibold text-sm">
+                        {watchedJob || watchedEmployer
+                          ? `${watchedJob || ''}${watchedEmployer ? ' at ' + watchedEmployer : ''}`
+                          : "(Not specified)"}
                       </AccordionTitle>
-                      <AccordionContent>
+
+                      <AccordionContent className="pt-0">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Job Title */}
                           <div>
@@ -110,7 +101,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                             <input
                               type="text"
                               placeholder="e.g. Software Engineer"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                              className="mt-1 rounded-lg border border-gray-300 p-2 text-sm"
                               {...register(`employmentHistory.${index}.job_title`)}
                             />
                           </div>
@@ -126,31 +117,54 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                             />
                           </div>
 
-                          {/* Start & End Date */}
-                          <div className='md:col-span-1 date_area'>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Strat & End Date
-                            </label>
+                          {/* Date Section */}
+                          <div className='md:col-span-2'>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase">Start & End Date</label>
                             <div className='flex gap-2 mt-1'>
-                              <Controller
-                                control={control}
-                                name={`employmentHistory.${index}.startDate`}
-                                render={({ field }) => (
-                                  <Datepicker selectedDate={field.value} onChange={(date) => field.onChange(date)} />
-                                )}
+                              <div className="flex-1">
+                                <Controller
+                                  control={control}
+                                  name={`employmentHistory.${index}.startDate`}
+                                  render={({ field }) => (
+                                    <Datepicker selectedDate={field.value} onChange={field.onChange} />
+                                  )}
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <Controller
+                                  control={control}
+                                  name={`employmentHistory.${index}.endDate`}
+                                  render={({ field }) => (
+                                    <Datepicker
+                                      selectedDate={field.value}
+                                      onChange={field.onChange}
+                                      disabled={isCurrentlyWorking}
+                                    />
+                                  )}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 mt-2">
+                              <input
+                                type="checkbox"
+                                id={`currently-working-${index}`}
+                                checked={isCurrentlyWorking || false}
+                                onChange={(e) => {
+                                  const isChecked = e.target.checked;
+                                  setValue(`employmentHistory.${index}.isCurrentlyWorking`, isChecked);
+                                  setValue(`employmentHistory.${index}.endDate`, isChecked ? 'PRESENT' : '');
+                                }}
+                                className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
                               />
-                              <Controller
-                                control={control}
-                                name={`employmentHistory.${index}.endDate`}
-                                render={({ field }) => (
-                                  <Datepicker selectedDate={field.value} onChange={(date) => field.onChange(date)} />
-                                )}
-                              />
+                              <label htmlFor={`currently-working-${index}`} className="text-sm text-gray-700 cursor-pointer">
+                                I currently work here
+                              </label>
                             </div>
                           </div>
 
                           {/* City */}
-                          <div>
+                          <div className="md:col-span-2">
                             <label className="block text-xs font-semibold text-gray-500 uppercase">City, State</label>
                             <input
                               type="text"
@@ -163,84 +177,53 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move }) 
                           {/* Description */}
                           <div className="md:col-span-2">
                             <label className="block text-xs font-semibold text-gray-500 uppercase">Description</label>
-                            <textarea
-                              rows="4"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              placeholder="Describe your responsibilities and achievements..."
-                              {...register(`employmentHistory.${index}.description`)}
-                            />
-                          </div>
-
-                          <div className="md:col-span-2">
-                            <label className="block text-xs font-semibold text-gray-500 uppercase">
-                              Description
-                            </label>
-
                             <Controller
                               name={`employmentHistory.${index}.description`}
                               control={control}
-                              defaultValue=""
-                              render={({ field }) => (
-                                <TipTapEditor
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                />
-                              )}
+                              render={({ field }) => <TipTapEditor value={field.value} onChange={field.onChange} />}
                             />
-
                             <div className="relative flex justify-end mt-1">
-                              <button
-                                type="button"
-                                className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080]"
-                              >
+                              <button type="button" className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] hover:bg-[#ebdcfc] transition-colors">
                                 <HiSparkles className="text-md" />
                                 Get help with writing
                               </button>
                             </div>
                           </div>
-
-
-
-                          {/* Delete Button inside the Content */}
-                          <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                            <button
-                              type="button"
-                              onClick={() => deleteEmp(index)}
-                              className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                            >
-                              <MdDelete className='text-lg' />
-                            </button>
-                          </div>
                         </div>
                       </AccordionContent>
                     </AccordionPanel>
                   </Accordion>
+                  {/* Delete Button - Bottom Right inside content */}
+                  <div className="flex justify-end pt-3 mt-4 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(index)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                      title="Delete this employment"
+                    >
+                      <FaTrash
+                        className="text-sm text-gray-400 cursor-pointer
+                          hover:text-red-500
+                          transition-colors"
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className='mt-6'>
-          <button
-            type="button"
-            onClick={addMore}
-            className='flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-bold transition-all p-2 rounded-lg hover:bg-cyan-50'
-          >
-            <FaPlus /> Add one more employment
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => append({})}
+          className="text-sm !text-[#800080] font-medium mt-4 hover:underline"
+        >
+          + Add one more employment
+        </button>
       </div>
     </>
   );
 };
 
 export default EmpHistory;
-
-
-
-
-
-
-
-

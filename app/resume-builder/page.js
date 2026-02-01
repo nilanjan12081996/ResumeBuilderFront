@@ -75,6 +75,7 @@ const page = () => {
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const lastSavedData = useRef(null);
   const [selectedTemplate, setSelectedTemplate] = useState('clear');
+  const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
 
   const templateMap = {
     professional: Professional,
@@ -134,6 +135,7 @@ const page = () => {
     control,
     formState: { errors },
   } = methods;
+  
 
   // Track which optional sections are active
   const [activeSections, setActiveSections] = useState([]);
@@ -340,15 +342,15 @@ const page = () => {
     setValue("profileImage", "");
   };
 
-    // -------------------- AUTO HIDE STATUS --------------------
-    useEffect(() => {
-      if (savingStatus === "saved") {
-        const timer = setTimeout(() => {
-          setSavingStatus("unsaved");
-        }, 2000);
-        return () => clearTimeout(timer);
-      }
-    }, [savingStatus]);
+  // -------------------- AUTO HIDE STATUS --------------------
+  useEffect(() => {
+    if (savingStatus === "saved") {
+      const timer = setTimeout(() => {
+        setSavingStatus("unsaved");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [savingStatus]);
 
   const { activeTab } = useTabs();
 
@@ -522,6 +524,58 @@ const page = () => {
                                   />
                                 </div>
 
+                                {/* LinkedIn */}
+                                <div>
+                                  <label className="block !text-sm !font-medium !text-gray-500">
+                                    LinkedIn URL
+                                  </label>
+                                  <input
+                                    type="url"
+                                    placeholder="linkedin.com/in/yourprofile"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                    {...register("linkedin")}
+                                  />
+                                </div>
+                                {/* GitHub */}
+                                <div>
+                                  <label className="block !text-sm !font-medium !text-gray-500">
+                                    GitHub
+                                  </label>
+                                  <input
+                                    type="url"
+                                    placeholder="github.com/username"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                    {...register("github")}
+                                  />
+                                </div>
+
+                                {/* Stack Overflow */}
+                                <div>
+                                  <label className="block !text-sm !font-medium !text-gray-500">
+                                    Stack Overflow
+                                  </label>
+                                  <input
+                                    type="url"
+                                    placeholder="stackoverflow.com/users/your-id"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                    {...register("stackoverflow")}
+                                  />
+                                </div>
+
+                                {/* LeetCode */}
+                                <div>
+                                  <label className="block !text-sm !font-medium !text-gray-500">
+                                    LeetCode
+                                  </label>
+                                  <input
+                                    type="url"
+                                    placeholder="leetcode.com/username"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                                    {...register("leetcode")}
+                                  />
+                                </div>
+
+
                                 {/* Address */}
                                 <div className="md:col-span-2">
                                   <label className="block text-sm font-medium text-gray-700">
@@ -561,7 +615,18 @@ const page = () => {
                                   />
                                 </div>
 
-
+                                {/* Postal Code */}
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Postal Code
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="Postal Code"
+                                    className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                    {...register("postal_code")}
+                                  />
+                                </div>
 
                                 <div className="md:col-span-2">
                                   <button
@@ -588,19 +653,6 @@ const page = () => {
                                 {/* Additional Details - Conditionally Rendered */}
                                 {showAdditionalDetails && (
                                   <>
-                                    {/* Postal Code */}
-                                    <div>
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Postal Code
-                                      </label>
-                                      <input
-                                        type="text"
-                                        placeholder="Postal Code"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register("postal_code")}
-                                      />
-                                    </div>
-
                                     {/* Driving License */}
                                     <div>
                                       <label className="block text-sm font-medium text-gray-700">
@@ -925,6 +977,8 @@ const page = () => {
                 onSelectTemplate={handleSelectTemplate}
                 themeColor={themeColor}
                 setThemeColor={setThemeColor}
+                resumeSettings={resumeSettings}
+                setResumeSettings={setResumeSettings}
               />
             }
             <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
@@ -956,7 +1010,7 @@ const page = () => {
               </div>
             </div>
             <div ref={componentRef} className=''>
-              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} />
+              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} resumeSettings={resumeSettings} />
             </div>
           </div>
 

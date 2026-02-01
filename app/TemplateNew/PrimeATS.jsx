@@ -120,8 +120,13 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
                 </div>
                 <div className="w-1/2 text-right">
                   <span className="font-bold text-black">
-                    {formatDate(job.startDate)} —{" "}
-                    {formatDate(job.endDate) || "PRESENT"}
+                    {formatDate(job.startDate)}
+                    {job.endDate && (
+                      <>
+                        {" — "}
+                        {formatDate(job.endDate)}
+                      </>
+                    )}
                   </span>
                 </div>
               </div>
@@ -182,15 +187,29 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
                 </div>
                 <div className="w-1/2 text-right">
                   <span className="font-bold text-black">
-                    {formatDate(edu.startDate)} —{" "}
-                    {formatDate(edu.endDate) || "PRESENT"}
+                    {formatDate(edu.startDate)}
+                    {edu.endDate && (
+                      <>
+                        {" — "}
+                        {formatDate(edu.endDate)}
+                      </>
+                    )}
                   </span>
                 </div>
               </div>
               {edu.description && (
-                <p className="text-[11px] mt-1 text-gray-700">
-                  {edu.description}
-                </p>
+                <div
+                  className="
+                    text-gray-700 mt-1 leading-relaxed
+                      [&_p]:mb-1
+                      [&_ul]:list-disc [&_ul]:pl-4
+                      [&_ol]:list-decimal [&_ol]:pl-4
+                      [&_li]:mb-1
+                      [&_strong]:font-semibold
+                      [&_em]:italic
+                    "
+                  dangerouslySetInnerHTML={{ __html: edu.description }}
+                />
               )}
             </div>
           ))}
@@ -309,7 +328,13 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
                   {course.institution ? `, ${course.institution}` : ""}
                 </h4>
                 <span className="text-[10px] font-bold text-black">
-                  {formatDate(course.startDate)} — {formatDate(course.endDate)}
+                  {formatDate(course.startDate)}
+                  {course.endDate && (
+                    <>
+                      {" — "}
+                      {formatDate(course.endDate)}
+                    </>
+                  )}
                 </span>
               </div>
               {course.description && (
@@ -514,40 +539,47 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
         }}
       >
         {/* ----------------- HEADER SECTION ----------------- */}
-        <div  className={`flex ${containerJustify} gap-4`}>
+        <div className={`flex ${containerJustify} gap-4`}>
           <div className={`flex-1 flex flex-col ${alignmentClass}`}>
-            <h1 className="font-bold uppercase tracking-tight"
+            <h1
+              className="font-bold uppercase tracking-tight"
               style={{
                 color: themeColor,
                 fontFamily: text.secondaryFont,
                 fontSize: `${text.primaryHeading}pt`,
-                fontWeight: text.primaryHeadingWeight
+                fontWeight: text.primaryHeadingWeight,
               }}
             >
               {formData.first_name} {formData.last_name}
             </h1>
-            <h2 className="text-black mt-1 uppercase"
+
+            <h2
+              className="uppercase mt-1"
               style={{
                 fontSize: `${text.secondaryHeading}pt`,
-                fontWeight: text.secondaryHeadingWeight
+                fontWeight: text.secondaryHeadingWeight,
               }}
             >
               {formData.job_target}
             </h2>
 
-            {/* Contact Details Row */}
-            <div className="mt-2 text-gray-600 flex flex-wrap gap-x-2 items-center"
+            {/* ---------- CONTACT DETAILS ---------- */}
+            <div
+              className="mt-2 flex flex-wrap items-center gap-x-2 text-gray-600"
               style={{
                 fontSize: `${text.body}pt`,
-                fontWeight: text.bodyWeight
+                fontWeight: text.bodyWeight,
               }}
             >
-              <span>{formData.address}</span>
-              {formData.city_state && (
+              {formData.address && <span>{formData.address},</span>}
+
+              {(formData.city_state || formData.postal_code) && (
                 <span>
-                  | {formData.city_state}, {formData.postal_code}
+                  {formData.city_state}, {formData.postal_code},
                 </span>
               )}
+              {formData.country && <span>{formData.country}</span>}
+
               {formData.email && (
                 <>
                   <span>|</span>
@@ -559,25 +591,78 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
                   </a>
                 </>
               )}
+
               {formData.phone && <span>| {formData.phone}</span>}
-              {formData.linkedin && <span>| LinkedIn</span>}
             </div>
-            {hasContactInfo && (
-              <div className="mt-1 text-[11px] text-gray-600"
+
+            {/* ---------- SOCIAL LINKS (BLUE, SERIAL) ---------- */}
+            <div
+              className="mt-1 flex flex-wrap gap-x-3"
+              style={{
+                fontSize: `${text.body}pt`,
+                fontWeight: text.bodyWeight,
+              }}
+            >
+              {formData.linkedin && (
+                <a
+                  href={formData.linkedin}
+                  target="_blank"
+                  className="text-[#2b6cb0] underline"
+                >
+                  LinkedIn
+                </a>
+              )}
+
+              {formData.github && (
+                <a
+                  href={formData.github}
+                  target="_blank"
+                  className="text-[#2b6cb0] underline"
+                >
+                  GitHub
+                </a>
+              )}
+
+              {formData.stackoverflow && (
+                <a
+                  href={formData.stackoverflow}
+                  target="_blank"
+                  className="text-[#2b6cb0] underline"
+                >
+                  Stack Overflow
+                </a>
+              )}
+
+              {formData.leetcode && (
+                <a
+                  href={formData.leetcode}
+                  target="_blank"
+                  className="text-[#2b6cb0] underline"
+                >
+                  LeetCode
+                </a>
+              )}
+            </div>
+
+            {/* ---------- PERSONAL DETAILS ---------- */}
+            {(formData.dob || formData.nationality) && (
+              <div
+                className="mt-1 text-gray-600"
                 style={{
                   fontSize: `${text.body}pt`,
-                  fontWeight: text.bodyWeight
+                  fontWeight: text.bodyWeight,
                 }}
               >
-                <span className="font-bold">Personal Details: </span>
-                {formData.dob && <span>{formData.dob} | </span>}
-                {formData.nationality && <span>{formData.nationality} | </span>}
+                <span>Personal Details: </span><br />
+                {formData.dob && <span>{formData.dob}</span>}
+                {formData.birth_place && <span> | {formData.birth_place}</span>}
+                {formData.nationality && <span> | {formData.nationality}</span>}
+                {formData.driving_licence && <span> | {formData.driving_licence}</span>}
               </div>
             )}
-            {/* Secondary Details (DOB, Nationality etc) */}
           </div>
 
-          {/* Profile Image - Top Right */}
+          {/* ---------- PROFILE IMAGE ---------- */}
           {formData.profileImage && (
             <div className="w-24 h-24 ml-4">
               <img

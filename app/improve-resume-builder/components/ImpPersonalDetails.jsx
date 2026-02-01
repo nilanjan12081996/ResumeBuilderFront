@@ -8,22 +8,22 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setSelectedImage(reader.result);
-      setValue("profileImage", reader.result); // form data তে save
-    };
-    reader.readAsDataURL(file);
-  }
-};
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+        setValue("profileImage", reader.result); // form data তে save
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-const handleDeleteImage = () => {
-  setSelectedImage(null);
-  setValue("profileImage", "");
-};
+  const handleDeleteImage = () => {
+    setSelectedImage(null);
+    setValue("profileImage", "");
+  };
 
 
   return (
@@ -218,18 +218,18 @@ const handleDeleteImage = () => {
                 />
               </div>
 
-              {/* City, State */}
-              {/* <div>
+              <div className="md:col-span-2">
                 <label className="block !text-sm !font-medium !text-gray-500">
-                  City, State
+                  Address
                 </label>
                 <input
                   type="text"
-                  placeholder="City, State"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("city_state")}
+                  placeholder="Enter your address"
+                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                  {...register("address")}
                 />
-              </div> */}
+              </div>
+
 
               {/* City, State */}
               <div>
@@ -254,6 +254,18 @@ const handleDeleteImage = () => {
                   placeholder="Country"
                   className="mt-1 w-full rounded-lg border border-gray-300 p-2"
                   {...register("country")}
+                />
+              </div>
+              {/* Postal Code */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Postal Code
+                </label>
+                <input
+                  type="text"
+                  placeholder="Postal Code"
+                  className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                  {...register("postal_code")}
                 />
               </div>
 
@@ -281,18 +293,6 @@ const handleDeleteImage = () => {
               {/* Additional Details */}
               {showAdditionalDetails && (
                 <>
-                  <div className="md:col-span-2">
-                    <label className="block !text-sm !font-medium !text-gray-500">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter your address"
-                      className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                      {...register("address")}
-                    />
-                  </div>
-
                   <div>
                     <label className="block !text-sm !font-medium !text-gray-500">
                       Nationality

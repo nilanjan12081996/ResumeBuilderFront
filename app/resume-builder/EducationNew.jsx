@@ -1,18 +1,20 @@
 'use client';
 import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
-import { Controller } from "react-hook-form";
-import Datepicker from "../utils/Datepicker";
+import { Controller, useFormContext } from "react-hook-form";
+import { HiSparkles } from "react-icons/hi";
+import { TbDragDrop } from 'react-icons/tb';
+import { FaTrash } from 'react-icons/fa';
+import Datepicker from "../ui/Datepicker";
+import TipTapEditor from "../editor/TipTapEditor";
 
 const EducationNew = ({ register, watch, control, fields, append, remove, move }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState(null);
+  const { setValue } = useFormContext();
 
   const handleDragStart = (e, index) => {
-    // Only allow drag if it started from our handle logic
     if (!isHandleHovered) {
       e.preventDefault();
       return;
@@ -26,27 +28,19 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move }
     setIsHandleHovered(false);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
-
     move(draggedIndex, targetIndex);
     setDraggedIndex(null);
   };
 
-  const addMore = () => {
-    append({}); 
-  };
-
-  const deleteEmp = (index) => {
-    if (fields.length > 1) {
+  const handleDelete = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
       remove(index);
-    }
+      setDeletingIndex(null);
+    }, 500);
   };
 
   return (
@@ -63,156 +57,169 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move }
           {fields.map((item, index) => {
             const watchedSchool = watch(`educationHistory.${index}.school`);
             const watchedDegree = watch(`educationHistory.${index}.degree`);
+            const isCurrentlyStudying = watch(`educationHistory.${index}.isCurrentlyStudying`);
 
             return (
               <div
                 key={item.id}
-                draggable={isHandleHovered}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
+                onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${
-                  draggedIndex === index 
-                    ? "opacity-20 border-cyan-500 scale-95" 
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                } cursor-default`}
+                className={`flex items-start gap-2 transition-all duration-500 mb-3
+                  ${draggedIndex === index ? "opacity-20 scale-95" : "opacity-100"}
+                  ${deletingIndex === index ? "-translate-x-6 opacity-0" : ""} 
+                `}
               >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                <Accordion flush={true}>
-                  <AccordionPanel>
-                    <AccordionTitle className="p-4">
-                      <div className="flex items-center gap-3">
-                        {/* THE HANDLE: Only this part triggers the drag */}
-                        <button
-                          type="button"
-                          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                          onMouseEnter={() => setIsHandleHovered(true)}
-                          onMouseLeave={() => setIsHandleHovered(false)}
-                        >
-                          <RiDraggable className="text-xl text-gray-400" />
-                        </button>
+                {/* DRAG HANDLE */}
+                <div
+                  className="mt-5 cursor-grab active:cursor-grabbing group relative"
+                  draggable
+                  onMouseEnter={() => setIsHandleHovered(true)}
+                  onMouseLeave={() => setIsHandleHovered(false)}
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <TbDragDrop className="text-xl text-[#656e83] group-hover:text-[#800080]" />
+                  <span className="tooltip">Click and drag to move</span>
+                </div>
 
-                        <span className="font-bold text-sm text-gray-700">
-                          {watchedSchool || watchedDegree 
-                            ? `${watchedDegree || ''}${watchedSchool ? ' at ' + watchedSchool : ''}` 
+                <div className="flex-1">
+                  <div className="flex items-start gap-2 w-full">
+                    <Accordion collapseAll className="!border w-full !border-gray-300 rounded-lg !overflow-hidden bg-white shadow-sm">
+                      <AccordionPanel>
+                        <AccordionTitle className="p-4 font-semibold text-sm">
+                          {watchedSchool || watchedDegree
+                            ? `${watchedDegree || ''}${watchedSchool ? ' at ' + watchedSchool : ''}`
                             : "(Not specified)"}
-                        </span>
-                      </div>
-                    </AccordionTitle>
-                    <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        </AccordionTitle>
 
-                          {/* School */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              School
-                            </label>
-                            <input
-                              type="text"
-                              placeholder=""
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              {...register(`educationHistory.${index}.school`)}
-                            />
-                          </div>
-
-                          {/* Degree */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Degree
-                            </label>
-                            <input
-                              type="text"
-                              placeholder=""
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                             {...register(`educationHistory.${index}.degree`)}
-                            />
-                          </div>
-
-                          {/* Start & End Date */}
-                        <div className='date_area'>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Start & End Date
-                        </label>
-                        <div className='flex gap-5'>
-                     
-                          <div className="flex-1">
-                          <Controller
-                          control={control} 
-                          name={`educationHistory.${index}.startDate`}
-                          render={({ field }) => (
-                            <Datepicker 
-                              selectedDate={field.value} 
-                              onChange={(date) => field.onChange(date)} 
-                            />
-                          )}
-                        />
-                        </div>
-                          <div className="flex-1">
-                          <Controller
-                            control={control}
-                            name={`educationHistory.${index}.endDate`}
-                            render={({ field }) => (
-                              <Datepicker 
-                                selectedDate={field.value} 
-                                onChange={(date) => field.onChange(date)} 
+                        <AccordionContent className="pt-0">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* School */}
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 uppercase">School</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. University of Dhaka"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register(`educationHistory.${index}.school`)}
                               />
-                            )}
-                          />
-                        </div>
-                          </div>
-                      </div>
-                          
-                          {/* City */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              City, State
-                            </label>
-                            <input
-                              type="text"
-                              placeholder=""
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              {...register(`educationHistory.${index}.city_state`)}
-                            />
-                          </div>
+                            </div>
 
-                          {/* Description */}
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              Description
-                            </label>
-                            <textarea rows="4" className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm" placeholder="Write here..."
-                           {...register(`educationHistory.${index}.description`)}
-                            ></textarea>
+                            {/* Degree */}
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 uppercase">Degree</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Bachelor of Science"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register(`educationHistory.${index}.degree`)}
+                              />
+                            </div>
+
+                            {/* Start & End Date */}
+                            <div className='md:col-span-2'>
+                              <label className="block text-xs font-semibold text-gray-500 uppercase">Start & End Date</label>
+                              <div className='flex gap-2 mt-1'>
+                                <div className="flex-1">
+                                  <Controller
+                                    control={control}
+                                    name={`educationHistory.${index}.startDate`}
+                                    render={({ field }) => (
+                                      <Datepicker selectedDate={field.value} onChange={field.onChange} />
+                                    )}
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <Controller
+                                    control={control}
+                                    name={`educationHistory.${index}.endDate`}
+                                    render={({ field }) => (
+                                      <Datepicker
+                                        selectedDate={field.value}
+                                        onChange={field.onChange}
+                                        disabled={isCurrentlyStudying}
+                                      />
+                                    )}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Currently Studying Checkbox */}
+                              <div className="flex items-center gap-2 mt-2">
+                                <input
+                                  type="checkbox"
+                                  id={`currently-studying-${index}`}
+                                  checked={isCurrentlyStudying || false}
+                                  onChange={(e) => {
+                                    const isChecked = e.target.checked;
+                                    setValue(`educationHistory.${index}.isCurrentlyStudying`, isChecked);
+                                    setValue(`educationHistory.${index}.endDate`, isChecked ? 'PRESENT' : '');
+                                  }}
+                                  className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                                />
+                                <label htmlFor={`currently-studying-${index}`} className="text-sm text-gray-700 cursor-pointer">
+                                  I currently study here
+                                </label>
+                              </div>
+                            </div>
+
+                            {/* City */}
+                            <div className="md:col-span-2">
+                              <label className="block text-xs font-semibold text-gray-500 uppercase">City, State</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Dhaka, Bangladesh"
+                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                {...register(`educationHistory.${index}.city_state`)}
+                              />
+                            </div>
+
+                            {/* Description with TipTap */}
+                            <div className="md:col-span-2">
+                              <label className="block text-xs font-semibold text-gray-500 uppercase">Description</label>
+                              <Controller
+                                name={`educationHistory.${index}.description`}
+                                control={control}
+                                render={({ field }) => <TipTapEditor value={field.value} onChange={field.onChange} />}
+                              />
+                              <div className="relative flex justify-end mt-1">
+                                <button type="button" className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] hover:bg-[#ebdcfc] transition-colors">
+                                  <HiSparkles className="text-md" />
+                                  Get help with writing
+                                </button>
+                              </div>
+                            </div>
                           </div>
+                        </AccordionContent>
+                      </AccordionPanel>
+                    </Accordion>
 
-                          {/* Delete Button inside the Content */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                          <button 
-                            type="button" 
-                            onClick={() => deleteEmp(index)}
-                            className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                          >
-                            <MdDelete className='text-lg' /> 
-                          </button>
-                        </div>
-
-                      </div>
-                  </AccordionContent>
-                </AccordionPanel>
-              </Accordion>
+                    {/* DELETE BUTTON */}
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(index)}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        title="Delete this education"
+                      >
+                        <FaTrash className="text-sm" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            )
+            );
           })}
         </div>
-          
-          <div className='mt-4'>
-            <button type="button" onClick={addMore} className='flex items-center gap-2 text-blue-500 font-bold'>
-                <FaPlus /> Add one more education
-            </button>
-          </div>
-        </div >
+
+        <button
+          type="button"
+          onClick={() => append({})}
+          className="text-sm !text-[#800080] font-medium mt-4 hover:underline inline-block"
+        >
+          + Add one more education
+        </button>
+      </div>
     </>
   );
 };
