@@ -88,9 +88,9 @@ export default function TipTapEditor({ value, onChange }) {
         </span>
     );
     return (
-        <div className="border rounded-md text-sm bg-white">
+        <div className=" rounded-md text-sm bg-white">
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center gap-1 border-b px-2 py-1 bg-gray-50">
+            <div className="flex flex-wrap items-center gap-1 px-2 py-1 bg-gray-50">
 
                 <button type="button" className={btn(editor.isActive("bold"))}
                     onClick={() => editor.chain().focus().toggleBold().run()}>

@@ -1644,6 +1644,16 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+
+        // toggle hideExperienceLevel
+        if (skillId === null) {
+          return {
+            ...section,
+            [field]: value,
+          };
+        }
+
+        // delete skill
         if (field === "delete") {
           return {
             ...section,
@@ -1652,6 +1662,8 @@ const Page = () => {
             ),
           };
         }
+
+        // update skill
         return {
           ...section,
           skills: section.skills.map(skill =>
@@ -1663,8 +1675,6 @@ const Page = () => {
       })
     );
   };
-
-
 
   // Education handlers
   const handleEducationDragStart = (e, index) => {
@@ -1961,21 +1971,33 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+
+        if (itemIndex === null) {
+          return {
+            ...section,
+            [field]: value,
+          };
+        }
+
+        // delete
         if (field === "delete") {
           return {
             ...section,
             items: section.items.filter((_, idx) => idx !== itemIndex),
           };
         }
+
+        // update name / level
         return {
           ...section,
           items: section.items.map((item, idx) =>
-            idx === itemIndex ? value : item
+            idx === itemIndex ? { ...item, [field]: value } : item
           ),
         };
       })
     );
   };
+
 
 
 
@@ -2040,7 +2062,7 @@ const Page = () => {
               />
 
               {/* Personal Details */}
-              <ImpPersonalDetails register={register} watch={watch} selectedTemplate={selectedTemplate} setValue={setValue}/>
+              <ImpPersonalDetails register={register} watch={watch} selectedTemplate={selectedTemplate} setValue={setValue} />
 
               {/* Dynamic Sections */}
               <div className="space-y-2">

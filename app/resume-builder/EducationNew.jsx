@@ -202,7 +202,7 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move }
                         className="text-gray-400 hover:text-red-500 transition-colors"
                         title="Delete this education"
                       >
-                        <FaTrash className="text-sm" />
+                        <FaTrash className="text-sm text-gray-400 hover:text-red-500 transition-colors" />
                       </button>
                     </div>
                   </div>

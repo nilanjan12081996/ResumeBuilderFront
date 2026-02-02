@@ -42,14 +42,14 @@ const AddSection = ({ onSelectSection }) => {
                     className={`flex items-center gap-3 p-4 rounded-lg border transition-all text-left group
                         ${section.isLocked 
                             ? 'bg-gray-50 border-gray-100 cursor-not-allowed opacity-60' 
-                            : 'bg-white border-gray-200 hover:border-blue-500 hover:shadow-md cursor-pointer'
+                            : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
                         }`}
                 >
-                    <div className={`text-2xl ${section.id === 'custom' ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                    <div className={`text-2xl ${section.id === 'custom' ? 'text-[#800080]' : 'text-gray-400 group-hover:text-gray-600'}`}>
                         {section.icon}
                     </div>
                     <div className="flex-1">
-                        <span className={`font-medium block ${section.id === 'custom' ? 'text-blue-500' : 'text-gray-700'}`}>
+                        <span className={`font-medium block ${section.id === 'custom' ? 'text-[#800080]' : 'text-gray-700'}`}>
                             {section.label}
                         </span>
                     </div>

@@ -13,6 +13,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
 
     const [editingSkillIndex, setEditingSkillIndex] = useState(null);
     const [deletingSkillIndex, setDeletingSkillIndex] = useState(null);
+    const hideExperienceLevel = section.hideExperienceLevel || false;
 
     const handleDelete = (sIndex, skillId) => {
         setDeletingSkillIndex(sIndex);
@@ -27,10 +28,24 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
 
     return (
         <>
-            <p className="!text-sm !font-medium !text-gray-500 mb-4">
-                Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing.
-            </p>
+            <div>
+                <p className="!text-sm !font-medium !text-gray-500">
+                    Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing.
+                </p>
 
+                <div className="flex items-center gap-2 my-1">
+                    <input
+                        id="hideLevelToggleImp"
+                        type="checkbox"
+                        className="!w-4 !h-4 text-[#800080] bg-gray-100 border-gray-300 rounded focus:ring-[#800080]"
+                        checked={hideExperienceLevel}
+                        onChange={(e) => handleSkillUpdate(sectionIndex, null, "hideExperienceLevel", e.target.checked)}
+                    />
+                    <label htmlFor="hideLevelToggleImp" className="text-sm font-medium text-gray-500 cursor-pointer">
+                        Don't show experience level
+                    </label>
+                </div>
+            </div>
             {section.skills.map((skill, sIndex) => {
                 const isEditing = editingSkillIndex === sIndex;
 
@@ -44,7 +59,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                             flex items-center justify-between gap-4 mb-2 p-2 !border-b !border-gray-300
                             transition-all duration-300 ease-in-out
                             ${draggedSkillIndex === sIndex ? "opacity-20 scale-95" : ""}
-                            ${deletingSkillIndex === sIndex ? "-translate-x-6 opacity-0 bg-red-400" : "bg-white"}
+                            ${deletingSkillIndex === sIndex ? "-translate-x-6 opacity-0" : ""}
                             `}
 
                     >
@@ -106,35 +121,37 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                         </div>
 
                         {/* Skill Level */}
-                        <div className="flex flex-col items-center gap-1">
-                            {/* Level Label */}
-                            <span className="text-xs font-medium text-gray-600">
-                                {levels[skill.level]} {/* Shows current level like "Expert" */}
-                            </span>
+                        {!hideExperienceLevel && (
+                            <div className="flex flex-col items-center gap-1">
+                                {/* Level Label */}
+                                <span className="text-xs font-medium text-gray-600">
+                                    {levels[skill.level]} {/* Shows current level like "Expert" */}
+                                </span>
 
-                            {/* Level Circles */}
-                            <Tabs
-                                selectedIndex={skill.level}
-                                onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
-                            >
-                                <TabList className="flex gap-1">
-                                    {levels.map((lvl, i) => (
-                                        <Tab key={i} className="outline-none">
-                                            <div
-                                                className={`
+                                {/* Level Circles */}
+                                <Tabs
+                                    selectedIndex={skill.level}
+                                    onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
+                                >
+                                    <TabList className="flex gap-1">
+                                        {levels.map((lvl, i) => (
+                                            <Tab key={i} className="outline-none">
+                                                <div
+                                                    className={`
               w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300
               ${skill.level === i ? "scale-110 border border-[#800080] shadow-md" : "opacity-60 hover:opacity-100"}
             `}
-                                                style={{ backgroundColor: tabColors[i], color: textColor[i] }}
-                                                title={lvl}
-                                            >
-                                                {i + 1}
-                                            </div>
-                                        </Tab>
-                                    ))}
-                                </TabList>
-                            </Tabs>
-                        </div>
+                                                    style={{ backgroundColor: tabColors[i], color: textColor[i] }}
+                                                    title={lvl}
+                                                >
+                                                    {i + 1}
+                                                </div>
+                                            </Tab>
+                                        ))}
+                                    </TabList>
+                                </Tabs>
+                            </div>
+                        )}
 
                     </div>
                 );

@@ -274,7 +274,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
                 <button
                   type="button"
                   onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
-                  className="flex items-center gap-2 !text-[#800080] hover:!text-[#b98ab9] font-medium transition-colors"
+                  className="flex items-center gap-2 !text-sm !text-[#800080] hover:!text-[#b98ab9] font-medium transition-colors"
                 >
                   {showAdditionalDetails ? (
                     <>

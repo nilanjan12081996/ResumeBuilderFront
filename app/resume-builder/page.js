@@ -235,11 +235,13 @@ const page = () => {
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
-  const onSubmit = (data) => {
-    // If we haven't saved initially yet
+ const onSubmit = (data) => {
+    // Determine if we are on the last step
+    const isLastStep = step === STEPS.length;
+
+    // 1. Initial Save (If we don't have IDs yet)
     if (!resumeIds.mongo_id) {
       setSavingStatus('saving');
-      // Add resume_type to the data we are saving
       const dataToSave = { ...data, resume_type: "scratch" };
 
       dispatch(saveResumeNew(dataToSave)).then((res) => {
@@ -253,17 +255,16 @@ const page = () => {
               mysql_id: newMysqlId
             });
 
-            // Initialize lastSavedData with what we submitted
             lastSavedData.current = JSON.parse(JSON.stringify(data));
-
             setSavingStatus('saved');
 
-            // Proceed to next step
-            if (step < STEPS.length) {
+            if (isLastStep) {
+              // Jodi prothom save-ei user finish click kore thake
+              router.push(`/resume-builder-edit?id=${newMysqlId}&fetch=scratch_resume`);
+            } else {
               nextStep();
             }
           } else {
-            router.push('/resume-builder-edit');
             setSavingStatus('error');
             toast.error("Error saving resume: Missing IDs");
           }
@@ -272,13 +273,18 @@ const page = () => {
           toast.error("Error saving resume");
         }
       });
-    } else {
-      // We are in edit mode, just go to next step (auto-save handles data)
-      if (step < STEPS.length) {
-        nextStep();
+    } 
+    // 2. Update Mode (Already have IDs)
+    else {
+      if (isLastStep) {
+        // Jodi itomoddhei auto-save hoye thake, tahole direct redirect
+        if (resumeIds.mysql_id) {
+          router.push(`/resume-builder-edit?id=${resumeIds.mysql_id}&fetch=scratch_resume`);
+        } else {
+          toast.error("Resume ID not found. Please wait...");
+        }
       } else {
-        // router.push('/resume-builder-edit');
-        console.log("Final Submission:", data);
+        nextStep();
       }
     }
   };
@@ -360,7 +366,7 @@ const page = () => {
         <div className='lg:flex gap-1 pb-0'>
 
           <ToastContainer />
-          <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0'>
+          <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] mb-4 lg:mb-0 '>
 
             {activeTab === 'edit' ?
               <FormProvider {...methods}>
@@ -874,6 +880,7 @@ const page = () => {
                                 register={register}
                                 watch={watch}
                                 control={control}
+                                setValue={setValue}
                                 fields={customFields}
                                 append={customAppend}
                                 remove={customRemove}
@@ -1013,93 +1020,6 @@ const page = () => {
               <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} resumeSettings={resumeSettings} />
             </div>
           </div>
-
-          {/* add modal for apply job start here */}
-          <Modal size="3xl" className="apply_modal_area" show={openModalAnalyzeResume} onClose={() => setOpenModalAnalyzeResume(false)}>
-            <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
-            <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
-              <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3'>
-                <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-                <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                  <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-                </div>
-                <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[30px] lg:bottom-[-130px] bottom-[130px] p-5'>
-                  <Image src={resume_score} alt="resume_score" className='mb-0' />
-                </div>
-              </div>
-              <div>
-                <p className='text-[14px] text-[#DF1B35] font-semibold pb-0'>Important Note: </p>
-                <p className='text-[14px] text-[#626262]'>Unlock enhanced features and maximize your potential by upgrading to our Premium packages.</p>
-              </div>
-            </ModalBody>
-          </Modal>
-          {/* add modal for apply job ends here */}
-
-          {/* add modal for apply job start here */}
-          <Modal size="6xl" className="apply_modal_area" show={openModalAnalyzeResumeBig} onClose={() => setOpenModalAnalyzeResumeBig(false)}>
-            <ModalHeader className='bg-white text-black border-0 pt-2 pr-2'>&nbsp;</ModalHeader>
-            <ModalBody className='bg-white p-5 rounded-b-[4px] relative'>
-              <div className='flex gap-4'>
-                <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
-                  <h3 className='text-base font-medium mb-4 text-[#151515]'>Before</h3>
-                  <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                    <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-                  </div>
-                  <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute left-[10px] bottom-[20px] p-5'>
-                    <Image src={resume_score} alt="resume_score" className='mb-0' />
-                  </div>
-                </div>
-                <div className='border border-[#E5E5E5] rounded-[8px] p-5 mb-3 w-6/12 relative'>
-                  <h3 className='text-base font-medium mb-4 text-[#151515]'>After</h3>
-                  <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-                    <Image src={resume_sections_view} alt="resume_sections_view" className='' />
-                  </div>
-                  <div className='bg-[#FFFFFF] rounded-[10px] shadow-2xl absolute right-[10px] bottom-[20px] p-5'>
-                    <Image src={resume_score2} alt="resume_score2" className='mb-0' />
-                  </div>
-                </div>
-              </div>
-            </ModalBody>
-          </Modal>
-          {/* add modal for apply job ends here */}
-          <Modal
-            show={openPreviewModal}
-            size="6xl"
-            onClose={() => setOpenPreviewModal(false)}
-          >
-            <ModalHeader className='text-black border-0 pt-2 pr-2'>
-              Preview
-            </ModalHeader>
-            <ModalBody className='bg-white p-5 rounded-b-[4px]'>
-              <div className='border border-[#E5E5E5] rounded-[8px] p-5'>
-                {template == 1 && (
-                  <Template1
-                    data={formValues}
-                    education={educationEntries}
-                    experiences={experiences}
-                    skills={skills}
-                    languages={languages}
-                    personalPro={personalPro}
-                    achivments={achivments}
-                    certificates={certificates}
-                  />
-                )}
-                {template == 2 && (
-                  <Template2
-                    data={formValues}
-                    education={educationEntries}
-                    experiences={experiences}
-                    skills={skills}
-                    languages={languages}
-                    personalPro={personalPro}
-                    achivments={achivments}
-                    certificates={certificates}
-                  />
-                )}
-              </div>
-            </ModalBody>
-          </Modal>
-
         </div>
       </Tabs>
     </div>

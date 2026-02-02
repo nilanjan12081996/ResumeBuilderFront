@@ -19,6 +19,7 @@ const ImpCoreCompetencies = ({
 
   const [editingIndex, setEditingIndex] = useState(null);
   const [deletingIndex, setDeletingIndex] = useState(null);
+  const hideExperienceLevel = section.hideExperienceLevel || false;
 
   const handleDelete = (index) => {
     setDeletingIndex(index);
@@ -30,9 +31,24 @@ const ImpCoreCompetencies = ({
 
   return (
     <>
-      <p className="!text-sm !font-medium !text-gray-500 mb-4">
+      <p className="!text-sm !font-medium !text-gray-500">
         Highlight your strongest competencies relevant to the role.
       </p>
+
+
+      <div className="flex items-center gap-2 my-1">
+        <input
+          type="checkbox"
+          className="!w-4 !h-4 text-[#800080]"
+          checked={hideExperienceLevel}
+          onChange={(e) =>
+            handleUpdate(sectionIndex, null, "hideExperienceLevel", e.target.checked)
+          }
+        />
+        <label className="text-sm text-gray-500 cursor-pointer">
+          Don't show experience level
+        </label>
+      </div>
 
       {section.items.map((item, i) => {
         const isEditing = editingIndex === i;
@@ -64,21 +80,22 @@ const ImpCoreCompetencies = ({
             <div className="flex-1">
               {isEditing ? (
                 <input
-                  value={item}
+                  value={item.name}
                   autoFocus
                   onChange={(e) =>
-                    handleUpdate(sectionIndex, i, "value", e.target.value)
+                    handleUpdate(sectionIndex, i, "name", e.target.value)
                   }
                   onBlur={() => {
                     setEditingIndex(null);
-                    if (!item.trim()) handleDelete(i);
+                    if (!item.name.trim()) handleDelete(i);
                   }}
                   className="w-full text-sm border-b outline-none bg-transparent"
                 />
+
               ) : (
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">
-                    {item || "Your Competency"}
+                    {item.name || "Your Competency"}
                   </span>
 
                   <div className="flex items-center gap-2
@@ -103,30 +120,43 @@ const ImpCoreCompetencies = ({
             </div>
 
             {/* Level */}
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-medium text-gray-600">
-                {levels[3]}
-              </span>
+            {!hideExperienceLevel && (
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-xs font-medium text-gray-600">
+                  {levels[item.level]}
+                </span>
 
-              <Tabs selectedIndex={3}>
-                <TabList className="flex gap-1">
-                  {levels.map((lvl, idx) => (
-                    <Tab key={idx} className="outline-none">
-                      <div
-                        className="w-6 h-6 flex items-center justify-center rounded-full opacity-60"
-                        style={{
-                          backgroundColor: tabColors[idx],
-                          color: textColor[idx]
-                        }}
-                        title={lvl}
-                      >
-                        {idx + 1}
-                      </div>
-                    </Tab>
-                  ))}
-                </TabList>
-              </Tabs>
-            </div>
+                <Tabs
+                  selectedIndex={item.level}
+                  onSelect={(tabIndex) =>
+                    handleUpdate(sectionIndex, i, "level", tabIndex)
+                  }
+                >
+                  <TabList className="flex gap-1">
+                    {levels.map((lvl, idx) => (
+                      <Tab key={idx} className="outline-none">
+                        <div
+                          className={`
+                w-6 h-6 flex items-center justify-center rounded-full cursor-pointer
+                ${item.level === idx
+                              ? "scale-110 border border-[#800080]"
+                              : "opacity-60"}
+              `}
+                          style={{
+                            backgroundColor: tabColors[idx],
+                            color: textColor[idx],
+                          }}
+                          title={lvl}
+                        >
+                          {idx + 1}
+                        </div>
+                      </Tab>
+                    ))}
+                  </TabList>
+                </Tabs>
+              </div>
+            )}
+
           </div>
         );
       })}

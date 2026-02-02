@@ -530,7 +530,7 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
 
   return (
     <div className="h-screen overflow-y-auto hide-scrollbar">
-      <div className="h-[297mm] w-full bg-white text-gray-800 font-sans shadow-lg resume-root"
+      <div className="min-h-[297mm] w-full bg-white text-gray-800 font-sans shadow-lg resume-root"
         style={{
           padding: `${layout.topBottom}pt ${layout.leftRight}pt`,
           fontFamily: text.primaryFont,

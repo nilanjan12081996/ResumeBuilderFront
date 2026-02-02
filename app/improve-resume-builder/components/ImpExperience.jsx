@@ -6,13 +6,14 @@ import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
 import { HiPlus, HiMinus } from "react-icons/hi";
 import { TbDragDrop } from 'react-icons/tb';
 import { FaTrash } from 'react-icons/fa';
+import Datepicker from "../../ui/Datepicker";
 
 
 const ImpExperience = ({
   section,
   sectionIndex,
   handleExpUpdate,
-  handleExpDragStart,
+  handleExpDragStart, 
   handleExpDrop,
   handleAddExperience,
   draggedExpIndex,
@@ -94,26 +95,42 @@ const ImpExperience = ({
                       />
                     </div>
 
-                    <div>
-                      <Label className="!text-sm !font-medium !text-gray-500">Start Date</Label>
-                      <input
-                        value={exp.startDate}
-                        onChange={(e) =>
-                          handleExpUpdate(sectionIndex, exp.id, "startDate", e.target.value)
-                        }
-                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                      />
-                    </div>
+                    {/* Date Section */}
+                    <div className='md:col-span-2'>
+                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
+                      <div className='flex gap-2 mt-1'>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={exp.startDate}
+                            onChange={(date) => handleExpUpdate(sectionIndex, exp.id, "startDate", date)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={exp.endDate}
+                            onChange={(date) => handleExpUpdate(sectionIndex, exp.id, "endDate", date)}
+                            disabled={exp.isCurrentlyWorking}
+                          />
+                        </div>
+                      </div>
 
-                    <div>
-                      <Label className="!text-sm !font-medium !text-gray-500">End Date</Label>
-                      <input
-                        value={exp.endDate}
-                        onChange={(e) =>
-                          handleExpUpdate(sectionIndex, exp.id, "endDate", e.target.value)
-                        }
-                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                      />
+                      {/* Currently Working Checkbox */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="checkbox"
+                          id={`currently-working-${exp.id}`}
+                          checked={exp.isCurrentlyWorking || false}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            handleExpUpdate(sectionIndex, exp.id, "isCurrentlyWorking", isChecked);
+                            handleExpUpdate(sectionIndex, exp.id, "endDate", isChecked ? 'PRESENT' : '');
+                          }}
+                          className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                        />
+                        <label htmlFor={`currently-working-${exp.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          I currently work here
+                        </label>
+                      </div>
                     </div>
 
                     <div className="col-span-2">

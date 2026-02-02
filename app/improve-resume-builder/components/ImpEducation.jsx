@@ -189,6 +189,7 @@ import { TbDragDrop } from 'react-icons/tb';;
 import { FaPlus, FaMinus } from "react-icons/fa6";
 import TipTapEditor from "../../editor/TipTapEditor";
 import { FaTrash } from "react-icons/fa";
+import Datepicker from "../../ui/Datepicker";
 
 const ImpEducation = ({
   section,
@@ -209,14 +210,14 @@ const ImpEducation = ({
 
   const [deletingEduIndex, setDeletingEduIndex] = useState(null);
 
-const handleDeleteEducation = (eduIndex, eduId) => {
-  setDeletingEduIndex(eduIndex);
+  const handleDeleteEducation = (eduIndex, eduId) => {
+    setDeletingEduIndex(eduIndex);
 
-  setTimeout(() => {
-    handleEducationUpdate(sectionIndex, eduId, "delete");
-    setDeletingEduIndex(null);
-  }, 500);
-};
+    setTimeout(() => {
+      handleEducationUpdate(sectionIndex, eduId, "delete");
+      setDeletingEduIndex(null);
+    }, 500);
+  };
 
   return (
     <>
@@ -305,42 +306,42 @@ const handleDeleteEducation = (eduIndex, eduId) => {
                       />
                     </div>
 
-                    <div>
-                      <Label className="!text-sm !font-medium !text-gray-500">
-                        Start Date
-                      </Label>
-                      <input
-                        placeholder="MM / YYYY"
-                        value={edu.startDate}
-                        onChange={(e) =>
-                          handleEducationUpdate(
-                            sectionIndex,
-                            edu.id,
-                            "startDate",
-                            e.target.value,
-                          )
-                        }
-                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                      />
-                    </div>
+                    {/* Date Section */}
+                    <div className="md:col-span-2">
+                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
+                      <div className="flex gap-2 mt-1">
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={edu.startDate}
+                            onChange={(date) => handleEducationUpdate(sectionIndex, edu.id, "startDate", date)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={edu.endDate}
+                            onChange={(date) => handleEducationUpdate(sectionIndex, edu.id, "endDate", date)}
+                            disabled={edu.isCurrentlyStudying}
+                          />
+                        </div>
+                      </div>
 
-                    <div>
-                      <Label className="!text-sm !font-medium !text-gray-500">
-                        End Date
-                      </Label>
-                      <input
-                        placeholder="MM / YYYY"
-                        value={edu.endDate}
-                        onChange={(e) =>
-                          handleEducationUpdate(
-                            sectionIndex,
-                            edu.id,
-                            "endDate",
-                            e.target.value,
-                          )
-                        }
-                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                      />
+                      {/* Currently Studying Checkbox */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="checkbox"
+                          id={`currently-studying-${edu.id}`}
+                          checked={edu.isCurrentlyStudying || false}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            handleEducationUpdate(sectionIndex, edu.id, "isCurrentlyStudying", isChecked);
+                            handleEducationUpdate(sectionIndex, edu.id, "endDate", isChecked ? 'PRESENT' : '');
+                          }}
+                          className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                        />
+                        <label htmlFor={`currently-studying-${edu.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          I currently study here
+                        </label>
+                      </div>
                     </div>
 
                     <div className="col-span-2">

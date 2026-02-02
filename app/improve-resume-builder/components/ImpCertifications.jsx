@@ -4,6 +4,7 @@ import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } fr
 import TipTapEditor from '../../editor/TipTapEditor';
 import { TbDragDrop } from 'react-icons/tb';
 import { FaTrash } from 'react-icons/fa';
+import Datepicker from "../../ui/Datepicker";
 
 
 const ImpCertifications = ({
@@ -97,15 +98,42 @@ const ImpCertifications = ({
                       />
                     </div>
 
-                    <div>
-                      <Label className="!text-sm !font-medium !text-gray-500">Start Year</Label>
-                      <input
-                        value={cert.startYear}
-                        onChange={(e) =>
-                          handleCertUpdate(sectionIndex, cert.id, "startYear", e.target.value)
-                        }
-                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                      />
+                    {/* Date Section */}
+                    <div className='md:col-span-2'>
+                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
+                      <div className='flex gap-2 mt-1'>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={cert.startYear}
+                            onChange={(date) => handleCertUpdate(sectionIndex, cert.id, "startYear", date)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={cert.endYear}
+                            onChange={(date) => handleCertUpdate(sectionIndex, cert.id, "endYear", date)}
+                            disabled={cert.isOngoing}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Ongoing Checkbox */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="checkbox"
+                          id={`ongoing-cert-${cert.id}`}
+                          checked={cert.isOngoing || false}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            handleCertUpdate(sectionIndex, cert.id, "isOngoing", isChecked);
+                            handleCertUpdate(sectionIndex, cert.id, "endYear", isChecked ? 'PRESENT' : '');
+                          }}
+                          className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                        />
+                        <label htmlFor={`ongoing-cert-${cert.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          This certification does not expire / Ongoing
+                        </label>
+                      </div>
                     </div>
 
                     <div>

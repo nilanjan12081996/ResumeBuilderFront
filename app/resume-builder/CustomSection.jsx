@@ -1,18 +1,24 @@
 'use client';
-import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
+import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
 import { useState, useEffect, useRef } from "react";
-import { FaPlus, FaPen } from "react-icons/fa6";
 import { Controller, useFieldArray } from "react-hook-form";
-import Datepicker from "../utils/Datepicker";
+import Datepicker from "../ui/Datepicker";
+import { TbDragDrop } from "react-icons/tb";
+import TipTapEditor from "../editor/TipTapEditor";
+import { FaPen, FaTrash } from "react-icons/fa6";
 
-const CustomSection = ({ register, watch, control, sectionId, removeSection }) => {
+const CustomSection = ({
+  register,
+  watch,
+  control,
+  sectionId,
+  removeSection,
+  setValue
+}) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState(null);
 
-  // Initialize useFieldArray with a dynamic name based on sectionId
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: `customSectionHistory_${sectionId}`,
@@ -27,211 +33,196 @@ const CustomSection = ({ register, watch, control, sectionId, removeSection }) =
     }
   }, [fields, append]);
 
-  const handleDragStart = (e, index) => {
-    if (!isHandleHovered) {
-      e.preventDefault();
-      return;
-    }
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
+  const titleField = `customSectionTitle_${sectionId}`;
+  const sectionTitle = watch(titleField);
 
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setIsHandleHovered(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
-    move(draggedIndex, targetIndex);
-    setDraggedIndex(null);
-  };
-
-  const addMore = () => {
-    append({}); 
-  };
-
-  const deleteItem = (index) => {
+  // Animated Delete Logic
+  const handleDeleteItem = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
       remove(index);
+      setDeletingIndex(null);
+    }, 500);
   };
-
-  // Dynamic title field name
-  const titleFieldName = `customSectionTitle_${sectionId}`;
-  const sectionTitle = watch(titleFieldName);
 
   return (
     <>
-      <div className='mb-4 group flex justify-between items-start'>
+      {/* ===== SECTION HEADER (WITH DYNAMIC RENAME) ===== */}
+      <div className="mb-4 group flex justify-between items-start">
         <div>
-            <div className="flex items-center gap-2 pb-1">
-                {isEditingTitle ? (
-                    <input
-                        type="text"
-                        {...register(titleFieldName)}
-                        className="text-xl font-bold text-black border-b border-gray-300 focus:border-cyan-500 outline-none bg-transparent px-1"
-                        autoFocus
-                        onBlur={() => setIsEditingTitle(false)}
-                        placeholder="Section Title"
-                    />
-                ) : (
-                    <h2 
-                        className='text-xl font-bold text-black cursor-pointer hover:text-cyan-600 flex items-center gap-2'
-                        onClick={() => setIsEditingTitle(true)}
-                    >
-                        {sectionTitle || "Custom Section"}
-                        <FaPen className="text-sm opacity-0 group-hover:opacity-100 text-gray-400" />
-                    </h2>
-                )}
+          <div className="flex items-center gap-2 pb-1">
+            {isEditingTitle ? (
+              <input
+                {...register(titleField)}
+                className="text-xl font-bold border-b-2 border-[#800080] outline-none bg-transparent focus:ring-0 p-0"
+                autoFocus
+                onBlur={() => setIsEditingTitle(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setIsEditingTitle(false)}
+                placeholder="Section Title"
+              />
+            ) : (
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                {sectionTitle || "Custom Section"}
+                <FaPen
+                  className="text-sm text-gray-400 hover:text-[#800080] cursor-pointer transition-colors"
+                  onClick={() => setIsEditingTitle(true)}
+                />
+              </h2>
+            )}
+            <div className="flex gap-2 ml-2">
+              <FaTrash
+                onClick={removeSection}
+                className="text-sm text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
+              />
             </div>
-            <p className='text-sm text-[#808897] font-medium'>
+          </div>
+          <p className="text-sm text-[#808897] font-medium">
             Add your own custom activities, achievements, or experiences.
-            </p>
+          </p>
         </div>
-        <button
-            type="button"
-            onClick={removeSection}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-            title="Delete Section"
-        >
-            <MdDelete size={20} />
-        </button>
       </div>
 
-      <div className=''>
-        <div className="space-y-3">
-          {fields.map((item, index) => {
-            const watchedActivity = watch(`customSectionHistory_${sectionId}.${index}.activity`);
-            const watchedCity = watch(`customSectionHistory_${sectionId}.${index}.city`);
+      {/* ===== ITEMS (WITH DELETE ANIMATION) ===== */}
+      <div className="space-y-3">
+        {fields.map((item, index) => {
+          const base = `customSectionHistory_${sectionId}.${index}`;
+          const title = watch(`${base}.activity`);
+          const city = watch(`${base}.city`);
+          const isOngoing = watch(`${base}.isOngoing`);
 
-            return (
-              <div
-                key={item.id}
-                draggable={isHandleHovered}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${
-                  draggedIndex === index 
-                    ? "opacity-20 border-cyan-500 scale-95" 
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                } cursor-default`}
+          return (
+            <div
+              key={item.id}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => move(draggedIndex, index)}
+              className={`
+                                flex items-start gap-2 transition-all duration-500 
+                                ${deletingIndex === index ? "-translate-x-10 opacity-0 scale-95" : "opacity-100"}
+                                ${draggedIndex === index ? "opacity-30 scale-95" : ""}
+                            `}
+            >
+              {/* DRAG HANDLE */}
+              <span
+                draggable
+                onDragStart={() => setDraggedIndex(index)}
+                onDragEnd={() => setDraggedIndex(null)}
+                className="mt-5 cursor-grab"
               >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                <Accordion flush={true}>
+                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
+              </span>
+
+              {/* ACCORDION WRAPPER */}
+              <div className="acco_section w-full flex gap-2">
+                <Accordion collapseAll className="!border !border-gray-300 w-full rounded-lg !overflow-hidden bg-white shadow-sm">
                   <AccordionPanel>
-                    <AccordionTitle className="p-4">
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                          onMouseEnter={() => setIsHandleHovered(true)}
-                          onMouseLeave={() => setIsHandleHovered(false)}
-                        >
-                          <RiDraggable className="text-xl text-gray-400" />
-                        </button>
-
-                        <span className="font-bold text-sm text-gray-700">
-                          {watchedActivity || watchedCity 
-                            ? `${watchedActivity || ''}${watchedCity ? ', ' + watchedCity : ''}` 
-                            : "(Not specified)"}
-                        </span>
-                      </div>
+                    <AccordionTitle className="!text-sm !font-semibold p-4">
+                      {title || city
+                        ? `${title || ""}${city ? ", " + city : ""}`
+                        : "(Not specified)"}
                     </AccordionTitle>
-                    <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Activity Name */}
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-500 uppercase">Activity name, job title, book title etc.</label>
+
+                    <AccordionContent className="pt-0">
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        {/* ITEM TITLE */}
+                        <div className="col-span-2">
+                          <Label className="!text-xs !font-semibold !text-gray-500 uppercase block mb-1">Title</Label>
                           <input
-                            type="text"
-                            placeholder="e.g. Project Lead"
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                            {...register(`customSectionHistory_${sectionId}.${index}.activity`)}
+                            className="w-full border border-gray-300 p-2 rounded-lg text-sm focus:ring-[#800080] focus:border-[#800080]"
+                            {...register(`${base}.activity`)}
+                            placeholder="e.g. Volunteer Work"
                           />
                         </div>
 
-                        {/* City */}
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-500 uppercase">City</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. New York"
-                             className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                            {...register(`customSectionHistory_${sectionId}.${index}.city`)}
-                          />
-                        </div>
-
-                        {/* Start & End Date */}
-                        <div className='md:col-span-1 date_area'>
-                          <label className="block text-sm font-medium text-gray-700">
-                              Start & End Date
-                            </label>
-                          <div className='flex gap-2 mt-1'>
+                        {/* DATE SECTION */}
+                        <div className="col-span-2">
+                          <Label className="!text-xs !font-semibold !text-gray-500 uppercase block mb-1">Start & End Date</Label>
+                          <div className="flex gap-2">
                             <Controller
                               control={control}
-                              name={`customSectionHistory_${sectionId}.${index}.startDate`}
+                              name={`${base}.startDate`}
                               render={({ field }) => (
-                                <Datepicker selectedDate={field.value} onChange={(date) => field.onChange(date)} />
+                                <Datepicker selectedDate={field.value} onChange={field.onChange} />
                               )}
                             />
                             <Controller
                               control={control}
-                              name={`customSectionHistory_${sectionId}.${index}.endDate`}
+                              name={`${base}.endDate`}
                               render={({ field }) => (
-                                <Datepicker selectedDate={field.value} onChange={(date) => field.onChange(date)} />
+                                <Datepicker
+                                  selectedDate={field.value}
+                                  onChange={field.onChange}
+                                  disabled={isOngoing}
+                                />
                               )}
                             />
                           </div>
+
+                          {/* ONGOING CHECKBOX */}
+                          <div className="flex items-center gap-2 mt-2">
+                            <input
+                              type="checkbox"
+                              id={`ongoing-${sectionId}-${index}`}
+                              {...register(`${base}.isOngoing`)}
+                              onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                setValue(`${base}.isOngoing`, isChecked);
+                                setValue(`${base}.endDate`, isChecked ? "PRESENT" : "");
+                              }}
+                              className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                            />
+                            <label htmlFor={`ongoing-${sectionId}-${index}`} className="text-sm text-gray-700 cursor-pointer">
+                              Ongoing (Present)
+                            </label>
+                          </div>
                         </div>
 
-                        {/* Description */}
-                        <div className="md:col-span-2">
-                          <label className="block text-xs font-semibold text-gray-500 uppercase">Description</label>
-                          <textarea 
-                            rows="4" 
-                            className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                            placeholder="Describe details..."
-                            {...register(`customSectionHistory_${sectionId}.${index}.description`)}
+                        {/* CITY */}
+                        <div className="col-span-2">
+                          <Label className="!text-xs !font-semibold !text-gray-500 uppercase block mb-1">City</Label>
+                          <input
+                            className="w-full border border-gray-300 p-2 rounded-lg text-sm focus:ring-[#800080] focus:border-[#800080]"
+                            {...register(`${base}.city`)}
+                            placeholder="e.g. Dhaka, Bangladesh"
                           />
                         </div>
 
-                        {/* Delete Button */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                          <button 
-                            type="button" 
-                            onClick={() => deleteItem(index)}
-                            className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                          >
-                            <MdDelete className='text-lg' /> 
-                          </button>
+                        {/* DESCRIPTION WITH TIPTAP */}
+                        <div className="col-span-2">
+                          <Label className="!text-xs !font-semibold !text-gray-500 uppercase block mb-1">Description</Label>
+                          <Controller
+                            name={`${base}.description`}
+                            control={control}
+                            render={({ field }) => (
+                              <TipTapEditor value={field.value} onChange={field.onChange} />
+                            )}
+                          />
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionPanel>
                 </Accordion>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteItem(index)}
+                  >
+                    <FaTrash className="text-sm text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1" />
+                  </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        <div className='mt-6'>
-          <button 
-            type="button" 
-            onClick={addMore} 
-            className='flex items-center gap-2 text-cyan-600 hover:text-cyan-700 font-bold transition-all p-2 rounded-lg hover:bg-cyan-50'
-          >
-            <FaPlus /> Add one more item
-          </button>
-        </div>
+            </div>
+          );
+        })}
       </div>
+
+      {/* ADD MORE BUTTON */}
+      <button
+        type="button"
+        onClick={() => append({})}
+        className="text-sm !text-[#800080] font-medium mt-4 hover:underline inline-block"
+      >
+        + Add one more item
+      </button>
     </>
   );
 };

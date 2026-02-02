@@ -2,6 +2,7 @@ import React from "react";
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
 import TipTapEditor from "../../editor/TipTapEditor";
+import Datepicker from "../../ui/Datepicker";
 
 const ImpAchievements = ({
   section,
@@ -13,7 +14,7 @@ const ImpAchievements = ({
   handleAdd,
   handleDragEnd
 }) => {
-    console.log('section',section)
+  console.log('section', section)
   return (
     <>
       <p className="text-sm text-gray-500 mb-3">
@@ -67,26 +68,42 @@ const ImpAchievements = ({
                       />
                     </div>
 
-                    <div>
-                      <Label>Start Date</Label>
-                      <input
-                        value={item.startDate}
-                        onChange={(e) =>
-                          handleUpdate(sectionIndex, item.id, "startDate", e.target.value)
-                        }
-                        className="w-full border p-2 text-sm rounded"
-                      />
-                    </div>
+                    {/* Date Section */}
+                    <div className='md:col-span-2'>
+                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
+                      <div className='flex gap-2 mt-1'>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={item.startDate}
+                            onChange={(date) => handleUpdate(sectionIndex, item.id, "startDate", date)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={item.endDate}
+                            onChange={(date) => handleUpdate(sectionIndex, item.id, "endDate", date)}
+                            disabled={item.isOngoing}
+                          />
+                        </div>
+                      </div>
 
-                    <div>
-                      <Label>End Date</Label>
-                      <input
-                        value={item.endDate}
-                        onChange={(e) =>
-                          handleUpdate(sectionIndex, item.id, "endDate", e.target.value)
-                        }
-                        className="w-full border p-2 text-sm rounded"
-                      />
+                      {/* Ongoing Checkbox */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="checkbox"
+                          id={`ongoing-${item.id}`}
+                          checked={item.isOngoing || false}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            handleUpdate(sectionIndex, item.id, "isOngoing", isChecked);
+                            handleUpdate(sectionIndex, item.id, "endDate", isChecked ? 'PRESENT' : '');
+                          }}
+                          className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                        />
+                        <label htmlFor={`ongoing-${item.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          Ongoing (Present)
+                        </label>
+                      </div>
                     </div>
                   </div>
 
