@@ -2,8 +2,8 @@
 import React from "react";
 import DynamicTempPage from "./DynamicTempPage";
 
-const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
-  ;
+const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings }) => {
+  console.log('sections',sections)
   const { text, layout } = resumeSettings;
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
@@ -98,7 +98,7 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
             marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
-          Professional Experience
+          {formData.employmentSectionTitle || "Professional Experience"}
         </h3>
         <div className="flex flex-col gap-4"
           style={{
@@ -165,7 +165,7 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
             marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
-          Education
+          {formData.educationSectionTitle || "Education"}
         </h3>
         <div className="flex flex-col gap-4"
           style={{
@@ -232,7 +232,7 @@ const PrimeATS = ({ formData, sectionOrder, themeColor, resumeSettings }) => {
             marginBottom: `${layout.betweenTitlesContent}pt`,
           }}
         >
-          Technical Skills
+          {formData.skillSectionTitle || "Skills"}
         </h3>
         <div className="grid grid-cols-2 gap-x-8 mt-2"
           style={{

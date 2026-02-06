@@ -323,6 +323,26 @@ export const saveResumeImprove = createAsyncThunk(
     }
 )
 
+export const saveResumeJd = createAsyncThunk(
+    'saveResumeJd',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/jd/resume/save', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 
 const initialState = {
     loading: false,
@@ -499,6 +519,19 @@ const ResumeSlice = createSlice(
                     state.error = false
                 })
                 .addCase(saveResumeImprove.rejected, (state, { payload }) => {
+                    state.loading = false
+                    state.error = payload
+                })
+
+                 .addCase(saveResumeJd.pending, (state) => {
+                    state.loading = true
+                })
+                .addCase(saveResumeJd.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.saveResumeData = payload
+                    state.error = false
+                })
+                .addCase(saveResumeJd.rejected, (state, { payload }) => {
                     state.loading = false
                     state.error = payload
                 })

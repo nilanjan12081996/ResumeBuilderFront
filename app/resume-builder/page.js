@@ -74,7 +74,7 @@ const page = () => {
   const [isCreated, setIsCreated] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const lastSavedData = useRef(null);
-  const [selectedTemplate, setSelectedTemplate] = useState('clear');
+  const [selectedTemplate, setSelectedTemplate] = useState('ats');
   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
 
   const templateMap = {
@@ -109,9 +109,19 @@ const page = () => {
   const [empHistory, setEmpHistory] = useState([{ id: 1 }])
   const [education, setEducation] = useState([{ id: 1 }])
   const [newskill, setNewSkill] = useState([{ id: 1 }])
+
+  const [empSectionTitle, setEmpSectionTitle] = useState("Professional Experience");
+  const [isEditingEmpTitle, setIsEditingEmpTitle] = useState(false);
+  const [eduSectionTitle, setEduSectionTitle] = useState("Education");
+  const [isEditingEduTitle, setIsEditingEduTitle] = useState(false);
+  const [skillSectionTitle, setSkillSectionTitle] = useState("Skills");
+  const [isEditingSkillTitle, setIsEditingSkillTitle] = useState(false);
   const methods = useForm({
     mode: "onChange",
     defaultValues: {
+      employmentSectionTitle: "Professional Experience",
+      educationSectionTitle: "Education",
+      skillSectionTitle: "Skills",
       employmentHistory: [{}],
       educationHistory: [{}],
       newSkillHistory: [{}],
@@ -135,7 +145,7 @@ const page = () => {
     control,
     formState: { errors },
   } = methods;
-  
+
 
   // Track which optional sections are active
   const [activeSections, setActiveSections] = useState([]);
@@ -235,7 +245,7 @@ const page = () => {
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
- const onSubmit = (data) => {
+  const onSubmit = (data) => {
     // Determine if we are on the last step
     const isLastStep = step === STEPS.length;
 
@@ -273,7 +283,7 @@ const page = () => {
           toast.error("Error saving resume");
         }
       });
-    } 
+    }
     // 2. Update Mode (Already have IDs)
     else {
       if (isLastStep) {
@@ -733,6 +743,10 @@ const page = () => {
                               append={empAppend}
                               remove={empRemove}
                               move={empMove}
+                              sectionTitle={empSectionTitle}
+                              setSectionTitle={setEmpSectionTitle}
+                              isEditingTitle={isEditingEmpTitle}
+                              setIsEditingTitle={setIsEditingEmpTitle}
                             />
                           </div>
                         )
@@ -750,6 +764,10 @@ const page = () => {
                               append={eduAppend}
                               remove={eduRemove}
                               move={eduMove}
+                              sectionTitle={eduSectionTitle}
+                              setSectionTitle={setEduSectionTitle}
+                              isEditingTitle={isEditingEduTitle}
+                              setIsEditingTitle={setIsEditingEduTitle}
                             />
                           </div>
                         )
@@ -768,6 +786,10 @@ const page = () => {
                               append={skillAppend}
                               remove={skillRemove}
                               move={skillMove}
+                              sectionTitle={skillSectionTitle}
+                              setSectionTitle={setSkillSectionTitle}
+                              isEditingTitle={isEditingSkillTitle}
+                              setIsEditingTitle={setIsEditingSkillTitle}
                             />
                           </div>
                         )

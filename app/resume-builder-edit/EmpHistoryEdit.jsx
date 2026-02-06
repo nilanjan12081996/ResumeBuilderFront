@@ -9,12 +9,11 @@ import {
 } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
 import { FaTrash } from "react-icons/fa";
-import { FaPlus } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
 
-const EmpHistory = ({
+const EmpHistoryEdit = ({
   register,
   watch,
   control,
@@ -22,6 +21,7 @@ const EmpHistory = ({
   append,
   remove,
   move,
+  setValue, 
   noHeader,
 }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
@@ -61,6 +61,7 @@ const EmpHistory = ({
       {fields.map((item, index) => {
         const job = watch(`employmentHistory.${index}.job_title`);
         const company = watch(`employmentHistory.${index}.employer`);
+        const isCurrentlyWorking = watch(`employmentHistory.${index}.isCurrentlyWorking`);
 
         return (
           <div
@@ -71,7 +72,6 @@ const EmpHistory = ({
               }`}
           >
             <div className="flex items-start gap-2">
-              {/* Drag Handle */}
               <span
                 draggable
                 onDragStart={(e) => handleDragStart(e, index)}
@@ -80,7 +80,6 @@ const EmpHistory = ({
                 <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
               </span>
 
-              {/* Accordion */}
               <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden">
                 <AccordionPanel>
                   <AccordionTitle className="font-semibold text-sm">
@@ -91,108 +90,102 @@ const EmpHistory = ({
 
                   <AccordionContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      {/* Job */}
                       <div>
                         <Label className="!text-sm !text-gray-500">Job Title</Label>
                         <input
                           {...register(`employmentHistory.${index}.job_title`)}
                           className="w-full rounded-md border p-2 text-sm"
+                          placeholder="e.g. Software Engineer"
                         />
                       </div>
 
-                      {/* Employer */}
                       <div>
                         <Label className="!text-sm !text-gray-500">Employer</Label>
                         <input
                           {...register(`employmentHistory.${index}.employer`)}
                           className="w-full rounded-md border p-2 text-sm"
+                          placeholder="e.g. Google"
                         />
                       </div>
 
-                      {/* Date */}
                       <div className="md:col-span-2">
                         <Label className="!text-sm !text-gray-500">
                           Start & End Date
                         </Label>
                         <div className="flex gap-2 mt-1">
-                          <Controller
-                            control={control}
-                            name={`employmentHistory.${index}.startDate`}
-                            render={({ field }) => (
-                              <Datepicker
-                                selectedDate={field.value}
-                                onChange={field.onChange}
-                              />
-                            )}
-                          />
-                          <Controller
-                            control={control}
-                            name={`employmentHistory.${index}.endDate`}
-                            render={({ field }) => {
-                              const isCurrent = watch(`employmentHistory.${index}.isCurrentlyWorking`);
-
-                              return isCurrent ? (
-                                <div className="w-full flex items-center px-3 rounded-md border text-sm text-gray-700">
-                                  Present
-                                </div>
-                              ) : (
+                          <div className="flex-1">
+                            <Controller
+                              control={control}
+                              name={`employmentHistory.${index}.startDate`}
+                              render={({ field }) => (
                                 <Datepicker
-                                  selectedDate={field.value || null}
-                                  onChange={(date) => field.onChange(date)}
+                                  selectedDate={field.value}
+                                  onChange={field.onChange}
                                 />
-                              );
-                            }}
-                          />
-
-
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="flex-1 relative">
+                            <Controller
+                              control={control}
+                              name={`employmentHistory.${index}.endDate`}
+                              render={({ field }) => (
+                                <>
+                                  <Datepicker
+                                    selectedDate={isCurrentlyWorking ? null : field.value}
+                                    onChange={field.onChange}
+                                    disabled={isCurrentlyWorking}
+                                  />
+                                  {isCurrentlyWorking && (
+                                    <div className="absolute inset-0 flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-gray-300 rounded-md pointer-events-none">
+                                      Present
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            />
+                          </div>
                         </div>
+
                         <div className="flex items-center gap-2 mt-2">
-                          <Controller
-                            control={control}
-                            name={`employmentHistory.${index}.isCurrentlyWorking`}
-                            defaultValue={false}
-                            render={({ field }) => (
-                              <input
-                                type="checkbox"
-                                checked={field.value}
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  field.onChange(checked);
-
-                                  if (checked) {
-                                    control.setValue(
-                                      `employmentHistory.${index}.endDate`,
-                                      null,
-                                      { shouldDirty: true, shouldValidate: true }
-                                    );
-                                  }
-                                }}
-                                className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080]"
-                              />
-                            )}
+                          <input
+                            type="checkbox"
+                            id={`currently-working-${index}`}
+                            checked={!!isCurrentlyWorking}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setValue(`employmentHistory.${index}.isCurrentlyWorking`, checked);
+                              if (checked) {
+                                // Template-এ "Present" পাঠানোর জন্য ভ্যালু সেট করা হলো
+                                setValue(`employmentHistory.${index}.endDate`, "Present");
+                              } else {
+                                // চেক তুলে দিলে ফিল্ড ক্লিয়ার হয়ে যাবে যাতে নতুন ডেট দেওয়া যায়
+                                setValue(`employmentHistory.${index}.endDate`, "");
+                              }
+                            }}
+                            className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080]"
                           />
-
-
-                          <label className="text-sm text-gray-700 cursor-pointer">
+                          <label 
+                            htmlFor={`currently-working-${index}`}
+                            className="text-sm text-gray-700 cursor-pointer"
+                          >
                             I currently work here
                           </label>
                         </div>
-
                       </div>
 
-                      {/* City */}
                       <div className="md:col-span-2">
                         <Label className="!text-sm !text-gray-500">City</Label>
                         <input
                           {...register(`employmentHistory.${index}.city_state`)}
                           className="w-full rounded-md border p-2 text-sm"
+                          placeholder="e.g. Kolkata, West Bengal"
                         />
                       </div>
 
-                      {/* Description */}
                       <div className="md:col-span-2">
-                        <Label className="text-sm text-gray-500">Description</Label>
-
+                        <Label className="!text-sm !text-gray-500">Description</Label>
                         <Controller
                           control={control}
                           name={`employmentHistory.${index}.description`}
@@ -201,21 +194,18 @@ const EmpHistory = ({
                             <TipTapEditor
                               value={field.value}
                               onChange={field.onChange}
-                              placeholder="Describe your role, responsibilities, and achievements"
                             />
                           )}
                         />
                       </div>
-
                     </div>
                   </AccordionContent>
                 </AccordionPanel>
               </Accordion>
 
-              {/* Delete */}
               <FaTrash
                 onClick={() => handleDelete(index)}
-                className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer"
+                className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
               />
             </div>
           </div>
@@ -225,12 +215,12 @@ const EmpHistory = ({
       <button
         type="button"
         onClick={() => append({})}
-        className="flex items-center gap-2 text-cyan-600 text-sm font-medium mt-2"
+        className="text-sm !text-[#800080] font-medium mt-4 hover:underline"
       >
-        <FaPlus /> Add one more employment
+        + Add one more employment
       </button>
     </>
   );
 };
 
-export default EmpHistory;
+export default EmpHistoryEdit;

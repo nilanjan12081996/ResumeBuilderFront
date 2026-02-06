@@ -4,8 +4,9 @@ import { Tabs, TabList, Tab } from "react-tabs";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { TbDragDrop } from "react-icons/tb";
 import 'react-tabs/style/react-tabs.css';
+import { useFormContext } from 'react-hook-form';
 
-const SkillsNew = ({ register, watch, setValue, fields, append, remove, move }) => {
+const SkillsNew = ({ register, watch, setValue, fields, append, remove, move,sectionTitle, setSectionTitle, isEditingTitle, setIsEditingTitle  }) => {
     const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
     const tabColors = ["#ffeaec", "#feebe3", "#fff2cc", "#e7f4ed", "#f1f2ff"];
     const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
@@ -13,6 +14,19 @@ const SkillsNew = ({ register, watch, setValue, fields, append, remove, move }) 
     const [editingIndex, setEditingIndex] = useState(null);
     const [draggedIndex, setDraggedIndex] = useState(null);
     const [deletingIndex, setDeletingIndex] = useState(null);
+    const { setValue: setFormValue } = useFormContext();
+
+    // Real-time update handler for Title
+    const handleTitleChange = (e) => {
+        const newTitle = e.target.value;
+        setSectionTitle(newTitle); // UI local state update
+        setFormValue("skillSectionTitle", newTitle); // Template real-time sync
+    };
+
+    const handleTitleBlur = () => {
+        setIsEditingTitle(false);
+        setFormValue("skillSectionTitle", sectionTitle); 
+    };
 
     const hideExperienceLevel = watch("hideExperienceLevel");
     const handleDelete = (index) => {
@@ -25,7 +39,26 @@ const SkillsNew = ({ register, watch, setValue, fields, append, remove, move }) 
     return (
         <>
             <div>
-                <h2 className='text-xl font-bold text-black pb-1'>Skills</h2>
+                <div className="acco_section flex items-center gap-2 group w-fit">
+                    {isEditingTitle ? (
+                        <input
+                            autoFocus
+                            className="text-xl font-bold text-black border-b-2 border-[#800080] outline-none"
+                            value={sectionTitle}
+                            onChange={handleTitleChange} // typing-er somoy real-time change hobe
+                            onBlur={handleTitleBlur}
+                            onKeyDown={(e) => e.key === 'Enter' && handleTitleBlur()}
+                        />
+                    ) : (
+                        <h2
+                            className='text-xl font-bold text-black pb-1 cursor-pointer flex items-center gap-3'
+                            onClick={() => setIsEditingTitle(true)}
+                        >
+                            {sectionTitle}
+                            <FaPen className="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-purple-600 cursor-pointer duration-200" />
+                        </h2>
+                    )}
+                </div>
                 <div className='flex justify-between items-center'>
                     <p className='text-sm text-[#808897] font-medium'>
                         Choose 5 important skills that show you fit the position.
@@ -77,7 +110,7 @@ const SkillsNew = ({ register, watch, setValue, fields, append, remove, move }) 
                                     <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
                                 </span>
 
-                                <div className="flex-1">
+                                <div className="flex-1 acco_section">
                                     {isEditing ? (
                                         <input
                                             type="text"
@@ -85,7 +118,7 @@ const SkillsNew = ({ register, watch, setValue, fields, append, remove, move }) 
                                             onBlur={() => setEditingIndex(null)}
                                             autoFocus
                                             // Added !border-b to match ImpSkills input style
-                                            className="w-full text-sm font-medium !border-b outline-none bg-transparent px-1 border-[#800080]"
+                                            className="w-full text-sm font-medium !border-b-2 outline-none bg-transparent px-1 border-[#800080]"
                                         />
                                     ) : (
                                         <div className="flex items-center gap-2">

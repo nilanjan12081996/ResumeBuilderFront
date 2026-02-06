@@ -809,7 +809,7 @@ const initialState = {
 
     grammarlySentenceData: null,
     grammarlySentenceLoading: false,
-    missingSkills: [],
+    missingSkillsData: [],
 }
 
 const DashboardSlice = createSlice(
@@ -1318,9 +1318,9 @@ const DashboardSlice = createSlice(
                     state.loading = true;
                     state.error = null;
                 })
-                .addCase(fetchMissingSkills.fulfilled, (state, action) => {
+                .addCase(fetchMissingSkills.fulfilled, (state, payload) => {
                     state.loading = false;
-                    state.missingSkills = action.payload;
+                    state.missingSkillsData = payload;
                 })
                 .addCase(fetchMissingSkills.rejected, (state, action) => {
                     state.loading = false;

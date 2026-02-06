@@ -42,7 +42,7 @@ export function SortableSection({ id, title, children }) {
                 <span className="font-bold text-xl">{title}</span>
              </div>
           </AccordionTitle>
-          <AccordionContent className=" !py-0 border-t border-gray-100">
+          <AccordionContent className="!pt-0">
              {children}
           </AccordionContent>
         </AccordionPanel>

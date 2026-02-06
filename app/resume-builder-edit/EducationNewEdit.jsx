@@ -1,224 +1,226 @@
 'use client';
-import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import {
+  Accordion,
+  AccordionPanel,
+  AccordionTitle,
+  AccordionContent,
+  Label,
+} from "flowbite-react";
+import { TbDragDrop } from "react-icons/tb";
+import { FaTrash } from "react-icons/fa";
 import { Controller } from "react-hook-form";
-import Datepicker from "../utils/Datepicker";
+import Datepicker from "../ui/Datepicker";
+import TipTapEditor from "../editor/TipTapEditor";
 
-const EducationNew = ({ register, watch, control, fields, append, remove, move, noHeader }) => {
+const EducationNewEdit = ({
+  register,
+  watch,
+  control,
+  fields,
+  append,
+  remove,
+  move,
+  setValue,
+  noHeader,
+}) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
-
-  // ... (handlers)
+  const [deletingIndex, setDeletingIndex] = useState(null);
 
   const handleDragStart = (e, index) => {
-    // Only allow drag if it started from our handle logic
-    if (!isHandleHovered) {
-      e.preventDefault();
-      return;
-    }
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setIsHandleHovered(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
   };
 
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
-
     move(draggedIndex, targetIndex);
     setDraggedIndex(null);
   };
 
-  const addMore = () => {
-    append({}); 
-  };
-
-  const deleteEmp = (index) => {
-    if (fields.length > 1) {
+  const handleDelete = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
       remove(index);
-    }
+      setDeletingIndex(null);
+    }, 400);
   };
 
   return (
     <>
       {!noHeader && (
-        <div className='mb-4'>
-          <h2 className='text-xl font-bold text-black pb-1'>Education</h2>
-          <p className='text-sm text-[#808897] font-medium'>
-            A varied education on your resume sums up the value that your learnings and background will bring to job.
+        <div className="mb-4">
+          <h2 className="text-xl font-bold">Education</h2>
+          <p className="text-sm text-gray-500">
+            Add your education background.
           </p>
         </div>
       )}
 
-      <div className=''>
-        <div className="space-y-3">
-          {fields.map((item, index) => {
-            const watchedSchool = watch(`educationHistory.${index}.school`);
-            const watchedDegree = watch(`educationHistory.${index}.degree`);
+      {fields.map((item, index) => {
+        const degree = watch(`educationHistory.${index}.degree`);
+        const school = watch(`educationHistory.${index}.school`);
+        const isCurrentlyStudying = watch(`educationHistory.${index}.isCurrentlyStudying`);
 
-            return (
-              <div
-                key={item.id}
-                draggable={isHandleHovered}
+        return (
+          <div
+            key={item.id}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => handleDrop(e, index)}
+            className={`transition-all duration-500 mb-3 ${
+              deletingIndex === index ? "-translate-x-6 opacity-0" : ""
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              <span
+                draggable
                 onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${
-                  draggedIndex === index 
-                    ? "opacity-20 border-cyan-500 scale-95" 
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                } cursor-default`}
+                className="mt-5 cursor-grab active:cursor-grabbing"
               >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                <Accordion flush={true}>
-                  <AccordionPanel>
-                    <AccordionTitle className="p-4">
-                      <div className="flex items-center gap-3">
-                        {/* THE HANDLE: Only this part triggers the drag */}
-                        <button
-                          type="button"
-                          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                          onMouseEnter={() => setIsHandleHovered(true)}
-                          onMouseLeave={() => setIsHandleHovered(false)}
-                        >
-                          <RiDraggable className="text-xl text-gray-400" />
-                        </button>
+                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
+              </span>
 
-                        <span className="font-bold text-sm text-gray-700">
-                          {watchedSchool || watchedDegree 
-                            ? `${watchedDegree || ''}${watchedDegree ? ' at ' + watchedSchool : ''}` 
-                            : "(Not specified)"}
-                        </span>
+              <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden">
+                <AccordionPanel>
+                  <AccordionTitle className="font-semibold text-sm">
+                    {degree?.trim()
+                      ? `${degree}${school ? " at " + school : ""}`
+                      : "(Not specified)"}
+                  </AccordionTitle>
+
+                  <AccordionContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <Label className="!text-sm !text-gray-500">School</Label>
+                        <input
+                          {...register(`educationHistory.${index}.school`)}
+                          className="w-full rounded-md border p-2 text-sm"
+                          placeholder="e.g. University of Dhaka"
+                        />
                       </div>
-                    </AccordionTitle>
-                    <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                          {/* School */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              School
-                            </label>
-                            <input
-                              type="text"
-                              placeholder=""
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              {...register(`educationHistory.${index}.school`)}
-                            />
-                          </div>
+                      <div>
+                        <Label className="!text-sm !text-gray-500">Degree</Label>
+                        <input
+                          {...register(`educationHistory.${index}.degree`)}
+                          className="w-full rounded-md border p-2 text-sm"
+                          placeholder="e.g. Bachelor of Science"
+                        />
+                      </div>
 
-                          {/* Degree */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Degree
-                            </label>
-                            <input
-                              type="text"
-                              placeholder=""
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                             {...register(`educationHistory.${index}.degree`)}
-                            />
-                          </div>
-
-                          {/* Start & End Date */}
-                        <div className='date_area'>
-                        <label className="block text-sm font-medium text-gray-700">
+                      <div className="md:col-span-2">
+                        <Label className="!text-sm !text-gray-500">
                           Start & End Date
-                        </label>
-                        <div className='flex gap-5'>
-                     
+                        </Label>
+                        <div className="flex gap-2 mt-1">
                           <div className="flex-1">
-                          <Controller
-                          control={control} 
-                          name={`educationHistory.${index}.startDate`}
+                            <Controller
+                              control={control}
+                              name={`educationHistory.${index}.startDate`}
+                              render={({ field }) => (
+                                <Datepicker
+                                  selectedDate={field.value}
+                                  onChange={field.onChange}
+                                />
+                              )}
+                            />
+                          </div>
+
+                          <div className="flex-1 relative">
+                            <Controller
+                              control={control}
+                              name={`educationHistory.${index}.endDate`}
+                              render={({ field }) => (
+                                <>
+                                  <Datepicker
+                                    selectedDate={isCurrentlyStudying ? null : field.value}
+                                    onChange={field.onChange}
+                                    disabled={isCurrentlyStudying}
+                                  />
+                                  {isCurrentlyStudying && (
+                                    <div className="absolute inset-0 flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-gray-300 rounded-md pointer-events-none">
+                                      Present
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-2">
+                          <input
+                            type="checkbox"
+                            id={`currently-studying-${index}`}
+                            checked={!!isCurrentlyStudying}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setValue(`educationHistory.${index}.isCurrentlyStudying`, checked);
+                              if (checked) {
+                                setValue(`educationHistory.${index}.endDate`, "Present");
+                              } else {
+                                setValue(`educationHistory.${index}.endDate`, "");
+                              }
+                            }}
+                            className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080]"
+                          />
+                          <label 
+                            htmlFor={`currently-studying-${index}`}
+                            className="text-sm text-gray-700 cursor-pointer"
+                          >
+                            I currently study here
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <Label className="!text-sm !text-gray-500">City</Label>
+                        <input
+                          {...register(`educationHistory.${index}.city_state`)}
+                          className="w-full rounded-md border p-2 text-sm"
+                          placeholder="e.g. Dhaka"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <Label className="!text-sm !text-gray-500">Description</Label>
+                        <Controller
+                          control={control}
+                          name={`educationHistory.${index}.description`}
+                          defaultValue=""
                           render={({ field }) => (
-                            <Datepicker 
-                              selectedDate={field.value} 
-                              onChange={(date) => field.onChange(date)} 
+                            <TipTapEditor
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Describe your studies, achievements, projects"
                             />
                           )}
                         />
-                        </div>
-                          <div className="flex-1">
-                          <Controller
-                            control={control}
-                            name={`educationHistory.${index}.endDate`}
-                            render={({ field }) => (
-                              <Datepicker 
-                                selectedDate={field.value} 
-                                onChange={(date) => field.onChange(date)} 
-                              />
-                            )}
-                          />
-                        </div>
-                          </div>
                       </div>
-                          
-                          {/* City */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              City, State
-                            </label>
-                            <input
-                              type="text"
-                              placeholder=""
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              {...register(`educationHistory.${index}.city_state`)}
-                            />
-                          </div>
-
-                          {/* Description */}
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              Description
-                            </label>
-                            <textarea rows="4" className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm" placeholder="Write here..."
-                           {...register(`educationHistory.${index}.description`)}
-                            ></textarea>
-                          </div>
-
-                          {/* Delete Button inside the Content */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                          <button 
-                            type="button" 
-                            onClick={() => deleteEmp(index)}
-                            className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                          >
-                            <MdDelete className='text-lg' /> 
-                          </button>
-                        </div>
-
-                      </div>
+                    </div>
                   </AccordionContent>
                 </AccordionPanel>
               </Accordion>
-              </div>
+
+              <FaTrash
+                onClick={() => handleDelete(index)}
+                className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
+              />
             </div>
-            )
-          })}
-        </div>
-          
-          <div className='mt-4'>
-            <button type="button" onClick={addMore} className='flex items-center gap-2 text-blue-500 font-bold'>
-                <FaPlus /> Add one more education
-            </button>
           </div>
-        </div >
+        );
+      })}
+
+      <button
+        type="button"
+        onClick={() => append({})}
+        className="text-sm !text-[#800080] font-medium mt-4 hover:underline"
+      >
+        + Add one more education
+      </button>
     </>
   );
 };
 
-export default EducationNew;
+export default EducationNewEdit;

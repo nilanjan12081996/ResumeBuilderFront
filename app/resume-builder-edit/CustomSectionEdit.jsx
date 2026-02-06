@@ -5,7 +5,7 @@ import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
 import { FaPlus, FaPen } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
-import Datepicker from "../utils/Datepicker";
+import Datepicker from "../ui/Datepicker"
 
 const CustomSectionEdit = ({ 
   sectionId = 'custom', // ✅ Accept sectionId prop

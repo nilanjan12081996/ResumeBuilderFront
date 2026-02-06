@@ -1,13 +1,26 @@
 'use client';
-import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import {
+  Accordion,
+  AccordionPanel,
+  AccordionTitle,
+  AccordionContent,
+  Label,
+} from "flowbite-react";
+import { TbDragDrop } from "react-icons/tb";
+import { FaTrash } from "react-icons/fa";
 
-const Languages = ({ register, watch, control, fields, append, remove, move, noHeader }) => {
+const newLanguageEdit = ({
+  register,
+  watch,
+  fields,
+  append,
+  remove,
+  move,
+  noHeader,
+}) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState(null);
 
   const levels = [
     "Native speaker",
@@ -18,161 +31,126 @@ const Languages = ({ register, watch, control, fields, append, remove, move, noH
   ];
 
   const handleDragStart = (e, index) => {
-    if (!isHandleHovered) {
-      e.preventDefault();
-      return;
-    }
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setIsHandleHovered(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
   };
 
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
-
     move(draggedIndex, targetIndex);
     setDraggedIndex(null);
   };
 
-  const addMore = () => {
-    append({ level: "Select level" }); 
-  };
-
-  const deleteItem = (index) => {
-    if (fields.length > 1) {
+  const handleDelete = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
       remove(index);
-    }
+      setDeletingIndex(null);
+    }, 400);
   };
 
   return (
     <>
-      {!noHeader && (
-          <div className='mb-4'>
-            <h2 className='text-xl font-bold text-black pb-1'>Languages</h2>
-            <p className='text-sm text-[#808897] font-medium'>
-                Enter the languages you speak and your proficiency level.
-            </p>
-          </div>
-      )}
+      <div className="mb-4">
+        {!noHeader && (
+          <h2 className="text-xl font-bold text-black pb-1">Languages</h2>
+        )}
+        <p className="text-sm text-[#808897] font-medium">
+          Enter the languages you speak and your proficiency level.
+        </p>
+      </div>
 
-      <div className=''>
-        <div className="space-y-3">
-          {fields.map((item, index) => {
-            const watchedLanguage = watch(`languageHistory.${index}.language`);
-            const watchedLevel = watch(`languageHistory.${index}.level`);
+      <div className="space-y-3">
+        {fields.map((item, index) => {
+          const watchedLanguage = watch(`languageHistory.${index}.language`);
+          const watchedLevel = watch(`languageHistory.${index}.level`);
 
-            return (
-              <div
-                key={item.id}
-                draggable={isHandleHovered}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${
-                  draggedIndex === index 
-                    ? "opacity-20 border-cyan-500 scale-95" 
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                } cursor-default`}
-              >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                <Accordion flush={true}>
+          return (
+            <div
+              key={item.id}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => handleDrop(e, index)}
+              className={`transition-all duration-500 mb-3 ${
+                deletingIndex === index ? "-translate-x-6 opacity-0" : ""
+              }`}
+            >
+              <div className="flex items-start gap-2">
+                {/* Drag Handle */}
+                <span
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  className="mt-5 cursor-grab active:cursor-grabbing"
+                >
+                  <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
+                </span>
+
+                {/* Accordion */}
+                <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
                   <AccordionPanel>
-                    <AccordionTitle className="p-4">
-                      <div className="flex items-center gap-3">
-                        {/* Drag Handle */}
-                        <button
-                          type="button"
-                          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                          onMouseEnter={() => setIsHandleHovered(true)}
-                          onMouseLeave={() => setIsHandleHovered(false)}
-                        >
-                          <RiDraggable className="text-xl text-gray-400" />
-                        </button>
-
-                        <div className="flex flex-col text-left">
-                            <span className="font-bold text-sm text-gray-700">
-                            {watchedLanguage || "(Not specified)"}
-                            </span>
-                             {watchedLevel && watchedLevel !== "Select level" && (
-                                <span className="text-xs text-gray-400 font-normal">
-                                    {watchedLevel}
-                                </span>
-                            )}
-                         </div>
+                    <AccordionTitle className="font-semibold text-sm">
+                      <div className="flex flex-col text-left">
+                        <span className="text-gray-700">
+                          {watchedLanguage || "(Not specified)"}
+                        </span>
+                        {watchedLevel && watchedLevel !== "Select level" && (
+                          <span className="text-xs text-gray-400 font-normal">
+                            {watchedLevel}
+                          </span>
+                        )}
                       </div>
                     </AccordionTitle>
+
                     <AccordionContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                          {/* Language */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Language
-                            </label>
-                            <input
-                              type="text"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              placeholder="e.g. English"
-                              {...register(`languageHistory.${index}.language`)}
-                            />
-                          </div>
-
-                          {/* Level */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Level
-                            </label>
-                            <select
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm bg-gray-50 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
-                                {...register(`languageHistory.${index}.level`)}
-                            >
-                                <option value="Select level" disabled>Select level</option>
-                                {levels.map(level => (
-                                    <option key={level} value={level}>{level}</option>
-                                ))}
-                            </select>
-                          </div>
-
-                          {/* Delete Button inside the Content */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                          <button 
-                            type="button" 
-                            onClick={() => deleteItem(index)}
-                            className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                          >
-                            <MdDelete className='text-lg' /> 
-                          </button>
+                        {/* Language */}
+                        <div>
+                          <Label className="!text-sm !text-gray-500 font-semibold mb-1 block">Language</Label>
+                          <input
+                            {...register(`languageHistory.${index}.language`)}
+                            className="w-full rounded-md border p-2 text-sm border-gray-300 focus:ring-[#800080] focus:border-[#800080]"
+                            placeholder="e.g. English"
+                          />
                         </div>
 
+                        {/* Level */}
+                        <div>
+                          <Label className="!text-sm !text-gray-500 font-semibold mb-1 block">Level</Label>
+                          <select
+                            className="w-full rounded-md border p-2 text-sm bg-gray-50 text-gray-700 border-gray-300 focus:ring-[#800080] focus:border-[#800080]"
+                            {...register(`languageHistory.${index}.level`)}
+                          >
+                            <option value="Select level" disabled>Select level</option>
+                            {levels.map(level => (
+                              <option key={level} value={level}>{level}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                  </AccordionContent>
-                </AccordionPanel>
-              </Accordion>
+                    </AccordionContent>
+                  </AccordionPanel>
+                </Accordion>
+
+                {/* Delete Button (Accordion এর পাশে) */}
+                <FaTrash
+                  onClick={() => handleDelete(index)}
+                  className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
+                />
               </div>
             </div>
-            )
-          })}
-        </div>
-          
-          <div className='mt-4'>
-            <button type="button" onClick={addMore} className='flex items-center gap-2 text-blue-500 font-bold'>
-                <FaPlus /> Add one more language
-            </button>
-          </div>
-        </div >
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => append({ level: "Select level" })}
+        className="text-sm !text-[#800080] font-medium mt-4 hover:underline"
+      >
+        + Add one more language
+      </button>
     </>
   );
 };
 
-export default Languages;
+export default newLanguageEdit;

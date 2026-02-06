@@ -4,15 +4,27 @@ import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { HiSparkles } from "react-icons/hi";
 import { TbDragDrop } from 'react-icons/tb';
-import { FaTrash } from 'react-icons/fa';
+import { FaPen, FaTrash } from 'react-icons/fa';
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
 
-const EducationNew = ({ register, watch, control, fields, append, remove, move }) => {
+const EducationNew = ({ register, watch, control, fields, append, remove, move, sectionTitle, setSectionTitle, isEditingTitle, setIsEditingTitle }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [isHandleHovered, setIsHandleHovered] = useState(false);
   const [deletingIndex, setDeletingIndex] = useState(null);
   const { setValue } = useFormContext();
+
+  // Real-time update handler
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setSectionTitle(newTitle); // Input update
+    setValue("educationSectionTitle", newTitle); // Template sync
+  };
+
+  const handleTitleBlur = () => {
+    setIsEditingTitle(false);
+    setValue("educationSectionTitle", sectionTitle);
+  };
 
   const handleDragStart = (e, index) => {
     if (!isHandleHovered) {
@@ -46,8 +58,27 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move }
   return (
     <>
       <div className='mb-4'>
-        <h2 className='text-xl font-bold text-black pb-1'>Education</h2>
-        <p className='text-sm text-[#808897] font-medium'>
+        <div className="acco_section flex items-center gap-2 group w-fit">
+          {isEditingTitle ? (
+            <input
+              autoFocus
+              className="text-xl font-bold text-black border-b-2 border-[#800080] outline-none"
+              value={sectionTitle}
+              onChange={handleTitleChange}
+              onBlur={handleTitleBlur}
+              onKeyDown={(e) => e.key === 'Enter' && handleTitleBlur()}
+            />
+          ) : (
+            <h2
+              className='text-xl font-bold text-black pb-1 cursor-pointer flex items-center gap-3'
+              onClick={() => setIsEditingTitle(true)}
+            >
+              {sectionTitle}
+              <FaPen className="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-purple-600 cursor-pointer duration-200" />
+            </h2>
+          )}
+        </div>
+        <p className='text-sm text-[#808897] font-medium pt-1'>
           A varied education on your resume sums up the value that your learnings and background will bring to job.
         </p>
       </div>

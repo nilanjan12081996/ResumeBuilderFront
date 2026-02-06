@@ -1,209 +1,218 @@
 'use client';
-import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import {
+  Accordion,
+  AccordionPanel,
+  AccordionTitle,
+  AccordionContent,
+  Label,
+} from "flowbite-react";
+import { TbDragDrop } from "react-icons/tb";
+import { FaTrash } from "react-icons/fa";
 import { Controller } from "react-hook-form";
-import Datepicker from "../utils/Datepicker";
+import Datepicker from "../ui/Datepicker";
+import TipTapEditor from "../editor/TipTapEditor";
 
-const Courses = ({ register, watch, control, fields, append, remove, move, noHeader }) => {
+const CoursesEdit = ({
+  register,
+  watch,
+  control,
+  fields,
+  append,
+  remove,
+  move,
+  setValue,
+  noHeader,
+}) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState(null);
 
   const handleDragStart = (e, index) => {
-    if (!isHandleHovered) {
-      e.preventDefault();
-      return;
-    }
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setIsHandleHovered(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
   };
 
   const handleDrop = (e, targetIndex) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
-
     move(draggedIndex, targetIndex);
     setDraggedIndex(null);
   };
 
-  const addMore = () => {
-    append({}); 
-  };
-
-  const deleteItem = (index) => {
-    if (fields.length > 1) {
+  const handleDelete = (index) => {
+    setDeletingIndex(index);
+    setTimeout(() => {
       remove(index);
-    }
+      setDeletingIndex(null);
+    }, 400);
   };
 
   return (
     <>
-      {!noHeader && (
-          <div className='mb-4'>
-            <h2 className='text-xl font-bold text-black pb-1'>Courses</h2>
-            <p className='text-sm text-[#808897] font-medium'>
-               Show your relevant experience (last 10 years). Use bullet points to note your achievements.
-            </p>
-          </div>
-      )}
+      <div className="mb-4">
+        {!noHeader && (
+          <h2 className="text-xl font-bold text-black pb-1">Courses</h2>
+        )}
+        <p className="text-sm text-[#808897] font-medium">
+          Add relevant courses or certifications you have completed.
+        </p>
+      </div>
 
-      <div className=''>
-        <div className="space-y-3">
-          {fields.map((item, index) => {
-            const watchedCourse = watch(`coursesHistory.${index}.course`);
-            const watchedInstitution = watch(`coursesHistory.${index}.institution`);
-            const watchedStartDate = watch(`coursesHistory.${index}.startDate`);
+      <div className="space-y-3">
+        {fields.map((item, index) => {
+          const course = watch(`coursesHistory.${index}.course`);
+          const institution = watch(`coursesHistory.${index}.institution`);
+          const isCurrentlyOngoing = watch(`coursesHistory.${index}.isCurrentlyOngoing`);
 
-            return (
-              <div
-                key={item.id}
-                draggable={isHandleHovered}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${
-                  draggedIndex === index 
-                    ? "opacity-20 border-cyan-500 scale-95" 
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                } cursor-default`}
-              >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                <Accordion flush={true}>
+          return (
+            <div
+              key={item.id}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => handleDrop(e, index)}
+              className={`transition-all duration-500 mb-3 ${
+                deletingIndex === index ? "-translate-x-6 opacity-0" : ""
+              }`}
+            >
+              <div className="flex items-start gap-2">
+                {/* Drag Handle */}
+                <span
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  className="mt-5 cursor-grab active:cursor-grabbing"
+                >
+                  <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
+                </span>
+
+                {/* Accordion */}
+                <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden bg-white">
                   <AccordionPanel>
-                    <AccordionTitle className="p-4">
-                      <div className="flex items-center gap-3">
-                        {/* Drag Handle */}
-                        <button
-                          type="button"
-                          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                          onMouseEnter={() => setIsHandleHovered(true)}
-                          onMouseLeave={() => setIsHandleHovered(false)}
-                        >
-                          <RiDraggable className="text-xl text-gray-400" />
-                        </button>
-
-                        <div className="flex flex-col text-left">
-                            <span className="font-bold text-sm text-gray-700">
-                            {watchedCourse || watchedInstitution 
-                                ? `${watchedCourse || ''}${watchedInstitution ? ' at ' + watchedInstitution : ''}` 
-                                : "(Not specified)"}
-                            </span>
-                            {/* Showing Start Date in header similar to screenshot */}
-                            {watchedStartDate && (
-                                <span className="text-xs text-gray-400 font-normal">
-                                    {new Date(watchedStartDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })}
-                                </span>
-                            )}
-                         </div>
-                      </div>
+                    <AccordionTitle className="font-semibold text-sm">
+                      {course?.trim()
+                        ? `${course}${institution ? " at " + institution : ""}`
+                        : "(Not specified)"}
                     </AccordionTitle>
+
                     <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                          {/* Course */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Course
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="e.g. Data Structures"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              {...register(`coursesHistory.${index}.course`)}
-                            />
-                          </div>
-
-                          {/* Institution */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Institution
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="e.g. Udacity"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                             {...register(`coursesHistory.${index}.institution`)}
-                            />
-                          </div>
-
-                          {/* Start & End Date */}
-                        <div className='date_area'>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Start & End Date
-                        </label>
-                        <div className='flex gap-5'>
-                     
-                          <div className="flex-1">
-                          <Controller
-                          control={control} 
-                          name={`coursesHistory.${index}.startDate`}
-                          render={({ field }) => (
-                            <Datepicker 
-                              selectedDate={field.value} 
-                              onChange={(date) => field.onChange(date)} 
-                            />
-                          )}
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <Label className="!text-sm !text-gray-500 font-semibold">Course</Label>
+                          <input
+                            {...register(`coursesHistory.${index}.course`)}
+                            className="w-full rounded-md border p-2 text-sm mt-1"
+                            placeholder="e.g. Web Development Boot Camp"
+                          />
                         </div>
-                          <div className="flex-1">
+
+                        <div>
+                          <Label className="!text-sm !text-gray-500 font-semibold">Institution</Label>
+                          <input
+                            {...register(`coursesHistory.${index}.institution`)}
+                            className="w-full rounded-md border p-2 text-sm mt-1"
+                            placeholder="e.g. Udemy"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <Label className="!text-sm !text-gray-500 font-semibold">
+                            Start & End Date
+                          </Label>
+                          <div className="flex gap-2 mt-1">
+                            <div className="flex-1">
+                              <Controller
+                                control={control}
+                                name={`coursesHistory.${index}.startDate`}
+                                render={({ field }) => (
+                                  <Datepicker
+                                    selectedDate={field.value}
+                                    onChange={field.onChange}
+                                  />
+                                )}
+                              />
+                            </div>
+
+                            <div className="flex-1 relative">
+                              <Controller
+                                control={control}
+                                name={`coursesHistory.${index}.endDate`}
+                                render={({ field }) => (
+                                  <>
+                                    <Datepicker
+                                      selectedDate={isCurrentlyOngoing ? null : field.value}
+                                      onChange={field.onChange}
+                                      disabled={isCurrentlyOngoing}
+                                    />
+                                    {isCurrentlyOngoing && (
+                                      <div className="absolute inset-0 flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-gray-300 rounded-md pointer-events-none">
+                                        Present
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 mt-2">
+                            <input
+                              type="checkbox"
+                              id={`currently-ongoing-${index}`}
+                              checked={!!isCurrentlyOngoing}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setValue(`coursesHistory.${index}.isCurrentlyOngoing`, checked);
+                                if (checked) {
+                                  setValue(`coursesHistory.${index}.endDate`, "Present");
+                                } else {
+                                  setValue(`coursesHistory.${index}.endDate`, "");
+                                }
+                              }}
+                              className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080]"
+                            />
+                            <label
+                              htmlFor={`currently-ongoing-${index}`}
+                              className="text-sm text-gray-700 cursor-pointer"
+                            >
+                              Ongoing(Present)
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <Label className="!text-sm !text-gray-500 font-semibold">Description</Label>
                           <Controller
                             control={control}
-                            name={`coursesHistory.${index}.endDate`}
+                            name={`coursesHistory.${index}.description`}
                             render={({ field }) => (
-                              <Datepicker 
-                                selectedDate={field.value} 
-                                onChange={(date) => field.onChange(date)} 
+                              <TipTapEditor
+                                value={field.value}
+                                onChange={field.onChange}
                               />
                             )}
                           />
                         </div>
-                          </div>
                       </div>
-                          
-                    
-
-                          {/* Delete Button inside the Content */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                          <button 
-                            type="button" 
-                            onClick={() => deleteItem(index)}
-                            className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                          >
-                            <MdDelete className='text-lg' /> 
-                          </button>
-                        </div>
-
-                      </div>
-                  </AccordionContent>
-                </AccordionPanel>
-              </Accordion>
+                    </AccordionContent>
+                  </AccordionPanel>
+                </Accordion>
+                <FaTrash
+                  onClick={() => handleDelete(index)}
+                  className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
+                />
               </div>
             </div>
-            )
-          })}
-        </div>
-          
-          <div className='mt-4'>
-            <button type="button" onClick={addMore} className='flex items-center gap-2 text-blue-500 font-bold'>
-                <FaPlus /> Add one more course
-            </button>
-          </div>
-        </div >
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => append({})}
+        className="text-sm !text-[#800080] font-medium mt-4 hover:underline"
+      >
+        + Add one more course
+      </button>
     </>
   );
 };
 
-export default Courses;
+export default CoursesEdit;

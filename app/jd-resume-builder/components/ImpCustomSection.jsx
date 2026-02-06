@@ -7,6 +7,7 @@ import { FaChessKnight, FaLanguage, FaCertificate } from "react-icons/fa6";
 import { HiSpeakerphone, HiAcademicCap } from "react-icons/hi";
 import TipTapEditor from "../../editor/TipTapEditor";
 import { FaTrash } from "react-icons/fa";
+import Datepicker from "../../ui/Datepicker";
 
 const ImpCustomSection = ({
     section,
@@ -71,26 +72,42 @@ const ImpCustomSection = ({
                                             />
                                         </div>
 
-                                        <div>
-                                            <Label className="!text-sm !font-medium !text-gray-500">Start Date</Label>
-                                            <input
-                                                className="w-full border p-2 rounded"
-                                                value={item.startDate}
-                                                onChange={(e) =>
-                                                    handleCustomUpdate(sectionIndex, item.id, "startDate", e.target.value)
-                                                }
-                                            />
-                                        </div>
+                                        {/* Date Section */}
+                                        <div className="md:col-span-2">
+                                           <Label className="!text-sm !font-medium !text-gray-500">Start & End Date</Label>
+                                            <div className="flex gap-2 mt-1">
+                                                <div className="flex-1">
+                                                    <Datepicker
+                                                        selectedDate={item.startDate}
+                                                        onChange={(date) => handleCustomUpdate(sectionIndex, item.id, "startDate", date)}
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <Datepicker
+                                                        selectedDate={item.endDate}
+                                                        onChange={(date) => handleCustomUpdate(sectionIndex, item.id, "endDate", date)}
+                                                        disabled={item.isOngoing}
+                                                    />
+                                                </div>
+                                            </div>
 
-                                        <div>
-                                            <Label className="!text-sm !font-medium !text-gray-500">End Date</Label>
-                                            <input
-                                                className="w-full border p-2 rounded"
-                                                value={item.endDate}
-                                                onChange={(e) =>
-                                                    handleCustomUpdate(sectionIndex, item.id, "endDate", e.target.value)
-                                                }
-                                            />
+                                            {/* Ongoing Checkbox */}
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id={`ongoing-custom-${item.id}`}
+                                                    checked={item.isOngoing || false}
+                                                    onChange={(e) => {
+                                                        const isChecked = e.target.checked;
+                                                        handleCustomUpdate(sectionIndex, item.id, "isOngoing", isChecked);
+                                                        handleCustomUpdate(sectionIndex, item.id, "endDate", isChecked ? 'PRESENT' : '');
+                                                    }}
+                                                    className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                                                />
+                                                <label htmlFor={`ongoing-custom-${item.id}`} className="text-sm text-gray-700 cursor-pointer">
+                                                    Ongoing (Present)
+                                                </label>
+                                            </div>
                                         </div>
 
                                         <div className="col-span-2">
@@ -117,7 +134,7 @@ const ImpCustomSection = ({
                                 </AccordionContent>
                             </AccordionPanel>
                         </Accordion>
-                         <div className="flex justify-end pt-3 mt-4 border-t border-gray-200">
+                        <div className="flex justify-end pt-3 mt-4 border-t border-gray-200">
                             <FaTrash
                                 className="text-sm text-gray-400 cursor-pointer hover:text-red-500 transition-colors"
                                 title="Delete this item"
