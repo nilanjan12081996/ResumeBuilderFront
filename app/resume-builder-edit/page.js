@@ -436,19 +436,14 @@ const page = () => {
   }, [savingStatus]);
 
   const handleAddNewSection = (sectionData) => {
-    // যদি এটি অলরেডি লিস্টে থাকে (যেমন: summary, education), তাহলে জাস্ট অ্যাক্টিভ করবে
     if (!activeSections.includes(sectionData.id)) {
       setActiveSections((prev) => [...prev, sectionData.id]);
-      
-      // যদি sectionOrder এ না থাকে তবেই যোগ করবে
       setSectionOrder((prev) => {
         if (!prev.includes(sectionData.id)) {
           return [...prev, sectionData.id];
         }
         return prev;
       });
-
-      // ডিফল্ট ফিল্ড সেট করা (যদি প্রয়োজন হয়)
       if (sectionData.id === 'summary' && !watch('summary')) {
         setValue('summary', '');
       }

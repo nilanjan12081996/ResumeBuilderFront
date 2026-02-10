@@ -810,6 +810,7 @@ const initialState = {
     grammarlySentenceData: null,
     grammarlySentenceLoading: false,
     missingSkillsData: [],
+    jobDescription: "",
 }
 
 const DashboardSlice = createSlice(
@@ -822,6 +823,9 @@ const DashboardSlice = createSlice(
             },
             resetImpExperience(state) {
                 state.generateImpExperienceData = null;
+            },
+            setJobDescription: (state, action) => {
+                state.jobDescription = action.payload;
             },
         },
         extraReducers: (builder) => {
@@ -1332,5 +1336,5 @@ const DashboardSlice = createSlice(
         }
     }
 )
-export const { resetImpSummary, resetImpExperience, } = DashboardSlice.actions;
+export const { resetImpSummary, resetImpExperience, setJobDescription } = DashboardSlice.actions;
 export default DashboardSlice.reducer;
