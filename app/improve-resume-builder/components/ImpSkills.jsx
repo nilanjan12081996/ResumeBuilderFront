@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Label } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
 import { Tab, Tabs, TabList } from "react-tabs";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaPlus } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 import 'react-tabs/style/react-tabs.css';
 
@@ -24,7 +24,15 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
         }, 500);
     };
 
+    const addSkill = (skillName = "") => {
+        const newSkill = {
+            id: `ts_${Math.random().toString(36).substr(2, 9)}`,
+            name: skillName,
+            level: 2
+        };
 
+        handleSkillUpdate(sectionIndex, null, "add", newSkill);
+    }
 
     return (
         <>
@@ -156,6 +164,13 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
                     </div>
                 );
             })}
+            <button
+                type="button"
+                onClick={() => addSkill("")}
+                className="flex items-center gap-2 !text-sm !text-[#800080] font-medium mt-4 hover:underline"
+            >
+                <FaPlus size={12} /> Add one more skill
+            </button>
         </>
     );
 };

@@ -5,17 +5,25 @@ import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flo
 import { HiSparkles } from "react-icons/hi2";
 import TipTapEditor from '../../editor/TipTapEditor';
 import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
+import { useSelector } from 'react-redux';
 
 const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex }) => {
   const [open, setOpen] = useState(false);
-  
+
   const summaryValue = watch("summary");
 
+  const { extracteResumeData } = useSelector((state) => state?.dash);
+  const { singleResumeInfo } = useSelector((state) => state?.resume);
+
+  const resumeSource =
+    singleResumeInfo?.data?.data ||
+    extracteResumeData?.resume_data ||
+    null;
+
   const handleSummaryChange = (html) => {
-    // Form data তে update করুন
+
     setValue("summary", html);
-    
-    // Sections array তেও update করুন
+
     if (setSections && typeof sectionIndex === 'number') {
       setSections(prev =>
         prev.map((section, i) =>
@@ -50,8 +58,9 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex }) =>
           <GenerateWithAiModal
             open={open}
             onClose={() => setOpen(false)}
-            aiType="imp_summary"
+            aiType="jd_summary"
             initialText={summaryValue || ""}
+            fullResumeData={resumeSource}
             onApply={(text) => {
               handleSummaryChange(text);
             }}

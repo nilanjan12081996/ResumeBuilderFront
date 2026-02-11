@@ -7,6 +7,7 @@ import { HiPlus, HiMinus } from "react-icons/hi";
 import { TbDragDrop } from 'react-icons/tb';
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from "../../ui/Datepicker";
+import { useSelector } from 'react-redux';
 
 
 const ImpExperience = ({
@@ -31,6 +32,13 @@ const ImpExperience = ({
     }, 500);
   };
 
+ const { extracteResumeData } = useSelector((state) => state?.dash);
+  const { singleResumeInfo } = useSelector((state) => state?.resume);
+
+  const resumeSource =
+    singleResumeInfo?.data?.data ||
+    extracteResumeData?.resume_data ||
+    null;
 
   return (
     <>
@@ -170,6 +178,7 @@ const ImpExperience = ({
                           onClose={() => setActiveExpId(null)}
                           aiType="imp_experience"
                           initialText={exp.description || ""}
+                          fullResumeData={resumeSource}
                           onApply={(text) => {
                             handleExpUpdate(sectionIndex, exp.id, "description", text);
                           }}

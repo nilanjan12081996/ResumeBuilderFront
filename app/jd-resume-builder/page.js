@@ -27,7 +27,7 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
 import { checkATS } from '../reducers/DashboardSlice';
-import { getSingleResume, saveResumeImprove, saveResumeJd } from '../reducers/ResumeSlice';
+import { getSingleResume, saveResumeJd } from '../reducers/ResumeSlice';
 import { TbDragDrop } from 'react-icons/tb';
 import ImpCustomSection from './components/ImpCustomSection';
 import AddSectionButton from './components/AddSectionButton';
@@ -37,13 +37,14 @@ import { defaultResumeSettings } from "../config/defaultResumeSettings";
 const Page = () => {
   const componentRef = useRef();
   const dispatch = useDispatch();
-  const { improveResumeData } = useSelector((state) => state?.dash);
+  const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
   console.log('singleResumeInfo', singleResumeInfo)
+  console.log('extracteResumeData',extracteResumeData)
   // console.log('singleResumeInfo', singleResumeInfo)
   const resumeSource =
     singleResumeInfo?.data?.data ||
-    improveResumeData?.resume_data ||
+    extracteResumeData?.resume_data ||
     null;
 
 
@@ -112,7 +113,7 @@ const Page = () => {
   const searchParams = useSearchParams();
 
   const resume_id = searchParams.get("id");
-  const resume_type = searchParams.get("fetch"); // "improve"
+  const resume_type = searchParams.get("fetch");
 
 
   // -------------------- INITIAL DATA LOAD --------------------
@@ -141,21 +142,72 @@ const Page = () => {
 
 
   // -------------------- AUTO SAVE --------------------
-  // Page.jsx এর ভেতরে Auto Save অংশটি এভাবে পরিবর্তন করুন
-useEffect(() => {
-  if (isInitialLoad.current) return;
+  useEffect(() => {
+    if (isInitialLoad.current) return;
 
-  const currentData = { ...formValues, sections };
-  const normalized = JSON.parse(JSON.stringify(currentData));
+    const currentData = {
+      ...formValues,
+      sections,
+    };
 
-  if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
-    return;
-  }
+    //  compare WITHOUT IDs
+    const normalized = JSON.parse(JSON.stringify(currentData));
 
-  setSavingStatus("saving");
+    if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
+      return;
+    }
 
-  const timeoutId = setTimeout(() => {
-    const payload = { ...currentData, resume_type: "improve" };
+    setSavingStatus("saving");
+
+    const timeoutId = setTimeout(() => {
+      const payload = {
+        ...currentData,
+        resume_type: "jd",
+      };
+
+      //  send IDs ONLY after first save
+      if (resumeIds.mongo_id && resumeIds.mysql_id) {
+        payload.mongo_id = resumeIds.mongo_id;
+        payload.mysql_id = resumeIds.mysql_id;
+      }
+
+      dispatch(saveResumeJd(payload)).then((res) => {
+        if (res.payload?.status_code === 200) {
+          setSavingStatus("saved");
+          lastSavedData.current = normalized;
+
+          // FIRST SAVE → capture IDs
+          if (!resumeIds.mongo_id) {
+            const mongo_id = res.payload.sectionsdata?.mongo_id;
+            const mysql_id = res.payload.sectionsdata?.mysql_id;
+
+            setResumeIds({ mongo_id, mysql_id });
+            router.replace(
+              `/jd-resume-builder?id=${mysql_id}&fetch=jd_resume`,
+              { scroll: false }
+            );
+
+          }
+
+        } else {
+          setSavingStatus("error");
+        }
+      });
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [formValues, sections]);
+
+
+  // -------------------- MANUAL SAVE --------------------
+  const onSubmit = (data) => {
+    setSavingStatus("saving");
+
+    const payload = {
+      ...data,
+      sections,
+      resume_type: "jd",
+    };
 
     if (resumeIds.mongo_id && resumeIds.mysql_id) {
       payload.mongo_id = resumeIds.mongo_id;
@@ -165,70 +217,33 @@ useEffect(() => {
     dispatch(saveResumeJd(payload)).then((res) => {
       if (res.payload?.status_code === 200) {
         setSavingStatus("saved");
-        lastSavedData.current = normalized;
 
-        const sData = res.payload.sectionsdata;
-        
-        // 1st time save check: যদি বর্তমানে URL-এ সঠিক ID না থাকে
-        if (!resume_id || resume_id === "null" || !resumeIds.mongo_id) {
-          if (sData?.mongo_id && sData?.mysql_id) {
-            setResumeIds({ mongo_id: sData.mongo_id, mysql_id: sData.mysql_id });
-            
-            // তাৎক্ষণিক রিডাইরেক্ট
-            router.replace(
-              `/jd-resume-builder?id=${sData.mysql_id}&fetch=jd_resume`,
-              { scroll: false }
-            );
-          }
+        lastSavedData.current = JSON.parse(
+          JSON.stringify({ ...data, sections })
+        );
+
+        // 🧠 FIRST SAVE ONLY
+        if (!resumeIds.mongo_id) {
+          const mongo_id = res.payload.sectionsdata?.mongo_id;
+          const mysql_id = res.payload.sectionsdata?.mysql_id;
+
+          setResumeIds({ mongo_id, mysql_id });
+
+          router.replace(
+            `/jd-resume-builder?id=${mysql_id}&fetch=jd_resume`,
+            { scroll: false }
+          );
+
         }
+
       } else {
         setSavingStatus("error");
       }
     });
-  }, 2000);
-
-  return () => clearTimeout(timeoutId);
-}, [formValues, sections, resumeIds, resume_id, router, dispatch]);
-
-  // -------------------- MANUAL SAVE --------------------
-  // onSubmit ফাংশনটি এভাবে পরিবর্তন করুন
-const onSubmit = (data) => {
-  setSavingStatus("saving");
-
-  const payload = { ...data, sections, resume_type: "improve" };
-
-  if (resumeIds.mongo_id && resumeIds.mysql_id) {
-    payload.mongo_id = resumeIds.mongo_id;
-    payload.mysql_id = resumeIds.mysql_id;
-  }
-
-  dispatch(saveResumeJd(payload)).then((res) => {
-    if (res.payload?.status_code === 200) {
-      setSavingStatus("saved");
-      lastSavedData.current = JSON.parse(JSON.stringify({ ...data, sections }));
-
-      const sData = res.payload.sectionsdata;
-
-      // 🧠 প্রথমবার আইডি পাওয়ার পর রিডাইরেক্ট লজিক
-      if (!resumeIds.mongo_id && sData?.mysql_id) {
-        setResumeIds({ mongo_id: sData.mongo_id, mysql_id: sData.mysql_id });
-
-        router.replace(
-          `/jd-resume-builder?id=${sData.mysql_id}&fetch=jd_resume`,
-          { scroll: false }
-        );
-      }
-    } else {
-      setSavingStatus("error");
-    }
-  });
-};
+  };
 
   useEffect(() => {
-    // console.log("Current URL Params:", { resume_id, resume_type }); s
-    if (!resume_id || resume_id === "null" || !resume_type || resume_type === "null") {
-        return;
-    }
+    if (!resume_id || !resume_type) return;
 
     dispatch(
       getSingleResume({
@@ -236,7 +251,8 @@ const onSubmit = (data) => {
         fetch: resume_type, 
       })
     );
-}, [resume_id, resume_type, dispatch]);
+  }, [resume_id, resume_type, dispatch]);
+
 
   // -------------------- AUTO HIDE STATUS --------------------
   useEffect(() => {
@@ -249,7 +265,7 @@ const onSubmit = (data) => {
   }, [savingStatus]);
 
   // Helper function to map resume data to sections
-  const mapImproveResumeDataToSections = (resumeData) => {
+  const mapextracteResumeDataToSections = (resumeData) => {
     if (!resumeData) return [];
 
     const sections = [];
@@ -426,7 +442,7 @@ const onSubmit = (data) => {
 useEffect(() => {
   if (!resumeSource) return;
 
-  const resumeData = improveResumeData?.resume_data || resumeSource;
+  const resumeData = extracteResumeData?.resume_data || resumeSource;
   const personal = resumeData?.personal_information || {};
   const meta = resumeData?.metadata || {};
 
@@ -475,7 +491,7 @@ useEffect(() => {
   setValue("dob", resumeSource.dob || "");
   setValue("driving_licence", resumeSource.driving_licence || "");
   
-}, [improveResumeData, resumeSource, setValue]);
+}, [extracteResumeData, resumeSource, setValue]);
 
 
 // ----------------- SYNC SUMMARY -----------------
@@ -498,7 +514,7 @@ useEffect(() => {
     }
 
     // ELSE generated resume (create mode)
-    const mappedSections = mapImproveResumeDataToSections(resumeSource);
+    const mappedSections = mapextracteResumeDataToSections(resumeSource);
     setSections(mappedSections);
   }, [resumeSource]);
 
@@ -598,19 +614,18 @@ useEffect(() => {
     setDraggedSkillIndex(null);
   };
 
- 
-const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
+  const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
   setSections(prev =>
     prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+
       if (field === "add") {
         return {
           ...section,
-          skills: [...(section.skills || []), value],
+          skills: [...section.skills, value],
         };
       }
 
-      // toggle hideExperienceLevel
       if (skillId === null) {
         return {
           ...section,
@@ -618,20 +633,18 @@ const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
         };
       }
 
-      // delete skill
       if (field === "delete") {
         return {
           ...section,
-          skills: (section.skills || []).filter(
+          skills: section.skills.filter(
             skill => skill.id !== skillId
           ),
         };
       }
 
-      // update skill name or level
       return {
         ...section,
-        skills: (section.skills || []).map(skill =>
+        skills: section.skills.map(skill =>
           skill.id === skillId
             ? { ...skill, [field]: value }
             : skill

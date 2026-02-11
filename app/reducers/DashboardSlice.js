@@ -5,8 +5,8 @@ import axios from 'axios';
 import aiApi from './aiApi';
 
 
-export const improveResume = createAsyncThunk(
-    "improveResume",
+export const extracteResume = createAsyncThunk(
+    "extracteResume",
     async (formData, { rejectWithValue }) => {
         try {
             const response = await aiApi.post(
@@ -666,8 +666,8 @@ export const impEnhanceUsageInfo = createAsyncThunk(
     }
 );
 
-export const generateImpSummary = createAsyncThunk(
-    "dashboard/generateImpSummary",
+export const improvementSummary = createAsyncThunk(
+    "dashboard/improvementSummary",
     async (payload, { rejectWithValue }) => {
         try {
             const res = await aiApi.post(
@@ -684,25 +684,8 @@ export const generateImpSummary = createAsyncThunk(
     }
 );
 
-export const generateNewSummary = createAsyncThunk(
-    "dashboard/generateNewSummary",
-    async (payload, { rejectWithValue }) => {
-        try {
-            const res = await aiApi.post(
-                "/agent/Generate/professional/summary",
-                payload
-            );
-            if (res?.status === 200) {
-                return res?.data;
-            }
-            return rejectWithValue(res?.data?.errors || "Something went wrong.");
-        } catch (e) {
-            return rejectWithValue(e?.response?.data || "Network error");
-        }
-    }
-);
-export const generateImpExperience = createAsyncThunk(
-    "dashboard/generateImpExperience",
+export const improvementExperience = createAsyncThunk(
+    "dashboard/improvementExperience",
     async (payload, { rejectWithValue }) => {
         try {
             const res = await aiApi.post(
@@ -720,23 +703,74 @@ export const generateImpExperience = createAsyncThunk(
     }
 );
 
-export const checkGrammarlySentence = createAsyncThunk(
-    "grammarly/checkSentence",
+export const generateImpNewSummary = createAsyncThunk(
+    "dashboard/generateImpNewSummary",
     async (payload, { rejectWithValue }) => {
         try {
-            const response = await aiApi.post(
-                "/Grammarly/sentence/Agent",
+            const res = await aiApi.post(
+                "/agent/Generate/professional/summary",
                 payload
             );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
 
-            console.log("Grammarly API response:", response);
-            return response.data;
-
-        } catch (err) {
-            console.error("Grammarly API error:", err);
-            return rejectWithValue(
-                err?.response?.data || err.message
+export const generateImpNewExperience = createAsyncThunk(
+    "dashboard/generateImpNewExperience",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post(
+                "/agent/Generate/Experience/Description",
+                payload
             );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+export const generateJdNewSummary = createAsyncThunk(
+    "dashboard/generateJdNewSummary",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post(
+                "/agent/JD/professional/summary",
+                payload
+            );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+export const generateJdNewExperience = createAsyncThunk(
+    "dashboard/generateJdNewExperience",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post(
+                "/agent/JD/Experience/Description",
+                payload
+            );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
         }
     }
 );
@@ -763,7 +797,7 @@ export const fetchMissingSkills = createAsyncThunk(
 const initialState = {
     error: false,
     loading: false,
-    improveResumeData: {},
+    extracteResumeData: {},
     checkATSData: {},
     atsLoading: false,
     jdBasedResumeData: {},
@@ -801,14 +835,24 @@ const initialState = {
     impEnhance: {},
     impEnUsageInfo: {},
 
-    generateImpSummaryLoading: false,
-    generateImpSummaryData: {},
+    improvementSummaryLoading: false,
+    improvementSummaryData: {},
 
-    generateImpExperienceLoading: false,
-    generateImpExperienceData: {},
+    improvementExperienceLoading: false,
+    improvementExperienceData: {},
 
-    grammarlySentenceData: null,
-    grammarlySentenceLoading: false,
+    generateImpNewSummaryLoading: false,
+    generateImpNewSummaryData:{},
+
+    generateImpNewExperienceLoading: false,
+    generateImpNewExperienceData: {},
+
+    generateJdNewSummaryLoading: false,
+    generateJdNewSummaryData:{},
+
+    generateJdNewExperienceLoading: false,
+    generateJdNewExperienceData: {},
+
     missingSkillsData: [],
     jobDescription: "",
 }
@@ -829,15 +873,15 @@ const DashboardSlice = createSlice(
             },
         },
         extraReducers: (builder) => {
-            builder.addCase(improveResume.pending, (state, { payload }) => {
+            builder.addCase(extracteResume.pending, (state, { payload }) => {
                 state.loading = true
             })
-            builder.addCase(improveResume.fulfilled, (state, { payload }) => {
+            builder.addCase(extracteResume.fulfilled, (state, { payload }) => {
                 state.loading = false
                 state.error = false
-                state.improveResumeData = payload
+                state.extracteResumeData = payload
             })
-                .addCase(improveResume.rejected, (state, { payload }) => {
+                .addCase(extracteResume.rejected, (state, { payload }) => {
                     state.error = payload
                     state.loading = false
                 })
@@ -1276,46 +1320,84 @@ const DashboardSlice = createSlice(
                 })
 
                 // ---------- GENERATE IMP SUMMARY ----------
-                .addCase(generateImpSummary.pending, (state) => {
-                    state.generateImpSummaryLoading = true;
+                .addCase(improvementSummary.pending, (state) => {
+                    state.improvementSummaryLoading = true;
                     state.error = false;
                 })
-                .addCase(generateImpSummary.fulfilled, (state, { payload }) => {
-                    state.generateImpSummaryLoading = false;
-                    state.generateImpSummaryData = payload;
+                .addCase(improvementSummary.fulfilled, (state, { payload }) => {
+                    state.improvementSummaryLoading = false;
+                    state.improvementSummaryData = payload;
                 })
-                .addCase(generateImpSummary.rejected, (state, { payload }) => {
-                    state.generateImpSummaryLoading = false;
+                .addCase(improvementSummary.rejected, (state, { payload }) => {
+                    state.improvementSummaryLoading = false;
                     state.error = payload;
                 })
 
                 // ---------- GENERATE IMP EXPERIENCE ----------
-                .addCase(generateImpExperience.pending, (state) => {
-                    state.generateImpExperienceLoading = true;
+                .addCase(improvementExperience.pending, (state) => {
+                    state.improvementLoading = true;
                     state.error = false;
                 })
-                .addCase(generateImpExperience.fulfilled, (state, { payload }) => {
-                    state.generateImpExperienceLoading = false;
-                    state.generateImpExperienceData = payload;
+                .addCase(improvementExperience.fulfilled, (state, { payload }) => {
+                    state.improvementExperienceLoading = false;
+                    state.improvementExperienceData = payload;
                 })
-                .addCase(generateImpExperience.rejected, (state, { payload }) => {
-                    state.generateImpExperienceLoading = false;
+                .addCase(improvementExperience.rejected, (state, { payload }) => {
+                    state.improvementExperienceLoading = false;
                     state.error = payload;
                 })
 
-                .addCase(checkGrammarlySentence.pending, (state) => {
-                    state.grammarlySentenceLoading = true;
-                    state.error = null;
+                .addCase(generateImpNewSummary.pending, (state) => {
+                    state.generateImpNewSummaryLoading = true;
+                    state.error = false;
+                })
+                .addCase(generateImpNewSummary.fulfilled, (state, { payload }) => {
+                    state.generateImpNewSummaryLoading = false;
+                    state.generateImpNewSummaryData = payload;
+                })
+                .addCase(generateImpNewSummary.rejected, (state, { payload }) => {
+                    state.generateImpNewSummaryLoading = false;
+                    state.error = payload;
                 })
 
-                .addCase(checkGrammarlySentence.fulfilled, (state, action) => {
-                    state.grammarlySentenceLoading = false;
-                    state.grammarlySentenceData = action.payload;
+                .addCase(generateImpNewExperience.pending, (state) => {
+                    state.generateImpNewExperienceLoading = true;
+                    state.error = false;
+                })
+                .addCase(generateImpNewExperience.fulfilled, (state, { payload }) => {
+                    state.generateImpNewExperienceLoading = false;
+                    state.generateImpNewExperienceData = payload;
+                })
+                .addCase(generateImpNewExperience.rejected, (state, { payload }) => {
+                    state.generateImpNewExperienceLoading = false;
+                    state.error = payload;
                 })
 
-                .addCase(checkGrammarlySentence.rejected, (state, action) => {
-                    state.grammarlySentenceLoading = false;
-                    state.error = action.payload;
+            
+                .addCase(generateJdNewSummary.pending, (state) => {
+                    state.generateJdNewSummaryLoading = true;
+                    state.error = false;
+                })
+                .addCase(generateJdNewSummary.fulfilled, (state, { payload }) => {
+                    state.generateJdNewSummaryLoading = false;
+                    state.generateJdNewSummaryData = payload;
+                })
+                .addCase(generateJdNewSummary.rejected, (state, { payload }) => {
+                    state.generateJdNewSummaryLoading = false;
+                    state.error = payload;
+                })
+
+                .addCase(generateJdNewExperience.pending, (state) => {
+                    state.generateJdNewExperienceLoading = true;
+                    state.error = false;
+                })
+                .addCase(generateJdNewExperience.fulfilled, (state, { payload }) => {
+                    state.generateJdNewExperienceLoading = false;
+                    state.generateJdNewExperienceData = payload;
+                })
+                .addCase(generateJdNewExperience.rejected, (state, { payload }) => {
+                    state.generateJdNewExperienceLoading = false;
+                    state.error = payload;
                 })
 
                 .addCase(fetchMissingSkills.pending, (state) => {

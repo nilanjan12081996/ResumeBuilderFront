@@ -2,16 +2,33 @@ import React, { useState, useEffect } from "react";
 import { Label } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
 import { Tab, Tabs, TabList } from "react-tabs";
-import { FaPen, FaTrash, FaPlus, FaTimes } from "react-icons/fa"; 
+import { FaPen, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import 'react-tabs/style/react-tabs.css';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMissingSkills } from "../../reducers/DashboardSlice";
 
 const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragStart, handleSkillDrop, draggedSkillIndex, setDraggedSkillIndex }) => {
     const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
     const tabColors = ["#ffeaec", "#feebe3", "#fff2cc", "#e7f4ed", "#f1f2ff"];
     const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
+    const dispatch = useDispatch();
+
+    const currentSkillsString = section.skills.map(s => s.name).join(", ");
+    useEffect(() => {
+        const targetJd = sessionStorage.getItem("target_jd");
+        const securityId = process.env.NEXT_PUBLIC_AI_SECURITY_ID;
+        const payload = {
+            security_id: securityId,
+            Skill: currentSkillsString,
+            JD: targetJd || ""
+        };
+        if (securityId) {
+            dispatch(fetchMissingSkills(payload));
+        }
+    }, []);
+
     const { missingSkillsData } = useSelector((state) => state?.dash);
-    
+
     const [localMissingSkills, setLocalMissingSkills] = useState([]);
 
     useEffect(() => {
@@ -28,31 +45,45 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
         setLocalMissingSkills(prev => prev.filter(s => s !== skillName));
     };
 
-   
-const addSkill = (skillName) => {
+
+  const addSkill = (skillName = "") => {
     const newSkill = {
-        id: `ts_${Date.now()}`, 
+        id: `ts_${Math.random().toString(36).substr(2, 9)}`,
         name: skillName,
-        level: 2 
+        level: 2 // Default to Skillful
     };
     
     handleSkillUpdate(sectionIndex, null, "add", newSkill);
-    removeMissingSkill(skillName);
+
+    if (skillName) {
+        removeMissingSkill(skillName);
+    } else {
+        // If manually added (empty name), set the last item to editing mode
+        // We use the current length because the new skill will be at that index
+        setEditingSkillIndex(section.skills.length);
+    }
 };
 
-const applyAllSkills = () => {
-    localMissingSkills.forEach((skillName, index) => {
-        const newSkill = {
-            id: `ts_${Date.now() + index}`,
-            name: skillName,
-            level: 2
-        };
-        handleSkillUpdate(sectionIndex, null, "add", newSkill);
-    });
-    setLocalMissingSkills([]);
-};
+    const applyAllSkills = () => {
+        localMissingSkills.forEach((skillName, index) => {
+            const newSkill = {
+                id: `ts_${Date.now() + index}`,
+                name: skillName,
+                level: 2
+            };
+            handleSkillUpdate(sectionIndex, null, "add", newSkill);
+        });
+        setLocalMissingSkills([]);
+    };
 
-    
+    const handleDelete = (sIndex, skillId) => {
+        setDeletingSkillIndex(sIndex);
+
+        setTimeout(() => {
+            handleSkillUpdate(sectionIndex, skillId, "delete");
+            setDeletingSkillIndex(null);
+        }, 500);
+    };
 
     return (
         <>
@@ -60,13 +91,11 @@ const applyAllSkills = () => {
                 <p className="!text-sm !font-medium !text-gray-500">
                     Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing.
                 </p>
-
-                {/* --- Missing Skills UI Section Start --- */}
                 {localMissingSkills.length > 0 && (
                     <div className="mt-4 mb-6 p-4 border border-dashed border-purple-300 rounded-lg bg-purple-50/30">
                         <div className="flex justify-between items-center mb-3">
                             <span className="text-sm font-bold text-[#800080]">Missing Skills for this Job:</span>
-                            <button 
+                            <button
                                 onClick={applyAllSkills}
                                 className="text-xs font-bold !text-white !bg-[#800080] px-3 py-1 rounded-md hover:!bg-[#f9c3f9] transition"
                             >
@@ -75,13 +104,13 @@ const applyAllSkills = () => {
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {localMissingSkills.map((mSkill, idx) => (
-                                <div 
+                                <div
                                     key={idx}
                                     className="group flex items-center gap-1 bg-white border border-gray-200 pl-3 pr-1 py-1 rounded-full cursor-pointer hover:border-purple-400 hover:shadow-sm transition-all"
                                     onClick={() => addSkill(mSkill)}
                                 >
                                     <span className="text-xs font-medium text-gray-700">{mSkill}</span>
-                                    <div 
+                                    <div
                                         className="p-1 hover:bg-red-50 rounded-full text-gray-400 hover:text-red-500 transition-colors"
                                         onClick={(e) => {
                                             e.stopPropagation(); // Parent এর addSkill কল হওয়া আটকাবে
@@ -182,6 +211,13 @@ const applyAllSkills = () => {
                     </div>
                 );
             })}
+            <button
+                type="button"
+                onClick={() => addSkill("")}
+                className="flex items-center gap-2 !text-sm !text-[#800080] font-medium mt-4 hover:underline"
+            >
+                <FaPlus size={12} /> Add one more skill
+            </button>
         </>
     );
 };

@@ -7,13 +7,14 @@ import { HiPlus, HiMinus } from "react-icons/hi";
 import { TbDragDrop } from 'react-icons/tb';
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from "../../ui/Datepicker";
+import { useSelector } from 'react-redux';
 
 
 const ImpExperience = ({
   section,
   sectionIndex,
   handleExpUpdate,
-  handleExpDragStart, 
+  handleExpDragStart,
   handleExpDrop,
   handleAddExperience,
   draggedExpIndex,
@@ -30,6 +31,14 @@ const ImpExperience = ({
       setDeletingExpIndex(null);
     }, 500);
   };
+
+  const { extracteResumeData } = useSelector((state) => state?.dash);
+  const { singleResumeInfo } = useSelector((state) => state?.resume);
+
+  const resumeSource =
+    singleResumeInfo?.data?.data ||
+    extracteResumeData?.resume_data ||
+    null;
 
 
   return (
@@ -168,7 +177,8 @@ const ImpExperience = ({
                         <GenerateWithAiModal
                           open={true}
                           onClose={() => setActiveExpId(null)}
-                          aiType="imp_experience"
+                          aiType="jd_experience"
+                          fullResumeData={resumeSource}
                           initialText={exp.description || ""}
                           onApply={(text) => {
                             handleExpUpdate(sectionIndex, exp.id, "description", text);

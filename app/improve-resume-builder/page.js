@@ -37,13 +37,13 @@ import { defaultResumeSettings } from "../config/defaultResumeSettings";
 const Page = () => {
   const componentRef = useRef();
   const dispatch = useDispatch();
-  const { improveResumeData } = useSelector((state) => state?.dash);
+  const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
   console.log('singleResumeInfo', singleResumeInfo)
   // console.log('singleResumeInfo', singleResumeInfo)
   const resumeSource =
     singleResumeInfo?.data?.data ||
-    improveResumeData?.resume_data ||
+    extracteResumeData?.resume_data ||
     null;
 
 
@@ -70,7 +70,7 @@ const Page = () => {
   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
 
   // States
-  const [selectedTemplate, setSelectedTemplate] = useState('Professional');
+  const [selectedTemplate, setSelectedTemplate] = useState('professional');
   const [sections, setSections] = useState([]);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
@@ -91,10 +91,30 @@ const Page = () => {
     vivid: VividTemplate,
     corporate: CorporateTemplate,
   };
+  const [themeColor, setThemeColor] = useState(defaultResumeSettings.theme.defaultColor);
 
-  const [themeColor, setThemeColor] = useState(
-    defaultResumeSettings.theme.defaultColor
-  );
+
+const handleThemeColorChange = (color) => {
+  setThemeColor(color);
+
+  setResumeSettings(prev => {
+    const template = prev.theme.template;
+
+    return {
+      ...prev,
+      theme: {
+        ...prev.theme,
+        defaultColor: color,
+        templateColors: {
+          ...prev.theme.templateColors,
+          [template]: color, 
+        },
+      },
+    };
+  });
+};
+
+
 
   const ActiveResume = templateMap[selectedTemplate] || Professional;
 
@@ -131,6 +151,7 @@ const Page = () => {
       JSON.stringify({
         ...resumeSource,
         sections,
+        resumeSettings: resumeSource.resumeSettings || defaultResumeSettings,
       })
     );
 
@@ -147,6 +168,7 @@ const Page = () => {
     const currentData = {
       ...formValues,
       sections,
+      resumeSettings,
     };
 
     //  compare WITHOUT IDs
@@ -161,6 +183,8 @@ const Page = () => {
     const timeoutId = setTimeout(() => {
       const payload = {
         ...currentData,
+        sections,
+        resumeSettings,
         resume_type: "improve",
       };
 
@@ -195,7 +219,7 @@ const Page = () => {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [formValues, sections]);
+  }, [formValues, sections, resumeSettings]);
 
 
   // -------------------- MANUAL SAVE --------------------
@@ -205,6 +229,7 @@ const Page = () => {
     const payload = {
       ...data,
       sections,
+      resumeSettings,
       resume_type: "improve",
     };
 
@@ -218,7 +243,7 @@ const Page = () => {
         setSavingStatus("saved");
 
         lastSavedData.current = JSON.parse(
-          JSON.stringify({ ...data, sections })
+          JSON.stringify({ ...data, sections, resumeSettings })
         );
 
         // 🧠 FIRST SAVE ONLY
@@ -264,7 +289,7 @@ const Page = () => {
   }, [savingStatus]);
 
   // Helper function to map resume data to sections
-  const mapImproveResumeDataToSections = (resumeData) => {
+  const mapextracteResumeDataToSections = (resumeData) => {
     if (!resumeData) return [];
 
     const sections = [];
@@ -438,84 +463,103 @@ const Page = () => {
   };
 
   // ----------------- SETTING FORM VALUES -----------------
-useEffect(() => {
-  if (!resumeSource) return;
-
-  const resumeData = improveResumeData?.resume_data || resumeSource;
-  const personal = resumeData?.personal_information || {};
-  const meta = resumeData?.metadata || {};
-
-  // Profile summary
-  const profileSummaryFromAdditional =
-    resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
-
-  const summaryPoints =
-    Array.isArray(profileSummaryFromAdditional) && profileSummaryFromAdditional.length > 0
-      ? profileSummaryFromAdditional
-      : resumeData?.professional_summary?.summary_text
-        ? [resumeData.professional_summary.summary_text]
-        : [];
-
-  const formattedSummary =
-    summaryPoints.length > 1
-      ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
-      : summaryPoints[0] || "";
-
-  // Name
-  const fullName = personal.full_name || "";
-  const nameParts = fullName.split(" ");
-
-  setValue("job_target", meta.current_role || resumeSource.job_target || "");
-  setValue("first_name", nameParts[0] || resumeSource.first_name || "");
-  setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
-  setValue("email", personal.email || resumeSource.email || "");
-  setValue("phone", personal.phone || resumeSource.phone || "");
-  setValue(
-    "city_state",
-    [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || resumeSource.city_state || ""
-  );
-  setValue("country", personal.location?.country || resumeSource.country || "");
-  setValue("address", personal.location?.full_address || resumeSource.address || "");
-  setValue("summary", formattedSummary || resumeSource.summary || "");
-  setValue("profileImage", resumeSource.profileImage || "");
-  
-  // Additional Details
-  setValue("linkedin", resumeSource.linkedin || "");
-  setValue("github", resumeSource.github || "");
-  setValue("stackoverflow", resumeSource.stackoverflow || "");
-  setValue("leetcode", resumeSource.leetcode || "");
-  setValue("postal_code", resumeSource.postal_code || "");
-  setValue("nationality", resumeSource.nationality || "");
-  setValue("birth_place", resumeSource.birth_place || "");
-  setValue("dob", resumeSource.dob || "");
-  setValue("driving_licence", resumeSource.driving_licence || "");
-  
-}, [improveResumeData, resumeSource, setValue]);
-
-
-// ----------------- SYNC SUMMARY -----------------
-useEffect(() => {
-  const summarySections = sections.filter(sec => sec.type === "summary");
-  if (summarySections.length > 0) {
-    const summaryText = summarySections[0].summary || "";
-    setValue("summary", summaryText);
-  }
-}, [sections, setValue]);
-
-  // ----------------- MAP SECTIONS -----------------
   useEffect(() => {
     if (!resumeSource) return;
 
-    // IF already saved resume (edit mode)
-    if (resumeSource.sections?.length) {
-      setSections(resumeSource.sections);
-      return;
-    }
+    const resumeData = extracteResumeData?.resume_data || resumeSource;
+    const personal = resumeData?.personal_information || {};
+    const meta = resumeData?.metadata || {};
 
-    // ELSE generated resume (create mode)
-    const mappedSections = mapImproveResumeDataToSections(resumeSource);
-    setSections(mappedSections);
-  }, [resumeSource]);
+    // Profile summary
+    const profileSummaryFromAdditional =
+      resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
+
+    const summaryPoints =
+      Array.isArray(profileSummaryFromAdditional) && profileSummaryFromAdditional.length > 0
+        ? profileSummaryFromAdditional
+        : resumeData?.professional_summary?.summary_text
+          ? [resumeData.professional_summary.summary_text]
+          : [];
+
+    const formattedSummary =
+      summaryPoints.length > 1
+        ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : summaryPoints[0] || "";
+
+    // Name
+    const fullName = personal.full_name || "";
+    const nameParts = fullName.split(" ");
+
+    setValue("job_target", meta.current_role || resumeSource.job_target || "");
+    setValue("first_name", nameParts[0] || resumeSource.first_name || "");
+    setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
+    setValue("email", personal.email || resumeSource.email || "");
+    setValue("phone", personal.phone || resumeSource.phone || "");
+    setValue(
+      "city_state",
+      [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || resumeSource.city_state || ""
+    );
+    setValue("country", personal.location?.country || resumeSource.country || "");
+    setValue("address", personal.location?.full_address || resumeSource.address || "");
+    setValue("summary", formattedSummary || resumeSource.summary || "");
+    setValue("profileImage", resumeSource.profileImage || "");
+
+    // Additional Details
+    setValue("linkedin", resumeSource.linkedin || "");
+    setValue("github", resumeSource.github || "");
+    setValue("stackoverflow", resumeSource.stackoverflow || "");
+    setValue("leetcode", resumeSource.leetcode || "");
+    setValue("postal_code", resumeSource.postal_code || "");
+    setValue("nationality", resumeSource.nationality || "");
+    setValue("birth_place", resumeSource.birth_place || "");
+    setValue("dob", resumeSource.dob || "");
+    setValue("driving_licence", resumeSource.driving_licence || "");
+
+  }, [extracteResumeData, resumeSource, setValue]);
+
+
+  // ----------------- SYNC SUMMARY -----------------
+  useEffect(() => {
+    const summarySections = sections.filter(sec => sec.type === "summary");
+    if (summarySections.length > 0) {
+      const summaryText = summarySections[0].summary || "";
+      setValue("summary", summaryText);
+    }
+  }, [sections, setValue]);
+
+  // ----------------- MAP SECTIONS -----------------
+// ----------------- MAP SECTIONS + RESTORE SETTINGS -----------------
+useEffect(() => {
+  if (!resumeSource) return;
+
+  // 1️⃣ Restore resumeSettings
+  if (resumeSource.resumeSettings) {
+    const settings = resumeSource.resumeSettings;
+    setResumeSettings(settings);
+
+    const template = settings.theme?.template || "professional";
+    setSelectedTemplate(template);
+
+    const color =
+      settings.theme?.templateColors?.[template] ||
+      settings.theme?.defaultColor ||
+      defaultResumeSettings.theme.defaultColor;
+
+    setThemeColor(color);
+  }
+
+  // 2️⃣ Restore sections (edit mode)
+  if (resumeSource.sections?.length) {
+    setSections(resumeSource.sections);
+    return;
+  }
+
+  // 3️⃣ Create mode: map AI extracted data
+  const mappedSections = mapextracteResumeDataToSections(resumeSource);
+  setSections(mappedSections);
+
+}, [resumeSource]);
+
 
 
   // ----------------- SYNC SKILLS -----------------
@@ -982,6 +1026,14 @@ useEffect(() => {
       defaultResumeSettings.theme.defaultColor;
 
     setThemeColor(color);
+    + setResumeSettings(prev => ({
+      ...prev,
+      theme: {
+        ...prev.theme,
+        template: id,
+      },
+    }));
+
   };
 
   const handleAddNewSection = (newSection) => {
@@ -1139,7 +1191,7 @@ useEffect(() => {
                             )}
 
                             {section.type === "summary" && (
-                              <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index}/>
+                              <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index} />
                             )}
 
                             {section.type === "education" && (
@@ -1223,7 +1275,7 @@ useEffect(() => {
               selectedTemplate={selectedTemplate}
               onSelectTemplate={handleSelectTemplate}
               themeColor={themeColor}
-              setThemeColor={setThemeColor}
+              setThemeColor={handleThemeColorChange}
               resumeSettings={resumeSettings}
               setResumeSettings={setResumeSettings}
             />

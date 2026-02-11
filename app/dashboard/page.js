@@ -33,7 +33,7 @@ import { BiLogoLinkedin } from "react-icons/bi";
 import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
-import { addImpQuestions, checkATS, getUpdateResumeInfo, improveResume, updateAchievements, updateBasicInfo, updateCertification, updateEducation, updateExperience, updateExtraProject, updateLanguage, updateSkills } from "../reducers/DashboardSlice";
+import { addImpQuestions, checkATS, getUpdateResumeInfo, extracteResume, updateAchievements, updateBasicInfo, updateCertification, updateEducation, updateExperience, updateExtraProject, updateLanguage, updateSkills } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
 import LinkedInChooseModal from "./LinkedInChooseModal";
@@ -64,7 +64,7 @@ const Page = () => {
 
   const router = useRouter();
   const dispatch = useDispatch();
-  const { error, improveResumeData, loading } = useSelector(
+  const { error, extracteResumeData, loading } = useSelector(
     (state) => state.dash
   );
   const [openModalCreateResume, setOpenModalCreateResume] = useState(false);
@@ -123,7 +123,7 @@ const Page = () => {
 
   // Watch the resume_file field to see if it changes
   const resumeFile = watch("resume_file");
-  console.log("improveResumeData", improveResumeData);
+  console.log("extracteResumeData", extracteResumeData);
 
   useEffect(() => {
     if (resumeFile && resumeFile[0]) {
@@ -141,7 +141,7 @@ const handleResumeImprove = (data) => {
   const formData = new FormData();
   formData.append("resume_pdf", data.resume_file[0]);
 
- dispatch(improveResume(formData))
+ dispatch(extracteResume(formData))
   .then((res) => {
     console.log("spres", res);
 
