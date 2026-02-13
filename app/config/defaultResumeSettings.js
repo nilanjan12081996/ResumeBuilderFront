@@ -42,6 +42,7 @@ export const defaultResumeSettings = {
       clear: "#4B0082",
       vivid: "#FF6F61",
       corporate: "#0B3D91",
+      linkedin:"#293d48"
     },
   },
 };

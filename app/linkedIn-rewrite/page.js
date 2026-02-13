@@ -1,765 +1,938 @@
 'use client';
-
 import React, { useEffect, useRef, useState } from 'react';
-
-import Image from 'next/image';
-
-import { HiClipboardList } from "react-icons/hi";
-import { MdPreview } from "react-icons/md";
-import { IoStatsChart } from "react-icons/io5";
-import { IoMdDownload } from "react-icons/io";
-import { AiOutlineArrowRight } from "react-icons/ai";
-import { AiFillSave } from "react-icons/ai";
-
-import { BiSolidUser } from "react-icons/bi";
-import { BiSolidBriefcase } from "react-icons/bi";
-import { FaGlobe } from "react-icons/fa";
-import { BiLogoLinkedinSquare } from "react-icons/bi";
-import { BsGithub } from "react-icons/bs";
-import { MdEmail } from "react-icons/md";
-import { FaLocationDot } from "react-icons/fa6";
-import { BiSolidPhone } from "react-icons/bi";
-
-import { HiAcademicCap } from "react-icons/hi2";
-
-import { FaLanguage } from "react-icons/fa6";
-import { MdSettingsSuggest } from "react-icons/md";
-import { FaDiagramProject } from "react-icons/fa6";
-import { FaCertificate } from "react-icons/fa";
-import { FaTrophy } from "react-icons/fa6";
-
-import { BiSolidBank } from "react-icons/bi";
-
-import { BsFillPlusCircleFill } from "react-icons/bs";
-import { MdDelete } from "react-icons/md";
-
-import { FaTags } from "react-icons/fa";
-import { BiSolidBuilding } from "react-icons/bi";
-
-import { BiWorld } from "react-icons/bi";
-
-import { BsFillPersonVcardFill } from "react-icons/bs";
-import { BiCodeAlt } from "react-icons/bi";
-
-import { BiLink } from "react-icons/bi";
-
-import { MdOutlineWorkOutline } from "react-icons/md";
-
-
-import resume4 from "../assets/imagesource/resume4.png";
-
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
-
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker, Select } from "flowbite-react";
-import LinkedInTemplate from './LinkedInTemplate';
-import BasicInfoLkdin from './BasicInfoLkdin';
-import EducationLkdin from './EducationLkdin';
-import ExpLkdin from './ExpLkdin';
-import LanguageLkdin from './LanguageLkdin';
-import SkillsLkdin from './SkillsLkdin';
-import CoursesLkdin from './CoursesLkdin';
-import AwardLkdin from './AwardLkdin';
-import { useDispatch, useSelector } from 'react-redux';
-import { getLinkedinAtsScoreAnalyze, linkedgetDetails, linkedInBasicInfo, linkedInEduInfo, linkedInEnhance, linkedInExpInfo, linkedInLangInfo, linkedInSkillInfo, linkedInUsageInfo } from '../reducers/LinkedinSlice';
-import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { convertToSubmitFormat } from '../utils/DateSubmitFormatter';
-import { useReactToPrint } from 'react-to-print';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
-import LinkdinAtsScoreAnalyzeModal from '../modal/LinkdinAtsScoreAnalyzeModal';
-import { addCountResume, addCountResumeOrg } from '../reducers/ResumeSlice';
+import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
+import isEqual from 'lodash.isequal';
+import { AiFillSave } from "react-icons/ai";
+import { FaPen, FaTrash } from 'react-icons/fa';
 
-const page = () => {
-  const [openPreviewModal, setOpenPreviewModal] = useState(false);
-  const { lkdDetails, lkdUsageInfo } = useSelector((state) => state?.linkedIn)
-  const [enhancing, setEnhancing] = useState(false);
-  const [openLinkdinAtsModal, setOpenLinkdinAtsModal] = useState(false);
-  const [atsData, setAtsData] = useState(null)
-  const { profileData } = useSelector((state) => state?.profile)
+//  Import @dnd-kit
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
-  const dispatch = useDispatch()
-  const searchParams = useSearchParams();
-  const id = atob(searchParams.get("id"))
-  console.log("id", id);
+// Import components
+import LinkedInResumeScore from './components/LinkedInResumeScore';
+import LinkedInPersonalDetails from './components/LinkedInPersonalDetails';
+import LinkedInSkills from './components/LinkedInSkills';
+import LinkedInSummary from './components/LinkedInSummary';
+import LinkedInEducation from './components/LinkedInEducation';
+import LinkedInExperience from './components/LinkedInExperience';
+import CustomizeSection from '../ui/CustomizeSection.jsx';
+
+
+//  Import Draggable Components
+import DraggableWrapper from './DraggableWrapper';
+import DragIcon from './DragIcon';
+
+// Import templates
+import Professional from "../TemplateNew/Professional";
+import PrimeATS from "../TemplateNew/PrimeATS";
+import CleanTemplate from "../TemplateNew/CleanTemplate";
+import ClearTemplate from "../TemplateNew/ClearTemplate";
+import VividTemplate from "../TemplateNew/VividTemplate";
+import CorporateTemplate from '../TemplateNew/CorporateTemplate';
+import LinkedInPrime from '../TemplateNew/LinkedInPrime';
+
+import { useTabs } from '../context/TabsContext.js';
+import { checkATS } from '../reducers/DashboardSlice';
+import { getSingleResume, saveResumeLinkedIn } from '../reducers/ResumeSlice';
+import { defaultResumeSettings } from "../config/defaultResumeSettings";
+
+
+const LinkedInResumeBuilder = () => {
   const componentRef = useRef();
+  const dispatch = useDispatch();
+  const { extracteResumeData } = useSelector((state) => state?.dash);
+  const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
+
+  const resumeSource =
+    singleResumeInfo?.data?.data ||
+    extracteResumeData?.resume_data ||
+    null;
+
+  // Resume ID tracking
+  const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
+
+  // Auto-Save State
+  const lastSavedData = useRef(null);
+  const isInitialLoad = useRef(true);
+  const [savingStatus, setSavingStatus] = useState('unsaved');
+
   useEffect(() => {
-    dispatch(linkedgetDetails({ lkdin_resume_id: id }))
-    dispatch(linkedInUsageInfo(id));
-  }, [id])
+    if (!resumeSource) return;
+
+    const atsPayload = {
+      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+      resume_data: JSON.stringify(resumeSource),
+      Ats_score: 0
+    };
+
+    dispatch(checkATS(atsPayload));
+  }, [resumeSource, dispatch]);
+
+  const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+
+  // States
+  const [selectedTemplate, setSelectedTemplate] = useState('linkedin');
+  const [sections, setSections] = useState([]);
+  const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
+  const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
+  const [draggedCertIndex, setDraggedCertIndex] = useState(null);
+  const [draggedExpIndex, setDraggedExpIndex] = useState(null);
+  const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+  const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
+  const [deletingSectionIndex, setDeletingSectionIndex] = useState(null);
+  const { activeTab } = useTabs();
+
+  //  Setup sensors for @dnd-kit
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Template mapping
+  const templateMap = {
+    professional: Professional,
+    ats: PrimeATS,
+    clean: CleanTemplate,
+    clear: ClearTemplate,
+    vivid: VividTemplate,
+    corporate: CorporateTemplate,
+    linkedin: LinkedInPrime,
+  };
+
+  const [themeColor, setThemeColor] = useState(defaultResumeSettings.theme.defaultColor);
+
+  const handleThemeColorChange = (color) => {
+    setThemeColor(color);
+
+    setResumeSettings(prev => {
+      const template = prev.theme.template;
+
+      return {
+        ...prev,
+        theme: {
+          ...prev.theme,
+          defaultColor: color,
+          templateColors: {
+            ...prev.theme.templateColors,
+            [template]: color,
+          },
+        },
+      };
+    });
+  };
+
+  const ActiveResume = templateMap[selectedTemplate] || linkedin;
+
+  // Form handling
   const {
     register,
     handleSubmit,
-    setValue,
     watch,
+    setValue,
     formState: { errors },
   } = useForm();
 
   const formValues = watch();
-  // console.log('remaining', lkdUsageInfo)
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleAnalyzeResume = async () => {
-    try {
-      const res = await dispatch(getLinkedinAtsScoreAnalyze({ id })).unwrap();
-      if (res?.data) {
-        setAtsData(res.data);
-        setOpenLinkdinAtsModal(true);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch ATS Score");
+  const resume_id = searchParams.get("id");
+  const resume_type = searchParams.get("fetch");
+
+  //  Handle section drag end
+  const handleSectionDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setSections((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
     }
   };
 
-
-  const parseDate = (value) => {
-    if (!value || value === "Present") return null;
-    const parsed = new Date(value);
-    return isNaN(parsed) ? null : parsed.toISOString();
-  };
-
+  // -------------------- INITIAL DATA LOAD --------------------
   useEffect(() => {
-    if (lkdDetails?.data?.[0]?.experience_info) {
-      const mappedExp = lkdDetails.data[0].experience_info.map((exp) => {
-        const isCurrent = exp.end_date === "Present" || exp.current_work === 1;
+    if (!resumeSource) return;
 
-        return {
-          id: exp.id,
-          company_name: exp.company_name || "",
-          position: exp.position || "",
-          location: exp.location || "",
-          skill: exp.skill_set || "",
-          job_type: exp.job_type || "",
-
-          start_date: parseDate(exp.start_date),
-
-          // 🔑 IMPORTANT
-          end_date: isCurrent ? "Present" : parseDate(exp.end_date),
-
-          current_work: isCurrent,
-          job_description: exp.job_description || "",
-          projects: exp.projects || [],
-        };
+    if (resumeSource.mongo_id || resumeSource._id) {
+      setResumeIds({
+        mongo_id: resumeSource.mongo_id || resumeSource._id,
+        mysql_id: resumeSource.mysql_id || resumeSource.id,
       });
-
-      setExperiences(mappedExp);
     }
-  }, [lkdDetails]);
 
-  const [educationEntries, setEducationEntries] = useState([
-    { id: Date.now(), institution: "", location: "", field_study: "", degree: "", start_time: null, end_time: null, cgpa: "" }
-  ])
+    lastSavedData.current = JSON.parse(
+      JSON.stringify({
+        ...resumeSource,
+        sections,
+        resumeSettings: resumeSource.resumeSettings || defaultResumeSettings,
+      })
+    );
 
-  // useEffect(() => {
-  //   if (lkdDetails?.data?.[0]?.education_info) {
-  //     console.log('lkdDetails', lkdDetails)
-  //     const mappedEducation = lkdDetails?.data?.[0]?.education_info.map((edu) => {
-  //       // Try to separate field and degree if possible
-  //       let degree = "";
-  //       let field_study = "";
-  //       if (edu.course) {
-  //         // Look for parentheses (common LinkedIn format)
-  //         const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
-  //         if (match) {
-  //           field_study = match[1].trim();  // "Computer Science"
-  //           degree = match[2].trim();       // "Bachelor of Science - BS"
-  //         } else {
-  //           degree = edu.course; // fallback if no parentheses
-  //         }
-  //       }
+    setSavingStatus("saved");
+    isInitialLoad.current = false;
+  }, [resumeSource]);
 
-  //       return {
-  //         id: edu.id,
-  //         institution: edu.college || "",
-  //         location: edu.location || "",
-  //         degree,
-  //         field_study,
-  //         start_time: edu.course_start ? new Date(edu.course_start) : null,
-  //         end_time: edu.course_completed && edu.course_completed !== "1970-01-01"
-  //           ? new Date(edu.course_completed)
-  //           : null,
-  //         cgpa: edu.cgpa || null,
-  //         additionalInfo: edu.aditional_info || "",
-  //         currentlyStudying: !edu.course_completed || edu.course_completed === "1970-01-01",
-  //       };
-  //     });
-
-  //     setEducationEntries(mappedEducation);
-  //   }
-  // }, [lkdDetails]);
-
+  // -------------------- AUTO SAVE --------------------
   useEffect(() => {
-    if (lkdDetails?.data?.[0]?.education_info) {
-      console.log('lkdDetails', lkdDetails);
+    if (isInitialLoad.current) return;
 
-      const mappedEducation = lkdDetails.data[0].education_info.map((edu) => {
-        let degree = "";
-        let field_study = "";
-
-        if (edu.course) {
-          // Match patterns like "undefined (React js developer)"
-          const match = edu.course.match(/^(.*?)\s*\((.*?)\)$/);
-
-          if (match) {
-            let field = match[1].trim(); // "undefined"
-            let deg = match[2].trim();   // "React js developer"
-
-            // If field == undefined → only degree
-            if (field.toLowerCase() === "undefined" || field === "") {
-              field_study = "";
-              degree = deg;
-            } else {
-              field_study = field;
-              degree = deg;
-            }
-          } else {
-            // If no parentheses → treat whole as degree (unless undefined)
-            if (edu.course.toLowerCase() !== "undefined") {
-              degree = edu.course.trim();
-            }
-          }
-        }
-
-        return {
-          id: edu.id,
-          institution: edu.college || "",
-          location: edu.location || "",
-          degree,
-          field_study,
-          start_time: edu.course_start ? new Date(edu.course_start) : null,
-          end_time:
-            edu.course_completed &&
-              edu.course_completed !== "1970-01-01" &&
-              edu.course_completed !== "Present"
-              ? new Date(edu.course_completed)
-              : null,
-          cgpa: edu.cgpa || null,
-          additionalInfo: edu.aditional_info || "",
-          currentlyStudying:
-            !edu.course_completed ||
-            edu.course_completed === "1970-01-01" ||
-            edu.course_completed === "Present",
-        };
-      });
-
-      setEducationEntries(mappedEducation);
-    }
-  }, [lkdDetails]);
-
-
-
-
-
-
-
-  const [experiences, setExperiences] = useState([
-    {
-      id: Date.now(),
-      company_name: "",
-      position: "",
-      location: "",
-      skill: "",
-      job_type: "",
-      start_date: null,
-      end_date: null,
-      current_work: false,
-      job_description: "",
-    },
-  ]);
-
-  const [languages, setLanguages] = useState([
-    { id: Date.now(), language_name: "" },
-  ]);
-
-  useEffect(() => {
-    if (lkdDetails?.data?.[0]?.language_info?.length > 0) {
-      const mappedLanguages = lkdDetails.data[0].language_info.map((lang) => ({
-        id: lang.id,
-        language_name: lang.language || "",
-        proficiency: lang.level || "",
-      }));
-      setLanguages(mappedLanguages);
-    }
-  }, [lkdDetails, setLanguages]);
-
-  const [skills, setSkills] = useState([
-    { id: Date.now(), skill_category: "", skill: "" }
-  ])
-
-  useEffect(() => {
-    if (lkdDetails?.data?.[0]?.skills_info?.length > 0) {
-      const formattedSkills = lkdDetails?.data?.[0]?.skills_info.map((s) => ({
-        id: s.id,
-        skill_category: s.category || "",
-        skill: s.skill_set || "",
-      }));
-      setSkills(formattedSkills);
-    }
-  }, [lkdDetails?.data?.[0]?.skills_info]);
-
-  const onSubmit = (data) => {
-    console.log("LinkedIn Submit Data:", data);
-
-    const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
-    console.log("lkdin_resume_id:", lkdin_resume_id);
-
-
-    const basicInfoPayload = {
-      ...data,
-      lkdin_resume_id,
-      basicinfo_id: lkdDetails?.data?.[0]?.basic_info?.[0]?.id || null
+    const currentData = {
+      ...formValues,
+      sections,
+      resumeSettings,
     };
 
-    console.log("Basic Info Payload:", basicInfoPayload);
+    const normalized = JSON.parse(JSON.stringify(currentData));
 
-    dispatch(linkedInBasicInfo(basicInfoPayload)).then((res) => {
-      console.log("Basic Info Response:", res);
+    if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
+      return;
+    }
 
-      if (res?.payload?.status_code === 201) {
+    setSavingStatus("saving");
 
-        // Education Info
-        const eduPayload = {
-          lkdin_resume_id,
-          education_info: educationEntries.map((edu) => ({
-            id: edu?.id || null,
-            name_of_the_institution: edu.institution,
-            location: edu.location,
-            field_study: edu.field_study,
-            degree_name: edu.degree,
-            duration: {
-              start_date: convertToSubmitFormat(edu.start_time),
-              end_date: convertToSubmitFormat(edu.end_time),
-            },
+    const timeoutId = setTimeout(() => {
+      const payload = {
+        ...currentData,
+        sections,
+        resumeSettings,
+        resume_type: "linkedin",
+      };
 
-            cgpa: edu.cgpa,
-            additional_information: edu.additionalInfo,
-          }))
-        };
+      if (resumeIds.mongo_id && resumeIds.mysql_id) {
+        payload.mongo_id = resumeIds.mongo_id;
+        payload.mysql_id = resumeIds.mysql_id;
+      }
 
-        console.log("Education Payload:", eduPayload);
-        dispatch(linkedInEduInfo(eduPayload));
+      dispatch(saveResumeLinkedIn(payload)).then((res) => {
+        if (res.payload?.status_code === 200) {
+          setSavingStatus("saved");
+          lastSavedData.current = normalized;
 
+          if (!resumeIds.mongo_id) {
+            const mongo_id = res.payload.sectionsdata?.mongo_id;
+            const mysql_id = res.payload.sectionsdata?.mysql_id;
 
-        // Experience Info
-        const expPayload = {
-          lkdin_resume_id,
-          experience_info: experiences.map((exp) => ({
-            id: exp?.id || null,
-            company_name: exp.company_name,
-            position: exp.position,
-            location: exp.location,
-            skill_set: exp.skill?.split(",").map((s) => s.trim()),
-            additional_information: exp.job_description || "",
-            job_type: exp.job_type || "",
-            duration: {
-              start_date: exp.start_date,
-              end_date: exp.end_date,
-            },
-            current_work: exp.current_work ? 1 : 0,
-            projects:
-              exp.projects?.map((proj) => ({
-                title: proj.title,
-                role: proj.role,
-                technology: proj.technology?.split(",").map((t) => t.trim()),
-                description: proj.description,
-              })) || [],
-          })),
-        };
+            setResumeIds({ mongo_id, mysql_id });
+            router.replace(
+              `/linkedIn-rewrite?id=${mysql_id}&fetch=linkdin_resume`,
+              { scroll: false }
+            );
+          }
+        } else {
+          setSavingStatus("error");
+        }
+      });
+    }, 2000);
 
-        console.log("✅ Final Experience Payload:", expPayload);
-        dispatch(linkedInExpInfo(expPayload));
+    return () => clearTimeout(timeoutId);
+  }, [formValues, sections, resumeSettings]);
 
+  // -------------------- MANUAL SAVE --------------------
+  const onSubmit = (data) => {
+    setSavingStatus("saving");
 
+    const payload = {
+      ...data,
+      sections,
+      resumeSettings,
+      resume_type: "linkdin",
+    };
 
-        // Skills Info
-        const skillPayload = {
-          lkdin_resume_id,
+    if (resumeIds.mongo_id && resumeIds.mysql_id) {
+      payload.mongo_id = resumeIds.mongo_id;
+      payload.mysql_id = resumeIds.mysql_id;
+    }
 
-          skill_info: skills.map(sk => ({
-            skill_category: sk.skill_category,
-            position: "test",
-            skills: sk.skill.split(',').map(t => t.trim())
-            // skill: sk.skill.split(',').map(t => t.trim())
-          }))
-        };
-        console.log("Skills Payload:", skillPayload);
-        dispatch(linkedInSkillInfo(skillPayload));
+    dispatch(saveResumeLinkedIn(payload)).then((res) => {
+      if (res.payload?.status_code === 200) {
+        setSavingStatus("saved");
 
-        console.log('languages', languages)
-        // Language Info
-        const langPayload = {
-          lkdin_resume_id,
-          language_info: languages.map((lang) => ({
-            language_name: lang.language_name,
-            proficiency_level: lang.proficiency,
-          })),
-        };
-        console.log("Language Payload:", langPayload);
-        dispatch(linkedInLangInfo(langPayload));
+        lastSavedData.current = JSON.parse(
+          JSON.stringify({ ...data, sections, resumeSettings })
+        );
+
+        if (!resumeIds.mongo_id) {
+          const mongo_id = res.payload.sectionsdata?.mongo_id;
+          const mysql_id = res.payload.sectionsdata?.mysql_id;
+
+          setResumeIds({ mongo_id, mysql_id });
+
+          router.replace(
+            `/linkedin-resume-builder?id=${mysql_id}&fetch=linkdin_resume`,
+            { scroll: false }
+          );
+        }
+      } else {
+        setSavingStatus("error");
       }
     });
   };
-  const handlePrint = useReactToPrint({
-    contentRef: componentRef, // Updated for newer versions of react-to-print
-    documentTitle: `${formValues?.full_name || 'Resume'}_Resume`, // Dynamic file name
-    pageStyle: `
-    @page {
-      size: A4;
-      margin: 0.5in;
-    }
 
-    // body {
-    //   -webkit-print-color-adjust: exact;
-    //   print-color-adjust: exact;
-    //   margin: 0;
-    // }
+  useEffect(() => {
+    if (!resume_id || !resume_type) return;
 
-     html, body {
-      font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      color-adjust: exact !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    @page {
-  margin: 0.5in;
-}
-@page :header {
-  display: none !important;
-}
-@page :footer {
-  display: none !important;
-}
-  `,
-    onBeforeGetContent: () => {
-      // Optional: You can do something before printing starts
-      console.log('Starting PDF generation...');
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 100);
-      });
-    },
-    onAfterPrint: () => {
-      // Optional: You can do something after printing
-      console.log('PDF generated successfully!');
-    },
-  });
-
-
-  const handleEnhanceLinkedInPDF = async () => {
-    try {
-      setEnhancing(true);
-      const lkdin_resume_id = lkdDetails?.data?.[0]?.basic_info?.[0]?.lkdin_resume_id;
-      console.log('lkdin_resume_id', lkdin_resume_id)
-
-      if (!lkdin_resume_id) {
-        setEnhancing(false);
-        return;
-      }
-
-      const payload = {
-        lkdin_resume_id,
-        linkedin_text: lkdDetails?.data?.[0],
-      };
-
-      const resultAction = await dispatch(linkedInEnhance(payload));
-
-      if (linkedInEnhance.fulfilled.match(resultAction)) {
-        dispatch(linkedInUsageInfo(id));
-        toast.success("Linkedin Rewrite Enhance successfully!");
-        console.log("Enhance result:", resultAction.payload);
-
-        const rewriteData = resultAction?.payload?.data;
-        console.log('rewriteData', rewriteData)
-
-        // ALL DISPATCHES NOW WORK ✔
-        dispatch(
-          linkedInBasicInfo({
-            lkdin_resume_id,
-            ...rewriteData?.personal_info,
-            basicinfo_id: lkdDetails?.data?.[0]?.basic_info?.[0]?.id || null
-          })
-        );
-
-
-        dispatch(
-          linkedInExpInfo({
-            lkdin_resume_id,
-            experience_info: rewriteData?.experience_info,
-          })
-        );
-
-        dispatch(
-          linkedInEduInfo({
-            lkdin_resume_id,
-            education_info: rewriteData?.education_info,
-          })
-        );
-
-        dispatch(
-          linkedInSkillInfo({
-            lkdin_resume_id,
-            skill_info: rewriteData?.skill_info,
-          })
-        );
-
-        dispatch(
-          linkedInLangInfo({
-            lkdin_resume_id,
-            language_info: rewriteData?.language_info,
-          })
-
-        )
-        dispatch(linkedgetDetails({ lkdin_resume_id }))
-      } else {
-        console.error("Enhance Error:", resultAction.payload);
-      }
-    } catch (error) {
-      console.error("Enhance PDF Error:", error);
-    } finally {
-      setEnhancing(false);
-    }
-  };
-
-
-  // useEffect(() => {
-  //   if (id) {
-  //     dispatch(linkedInUsageInfo(id));
-  //   }
-  // }, [id]);
-
-  const maxLimit = lkdUsageInfo?.data?.enhance_limit?.max_limit;
-  const used = lkdUsageInfo?.data?.usage_limit;
-
-  const remaining =
-    typeof maxLimit === "number" && typeof used === "number"
-      ? maxLimit - used
-      : 5;
-
-  const handleDownloadWithCount = () => {
-    const isIndividual =
-      profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
-
-
-    const countAction = isIndividual ? addCountResume : addCountResumeOrg;
-
-    dispatch(countAction({ ref_type: "linkedin_resume" }))
-      .then((res) => {
-        if (res?.payload?.status_code === 200) {
-          handlePrint();
-        } else if (res?.payload?.response?.data?.status_code === 400) {
-          toast.error(res?.payload?.response?.data?.message, {
-            autoClose: false,
-          });
-        }
+    dispatch(
+      getSingleResume({
+        id: resume_id,
+        fetch: resume_type,
       })
-      .catch((err) => {
-        console.error("Download count error:", err);
-        toast.error("Something went wrong while downloading");
+    );
+  }, [resume_id, resume_type, dispatch]);
+
+  // -------------------- AUTO HIDE STATUS --------------------
+  useEffect(() => {
+    if (savingStatus === "saved") {
+      const timer = setTimeout(() => {
+        setSavingStatus("unsaved");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [savingStatus]);
+
+
+  const mapLinkedInDataToSections = (resumeData) => {
+    if (!resumeData) return [];
+
+    const sections = [];
+    let id = 0;
+
+    // Skills Section (Top Skills from LinkedIn)
+    const techCategories = resumeData?.technical_skills?.categories || {};
+    const techSkills = Object.values(techCategories).flat();
+
+    if (techSkills.length > 0) {
+      sections.push({
+        id: id++,
+        title: "Top Skills",
+        type: "skills",
+        skills: techSkills.slice(0, 10).map((skill, i) => ({
+          id: `ts_${i}_${Date.now()}`,
+          name: skill,
+          level: 3,
+        })),
       });
+    }
+
+    // Summary Section
+    if (resumeData?.professional_summary?.summary_text) {
+      sections.push({
+        id: id++,
+        title: "Summary",
+        type: "summary",
+        summary: resumeData.professional_summary.summary_text,
+      });
+    }
+
+    // Experience Section
+    if ((resumeData?.work_experience || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Experience",
+        type: "experience",
+        experiences: resumeData.work_experience.map((exp, i) => ({
+          id: `x_${i}_${Date.now()}`,
+          jobTitle: exp.job_title || "",
+          company: exp.company_name || "",
+          city: exp.location || "",
+          startDate: exp.start_date || "",
+          endDate: exp.end_date || "",
+          description: (exp.responsibilities || []).join("<br/>"),
+        })),
+      });
+    }
+
+    // Education Section
+    if ((resumeData?.education || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Education",
+        type: "education",
+        educations: resumeData.education.map((edu, i) => ({
+          id: `e_${i}_${Date.now()}`,
+          institute: edu.institution || "",
+          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
+          startDate: edu.start_date || "",
+          endDate: edu.graduation_date || "",
+          city: edu.location || "",
+          description: edu.description || "",
+        })),
+      });
+    }
+
+    return sections;
   };
+
+
+
+  // ----------------- SETTING FORM VALUES -----------------
+  useEffect(() => {
+    if (!resumeSource) return;
+
+    const resumeData = extracteResumeData?.resume_data || resumeSource;
+    const personal = resumeData?.personal_information || {};
+    const additionalSections = resumeData?.additional_sections || {};
+
+    const fullName = personal.full_name || "";
+    const nameParts = fullName.split(" ");
+
+
+    const headlineText =
+      additionalSections?.Headline?.content ||
+      resumeData?.metadata?.current_role ||
+      resumeSource.job_target ||
+      "";
+    console.log('headlineText', headlineText)
+
+    setValue("job_target", headlineText);
+    setValue("first_name", nameParts[0] || resumeSource.first_name || "");
+    setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
+    setValue("email", personal.email || resumeSource.email || "");
+    setValue("phone", personal.phone || resumeSource.phone || "");
+    setValue(
+      "city_state",
+      personal?.location?.full_address ||
+      [personal?.location?.city, personal?.location?.state, personal?.location?.country]
+        .filter(Boolean)
+        .join(", ") ||
+      resumeSource?.city_state ||
+      ""
+    );
+
+    setValue("linkedin", personal.linkedin || resumeSource.linkedin || "");
+    setValue("website", resumeSource.website || "");
+
+  }, [extracteResumeData, resumeSource, setValue]);
+
+  // ----------------- SYNC SUMMARY -----------------
+  useEffect(() => {
+    const summarySections = sections.filter(sec => sec.type === "summary");
+    if (summarySections.length > 0) {
+      const summaryText = summarySections[0].summary || "";
+      setValue("summary", summaryText);
+    }
+  }, [sections, setValue]);
+
+  // ----------------- MAP SECTIONS + RESTORE SETTINGS -----------------
+  useEffect(() => {
+    if (!resumeSource) return;
+
+    if (resumeSource.resumeSettings) {
+      const settings = resumeSource.resumeSettings;
+      setResumeSettings(settings);
+
+      const template = settings.theme?.template || "professional";
+      setSelectedTemplate(template);
+
+      const color =
+        settings.theme?.templateColors?.[template] ||
+        settings.theme?.defaultColor ||
+        defaultResumeSettings.theme.defaultColor;
+
+      setThemeColor(color);
+    }
+
+    if (resumeSource.sections?.length) {
+      setSections(resumeSource.sections);
+      return;
+    }
+
+    const mappedSections = mapLinkedInDataToSections(resumeSource);
+    setSections(mappedSections);
+
+  }, [resumeSource]);
+
+  // ----------------- SYNC SKILLS -----------------
+  useEffect(() => {
+    const skillSections = sections.filter(sec => sec.type === "skills");
+    const mergedSkills = skillSections.flatMap(sec =>
+      (sec.skills || []).map(skill => ({ skill: skill.name, level: skill.level ?? 3 }))
+    );
+    setValue("newSkillHistory", mergedSkills);
+  }, [sections, setValue]);
+
+  // ----------------- SYNC EDUCATION -----------------
+  useEffect(() => {
+    const educationSections = sections.filter(sec => sec.type === "education");
+    const educationHistory = educationSections.flatMap(sec =>
+      (sec.educations || []).map(edu => ({
+        school: edu.institute || "",
+        degree: edu.degree || "",
+        startDate: edu.startDate || "",
+        endDate: edu.endDate || "",
+        city_state: edu.city || "",
+        description: edu.description || "",
+      }))
+    );
+    setValue("educationHistory", educationHistory);
+  }, [sections, setValue]);
+
+  // ----------------- SYNC EXPERIENCE -----------------
+  useEffect(() => {
+    const expSections = sections.filter(sec => sec.type === "experience");
+    const employmentHistory = expSections.flatMap(sec =>
+      (sec.experiences || []).map(exp => ({
+        job_title: exp.jobTitle || "",
+        employer: exp.company || "",
+        city_state: exp.city || "",
+        startDate: exp.startDate || "",
+        endDate: exp.endDate || "",
+        description: exp.description || "",
+      }))
+    );
+    setValue("employmentHistory", employmentHistory);
+  }, [sections, setValue]);
+
+  // Skill handlers
+  const handleSkillDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedSkillIndex(index);
+  };
+
+  const handleSkillDrop = (e, sectionIndex, targetSkillIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedSkillIndex === null || draggedSkillIndex === targetSkillIndex) return;
+
+    const updatedSections = [...sections];
+    const skillsList = [...updatedSections[sectionIndex].skills];
+
+    const [movedSkill] = skillsList.splice(draggedSkillIndex, 1);
+    skillsList.splice(targetSkillIndex, 0, movedSkill);
+
+    updatedSections[sectionIndex].skills = skillsList;
+    setSections(updatedSections);
+    setDraggedSkillIndex(null);
+  };
+
+  const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+
+        if (skillId === null) {
+          return {
+            ...section,
+            [field]: value,
+          };
+        }
+
+        if (field === "delete") {
+          return {
+            ...section,
+            skills: section.skills.filter(
+              skill => skill.id !== skillId
+            ),
+          };
+        }
+
+        return {
+          ...section,
+          skills: section.skills.map(skill =>
+            skill.id === skillId
+              ? { ...skill, [field]: value }
+              : skill
+          ),
+        };
+      })
+    );
+  };
+
+  // Education handlers
+  const handleEducationDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedEducationIndex(index);
+  };
+
+  const handleEducationDrop = (e, sectionIndex, targetEduIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedEducationIndex === null || draggedEducationIndex === targetEduIndex) return;
+
+    const updatedSections = [...sections];
+    const educationList = [...updatedSections[sectionIndex].educations];
+
+    const [movedEdu] = educationList.splice(draggedEducationIndex, 1);
+    educationList.splice(targetEduIndex, 0, movedEdu);
+
+    updatedSections[sectionIndex].educations = educationList;
+    setSections(updatedSections);
+    setDraggedEducationIndex(null);
+  };
+
+  const handleEducationUpdate = (sectionIndex, eduId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            educations: section.educations.filter(
+              edu => edu.id !== eduId
+            ),
+          };
+        }
+        return {
+          ...section,
+          educations: section.educations.map(edu =>
+            edu.id === eduId
+              ? { ...edu, [field]: value }
+              : edu
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddEducation = (sectionIndex) => {
+    const newEducation = {
+      id: `e${Date.now()}`,
+      institute: "",
+      degree: "",
+      startDate: "",
+      endDate: "",
+      city: "",
+      description: ""
+    };
+
+    setSections(prev =>
+      prev.map((section, i) =>
+        i === sectionIndex
+          ? {
+            ...section,
+            educations: [...section.educations, newEducation]
+          }
+          : section
+      )
+    );
+  };
+
+  // Experience handlers
+  const handleExpDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedExpIndex(index);
+  };
+
+  const handleExpDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (draggedExpIndex === null || draggedExpIndex === targetIndex) return;
+
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].experiences];
+
+    const [moved] = list.splice(draggedExpIndex, 1);
+    list.splice(targetIndex, 0, moved);
+
+    updatedSections[sectionIndex].experiences = list;
+    setSections(updatedSections);
+    setDraggedExpIndex(null);
+  };
+
+  const handleExpUpdate = (sectionIndex, expId, field, value) => {
+    setSections(prevSections =>
+      prevSections.map((section, sIndex) => {
+        if (sIndex !== sectionIndex) return section;
+        if (field === "delete") {
+          return {
+            ...section,
+            experiences: section.experiences.filter(
+              exp => exp.id !== expId
+            ),
+          };
+        }
+
+        return {
+          ...section,
+          experiences: section.experiences.map(exp =>
+            exp.id === expId ? { ...exp, [field]: value } : exp
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddExperience = (sectionIndex) => {
+    setSections(prevSections =>
+      prevSections.map((section, sIndex) => {
+        if (sIndex !== sectionIndex) return section;
+
+        return {
+          ...section,
+          experiences: [
+            ...section.experiences,
+            {
+              id: `x${Date.now()}`,
+              jobTitle: "",
+              company: "",
+              city: "",
+              startDate: "",
+              endDate: "",
+              description: "",
+            },
+          ],
+        };
+      })
+    );
+  };
+
+  const handleSelectTemplate = (id) => {
+    setSelectedTemplate(id);
+    const color =
+      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+      defaultResumeSettings.theme.defaultColor;
+
+    setThemeColor(color);
+    setResumeSettings(prev => ({
+      ...prev,
+      theme: {
+        ...prev.theme,
+        template: id,
+      },
+    }));
+  };
+
+  const handleAddNewSection = (newSection) => {
+    const newId = Math.max(...sections.map(s => s.id), -1) + 1;
+    const sectionToAdd = {
+      id: newId,
+      ...newSection
+    };
+    setSections([...sections, sectionToAdd]);
+  };
+
+  const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
+    const updatedSections = [...sections];
+    updatedSections[sectionIndex] = {
+      ...updatedSections[sectionIndex],
+      title: newTitle
+    };
+    setSections(updatedSections);
+  };
+
+  const handleDeleteSection = (sectionIndex) => {
+    const updatedSections = sections.filter((_, i) => i !== sectionIndex);
+    setSections(updatedSections);
+  };
+
+  const handleAnimatedDeleteSection = (index) => {
+    setDeletingSectionIndex(index);
+
+    setTimeout(() => {
+      handleDeleteSection(index);
+      setDeletingSectionIndex(null);
+    }, 500);
+  };
+
+  // ✅ Dummy handler for child components
+  const handleDragEnd = () => { };
 
   return (
-    <div className='lg:flex gap-5 pb-5'>
-      <ToastContainer/>
-      <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] mb-4 lg:mb-0'>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-b border-[#E5E5E5] p-5'>
-            <div className=' flex items-center justify-between'>
-              <div className='flex items-center gap-1'>
-                <HiClipboardList className='text-[#800080] text-2xl' />
-                <h3 className='text-[16px] text-[#151515] font-medium'>Resume Sections</h3>
-              </div>
-              <div className='flex items-center gap-1'>
-                <button
-                  onClick={handleEnhanceLinkedInPDF}
-                  disabled={enhancing}
-                  className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-white font-medium cursor-pointer px-2 gap-1 flex items-center disabled:bg-[#b57bb5] disabled:cursor-not-allowed'
-                >
-                  {enhancing ? (
-                    <>
-                      <svg
-                        className="animate-spin h-4 w-4 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        ></path>
-                      </svg>
-                      Enhancing...
-                    </>
-                  ) : (
-                    <>
-                      Enhance LinkedIn
-                      <span className='bg-white text-[#800080] rounded-full w-[20px] h-[20px] text-[10px] font-bold border border-[#800080] flex items-center justify-center'>
-                        {remaining}
-                      </span>
-                    </>
-                  )}
-                </button>
-              </div>
-              <button type="submit" className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-2 lg:px-4 flex items-center gap-1.5'><AiFillSave className='text-[18px]' /> Save Resume</button>
-            </div>
-            <p className="text-[11px] text-gray-600 mt-1 text-center">
-              Enhancing attempts remaining: <span className="font-semibold text-[#800080]">{remaining}</span>
-            </p>
-          </div>
-          <div className='resume_tab_section'>
-            <Tabs>
-              <div className='border-b border-[#E5E5E5] p-5'>
-                <div className='tab_point'>
-                  <TabList>
-                    <Tab><span><BiSolidUser /></span> Personal Info</Tab>
-                    <Tab><span><HiAcademicCap /></span> Education</Tab>
-                    <Tab><span><BiSolidBriefcase /></span> Experience</Tab>
-                    <Tab><span><FaLanguage /></span> Languages</Tab>
-                    <Tab><span><MdSettingsSuggest /></span> Skills</Tab>
-                    {/* <Tab><span><FaCertificate /></span> Courses</Tab>
-                    <Tab><span><FaTrophy /></span> Honors & Awards</Tab> */}
-                  </TabList>
-                </div>
-              </div>
-              <div className='p-5 pr-0'>
-                <div className='mb-4'>
-                  <div>
-                    <TabPanel>
-                      <BasicInfoLkdin lkdDetails={lkdDetails} setValue={setValue} register={register} />
-                    </TabPanel>
+    <div className='lg:flex gap-1 pb-0'>
+      <ToastContainer />
 
-                    <TabPanel>
-                      <EducationLkdin lkdDetails={lkdDetails} setValue={setValue} register={register} educationEntries={educationEntries} setEducationEntries={setEducationEntries} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <ExpLkdin lkdDetails={lkdDetails} experiences={experiences} setExperiences={setExperiences} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <LanguageLkdin lkdDetails={lkdDetails} languages={languages} setLanguages={setLanguages} />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <SkillsLkdin lkdDetails={lkdDetails} skills={skills} setSkills={setSkills} />
-                    </TabPanel>
-
-                    {/* <TabPanel>
-                      <CoursesLkdin />
-                    </TabPanel>
-
-                    <TabPanel>
-                      <AwardLkdin />
-                    </TabPanel> */}
-
-                  </div>
-                </div>
-              </div>
-            </Tabs>
-          </div>
-        </form>
-      </div>
-      <div className='lg:w-6/12 bg-[#ffffff] border border-[#E5E5E5] rounded-[8px] p-5'>
-        <div className='flex items-center justify-between mb-4'>
-          <div className='flex items-center gap-1'>
-            <MdPreview className='text-[#800080] text-2xl' />
-            <button
-              onClick={() => setOpenPreviewModal(true)}
-              className='text-[16px] text-[#151515] font-medium cursor-pointer hover:text-[#800080]'
-            >
-              Preview
-            </button>
-          </div>
-
-          <div className='flex items-center gap-1'>
-            <button
-              onClick={handleAnalyzeResume}
-              className='bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[12px] leading-[36px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-4 flex items-center gap-1.5 mb-2 lg:mb-0'
-            >
-              <IoStatsChart className='text-base' />check linkedIn score
-            </button>
-          </div>
-
-          <div className='flex items-center gap-3'>
-            {/* <button onClick={handlePrint} className='bg-[#800080] hover:bg-[#F6EFFF] rounded-[7px] text-[12px] leading-[36px] text-[#ffffff] hover:text-[#92278F] font-medium cursor-pointer px-4 flex items-center gap-1.5'><IoMdDownload className='text-[18px]' /> Download PDF</button> */}
-            <div className="relative group inline-block">
-              <button
-                onClick={remaining === 5 ? null : handleDownloadWithCount}
-                className={`
-                                rounded-[7px] text-[12px] leading-[36px] px-4 flex items-center gap-1.5 
-                                ${remaining === 5
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-[#800080] hover:bg-[#F6EFFF] text-white hover:text-[#92278F] cursor-pointer"
-                  }
-                              `}
-              >
-                <IoMdDownload className="text-[18px]" /> Download PDF
-              </button>
-              {/* Tooltip */}
-              {remaining === 5 && (
-                <div className="
-      absolute left-1/2 -translate-x-1/2 top-[110%]
-      bg-black text-white text-[11px] px-2 py-1 rounded opacity-0 
-      group-hover:opacity-100 transition-all whitespace-nowrap
-    ">
-                  Enhance your resume first
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className='border border-[#E5E5E5] rounded-[8px] mb-4'>
-          {/* <Image src={resume4} alt="resume4" className='' /> */}
-          <div className='h-screen overflow-y-auto'>
-            <LinkedInTemplate ref={componentRef} data={formValues} educationEntries={educationEntries} experiences={experiences} languages={languages} skills={skills} />
-          </div>
-        </div>
-        <LinkdinAtsScoreAnalyzeModal
-          show={openLinkdinAtsModal}
-          setShow={setOpenLinkdinAtsModal}
-          atsData={atsData}
-        />
-        {/* Resume Preview Modal */}
-        <Modal
-          show={openPreviewModal}
-          size="6xl"
-          onClose={() => setOpenPreviewModal(false)}
-        >
-          <ModalHeader className='text-black border-0 pt-2 pr-2'>
-            Preview
-          </ModalHeader>
-          <ModalBody className='bg-white p-5 rounded-b-[4px]'>
-            <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] p-5'>
-              <LinkedInTemplate
-                data={formValues}
-                educationEntries={educationEntries}
-                experiences={experiences}
-                languages={languages}
-                skills={skills}
+      <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
+        {activeTab === 'edit' ? (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className='mb-10'>
+              <LinkedInResumeScore
+                score={checkATSData?.ATS_Score}
+                loading={atsLoading}
+                guide={checkATSData?.Improvment_Guide}
               />
-            </div>
-          </ModalBody>
-        </Modal>
 
+              <LinkedInPersonalDetails register={register} watch={watch} setValue={setValue} />
+
+              {/* ✅ Wrap with DndContext */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleSectionDragEnd}
+              >
+                <SortableContext
+                  items={sections.map(s => s.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {sections.map((section, index) => (
+                      <DraggableWrapper key={section.id} id={section.id}>
+                        <div
+                          className={`
+                            mb-[4px] transition-all duration-200 bg-white rounded-xl section-item
+                            ${deletingSectionIndex === index
+                              ? "!bg-red-400 !-translate-x-6 !opacity-0"
+                              : "!bg-white !opacity-100 !translate-x-0"}
+                          `}
+                        >
+                          <div className="acco_section">
+                            <Accordion flush={true}>
+                              <AccordionPanel>
+                                <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
+                                  <div className="flex items-center gap-2 flex-1">
+                                    {/* ✅ Use DragIcon instead of native drag */}
+                                    <DragIcon />
+
+                                    {editingSectionIndex === index ? (
+                                      <input
+                                        autoFocus
+                                        defaultValue={section.title}
+                                        onBlur={(e) => {
+                                          setEditingSectionIndex(null);
+                                          if (e.target.value.trim()) {
+                                            handleSectionTitleUpdate(index, e.target.value.trim());
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") e.target.blur();
+                                        }}
+                                        className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
+                                      />
+                                    ) : (
+                                      <span
+                                        className="cursor-pointer"
+                                        onClick={() => setEditingSectionIndex(index)}
+                                      >
+                                        {section.title}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="
+                                      flex items-center gap-3
+                                      opacity-0 translate-x-2
+                                      group-hover:opacity-100 group-hover:translate-x-0
+                                      transition-all duration-200
+                                    "
+                                  >
+                                    <FaPen
+                                      className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingSectionIndex(index);
+                                      }}
+                                    />
+                                    <FaTrash
+                                      className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAnimatedDeleteSection(index);
+                                      }}
+                                    />
+                                  </div>
+                                </AccordionTitle>
+
+                                <AccordionContent className='pt-0'>
+                                  {section.type === 'skills' && (
+                                    <LinkedInSkills
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleSkillUpdate={handleSkillUpdate}
+                                      handleSkillDragStart={handleSkillDragStart}
+                                      handleSkillDrop={handleSkillDrop}
+                                      draggedSkillIndex={draggedSkillIndex}
+                                      setDraggedSkillIndex={setDraggedSkillIndex}
+                                    />
+                                  )}
+
+                                  {section.type === "summary" && (
+                                    <LinkedInSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index} />
+                                  )}
+
+                                  {section.type === "education" && (
+                                    <LinkedInEducation
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleEducationUpdate={handleEducationUpdate}
+                                      handleEducationDragStart={handleEducationDragStart}
+                                      handleEducationDrop={handleEducationDrop}
+                                      handleAddEducation={handleAddEducation}
+                                      draggedEducationIndex={draggedEducationIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+
+                                  {section.type === "experience" && (
+                                    <LinkedInExperience
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleExpUpdate={handleExpUpdate}
+                                      handleExpDragStart={handleExpDragStart}
+                                      handleExpDrop={handleExpDrop}
+                                      handleAddExperience={handleAddExperience}
+                                      draggedExpIndex={draggedExpIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+                                </AccordionContent>
+                              </AccordionPanel>
+                            </Accordion>
+                          </div>
+                        </div>
+                      </DraggableWrapper>
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            </div>
+          </form>
+        ) : (
+          <div>
+            <CustomizeSection
+              selectedTemplate={selectedTemplate}
+              onSelectTemplate={handleSelectTemplate}
+              themeColor={themeColor}
+              setThemeColor={handleThemeColorChange}
+              resumeSettings={resumeSettings}
+              setResumeSettings={setResumeSettings}
+            />
+          </div>
+        )}
+
+        <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
+          {savingStatus === 'saving' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+              <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              Saving changes...
+            </div>
+          )}
+
+          {savingStatus === 'saved' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
+              <AiFillSave className="text-sm" />
+              Saved successfully
+            </div>
+          )}
+
+          {savingStatus === 'error' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
+              ❌ Save failed
+            </div>
+          )}
+        </div>
       </div>
 
+      <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+        <div className='h-screen overflow-y-scroll'>
+          <div ref={componentRef}>
+            <ActiveResume formData={formValues} sections={sections} themeColor={themeColor} setValue={setValue} resumeSettings={resumeSettings} />
+          </div>
+        </div>
+      </div>
     </div>
+  );
+};
 
-
-  )
-}
-
-export default page
+export default LinkedInResumeBuilder;

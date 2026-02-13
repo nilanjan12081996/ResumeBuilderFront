@@ -33,10 +33,10 @@ import { BiLogoLinkedin } from "react-icons/bi";
 import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 import { useForm } from "react-hook-form";
-import { addImpQuestions, checkATS, getUpdateResumeInfo, extracteResume, updateAchievements, updateBasicInfo, updateCertification, updateEducation, updateExperience, updateExtraProject, updateLanguage, updateSkills } from "../reducers/DashboardSlice";
+import { extracteResume } from "../reducers/DashboardSlice";
 import JdbasedModal from "./JdbasedModal";
 import JdBasedChooseModal from "./JdBasedChooseModal";
-import LinkedInChooseModal from "./LinkedInChooseModal";
+import LinkedInReWriteModal from "./LinkedInReWriteModal";
 
 
 const poppins = Poppins({
@@ -97,21 +97,6 @@ const Page = () => {
   };
 
 
-  const HandlerLinkedInRewrite = (id) => {
-    const encodedId = btoa(id);
-    router.push(`/linkedIn-rewrite?id=${encodedId}`);
-  };
-
-
-  // clear file input
-  const clearFileInput = () => {
-    const fileInput1 = document.getElementById("dropzone-file");
-
-    if (fileInput1) {
-      fileInput1.value = "";
-    }
-
-  };
 
 
   const {
@@ -352,14 +337,12 @@ const handleResumeImprove = (data) => {
         />
       )}
 
-      {openModalCreateResumeLinkedIn && (
-        <LinkedInChooseModal
-          openModalCreateResumeLinkedIn={openModalCreateResumeLinkedIn}
-          setOpenModalCreateResumeLinkedIn={setOpenModalCreateResumeLinkedIn}
-        />
-      )}
-
-      {/* add modal for apply job ends here */}
+      {openModalLinkedInRewrite && (
+  <LinkedInReWriteModal
+    openModalImproveexistingResume={openModalLinkedInRewrite} 
+    setOpenModalImproveexistingResume={setOpenModalLinkedInRewrite}
+  />
+)}
 
       {/* add modal for JD Based here */}
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BiCustomize, BiBriefcase, BiAward } from "react-icons/bi";
 import { MdLocalFlorist, MdVolunteerActivism, MdCardMembership } from "react-icons/md";
-import { FaChessKnight, FaLanguage, FaCertificate, FaPlus } from "react-icons/fa6";
+import { FaChessKnight, FaLanguage, FaCertificate, FaPlus, FaList } from "react-icons/fa6";
 import { FaTimes } from "react-icons/fa";
 import { HiSpeakerphone, HiAcademicCap } from "react-icons/hi";
 
@@ -9,7 +9,20 @@ const AddSectionButton = ({ onAddNewSection }) => {
     const [showSectionList, setShowSectionList] = useState(false);
 
     const sectionTemplates = [
-        { id: 'custom', label: 'Custom Section', icon: <BiCustomize />, isCustom: true },
+        { 
+            id: 'custom_simple', 
+            label: 'Custom Section (Simple)', 
+            icon: <FaList />, 
+            isCustom: true,
+            description: 'For lists like technologies, tools, competencies'
+        },
+        { 
+            id: 'custom_advanced', 
+            label: 'Custom Section (Advanced)', 
+            icon: <BiCustomize />, 
+            isCustom: true,
+            description: 'Full details with dates and descriptions'
+        },
         { id: 'courses', label: 'Courses', icon: <HiAcademicCap />, isCustom: false },
         { id: 'hobbies', label: 'Hobbies', icon: <FaChessKnight />, isCustom: false },
         { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
@@ -27,18 +40,51 @@ const AddSectionButton = ({ onAddNewSection }) => {
         const selectedTemplate = sectionTemplates.find(s => s.id === sectionId);
         if (selectedTemplate && !selectedTemplate.isLocked) {
             if (onAddNewSection) {
-                onAddNewSection({
-                    type: 'custom',
-                    title: selectedTemplate.label,
-                    items: [{
-                        id: `custom_${Date.now()}`,
-                        title: "",
-                        city: "",
-                        startDate: "",
-                        endDate: "",
-                        description: "",
-                    }]
-                });
+                // Simple custom section - just name and level
+                if (sectionId === 'custom_simple') {
+                    onAddNewSection({
+                        type: 'custom_simple',
+                        title: 'New Section',
+                        items: [
+                            {
+                                id: `simple_${Date.now()}`,
+                                name: '',
+                                level: 2 // Default: Skillful level
+                            }
+                        ],
+                        hideExperienceLevel: false
+                    });
+                } 
+                // Advanced custom section - full fields
+                else if (sectionId === 'custom_advanced') {
+                    onAddNewSection({
+                        type: 'custom',
+                        title: selectedTemplate.label,
+                        items: [{
+                            id: `custom_${Date.now()}`,
+                            title: "",
+                            city: "",
+                            startDate: "",
+                            endDate: "",
+                            description: "",
+                        }]
+                    });
+                }
+                // Predefined sections - use advanced format
+                else {
+                    onAddNewSection({
+                        type: 'custom',
+                        title: selectedTemplate.label,
+                        items: [{
+                            id: `custom_${Date.now()}`,
+                            title: "",
+                            city: "",
+                            startDate: "",
+                            endDate: "",
+                            description: "",
+                        }]
+                    });
+                }
             }
             setShowSectionList(false);
         }
@@ -90,13 +136,18 @@ const AddSectionButton = ({ onAddNewSection }) => {
                                         : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
                                     }`}
                             >
-                                <div className={`text-2xl ${section.id === 'custom' ? 'text-[#800080]' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                                <div className={`text-2xl ${section.isCustom ? 'text-[#800080]' : 'text-gray-400 group-hover:text-gray-600'}`}>
                                     {section.icon}
                                 </div>
                                 <div className="flex-1">
-                                    <span className={`font-medium block ${section.id === 'custom' ? 'text-[#800080]' : 'text-gray-700'}`}>
+                                    <span className={`font-medium block ${section.isCustom ? 'text-[#800080]' : 'text-gray-700'}`}>
                                         {section.label}
                                     </span>
+                                    {section.description && (
+                                        <span className="text-xs text-gray-500 block mt-1">
+                                            {section.description}
+                                        </span>
+                                    )}
                                 </div>
                                 {section.isLocked && (
                                     <div className="text-gray-300">

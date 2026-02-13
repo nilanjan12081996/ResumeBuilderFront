@@ -4,7 +4,7 @@ import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
 import { Tabs, Tab, TabList } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 
-const ImpCoreCompetencies = ({
+const ImpSimpleCustomSection = ({
   section,
   sectionIndex,
   handleUpdate,
@@ -19,7 +19,9 @@ const ImpCoreCompetencies = ({
 
   const [editingIndex, setEditingIndex] = useState(null);
   const [deletingIndex, setDeletingIndex] = useState(null);
-  const hideExperienceLevel = section.hideExperienceLevel || false;
+  
+  // ✅ Default OFF (true = hidden, false = shown)
+  const hideExperienceLevel = section.hideExperienceLevel ?? true;
 
   // Dynamic helper text based on section title
   const getHelperText = () => {
@@ -63,21 +65,21 @@ const ImpCoreCompetencies = ({
           {getHelperText()}
         </p>
 
-        <div className="flex items-center gap-2 my-1">
-          <input
-            id={`hideLevelToggle-${sectionIndex}`}
-            type="checkbox"
-            className="!w-4 !h-4 text-[#800080] bg-gray-100 border-gray-300 rounded focus:ring-[#800080]"
-            checked={hideExperienceLevel}
-            onChange={(e) =>
-              handleUpdate(sectionIndex, null, "hideExperienceLevel", e.target.checked)
-            }
-          />
-          <label 
-            htmlFor={`hideLevelToggle-${sectionIndex}`} 
-            className="text-sm font-medium text-gray-500 cursor-pointer"
-          >
-            Don't show experience level
+        {/* ✅ Toggle Button - Initially OFF */}
+        <div className="flex items-center gap-2 my-3">
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={!hideExperienceLevel}
+              onChange={(e) =>
+                handleUpdate(sectionIndex, null, "hideExperienceLevel", !e.target.checked)
+              }
+            />
+            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#800080] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#800080]"></div>
+            <span className="ml-3 text-sm font-medium text-gray-700">
+              Show experience level
+            </span>
           </label>
         </div>
       </div>
@@ -192,4 +194,4 @@ const ImpCoreCompetencies = ({
   );
 };
 
-export default ImpCoreCompetencies;
+export default ImpSimpleCustomSection;

@@ -7,6 +7,12 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
 import isEqual from 'lodash.isequal';
 import { AiFillSave } from "react-icons/ai";
+import { FaPen, FaTrash } from 'react-icons/fa';
+
+//  Import @dnd-kit
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+
 // Import components
 import ImpResumeScore from './components/ImpResumeScore';
 import ImpPersonalDetails from './components/ImpPersonalDetails';
@@ -16,7 +22,13 @@ import ImpEducation from './components/ImpEducation';
 import ImpCertifications from './components/ImpCertifications';
 import ImpExperience from './components/ImpExperience';
 import CustomizeSection from '../ui/CustomizeSection.jsx';
-import ImpCoreCompetencies from "./components/ImpCoreCompetencies";
+import ImpCustomSection from './components/ImpCustomSection';
+import AddSectionButton from './components/AddSectionButton';
+
+//  Import Draggable Components
+import DraggableWrapper from './DraggableWrapper';
+import DragIcon from './DragIcon';
+
 // Import templates
 import Professional from "../TemplateNew/Professional";
 import PrimeATS from "../TemplateNew/PrimeATS";
@@ -28,24 +40,19 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 import { useTabs } from '../context/TabsContext.js';
 import { checkATS } from '../reducers/DashboardSlice';
 import { getSingleResume, saveResumeImprove } from '../reducers/ResumeSlice';
-import { TbDragDrop } from 'react-icons/tb';
-import ImpCustomSection from './components/ImpCustomSection';
-import AddSectionButton from './components/AddSectionButton';
-import { FaPen, FaTrash } from 'react-icons/fa';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
+import ImpSimpleCustomSection from './components/Impsimplecustomsection';
 
 const Page = () => {
   const componentRef = useRef();
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
-  console.log('singleResumeInfo', singleResumeInfo)
-  // console.log('singleResumeInfo', singleResumeInfo)
+
   const resumeSource =
     singleResumeInfo?.data?.data ||
     extracteResumeData?.resume_data ||
     null;
-
 
   // Resume ID tracking
   const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
@@ -53,7 +60,7 @@ const Page = () => {
   // Auto-Save State
   const lastSavedData = useRef(null);
   const isInitialLoad = useRef(true);
-  const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
+  const [savingStatus, setSavingStatus] = useState('unsaved');
 
   useEffect(() => {
     if (!resumeSource) return;
@@ -70,9 +77,8 @@ const Page = () => {
   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
 
   // States
-  const [selectedTemplate, setSelectedTemplate] = useState('professional');
+  const [selectedTemplate, setSelectedTemplate] = useState('ats');
   const [sections, setSections] = useState([]);
-  const [draggedIndex, setDraggedIndex] = useState(null);
   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
   const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
@@ -82,6 +88,15 @@ const Page = () => {
   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
   const [deletingSectionIndex, setDeletingSectionIndex] = useState(null);
   const { activeTab } = useTabs();
+
+  //  Setup sensors for @dnd-kit
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   // Template mapping
   const templateMap = {
     professional: Professional,
@@ -91,32 +106,30 @@ const Page = () => {
     vivid: VividTemplate,
     corporate: CorporateTemplate,
   };
+
   const [themeColor, setThemeColor] = useState(defaultResumeSettings.theme.defaultColor);
 
+  const handleThemeColorChange = (color) => {
+    setThemeColor(color);
 
-const handleThemeColorChange = (color) => {
-  setThemeColor(color);
+    setResumeSettings(prev => {
+      const template = prev.theme.template;
 
-  setResumeSettings(prev => {
-    const template = prev.theme.template;
-
-    return {
-      ...prev,
-      theme: {
-        ...prev.theme,
-        defaultColor: color,
-        templateColors: {
-          ...prev.theme.templateColors,
-          [template]: color, 
+      return {
+        ...prev,
+        theme: {
+          ...prev.theme,
+          defaultColor: color,
+          templateColors: {
+            ...prev.theme.templateColors,
+            [template]: color,
+          },
         },
-      },
-    };
-  });
-};
+      };
+    });
+  };
 
-
-
-  const ActiveResume = templateMap[selectedTemplate] || Professional;
+  const ActiveResume = templateMap[selectedTemplate] || ats;
 
   // Form handling
   const {
@@ -132,14 +145,25 @@ const handleThemeColorChange = (color) => {
   const searchParams = useSearchParams();
 
   const resume_id = searchParams.get("id");
-  const resume_type = searchParams.get("fetch"); // "improve"
+  const resume_type = searchParams.get("fetch");
 
+  //  Handle section drag end
+  const handleSectionDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setSections((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   // -------------------- INITIAL DATA LOAD --------------------
   useEffect(() => {
     if (!resumeSource) return;
 
-    // set resume IDs (EDIT MODE)
     if (resumeSource.mongo_id || resumeSource._id) {
       setResumeIds({
         mongo_id: resumeSource.mongo_id || resumeSource._id,
@@ -159,8 +183,6 @@ const handleThemeColorChange = (color) => {
     isInitialLoad.current = false;
   }, [resumeSource]);
 
-
-
   // -------------------- AUTO SAVE --------------------
   useEffect(() => {
     if (isInitialLoad.current) return;
@@ -171,7 +193,6 @@ const handleThemeColorChange = (color) => {
       resumeSettings,
     };
 
-    //  compare WITHOUT IDs
     const normalized = JSON.parse(JSON.stringify(currentData));
 
     if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
@@ -188,7 +209,6 @@ const handleThemeColorChange = (color) => {
         resume_type: "improve",
       };
 
-      //  send IDs ONLY after first save
       if (resumeIds.mongo_id && resumeIds.mysql_id) {
         payload.mongo_id = resumeIds.mongo_id;
         payload.mysql_id = resumeIds.mysql_id;
@@ -199,7 +219,6 @@ const handleThemeColorChange = (color) => {
           setSavingStatus("saved");
           lastSavedData.current = normalized;
 
-          // FIRST SAVE → capture IDs
           if (!resumeIds.mongo_id) {
             const mongo_id = res.payload.sectionsdata?.mongo_id;
             const mysql_id = res.payload.sectionsdata?.mysql_id;
@@ -209,9 +228,7 @@ const handleThemeColorChange = (color) => {
               `/improve-resume-builder?id=${mysql_id}&fetch=improve_resume`,
               { scroll: false }
             );
-
           }
-
         } else {
           setSavingStatus("error");
         }
@@ -220,7 +237,6 @@ const handleThemeColorChange = (color) => {
 
     return () => clearTimeout(timeoutId);
   }, [formValues, sections, resumeSettings]);
-
 
   // -------------------- MANUAL SAVE --------------------
   const onSubmit = (data) => {
@@ -246,7 +262,6 @@ const handleThemeColorChange = (color) => {
           JSON.stringify({ ...data, sections, resumeSettings })
         );
 
-        // 🧠 FIRST SAVE ONLY
         if (!resumeIds.mongo_id) {
           const mongo_id = res.payload.sectionsdata?.mongo_id;
           const mysql_id = res.payload.sectionsdata?.mysql_id;
@@ -257,9 +272,7 @@ const handleThemeColorChange = (color) => {
             `/improve-resume-builder?id=${mysql_id}&fetch=improve_resume`,
             { scroll: false }
           );
-
         }
-
       } else {
         setSavingStatus("error");
       }
@@ -272,11 +285,10 @@ const handleThemeColorChange = (color) => {
     dispatch(
       getSingleResume({
         id: resume_id,
-        fetch: resume_type, // "improve"
+        fetch: resume_type,
       })
     );
   }, [resume_id, resume_type, dispatch]);
-
 
   // -------------------- AUTO HIDE STATUS --------------------
   useEffect(() => {
@@ -288,14 +300,13 @@ const handleThemeColorChange = (color) => {
     }
   }, [savingStatus]);
 
-  // Helper function to map resume data to sections
+  
   const mapextracteResumeDataToSections = (resumeData) => {
     if (!resumeData) return [];
 
     const sections = [];
     let id = 0;
 
-    // ----------------- TECHNICAL SKILLS -----------------
     const techCategories = resumeData?.technical_skills?.categories || {};
     const techSkills = Object.values(techCategories).flat();
 
@@ -312,7 +323,6 @@ const handleThemeColorChange = (color) => {
       });
     }
 
-    // ----------------- SOFT SKILLS -----------------
     if ((resumeData?.soft_skills || []).length > 0) {
       sections.push({
         id: id++,
@@ -326,7 +336,6 @@ const handleThemeColorChange = (color) => {
       });
     }
 
-    // ----------------- SUMMARY -----------------
     if (resumeData?.professional_summary?.summary_text) {
       sections.push({
         id: id++,
@@ -336,7 +345,6 @@ const handleThemeColorChange = (color) => {
       });
     }
 
-    // ----------------- EDUCATION -----------------
     if ((resumeData?.education || []).length > 0) {
       sections.push({
         id: id++,
@@ -354,7 +362,6 @@ const handleThemeColorChange = (color) => {
       });
     }
 
-    // ----------------- CERTIFICATIONS -----------------
     if ((resumeData?.certifications || []).length > 0) {
       sections.push({
         id: id++,
@@ -372,7 +379,6 @@ const handleThemeColorChange = (color) => {
       });
     }
 
-    // ----------------- EXPERIENCE -----------------
     if ((resumeData?.work_experience || []).length > 0) {
       sections.push({
         id: id++,
@@ -390,73 +396,65 @@ const handleThemeColorChange = (color) => {
       });
     }
 
-    // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
     const additionalSections = resumeData?.additional_sections || {};
-    const hasMainExperience = (resumeData?.work_experience || []).length > 0;
 
     Object.entries(additionalSections).forEach(([key, value]) => {
       if (!value?.content || value.content.length === 0) return;
 
-      const normalizedKey = key.toLowerCase().trim();
+      // Detect if it's a simple list (technologies, tools, etc.)
+      const isSimpleList = Array.isArray(value.content) && value.content.every(item => {
+        if (typeof item === 'string') return true;
+        if (typeof item === 'object') {
+          // Simple if it only has name/title and optionally level
+          const keys = Object.keys(item);
+          return keys.length <= 2 && (
+            (keys.includes('name') || keys.includes('title')) &&
+            (!keys.includes('description') && !keys.includes('city') && !keys.includes('start_date'))
+          );
+        }
+        return false;
+      });
 
-      // Skip summary, personal info, profile, header
-      // if (
-      //   normalizedKey.includes("summary") ||
-      //   normalizedKey.includes("personal") ||
-      //   normalizedKey.includes("profile") ||
-      //   normalizedKey.includes("header")
-      // ) return;
-
-      // Skip experience if main experience exists
-      // if (
-      //   hasMainExperience &&
-      //   (
-      //     normalizedKey.includes("experience") ||
-      //     normalizedKey.includes("employment") ||
-      //     normalizedKey.includes("career") ||
-      //     normalizedKey.includes("timeline")
-      //   )
-      // ) return;
-
-      // Core competencies
-      if (
-        normalizedKey.includes("core competencies") ||
-        normalizedKey.includes("competencies")
-      ) {
+      if (isSimpleList) {
+        // Use custom_simple type for simple lists
         sections.push({
           id: id++,
           title: key,
-          type: "core_competencies",
-          items: value.content,
+          type: "custom_simple",
+          items: value.content.map((item, i) => ({
+            id: `simple_${i}_${Date.now()}`,
+            name: typeof item === "string" ? item : item.name || item.title || "",
+            level: typeof item === "object" && item.level ? item.level : 2
+          })),
+          hideExperienceLevel: false
         });
-        return;
+      } else {
+        // Use custom (advanced) type for complex sections
+        sections.push({
+          id: id++,
+          title: key,
+          type: "custom",
+          items: Array.isArray(value.content)
+            ? value.content.map((item, i) => ({
+              id: `custom_${i}_${Date.now()}`,
+              title: typeof item === "string" ? item : item.title || item.name || "",
+              city: item.city || "",
+              startDate: item.start_date || "",
+              endDate: item.end_date || "",
+              description: item.description || "",
+            }))
+            : [
+              {
+                id: `custom_0_${Date.now()}`,
+                title: typeof value.content === "string" ? value.content : "",
+                city: "",
+                startDate: "",
+                endDate: "",
+                description: "",
+              },
+            ],
+        });
       }
-
-      // Everything else (including achievements) → custom
-      sections.push({
-        id: id++,
-        title: key,
-        type: "custom",
-        items: Array.isArray(value.content)
-          ? value.content.map((item, i) => ({
-            id: `custom_${i}_${Date.now()}`,
-            title: typeof item === "string" ? item : item.title || item.name || "",
-            city: item.city || "",
-            startDate: item.start_date || "",
-            endDate: item.end_date || "",
-            description: item.description || "",
-          }))
-          : [
-            {
-              id: `custom_0_${Date.now()}`,
-              title: typeof value.content === "string" ? value.content : "",
-              city: "",
-              startDate: "",
-              endDate: "",
-              description: "",
-            },
-          ],
-      });
     });
 
     return sections;
@@ -470,7 +468,6 @@ const handleThemeColorChange = (color) => {
     const personal = resumeData?.personal_information || {};
     const meta = resumeData?.metadata || {};
 
-    // Profile summary
     const profileSummaryFromAdditional =
       resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
 
@@ -486,7 +483,6 @@ const handleThemeColorChange = (color) => {
         ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
         : summaryPoints[0] || "";
 
-    // Name
     const fullName = personal.full_name || "";
     const nameParts = fullName.split(" ");
 
@@ -504,7 +500,6 @@ const handleThemeColorChange = (color) => {
     setValue("summary", formattedSummary || resumeSource.summary || "");
     setValue("profileImage", resumeSource.profileImage || "");
 
-    // Additional Details
     setValue("linkedin", resumeSource.linkedin || "");
     setValue("github", resumeSource.github || "");
     setValue("stackoverflow", resumeSource.stackoverflow || "");
@@ -517,7 +512,6 @@ const handleThemeColorChange = (color) => {
 
   }, [extracteResumeData, resumeSource, setValue]);
 
-
   // ----------------- SYNC SUMMARY -----------------
   useEffect(() => {
     const summarySections = sections.filter(sec => sec.type === "summary");
@@ -527,40 +521,34 @@ const handleThemeColorChange = (color) => {
     }
   }, [sections, setValue]);
 
-  // ----------------- MAP SECTIONS -----------------
-// ----------------- MAP SECTIONS + RESTORE SETTINGS -----------------
-useEffect(() => {
-  if (!resumeSource) return;
+  // ----------------- MAP SECTIONS + RESTORE SETTINGS -----------------
+  useEffect(() => {
+    if (!resumeSource) return;
 
-  // 1️⃣ Restore resumeSettings
-  if (resumeSource.resumeSettings) {
-    const settings = resumeSource.resumeSettings;
-    setResumeSettings(settings);
+    if (resumeSource.resumeSettings) {
+      const settings = resumeSource.resumeSettings;
+      setResumeSettings(settings);
 
-    const template = settings.theme?.template || "professional";
-    setSelectedTemplate(template);
+      const template = settings.theme?.template || "professional";
+      setSelectedTemplate(template);
 
-    const color =
-      settings.theme?.templateColors?.[template] ||
-      settings.theme?.defaultColor ||
-      defaultResumeSettings.theme.defaultColor;
+      const color =
+        settings.theme?.templateColors?.[template] ||
+        settings.theme?.defaultColor ||
+        defaultResumeSettings.theme.defaultColor;
 
-    setThemeColor(color);
-  }
+      setThemeColor(color);
+    }
 
-  // 2️⃣ Restore sections (edit mode)
-  if (resumeSource.sections?.length) {
-    setSections(resumeSource.sections);
-    return;
-  }
+    if (resumeSource.sections?.length) {
+      setSections(resumeSource.sections);
+      return;
+    }
 
-  // 3️⃣ Create mode: map AI extracted data
-  const mappedSections = mapextracteResumeDataToSections(resumeSource);
-  setSections(mappedSections);
+    const mappedSections = mapextracteResumeDataToSections(resumeSource);
+    setSections(mappedSections);
 
-}, [resumeSource]);
-
-
+  }, [resumeSource]);
 
   // ----------------- SYNC SKILLS -----------------
   useEffect(() => {
@@ -603,37 +591,6 @@ useEffect(() => {
     setValue("employmentHistory", employmentHistory);
   }, [sections, setValue]);
 
-
-  // Drag handlers for sections
-  const handleDragStart = (e, index) => {
-    setDraggedIndex(index);
-    const sectionEl = e.currentTarget.closest(".section-item");
-    if (sectionEl) {
-      e.dataTransfer.setDragImage(sectionEl, 20, 20);
-    }
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    if (draggedIndex === targetIndex) return;
-
-    const updatedSections = [...sections];
-    const [draggedItem] = updatedSections.splice(draggedIndex, 1);
-    updatedSections.splice(targetIndex, 0, draggedItem);
-
-    setSections(updatedSections);
-    setDraggedIndex(null);
-  };
-
   // Skill handlers
   const handleSkillDragStart = (e, index) => {
     e.stopPropagation();
@@ -662,7 +619,6 @@ useEffect(() => {
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
 
-        // toggle hideExperienceLevel
         if (skillId === null) {
           return {
             ...section,
@@ -670,7 +626,6 @@ useEffect(() => {
           };
         }
 
-        // delete skill
         if (field === "delete") {
           return {
             ...section,
@@ -680,7 +635,6 @@ useEffect(() => {
           };
         }
 
-        // update skill
         return {
           ...section,
           skills: section.skills.map(skill =>
@@ -740,8 +694,6 @@ useEffect(() => {
     );
   };
 
-
-
   const handleAddEducation = (sectionIndex) => {
     const newEducation = {
       id: `e${Date.now()}`,
@@ -764,7 +716,6 @@ useEffect(() => {
       )
     );
   };
-
 
   // Certification handlers
   const handleCertDragStart = (e, index) => {
@@ -815,8 +766,6 @@ useEffect(() => {
     );
   };
 
-
-
   const handleAddCertification = (sectionIndex) => {
     const newCert = {
       id: `c${Date.now()}`,
@@ -839,7 +788,6 @@ useEffect(() => {
       )
     );
   };
-
 
   // Experience handlers
   const handleExpDragStart = (e, index) => {
@@ -887,8 +835,6 @@ useEffect(() => {
     );
   };
 
-
-
   const handleAddExperience = (sectionIndex) => {
     setSections(prevSections =>
       prevSections.map((section, sIndex) => {
@@ -912,7 +858,6 @@ useEffect(() => {
       })
     );
   };
-
 
   const handleCustomDragStart = (e, index) => {
     e.stopPropagation();
@@ -960,7 +905,6 @@ useEffect(() => {
     );
   };
 
-
   const handleAddCustomItem = (sectionIndex) => {
     const newItem = {
       id: `custom_${Date.now()}`,
@@ -984,19 +928,21 @@ useEffect(() => {
   };
 
 
-  const handleCoreCompetencyUpdate = (sectionIndex, itemIndex, field, value) => {
+  const handleSimpleCustomUpdate = (sectionIndex, itemIndex, field, value) => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
 
-        if (itemIndex === null) {
+        if (itemIndex === null && field !== "add") {
+          return { ...section, [field]: value };
+        }
+        if (field === "add") {
           return {
             ...section,
-            [field]: value,
+            items: [...(section.items || []), value]
           };
         }
 
-        // delete
         if (field === "delete") {
           return {
             ...section,
@@ -1004,20 +950,18 @@ useEffect(() => {
           };
         }
 
-        // update name / level
         return {
           ...section,
-          items: section.items.map((item, idx) =>
-            idx === itemIndex ? { ...item, [field]: value } : item
-          ),
+          items: section.items.map((item, idx) => {
+            if (idx !== itemIndex) return item;
+
+            const itemObj = typeof item === 'object' ? item : { name: item, level: 2 };
+            return { ...itemObj, [field]: value };
+          }),
         };
       })
     );
   };
-
-
-
-
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
@@ -1026,14 +970,13 @@ useEffect(() => {
       defaultResumeSettings.theme.defaultColor;
 
     setThemeColor(color);
-    + setResumeSettings(prev => ({
+    setResumeSettings(prev => ({
       ...prev,
       theme: {
         ...prev.theme,
         template: id,
       },
     }));
-
   };
 
   const handleAddNewSection = (newSection) => {
@@ -1044,6 +987,7 @@ useEffect(() => {
     };
     setSections([...sections, sectionToAdd]);
   };
+
   const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
     const updatedSections = [...sections];
     updatedSections[sectionIndex] = {
@@ -1067,206 +1011,197 @@ useEffect(() => {
     }, 500);
   };
 
+  // ✅ Dummy handler for child components
+  const handleDragEnd = () => { };
 
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
 
-      {/* Left Panel */}
       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
         {activeTab === 'edit' ? (
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className='mb-10'>
-
-              {/* Resume Score */}
-
               <ImpResumeScore
                 score={checkATSData?.ATS_Score}
                 loading={atsLoading}
                 guide={checkATSData?.Improvment_Guide}
               />
 
-              {/* Personal Details */}
               <ImpPersonalDetails register={register} watch={watch} selectedTemplate={selectedTemplate} setValue={setValue} />
 
-              {/* Dynamic Sections */}
-              <div className="space-y-2">
-                {sections.map((section, index) => (
-                  <div
-                    key={section.id}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, index)}
-                    className={`
-                      mb-[4px] transition-all duration-200 bg-white rounded-xl section-item
-                      ${draggedIndex === index
-                        ? "opacity-20 border-cyan-500 scale-95"
-                        : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
-                      }`}
-                  >
-                    <div
-                      className={`
-                      acco_section
-                      transition-all duration-300 ease-in-out
-                      ${deletingSectionIndex === index
-                          ? "!bg-red-400 !-translate-x-6 !opacity-0"
-                          : "!bg-white !opacity-100 !translate-x-0"}
-                      `}
-                    >
-                      <Accordion flush={true}>
-                        <AccordionPanel>
-                          <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
-                            <div className="flex items-center gap-2 flex-1">
+              {/* ✅ Wrap with DndContext */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleSectionDragEnd}
+              >
+                <SortableContext
+                  items={sections.map(s => s.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {sections.map((section, index) => (
+                      <DraggableWrapper key={section.id} id={section.id}>
+                        <div
+                          className={`
+                            mb-[4px] transition-all duration-200 bg-white rounded-xl section-item
+                            ${deletingSectionIndex === index
+                              ? "!bg-red-400 !-translate-x-6 !opacity-0"
+                              : "!bg-white !opacity-100 !translate-x-0"}
+                          `}
+                        >
+                          <div className="acco_section">
+                            <Accordion flush={true}>
+                              <AccordionPanel>
+                                <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
+                                  <div className="flex items-center gap-2 flex-1">
+                                    {/* ✅ Use DragIcon instead of native drag */}
+                                    <DragIcon />
 
-                              <span
-                                className="drag-wrapper cursor-grab active:cursor-grabbing"
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, index)}
-                                onDragEnd={handleDragEnd}
-                              >
-                                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-                              </span>
+                                    {editingSectionIndex === index ? (
+                                      <input
+                                        autoFocus
+                                        defaultValue={section.title}
+                                        onBlur={(e) => {
+                                          setEditingSectionIndex(null);
+                                          if (e.target.value.trim()) {
+                                            handleSectionTitleUpdate(index, e.target.value.trim());
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") e.target.blur();
+                                        }}
+                                        className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
+                                      />
+                                    ) : (
+                                      <span
+                                        className="cursor-pointer"
+                                        onClick={() => setEditingSectionIndex(index)}
+                                      >
+                                        {section.title}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="
+                                      flex items-center gap-3
+                                      opacity-0 translate-x-2
+                                      group-hover:opacity-100 group-hover:translate-x-0
+                                      transition-all duration-200
+                                    "
+                                  >
+                                    <FaPen
+                                      className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingSectionIndex(index);
+                                      }}
+                                    />
+                                    <FaTrash
+                                      className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAnimatedDeleteSection(index);
+                                      }}
+                                    />
+                                  </div>
+                                </AccordionTitle>
 
-                              {editingSectionIndex === index ? (
-                                <input
-                                  autoFocus
-                                  defaultValue={section.title}
-                                  onBlur={(e) => {
-                                    setEditingSectionIndex(null);
-                                    if (e.target.value.trim()) {
-                                      handleSectionTitleUpdate(index, e.target.value.trim());
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") e.target.blur();
-                                  }}
-                                  className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
-                                />
-                              ) : (
-                                <span
-                                  className="cursor-pointer"
-                                  onClick={() => setEditingSectionIndex(index)}
-                                >
-                                  {section.title}
-                                </span>
-                              )}
-                            </div>
-                            <div
-                              className="
-                                flex items-center gap-3
-                                opacity-0 translate-x-2
-                                group-hover:opacity-100 group-hover:translate-x-0
-                                transition-all duration-200
-                              "
-                            >
-                              <FaPen
-                                className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingSectionIndex(index);
-                                }}
-                              />
+                                <AccordionContent className='pt-0'>
+                                  {section.type === 'skills' && (
+                                    <ImpSkills
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleSkillUpdate={handleSkillUpdate}
+                                      handleSkillDragStart={handleSkillDragStart}
+                                      handleSkillDrop={handleSkillDrop}
+                                      draggedSkillIndex={draggedSkillIndex}
+                                      setDraggedSkillIndex={setDraggedSkillIndex}
+                                    />
+                                  )}
 
-                              <FaTrash
-                                className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAnimatedDeleteSection(index);
-                                }}
-                              />
-                            </div>
-                          </AccordionTitle>
+                                  {section.type === "summary" && (
+                                    <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index} />
+                                  )}
 
-                          <AccordionContent className='pt-0'>
+                                  {section.type === "education" && (
+                                    <ImpEducation
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleEducationUpdate={handleEducationUpdate}
+                                      handleEducationDragStart={handleEducationDragStart}
+                                      handleEducationDrop={handleEducationDrop}
+                                      handleAddEducation={handleAddEducation}
+                                      draggedEducationIndex={draggedEducationIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
-                            {section.type === 'skills' && (
-                              <ImpSkills
-                                section={section}
-                                sectionIndex={index}
-                                handleSkillUpdate={handleSkillUpdate}
-                                handleSkillDragStart={handleSkillDragStart}
-                                handleSkillDrop={handleSkillDrop}
-                                draggedSkillIndex={draggedSkillIndex}
-                                setDraggedSkillIndex={setDraggedSkillIndex}
-                              />
-                            )}
+                                  {section.type === "certifications" && (
+                                    <ImpCertifications
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleCertUpdate={handleCertUpdate}
+                                      handleCertDragStart={handleCertDragStart}
+                                      handleCertDrop={handleCertDrop}
+                                      handleAddCertification={handleAddCertification}
+                                      draggedCertIndex={draggedCertIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
-                            {section.type === "summary" && (
-                              <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index} />
-                            )}
-
-                            {section.type === "education" && (
-                              <ImpEducation
-                                section={section}
-                                sectionIndex={index}
-                                handleEducationUpdate={handleEducationUpdate}
-                                handleEducationDragStart={handleEducationDragStart}
-                                handleEducationDrop={handleEducationDrop}
-                                handleAddEducation={handleAddEducation}
-                                draggedEducationIndex={draggedEducationIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
-
-                            {section.type === "certifications" && (
-                              <ImpCertifications
-                                section={section}
-                                sectionIndex={index}
-                                handleCertUpdate={handleCertUpdate}
-                                handleCertDragStart={handleCertDragStart}
-                                handleCertDrop={handleCertDrop}
-                                handleAddCertification={handleAddCertification}
-                                draggedCertIndex={draggedCertIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
-
-                            {section.type === "experience" && (
-                              <ImpExperience
-                                section={section}
-                                sectionIndex={index}
-                                handleExpUpdate={handleExpUpdate}
-                                handleExpDragStart={handleExpDragStart}
-                                handleExpDrop={handleExpDrop}
-                                handleAddExperience={handleAddExperience}
-                                draggedExpIndex={draggedExpIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
-                            {section.type === "core_competencies" && (
-                              <ImpCoreCompetencies
-                                section={section}
-                                sectionIndex={index}
-                                handleUpdate={handleCoreCompetencyUpdate}
-                                handleDragStart={handleCustomDragStart}
-                                handleDrop={handleCustomDrop}
-                                draggedIndex={draggedCustomIndex}
-                                setDraggedIndex={setDraggedCustomIndex}
-                              />
-                            )}
-
-                            {section.type === "custom" && (
-                              <ImpCustomSection
-                                section={section}
-                                sectionIndex={index}
-                                handleCustomUpdate={handleCustomUpdate}
-                                handleCustomDragStart={handleCustomDragStart}
-                                handleCustomDrop={handleCustomDrop}
-                                handleAddCustomItem={handleAddCustomItem}
-                                draggedIndex={draggedCustomIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
+                                  {section.type === "experience" && (
+                                    <ImpExperience
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleExpUpdate={handleExpUpdate}
+                                      handleExpDragStart={handleExpDragStart}
+                                      handleExpDrop={handleExpDrop}
+                                      handleAddExperience={handleAddExperience}
+                                      draggedExpIndex={draggedExpIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
 
+                                  {section.type === "custom_simple" && (
+                                    <ImpSimpleCustomSection
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleSimpleCustomUpdate}
+                                      handleDragStart={handleCustomDragStart}
+                                      handleDrop={handleCustomDrop}
+                                      draggedIndex={draggedCustomIndex}
+                                      setDraggedIndex={setDraggedCustomIndex}
+                                    />
+                                  )}
 
-                          </AccordionContent>
-                        </AccordionPanel>
-                      </Accordion>
-                    </div>
+
+                                  {section.type === "custom" && (
+                                    <ImpCustomSection
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleCustomUpdate={handleCustomUpdate}
+                                      handleCustomDragStart={handleCustomDragStart}
+                                      handleCustomDrop={handleCustomDrop}
+                                      handleAddCustomItem={handleAddCustomItem}
+                                      draggedIndex={draggedCustomIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+                                </AccordionContent>
+                              </AccordionPanel>
+                            </Accordion>
+                          </div>
+                        </div>
+                      </DraggableWrapper>
+                    ))}
                   </div>
-                ))}
-                <AddSectionButton onAddNewSection={handleAddNewSection} />
-              </div>
+                </SortableContext>
+              </DndContext>
+
+              <AddSectionButton onAddNewSection={handleAddNewSection} />
             </div>
           </form>
         ) : (
@@ -1281,6 +1216,7 @@ useEffect(() => {
             />
           </div>
         )}
+
         <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
           {savingStatus === 'saving' && (
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
@@ -1304,7 +1240,6 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Right Panel - Resume Preview */}
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
         <div className='h-screen overflow-y-scroll'>
           <div ref={componentRef}>

@@ -75,7 +75,7 @@ const JdbasedModal = ({ openModalImproveexistingResume, setOpenModalImproveexist
       onClose={() => setOpenModalImproveexistingResume(false)}
     >
       <ModalHeader className="bg-white text-black modal_header">
-        ATS Friendly Resume
+        JD based resume
       </ModalHeader>
       <ModalBody className="bg-white p-5 rounded-b-[4px]">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">

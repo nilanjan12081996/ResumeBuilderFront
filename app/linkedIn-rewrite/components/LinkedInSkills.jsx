@@ -1,21 +1,11 @@
 import React, { useState } from "react";
-import { Label } from "flowbite-react";
 import { TbDragDrop } from "react-icons/tb";
-import { Tab, Tabs, TabList } from "react-tabs";
 import { FaPen, FaPlus } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
-import 'react-tabs/style/react-tabs.css';
 
-const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragStart, handleSkillDrop, draggedSkillIndex, setDraggedSkillIndex }) => {
-    const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
-    const tabColors = ["#ffeaec", "#feebe3", "#fff2cc", "#e7f4ed", "#f1f2ff"];
-    const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
-
+const LinkedInSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragStart, handleSkillDrop, draggedSkillIndex, setDraggedSkillIndex }) => {
     const [editingSkillIndex, setEditingSkillIndex] = useState(null);
     const [deletingSkillIndex, setDeletingSkillIndex] = useState(null);
-    
-    // ✅ Default OFF (true = hidden, false = shown)
-    const hideExperienceLevel = section.hideExperienceLevel ?? true;
 
     const handleDelete = (sIndex, skillId) => {
         setDeletingSkillIndex(sIndex);
@@ -40,24 +30,8 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
         <>
             <div>
                 <p className="!text-sm !font-medium !text-gray-500">
-                    Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing.
+                    Add skills that are relevant to your professional profile. LinkedIn emphasizes top skills for better visibility.
                 </p>
-
-                {/* ✅ Toggle Button - Initially OFF */}
-                <div className="flex items-center gap-2 my-3">
-                    <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                            type="checkbox"
-                            className="sr-only peer"
-                            checked={!hideExperienceLevel}
-                            onChange={(e) => handleSkillUpdate(sectionIndex, null, "hideExperienceLevel", !e.target.checked)}
-                        />
-                        <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#800080] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#800080]"></div>
-                        <span className="ml-3 text-sm font-medium text-gray-700">
-                            Show experience level
-                        </span>
-                    </label>
-                </div>
             </div>
             
             {section.skills.map((skill, sIndex) => {
@@ -133,40 +107,6 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
 
                             )}
                         </div>
-
-                        {/* Skill Level - Only show if toggle is ON */}
-                        {!hideExperienceLevel && (
-                            <div className="flex flex-col items-center gap-1">
-                                {/* Level Label */}
-                                <span className="text-xs font-medium text-gray-600">
-                                    {levels[skill.level]} {/* Shows current level like "Expert" */}
-                                </span>
-
-                                {/* Level Circles */}
-                                <Tabs
-                                    selectedIndex={skill.level}
-                                    onSelect={(tabIndex) => handleSkillUpdate(sectionIndex, skill.id, 'level', tabIndex)}
-                                >
-                                    <TabList className="flex gap-1">
-                                        {levels.map((lvl, i) => (
-                                            <Tab key={i} className="outline-none">
-                                                <div
-                                                    className={`
-              w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300
-              ${skill.level === i ? "scale-110 border border-[#800080] shadow-md" : "opacity-60 hover:opacity-100"}
-            `}
-                                                    style={{ backgroundColor: tabColors[i], color: textColor[i] }}
-                                                    title={lvl}
-                                                >
-                                                    {i + 1}
-                                                </div>
-                                            </Tab>
-                                        ))}
-                                    </TabList>
-                                </Tabs>
-                            </div>
-                        )}
-
                     </div>
                 );
             })}
@@ -181,4 +121,4 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate, handleSkillDragSt
     );
 };
 
-export default ImpSkills;
+export default LinkedInSkills;

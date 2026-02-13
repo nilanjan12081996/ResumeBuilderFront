@@ -344,6 +344,26 @@ export const saveResumeJd = createAsyncThunk(
 )
 
 
+export const saveResumeLinkedIn = createAsyncThunk(
+    'saveResumeLinkedIn',
+    async (userInput, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/api/linkdin/resume/save', userInput);
+            if (response?.data?.status_code === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
 const initialState = {
     loading: false,
     error: false,
@@ -532,6 +552,19 @@ const ResumeSlice = createSlice(
                     state.error = false
                 })
                 .addCase(saveResumeJd.rejected, (state, { payload }) => {
+                    state.loading = false
+                    state.error = payload
+                })
+
+                .addCase(saveResumeLinkedIn.pending, (state) => {
+                    state.loading = true
+                })
+                .addCase(saveResumeLinkedIn.fulfilled, (state, { payload }) => {
+                    state.loading = false
+                    state.saveResumeData = payload
+                    state.error = false
+                })
+                .addCase(saveResumeLinkedIn.rejected, (state, { payload }) => {
                     state.loading = false
                     state.error = payload
                 })

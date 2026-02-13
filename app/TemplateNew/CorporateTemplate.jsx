@@ -13,15 +13,19 @@ const TITLE_ICON_MAP = {
   Certifications: FaStar,
 };
 
-const CorporateTemplate = ({ formData, sectionOrder }) => {
+const CorporateTemplate = ({ formData, sections, sectionOrder }) => {
   // --- Helpers ---
   const formatDate = (dateValue) => {
     if (!dateValue) return "";
+    if (typeof dateValue === "string" && dateValue.toLowerCase() === "present") {
+      return "Present";
+    }
     const d = new Date(dateValue);
+    if (isNaN(d.getTime())) return "";
     return d.toLocaleString("en-US", { month: "short", year: "numeric" });
   };
 
-  // --- Data Existence Checks ---
+  // --- Data Existence Checks (for scratch resume) ---
   const hasEmployment = formData.employmentHistory?.some(
     (job) => job.job_title || job.employer,
   );
@@ -40,7 +44,7 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
     (c) => c.course || c.institution,
   );
 
-  // --- Render Functions (Main Content) ---
+  // --- Render Functions for SCRATCH RESUME (Main Content) ---
 
   const renderSummary = () =>
     formData.summary && (
@@ -49,9 +53,6 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
           <IoMdContact className="text-md" />
           Profile
         </h2>
-        {/* <p className="text-xs text-gray-700 text-justify leading-relaxed whitespace-pre-wrap">
-                    {formData.summary}
-                </p> */}
         <div
           className="
           text-xs leading-relaxed text-gray-700 text-justify
@@ -178,7 +179,7 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
     </>
   );
 
-  // --- Render Functions (Sidebar) ---
+  // --- Render Functions for SCRATCH RESUME (Sidebar) ---
   const renderSkills = () =>
     hasSkills && (
       <section key="skills">
@@ -220,6 +221,117 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
       </section>
     );
 
+  // --- Render Functions for IMPROVE RESUME (Dynamic Sections) ---
+
+  const renderSummaryFromSection = (section) => (
+    <section key={section.id}>
+      <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-2">
+        <IoMdContact className="text-md" />
+        {section.title}
+      </h2>
+      <div
+        className="
+        text-xs leading-relaxed text-gray-700 text-justify
+        [&_ul]:list-disc
+        [&_ul]:pl-4
+        [&_ol]:list-decimal
+        [&_ol]:pl-4
+        [&_li]:mb-1
+      "
+        dangerouslySetInnerHTML={{ __html: section.summary }}
+      />
+    </section>
+  );
+
+  const renderExperienceFromSection = (section) => (
+    <TimelineSection
+      key={section.id}
+      title={section.title}
+      icon={BsBagFill}
+      items={section.experiences?.map((exp) => ({
+        heading: `${exp.jobTitle}${exp.company ? `, ${exp.company}` : ""}${exp.city ? `, ${exp.city}` : ""}`,
+        period: `${formatDate(exp.startDate)} — ${formatDate(exp.endDate)}`,
+        points: exp.description ? [exp.description] : [],
+      }))}
+    />
+  );
+
+  const renderEducationFromSection = (section) => (
+    <TimelineSection
+      key={section.id}
+      title={section.title}
+      icon={HiAcademicCap}
+      items={section.educations?.map((edu) => ({
+        heading: `${edu.degree}, ${edu.institute}, ${edu.city}`,
+        period: `${formatDate(edu.startDate)} — ${formatDate(edu.endDate)}`,
+        points: edu.description ? [edu.description] : [],
+      }))}
+    />
+  );
+
+  const renderCertificationsFromSection = (section) => (
+    <TimelineSection
+      key={section.id}
+      title={section.title}
+      icon={FaStar}
+      items={section.certifications?.map((cert) => ({
+        heading: `${cert.name}${cert.organization ? `, ${cert.organization}` : ""}`,
+        period: cert.startYear ? `${cert.startYear}${cert.endYear ? ` — ${cert.endYear}` : ""}` : "",
+        points: cert.description ? [cert.description] : [],
+      }))}
+    />
+  );
+
+  const renderCustomFromSection = (section) => (
+    <TimelineSection
+      key={section.id}
+      title={section.title}
+      icon={FaStar}
+      items={section.items?.map((item) => ({
+        heading: `${item.title}${item.city ? `, ${item.city}` : ""}`,
+        period: `${formatDate(item.startDate)} — ${formatDate(item.endDate)}`,
+        points: item.description ? [item.description] : [],
+      }))}
+    />
+  );
+
+  const renderSkillsFromSection = (section) => (
+    <section key={section.id}>
+      <h3 className="text-xs font-bold uppercase mb-2">{section.title}</h3>
+      <ul className="space-y-1">
+        {section.skills?.map((skill, i) => (
+          <li key={skill.id || i} className="text-xs text-gray-700">
+            {skill.name}
+            {!section.hideExperienceLevel && skill.level !== undefined
+              ? ` (${["Novice", "Beginner", "Skillful", "Experienced", "Expert"][skill.level]})`
+              : ""}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+
+  const renderCoreCompetenciesFromSection = (section) => (
+    <section key={section.id}>
+      <h3 className="text-xs font-bold uppercase mb-2">{section.title}</h3>
+      <ul className="space-y-1">
+        {section.items?.map((item, i) => {
+          const displayName = typeof item === 'object' ? (item.name || item.title) : item;
+          return (
+            <li key={i} className="text-xs text-gray-700">
+              {displayName}
+              {!section.hideExperienceLevel && typeof item === 'object' && item.level !== undefined && (
+                <span className="text-[10px] text-gray-500">
+                  {" "}({["Novice", "Beginner", "Skillful", "Experienced", "Expert"][item.level]})
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+
   // --- Section Mapping ---
   const mainSectionRenderers = {
     summary: renderSummary,
@@ -237,18 +349,100 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
     hobbies: renderHobbies,
   };
 
-  const order = sectionOrder || [
-    "summary",
-    "employment",
-    "education",
-    "activities",
-    "skills",
-    "languages",
-    "hobbies",
-    "internships",
-    "courses",
-    "custom",
-  ];
+  // --- Dynamic Section Rendering Logic ---
+  const renderMainDynamicSections = () => {
+    if (sections && sections.length > 0) {
+      return sections
+        .filter(section => {
+          // Filter out sidebar sections from main content
+          return !['skills', 'languages', 'hobbies'].includes(section.type);
+        })
+        .map((section) => {
+          switch (section.type) {
+            case "summary":
+              return renderSummaryFromSection(section);
+            case "experience":
+              return renderExperienceFromSection(section);
+            case "education":
+              return renderEducationFromSection(section);
+            case "certifications":
+              return renderCertificationsFromSection(section);
+            case "custom":
+              return renderCustomFromSection(section);
+            default:
+              return null;
+          }
+        });
+    }
+
+    const order = sectionOrder || [
+      "summary",
+      "employment",
+      "education",
+      "activities",
+      "internships",
+      "courses",
+      "custom",
+    ];
+
+    return order.map((sectionId) => {
+      if (mainSectionRenderers[sectionId]) {
+        return mainSectionRenderers[sectionId]();
+      }
+      return null;
+    });
+  };
+
+  const renderSidebarDynamicSections = () => {
+    if (sections && sections.length > 0) {
+      return sections
+        .filter(section => {
+          // Only render sidebar-appropriate sections
+          return ['skills', 'languages', 'hobbies', 'core_competencies'].includes(section.type);
+        })
+        .map((section) => {
+          switch (section.type) {
+            case "skills":
+              return renderSkillsFromSection(section);
+            case "core_competencies":
+              return renderCoreCompetenciesFromSection(section);
+            case "languages":
+              return section.items?.length > 0 ? (
+                <section key={section.id}>
+                  <h3 className="text-xs font-bold uppercase mb-2">{section.title}</h3>
+                  <ul className="space-y-1">
+                    {section.items.map((l, i) => (
+                      <li key={i} className="text-xs text-gray-700">
+                        {typeof l === 'object' ? `${l.language} ${l.level ? `- ${l.level}` : ''}` : l}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null;
+            case "hobbies":
+              return section.content ? (
+                <section key={section.id}>
+                  <h3 className="text-xs font-bold uppercase mb-2">{section.title}</h3>
+                  <p className="text-xs text-gray-700 whitespace-pre-wrap">
+                    {section.content}
+                  </p>
+                </section>
+              ) : null;
+            default:
+              return null;
+          }
+        });
+    }
+
+    const order = sectionOrder || ["skills", "languages", "hobbies"];
+
+    return order.map((sectionId) => {
+      if (sidebarSectionRenderers[sectionId]) {
+        return sidebarSectionRenderers[sectionId]();
+      }
+      return null;
+    });
+  };
 
   return (
     <div className="min-h-[297mm] bg-white shadow-xl font-sans text-sm">
@@ -318,22 +512,12 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
           )}
 
           {/* SIDEBAR DYNAMIC SECTIONS */}
-          {order.map((sectionId) => {
-            if (sidebarSectionRenderers[sectionId]) {
-              return sidebarSectionRenderers[sectionId]();
-            }
-            return null;
-          })}
+          {renderSidebarDynamicSections()}
         </aside>
 
         <main className="w-[68%] px-8 py-8 space-y-8">
           {/* MAIN DYNAMIC SECTIONS */}
-          {order.map((sectionId) => {
-            if (mainSectionRenderers[sectionId]) {
-              return mainSectionRenderers[sectionId]();
-            }
-            return null;
-          })}
+          {renderMainDynamicSections()}
         </main>
       </div>
     </div>
@@ -341,6 +525,8 @@ const CorporateTemplate = ({ formData, sectionOrder }) => {
 };
 
 const TimelineSection = ({ title, items, icon: Icon }) => {
+  if (!items || items.length === 0) return null;
+
   return (
     <section>
       <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider mb-4 text-gray-900">
@@ -368,9 +554,12 @@ const TimelineSection = ({ title, items, icon: Icon }) => {
 
             {/* BULLETS */}
             {item.points && item.points.length > 0 && (
-              <div className="text-xs text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
+              <div className="text-xs text-gray-600 mt-1 leading-relaxed">
                 {item.points.length === 1 ? (
-                  <p>{item.points[0]}</p>
+                  <div
+                    className="whitespace-pre-wrap [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
+                    dangerouslySetInnerHTML={{ __html: item.points[0] }}
+                  />
                 ) : (
                   <ul className="list-disc pl-4 space-y-0.5">
                     {item.points.map((p, idx) => (
