@@ -42,18 +42,20 @@ const SkillsNewEdit = ({
             <p className="text-sm text-[#808897] font-medium mb-2">
                 Choose 5 important skills that show you fit the position.
             </p>
-            <div className="flex items-center gap-2">
-                <input
-                    id="hideLevelToggleNew"
-                    type="checkbox"
-                    className="!w-4 !h-4 text-[#800080] bg-gray-100 border-gray-300 rounded focus:ring-[#800080]"
-                    {...register("hideExperienceLevel")}
-                />
-                <label
-                    htmlFor="hideLevelToggleNew"
-                    className="text-sm font-medium text-gray-500 cursor-pointer"
-                >
-                    Don't show experience level
+            
+            {/* Toggle Switch */}
+            <div className="flex items-center gap-2 my-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={!hideExperienceLevel}
+                        onChange={(e) => setValue("hideExperienceLevel", !e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#800080] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#800080]"></div>
+                    <span className="ml-3 text-sm font-medium text-gray-700">
+                        Show experience level
+                    </span>
                 </label>
             </div>
 

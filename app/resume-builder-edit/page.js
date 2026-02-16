@@ -1,10 +1,9 @@
-
 'use client';
 import { DndContext, closestCenter, TouchSensor, MouseSensor, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortableSection } from './SortableSection';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 
 import Image from 'next/image';
 
@@ -72,6 +71,8 @@ import ActivitiesEdit from './ActivitiesEdit';
 import LanguagesEdit from './newLanguageEdit';
 import InternshipsEdit from './InternshipsEdit';
 import CustomSectionEdit from './CustomSectionEdit';
+import SimpleCustomSectionEdit from './SimpleCustomSectionEdit';
+import AdvancedCustomSectionEdit from './AdvancedCustomSectionEdit';
 import CustomizeSection from '../ui/CustomizeSection';
 import { useTabs } from '../context/TabsContext';
 import CleanTemplate from '../TemplateNew/CleanTemplate';
@@ -83,6 +84,7 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 import { getSingleResume, saveResumeNew } from '../reducers/ResumeSlice';
 import isEqual from 'lodash.isequal';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
+
 
 
 const page = () => {
@@ -130,7 +132,7 @@ const page = () => {
   const [education, setEducation] = useState([{ id: 1 }])
   const [newskill, setNewSkill] = useState([{ id: 1 }])
   const [sectionOrder, setSectionOrder] = useState([
-    'summary', 'employment', 'education', 'skills', 'courses', 'hobbies', 'activities', 'languages', 'internships', 'custom'
+    'summary', 'employment', 'education', 'skills', 'courses', 'hobbies', 'activities', 'languages', 'internships'
   ]);
 
   // Auto-Save State
@@ -167,8 +169,6 @@ const page = () => {
       activityHistory: [{}],
       languageHistory: [{}],
       internshipHistory: [{}],
-      customSectionHistory: [{}],
-      customSectionTitle: "Custom Section",
       profileImage: "",
       hobbies: ""
     }
@@ -186,6 +186,7 @@ const page = () => {
 
   // Track which optional sections are active
   const [activeSections, setActiveSections] = useState([]);
+  const [deletingSectionId, setDeletingSectionId] = useState(null);
 
   // Employment History Field Array
   const { fields: empFields, append: empAppend, remove: empRemove, move: empMove } = useFieldArray({
@@ -229,17 +230,38 @@ const page = () => {
     name: "internshipHistory",
   });
 
-  // Custom Section Field Array
-  const { fields: customFields, append: customAppend, remove: customRemove, move: customMove } = useFieldArray({
-    control,
-    name: "customSectionHistory",
-  });
+  // ✅ Dynamic Simple Custom Sections - Create field arrays dynamically
+  const simpleCustomSections = useMemo(() => {
+    const sections = {};
+    activeSections
+      .filter(id => typeof id === 'string' && id.startsWith('custom_simple_'))
+      .forEach(sectionId => {
+        const historyFieldName = `customSimpleHistory_${sectionId}`;
+        // We can't use useFieldArray inside forEach, so we'll handle this differently
+      });
+    return sections;
+  }, [activeSections]);
+
+  // ✅ Dynamic Advanced Custom Sections - Create field arrays dynamically
+  const advancedCustomSections = useMemo(() => {
+    const sections = {};
+    activeSections
+      .filter(id => typeof id === 'string' && id.startsWith('custom_advanced_'))
+      .forEach(sectionId => {
+        const historyFieldName = `customAdvancedHistory_${sectionId}`;
+        // We can't use useFieldArray inside forEach, so we'll handle this differently
+      });
+    return sections;
+  }, [activeSections]);
 
   const onSubmit = (data) => {
     console.log("Manual Save / Final data:", data);
     setSavingStatus('saving');
+
     const dataToSave = {
       ...data,
+      activeSections: activeSections,  
+      sectionOrder: sectionOrder,    
       resume_type: resume_type || "scratch",
       mongo_id: resumeIds.mongo_id,
       mysql_id: resumeIds.mysql_id
@@ -248,7 +270,7 @@ const page = () => {
     dispatch(saveResumeNew(dataToSave)).then((res) => {
       if (res.payload && res.payload.status_code === 200) {
         setSavingStatus('saved');
-        lastSavedData.current = JSON.parse(JSON.stringify(data));
+        lastSavedData.current = JSON.parse(JSON.stringify(dataToSave));
         toast.success("Resume saved successfully!");
       } else {
         setSavingStatus('error');
@@ -315,18 +337,6 @@ const page = () => {
         setShowAdditionalDetails(true);
       }
 
-      // Determine active sections based on data
-      const newActiveSections = [];
-      if (resumeData.employmentHistory?.length > 0) newActiveSections.push('employment');
-      if (resumeData.educationHistory?.length > 0) newActiveSections.push('education');
-      if (resumeData.newSkillHistory?.length > 0) newActiveSections.push('skills');
-      if (resumeData.coursesHistory?.length > 0) newActiveSections.push('courses');
-      if (resumeData.activityHistory?.length > 0) newActiveSections.push('activities');
-      if (resumeData.languageHistory?.length > 0) newActiveSections.push('languages');
-      if (resumeData.internshipHistory?.length > 0) newActiveSections.push('internships');
-      if (resumeData.hobbies && resumeData.hobbies.trim() !== "") newActiveSections.push('hobbies');
-      if (resumeData.summary && resumeData.summary.trim() !== "") newActiveSections.push('summary');
-
       // Set IDs for Auto-Save
       if (resumeData._id || resumeData.mongo_id || resumeData.id || resumeData.mysql_id) {
         setResumeIds({
@@ -336,33 +346,91 @@ const page = () => {
         setSavingStatus('saved');
       }
 
-      // Initialize lastSavedData to match the loaded data
-      lastSavedData.current = resumeData;
+      // ✅ Prioritize saved activeSections over auto-detection
+      if (resumeData.activeSections && Array.isArray(resumeData.activeSections) && resumeData.activeSections.length > 0) {
+        console.log("✅ Loading saved activeSections:", resumeData.activeSections);
+        setActiveSections(resumeData.activeSections);
 
-      // ✅ FIXED: Check for dynamic custom section keys
-      const customKeys = Object.keys(resumeData).filter(key => key.startsWith('customSectionHistory_custom_'));
+        lastSavedData.current = {
+          ...resumeData,
+          activeSections: resumeData.activeSections,
+          sectionOrder: resumeData.sectionOrder || sectionOrder
+        };
+      } else {
+        // ✅ Only auto-detect if activeSections is NOT saved in database
+        console.log("⚠️ No saved activeSections, auto-detecting from data");
+        const newActiveSections = [];
 
-      if (customKeys.length > 0) {
-        // Process ALL dynamic custom sections (not just the first one)
-        customKeys.forEach(dynamicKey => {
-          const timestamp = dynamicKey.split('customSectionHistory_custom_')[1];
-          const sectionId = `custom_${timestamp}`;
-          const dynamicTitleKey = `customSectionTitle_custom_${timestamp}`;
+        if (resumeData.employmentHistory && resumeData.employmentHistory.length > 0 && resumeData.employmentHistory.some(e => e.job_title || e.employer)) {
+          newActiveSections.push('employment');
+        }
+        if (resumeData.educationHistory && resumeData.educationHistory.length > 0 && resumeData.educationHistory.some(e => e.school || e.degree)) {
+          newActiveSections.push('education');
+        }
+        if (resumeData.newSkillHistory && resumeData.newSkillHistory.length > 0 && resumeData.newSkillHistory.some(s => s.skill)) {
+          newActiveSections.push('skills');
+        }
+        if (resumeData.coursesHistory && resumeData.coursesHistory.length > 0 && resumeData.coursesHistory.some(c => c.course || c.institution)) {
+          newActiveSections.push('courses');
+        }
+        if (resumeData.activityHistory && resumeData.activityHistory.length > 0 && resumeData.activityHistory.some(a => a.functionTitle || a.employer)) {
+          newActiveSections.push('activities');
+        }
+        if (resumeData.languageHistory && resumeData.languageHistory.length > 0 && resumeData.languageHistory.some(l => l.language)) {
+          newActiveSections.push('languages');
+        }
+        if (resumeData.internshipHistory && resumeData.internshipHistory.length > 0 && resumeData.internshipHistory.some(i => i.jobTitle || i.employer)) {
+          newActiveSections.push('internships');
+        }
+        if (resumeData.hobbies && resumeData.hobbies.trim() !== "") {
+          newActiveSections.push('hobbies');
+        }
+        if (resumeData.summary && resumeData.summary.trim() !== "") {
+          newActiveSections.push('summary');
+        }
+
+        setActiveSections(newActiveSections);
+
+        lastSavedData.current = {
+          ...resumeData,
+          activeSections: newActiveSections,
+          sectionOrder: resumeData.sectionOrder || sectionOrder
+        };
+      }
+
+      // Load saved sectionOrder
+      if (resumeData.sectionOrder && Array.isArray(resumeData.sectionOrder) && resumeData.sectionOrder.length > 0) {
+        console.log("✅ Loading saved sectionOrder:", resumeData.sectionOrder);
+        setSectionOrder(resumeData.sectionOrder);
+      }
+
+      // ✅ Load Simple Custom Sections
+      const simpleCustomKeys = Object.keys(resumeData).filter(key => 
+        key.startsWith('customSimpleHistory_custom_simple_')
+      );
+
+      if (simpleCustomKeys.length > 0) {
+        simpleCustomKeys.forEach(dynamicKey => {
+          const sectionId = dynamicKey.replace('customSimpleHistory_', '');
+          const titleKey = `customSimpleTitle_${sectionId}`;
+          const hideLevelKey = `customSimpleHideLevel_${sectionId}`;
 
           const sectionData = resumeData[dynamicKey];
-          const sectionTitle = resumeData[dynamicTitleKey];
+          const sectionTitle = resumeData[titleKey];
+          const hideLevel = resumeData[hideLevelKey];
 
           if (sectionData && sectionData.length > 0) {
-            // ✅ Keep the dynamic key structure - DON'T map to 'customSectionHistory'
             setValue(dynamicKey, sectionData);
-            if (sectionTitle) {
-              setValue(dynamicTitleKey, sectionTitle);
-            }
+            if (sectionTitle) setValue(titleKey, sectionTitle);
+            if (hideLevel !== undefined) setValue(hideLevelKey, hideLevel);
 
-            // ✅ Add the full sectionId to activeSections
-            newActiveSections.push(sectionId);
+            setActiveSections(prev => {
+              if (!prev.includes(sectionId)) {
+                return [...prev, sectionId];
+              }
+              return prev;
+            });
 
-            // ✅ Also add to sectionOrder if not already there
             setSectionOrder(prev => {
               if (!prev.includes(sectionId)) {
                 return [...prev, sectionId];
@@ -371,12 +439,41 @@ const page = () => {
             });
           }
         });
-      } else if (resumeData.customSectionHistory?.length > 0) {
-        // Fallback for old format
-        newActiveSections.push('custom');
       }
 
-      setActiveSections(newActiveSections);
+      // ✅ Load Advanced Custom Sections
+      const advancedCustomKeys = Object.keys(resumeData).filter(key => 
+        key.startsWith('customAdvancedHistory_custom_advanced_')
+      );
+
+      if (advancedCustomKeys.length > 0) {
+        advancedCustomKeys.forEach(dynamicKey => {
+          const sectionId = dynamicKey.replace('customAdvancedHistory_', '');
+          const titleKey = `customAdvancedTitle_${sectionId}`;
+
+          const sectionData = resumeData[dynamicKey];
+          const sectionTitle = resumeData[titleKey];
+
+          if (sectionData && sectionData.length > 0) {
+            setValue(dynamicKey, sectionData);
+            if (sectionTitle) setValue(titleKey, sectionTitle);
+
+            setActiveSections(prev => {
+              if (!prev.includes(sectionId)) {
+                return [...prev, sectionId];
+              }
+              return prev;
+            });
+
+            setSectionOrder(prev => {
+              if (!prev.includes(sectionId)) {
+                return [...prev, sectionId];
+              }
+              return prev;
+            });
+          }
+        });
+      }
     }
   }, [singleResumeInfo, reset, setValue]);
 
@@ -385,7 +482,7 @@ const page = () => {
     const currentDataNormalized = JSON.parse(JSON.stringify(formValues));
 
     if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
-      return; // Data hasn't changed
+      return;
     }
 
     setSavingStatus('saving');
@@ -394,6 +491,8 @@ const page = () => {
 
       const dataToSave = {
         ...currentData,
+        activeSections: activeSections,
+        sectionOrder: sectionOrder,
         resume_type: resume_type || "scratch",
         mongo_id: resumeIds.mongo_id,
         mysql_id: resumeIds.mysql_id
@@ -404,7 +503,6 @@ const page = () => {
           setSavingStatus('saved');
           lastSavedData.current = currentData;
 
-          // If we just created it (didn't have IDs), update IDs now
           if (!resumeIds.mongo_id) {
             const newMongoId = res.payload.sectionsdata?.mongo_id;
             const newMysqlId = res.payload.sectionsdata?.mysql_id;
@@ -420,10 +518,10 @@ const page = () => {
           setSavingStatus('error');
         }
       });
-    }, 2000); // 2 second debounce
+    }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [formValues, resumeIds, resume_type, dispatch]);
+  }, [formValues, activeSections, sectionOrder, resumeIds, resume_type, dispatch]);
 
   useEffect(() => {
     if (savingStatus === 'saved') {
@@ -436,20 +534,211 @@ const page = () => {
   }, [savingStatus]);
 
   const handleAddNewSection = (sectionData) => {
-    if (!activeSections.includes(sectionData.id)) {
-      setActiveSections((prev) => [...prev, sectionData.id]);
-      setSectionOrder((prev) => {
-        if (!prev.includes(sectionData.id)) {
-          return [...prev, sectionData.id];
-        }
-        return prev;
-      });
-      if (sectionData.id === 'summary' && !watch('summary')) {
-        setValue('summary', '');
+    const timestamp = Date.now();
+    
+    if (sectionData.id === 'custom_simple') {
+      // ✅ Simple custom section with smart auto-incrementing name
+      const newSectionId = `custom_simple_${timestamp}`;
+      
+      // Get all existing simple custom section titles
+      const existingTitles = activeSections
+        .filter(id => typeof id === 'string' && id.startsWith('custom_simple_'))
+        .map(id => {
+          const titleKey = `customSimpleTitle_${id}`;
+          return watch(titleKey) || "";
+        })
+        .filter(title => title.trim() !== "");
+      
+      // Generate unique title
+      let defaultTitle = "Custom Section (Simple)";
+      let counter = 1;
+      
+      // Check if base title exists
+      while (existingTitles.includes(defaultTitle)) {
+        defaultTitle = `Custom Section (Simple) ${counter}`;
+        counter++;
       }
+      
+      setActiveSections((prev) => [...prev, newSectionId]);
+      setSectionOrder((prev) => [...prev, newSectionId]);
+      
+      // Initialize with default data
+      setValue(`customSimpleHistory_${newSectionId}`, [{
+        name: "",
+        level: 2
+      }]);
+      setValue(`customSimpleTitle_${newSectionId}`, defaultTitle);
+      setValue(`customSimpleHideLevel_${newSectionId}`, true);
+      
+    } else if (sectionData.id === 'custom_advanced') {
+      // ✅ Advanced custom section with smart auto-incrementing name
+      const newSectionId = `custom_advanced_${timestamp}`;
+      
+      // Get all existing advanced custom section titles
+      const existingTitles = activeSections
+        .filter(id => typeof id === 'string' && id.startsWith('custom_advanced_'))
+        .map(id => {
+          const titleKey = `customAdvancedTitle_${id}`;
+          return watch(titleKey) || "";
+        })
+        .filter(title => title.trim() !== "");
+      
+      // Generate unique title
+      let defaultTitle = "Custom Section (Advanced)";
+      let counter = 1;
+      
+      // Check if base title exists
+      while (existingTitles.includes(defaultTitle)) {
+        defaultTitle = `Custom Section (Advanced) ${counter}`;
+        counter++;
+      }
+      
+      setActiveSections((prev) => [...prev, newSectionId]);
+      setSectionOrder((prev) => [...prev, newSectionId]);
+      
+      // Initialize with default data
+      setValue(`customAdvancedHistory_${newSectionId}`, [{
+        title: "",
+        city: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+        isOngoing: false
+      }]);
+      setValue(`customAdvancedTitle_${newSectionId}`, defaultTitle);
+      
     } else {
-       toast.info(`${sectionData.label} is already added.`);
+      // Existing sections
+      if (!activeSections.includes(sectionData.id)) {
+        setActiveSections((prev) => [...prev, sectionData.id]);
+        setSectionOrder((prev) => {
+          if (!prev.includes(sectionData.id)) {
+            return [...prev, sectionData.id];
+          }
+          return prev;
+        });
+        if (sectionData.id === 'summary' && !watch('summary')) {
+          setValue('summary', '');
+        }
+      }
     }
+  };
+
+  const handleAnimatedDeleteSection = (sectionId) => {
+    setDeletingSectionId(sectionId);
+
+    setTimeout(() => {
+      const newActiveSections = activeSections.filter(s => s !== sectionId);
+      const newSectionOrder = sectionOrder.filter(s => s !== sectionId);
+
+      setActiveSections(newActiveSections);
+      setSectionOrder(newSectionOrder);
+      setDeletingSectionId(null);
+
+      const updatedFormValues = { ...formValues };
+
+      // ✅ Clean up Simple Custom Section
+      if (typeof sectionId === 'string' && sectionId.startsWith('custom_simple_')) {
+        const historyKey = `customSimpleHistory_${sectionId}`;
+        const titleKey = `customSimpleTitle_${sectionId}`;
+        const hideLevelKey = `customSimpleHideLevel_${sectionId}`;
+
+        delete updatedFormValues[historyKey];
+        delete updatedFormValues[titleKey];
+        delete updatedFormValues[hideLevelKey];
+
+        setValue(historyKey, undefined);
+        setValue(titleKey, undefined);
+        setValue(hideLevelKey, undefined);
+
+        methods.unregister(historyKey);
+        methods.unregister(titleKey);
+        methods.unregister(hideLevelKey);
+      }
+      // ✅ Clean up Advanced Custom Section
+      else if (typeof sectionId === 'string' && sectionId.startsWith('custom_advanced_')) {
+        const historyKey = `customAdvancedHistory_${sectionId}`;
+        const titleKey = `customAdvancedTitle_${sectionId}`;
+
+        delete updatedFormValues[historyKey];
+        delete updatedFormValues[titleKey];
+
+        setValue(historyKey, undefined);
+        setValue(titleKey, undefined);
+
+        methods.unregister(historyKey);
+        methods.unregister(titleKey);
+      }
+      // Core sections cleanup
+      else if (sectionId === 'summary') {
+        setValue('summary', '');
+        setValue('summarySectionTitle', '');
+        updatedFormValues.summary = '';
+        updatedFormValues.summarySectionTitle = '';
+      } else if (sectionId === 'employment') {
+        setValue('employmentHistory', []);
+        setValue('employmentSectionTitle', '');
+        updatedFormValues.employmentHistory = [];
+        updatedFormValues.employmentSectionTitle = '';
+      } else if (sectionId === 'education') {
+        setValue('educationHistory', []);
+        setValue('educationSectionTitle', '');
+        updatedFormValues.educationHistory = [];
+        updatedFormValues.educationSectionTitle = '';
+      } else if (sectionId === 'skills') {
+        setValue('newSkillHistory', []);
+        setValue('skillSectionTitle', '');
+        updatedFormValues.newSkillHistory = [];
+        updatedFormValues.skillSectionTitle = '';
+      } else if (sectionId === 'courses') {
+        setValue('coursesHistory', []);
+        setValue('coursesSectionTitle', '');
+        updatedFormValues.coursesHistory = [];
+        updatedFormValues.coursesSectionTitle = '';
+      } else if (sectionId === 'hobbies') {
+        setValue('hobbies', '');
+        setValue('hobbiesSectionTitle', '');
+        updatedFormValues.hobbies = '';
+        updatedFormValues.hobbiesSectionTitle = '';
+      } else if (sectionId === 'activities') {
+        setValue('activityHistory', []);
+        setValue('activitiesSectionTitle', '');
+        updatedFormValues.activityHistory = [];
+        updatedFormValues.activitiesSectionTitle = '';
+      } else if (sectionId === 'languages') {
+        setValue('languageHistory', []);
+        setValue('languagesSectionTitle', '');
+        updatedFormValues.languageHistory = [];
+        updatedFormValues.languagesSectionTitle = '';
+      } else if (sectionId === 'internships') {
+        setValue('internshipHistory', []);
+        setValue('internshipsSectionTitle', '');
+        updatedFormValues.internshipHistory = [];
+        updatedFormValues.internshipsSectionTitle = '';
+      }
+
+      // Save to database
+      const dataToSave = {
+        ...updatedFormValues,
+        activeSections: newActiveSections,
+        sectionOrder: newSectionOrder,
+        resume_type: resume_type || "scratch",
+        mongo_id: resumeIds.mongo_id,
+        mysql_id: resumeIds.mysql_id
+      };
+
+      console.log("🔍 Deleting section, data to save:", dataToSave);
+
+      setSavingStatus('saving');
+      dispatch(saveResumeNew(dataToSave)).then((res) => {
+        if (res.payload?.status_code === 200) {
+          setSavingStatus('saved');
+          lastSavedData.current = JSON.parse(JSON.stringify(dataToSave));
+        } else {
+          setSavingStatus('error');
+        }
+      });
+    }, 300);
   };
 
   return (
@@ -533,7 +822,6 @@ const page = () => {
                             <input type="text" placeholder="Phone" className="mt-1 w-full rounded-lg border border-gray-300 p-2" {...register("phone")} />
                           </div>
 
-                          {/* LinkedIn */}
                           <div>
                             <label className="block !text-sm !font-medium !text-gray-500">
                               LinkedIn URL
@@ -545,7 +833,6 @@ const page = () => {
                               {...register("linkedin")}
                             />
                           </div>
-                          {/* GitHub */}
                           <div>
                             <label className="block !text-sm !font-medium !text-gray-500">
                               GitHub
@@ -558,7 +845,6 @@ const page = () => {
                             />
                           </div>
 
-                          {/* Stack Overflow */}
                           <div>
                             <label className="block !text-sm !font-medium !text-gray-500">
                               Stack Overflow
@@ -571,7 +857,6 @@ const page = () => {
                             />
                           </div>
 
-                          {/* LeetCode */}
                           <div>
                             <label className="block !text-sm !font-medium !text-gray-500">
                               LeetCode
@@ -599,7 +884,6 @@ const page = () => {
                             <label className="block text-sm font-medium text-gray-700">Country</label>
                             <input type="text" placeholder="India" className="mt-1 w-full rounded-lg border border-gray-300 p-2" {...register("country")} />
                           </div>
-                          {/* Postal Code */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700">
                               Postal Code
@@ -690,34 +974,69 @@ const page = () => {
                         {sectionOrder.map((sectionId) => {
                           if (!activeSections.includes(sectionId)) return null;
 
-                          // ✅ Handle dynamic custom sections
+                          // ✅ Determine section type and title
                           let sectionTitle = "";
-                          let isDynamicCustom = false;
+                          let isSimpleCustom = false;
+                          let isAdvancedCustom = false;
 
-                          if (typeof sectionId === 'string' && sectionId.startsWith('custom_')) {
-                            isDynamicCustom = true;
-                            const timestamp = sectionId.split('custom_')[1];
-                            const titleKey = `customSectionTitle_custom_${timestamp}`;
+                          if (typeof sectionId === 'string' && sectionId.startsWith('custom_simple_')) {
+                            isSimpleCustom = true;
+                            const titleKey = `customSimpleTitle_${sectionId}`;
+                            sectionTitle = watch(titleKey) || "Custom Section";
+                          } else if (typeof sectionId === 'string' && sectionId.startsWith('custom_advanced_')) {
+                            isAdvancedCustom = true;
+                            const titleKey = `customAdvancedTitle_${sectionId}`;
                             sectionTitle = watch(titleKey) || "Custom Section";
                           } else {
                             // Static section titles
                             sectionTitle =
-                              sectionId === 'employment' ? "Employment History" :
-                                sectionId === 'education' ? "Education" :
-                                  sectionId === 'skills' ? "Skills" :
-                                    sectionId === 'summary' ? "Personal Summary" :
-                                      sectionId === 'courses' ? "Courses" :
-                                        sectionId === 'hobbies' ? "Hobbies" :
-                                          sectionId === 'activities' ? "Activities" :
-                                            sectionId === 'languages' ? "Languages" :
-                                              sectionId === 'internships' ? "Internships" :
-                                                sectionId === 'custom' ? (watch('customSectionTitle') || "Custom Section") :
-                                                  "Section";
+                              sectionId === 'employment' ? (watch('employmentSectionTitle') || "Employment History") :
+                              sectionId === 'education' ? (watch('educationSectionTitle') || "Education") :
+                              sectionId === 'skills' ? (watch('skillSectionTitle') || "Skills") :
+                              sectionId === 'summary' ? (watch('summarySectionTitle') || "Personal Summary") :
+                              sectionId === 'courses' ? (watch('coursesSectionTitle') || "Courses") :
+                              sectionId === 'hobbies' ? (watch('hobbiesSectionTitle') || "Hobbies") :
+                              sectionId === 'activities' ? (watch('activitiesSectionTitle') || "Activities") :
+                              sectionId === 'languages' ? (watch('languagesSectionTitle') || "Languages") :
+                              sectionId === 'internships' ? (watch('internshipsSectionTitle') || "Internships") :
+                              "Section";
                           }
 
                           return (
                             <div className='acco_section' key={sectionId}>
-                              <SortableSection id={sectionId} title={sectionTitle}>
+                              <SortableSection
+                                id={sectionId}
+                                title={sectionTitle}
+                                onTitleUpdate={(newTitle) => {
+                                  if (sectionId.startsWith('custom_simple_')) {
+                                    const titleKey = `customSimpleTitle_${sectionId}`;
+                                    setValue(titleKey, newTitle);
+                                  } else if (sectionId.startsWith('custom_advanced_')) {
+                                    const titleKey = `customAdvancedTitle_${sectionId}`;
+                                    setValue(titleKey, newTitle);
+                                  } else if (sectionId === 'summary') {
+                                    setValue('summarySectionTitle', newTitle);
+                                  } else if (sectionId === 'employment') {
+                                    setValue('employmentSectionTitle', newTitle);
+                                  } else if (sectionId === 'education') {
+                                    setValue('educationSectionTitle', newTitle);
+                                  } else if (sectionId === 'skills') {
+                                    setValue('skillSectionTitle', newTitle);
+                                  } else if (sectionId === 'courses') {
+                                    setValue('coursesSectionTitle', newTitle);
+                                  } else if (sectionId === 'hobbies') {
+                                    setValue('hobbiesSectionTitle', newTitle);
+                                  } else if (sectionId === 'activities') {
+                                    setValue('activitiesSectionTitle', newTitle);
+                                  } else if (sectionId === 'languages') {
+                                    setValue('languagesSectionTitle', newTitle);
+                                  } else if (sectionId === 'internships') {
+                                    setValue('internshipsSectionTitle', newTitle);
+                                  }
+                                }}
+                                onDelete={() => handleAnimatedDeleteSection(sectionId)}
+                                canDelete={true}
+                              >
                                 {sectionId === 'employment' && (
                                   <EmpHistoryEdit
                                     register={register}
@@ -766,7 +1085,7 @@ const page = () => {
                                 {sectionId === 'summary' && (
                                   <PersonalSummaryEdit
                                     register={register}
-                                    control={control} 
+                                    control={control}
                                     watch={watch}
                                     noHeader={true}
                                   />
@@ -804,6 +1123,7 @@ const page = () => {
                                   <LanguagesEdit
                                     register={register}
                                     watch={watch}
+                                    setValue={setValue}
                                     control={control}
                                     fields={languageFields}
                                     append={languageAppend}
@@ -825,22 +1145,27 @@ const page = () => {
                                     noHeader={true}
                                   />
                                 )}
-                                {(sectionId === 'custom' || isDynamicCustom) && (
-                                  <CustomSectionEdit
-                                    key={sectionId}
+                                
+                                {/* ✅ Simple Custom Section */}
+                                {isSimpleCustom && (
+                                  <DynamicSimpleCustomSection
+                                    sectionId={sectionId}
+                                    register={register}
+                                    watch={watch}
+                                    setValue={setValue}
+                                    control={control}
+                                    noHeader={true}
+                                  />
+                                )}
+
+                                {/* ✅ Advanced Custom Section */}
+                                {isAdvancedCustom && (
+                                  <DynamicAdvancedCustomSection
                                     sectionId={sectionId}
                                     register={register}
                                     watch={watch}
                                     control={control}
                                     setValue={setValue}
-                                    fields={customFields}
-                                    append={customAppend}
-                                    remove={customRemove}
-                                    move={customMove}
-                                    removeSection={() => {
-                                      setActiveSections(prev => prev.filter(s => s !== sectionId));
-                                      setSectionOrder(prev => prev.filter(s => s !== sectionId));
-                                    }}
                                     noHeader={true}
                                   />
                                 )}
@@ -850,7 +1175,11 @@ const page = () => {
                         })}
                       </SortableContext>
                     </DndContext>
-                     <AddSectionEdit onAddNewSection={handleAddNewSection} />
+                    
+                    <AddSectionEdit 
+                      onAddNewSection={handleAddNewSection} 
+                      activeSections={activeSections}
+                    />
                   </div>
 
                   <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
@@ -902,5 +1231,55 @@ const page = () => {
     </div>
   )
 }
+
+// ✅ Wrapper component for Simple Custom Section with dynamic useFieldArray
+const DynamicSimpleCustomSection = ({ sectionId, register, watch, setValue, control, noHeader }) => {
+  const historyFieldName = `customSimpleHistory_${sectionId}`;
+  
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: historyFieldName,
+  });
+
+  return (
+    <SimpleCustomSectionEdit
+      sectionId={sectionId}
+      register={register}
+      watch={watch}
+      setValue={setValue}
+      control={control}
+      fields={fields}
+      append={append}
+      remove={remove}
+      move={move}
+      noHeader={noHeader}
+    />
+  );
+};
+
+// ✅ Wrapper component for Advanced Custom Section with dynamic useFieldArray
+const DynamicAdvancedCustomSection = ({ sectionId, register, watch, control, setValue, noHeader }) => {
+  const historyFieldName = `customAdvancedHistory_${sectionId}`;
+  
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: historyFieldName,
+  });
+
+  return (
+    <AdvancedCustomSectionEdit
+      sectionId={sectionId}
+      register={register}
+      watch={watch}
+      control={control}
+      setValue={setValue}
+      fields={fields}
+      append={append}
+      remove={remove}
+      move={move}
+      noHeader={noHeader}
+    />
+  );
+};
 
 export default page

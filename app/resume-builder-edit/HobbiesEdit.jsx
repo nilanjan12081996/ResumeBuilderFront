@@ -17,7 +17,7 @@ const Hobbies = ({ register, noHeader }) => {
                 <textarea
                     rows="4"
                     placeholder="e.g. Hiking, Reading, Photography"
-                    className="w-full rounded-lg border border-gray-300 bg-[#f9fafb] p-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-lg bg-[#eff2f9] p-3 text-sm outline-none"
                     {...register("hobbies")}
                 ></textarea>
             </div>
