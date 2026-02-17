@@ -42,32 +42,51 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
     ];
 
     const handleSelectSection = (sectionId, isAlreadyAdded) => {
-        // Don't do anything if section is already added or locked
         if (isAlreadyAdded) return;
 
         const selectedTemplate = sectionTemplates.find(s => s.id === sectionId);
         if (selectedTemplate && !selectedTemplate.isLocked) {
             if (onAddNewSection) {
-                // ✅ Custom Simple Section
+
+                // ✅ Custom Simple — unique title
                 if (sectionId === 'custom_simple') {
+                    const BASE = 'Custom Section (Simple)';
+                    const existingTitles = sections
+                        .filter(s => s.type === 'custom_simple')
+                        .map(s => s.title);
+
+                    let uniqueTitle = BASE;
+                    let counter = 1;
+                    while (existingTitles.includes(uniqueTitle)) {
+                        uniqueTitle = `${BASE} ${counter}`;
+                        counter++;
+                    }
+
                     onAddNewSection({
                         type: 'custom_simple',
-                        title: 'Custom Section (Simple)',
-                        items: [
-                            {
-                                id: `simple_${Date.now()}`,
-                                name: '',
-                                level: 2
-                            }
-                        ],
+                        title: uniqueTitle,
+                        items: [{ id: `simple_${Date.now()}`, name: '', level: 2 }],
                         hideExperienceLevel: true
                     });
-                } 
-                // ✅ Custom Advanced Section
+                }
+
+                // ✅ Custom Advanced — unique title
                 else if (sectionId === 'custom_advanced') {
+                    const BASE = 'Custom Section (Advanced)';
+                    const existingTitles = sections
+                        .filter(s => s.type === 'custom')
+                        .map(s => s.title);
+
+                    let uniqueTitle = BASE;
+                    let counter = 1;
+                    while (existingTitles.includes(uniqueTitle)) {
+                        uniqueTitle = `${BASE} ${counter}`;
+                        counter++;
+                    }
+
                     onAddNewSection({
                         type: 'custom',
-                        title: 'Custom Section (Advanced)',
+                        title: uniqueTitle,
                         items: [{
                             id: `custom_${Date.now()}`,
                             title: "",
@@ -78,6 +97,7 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
                         }]
                     });
                 }
+
                 // ✅ Summary Section
                 else if (sectionId === 'summary') {
                     onAddNewSection({
@@ -147,6 +167,47 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
                         }]
                     });
                 }
+                // ✅ Hobbies Section
+                else if (sectionId === 'hobbies') {
+                    onAddNewSection({
+                        type: 'hobbies',
+                        title: 'Hobbies',
+                        hobbies: ''
+                    });
+                }
+                // ✅ Courses Section
+                else if (sectionId === 'courses') {
+                    onAddNewSection({
+                        type: 'courses',
+                        title: 'Courses',
+                        courses: [{ id: `course_${Date.now()}`, course: '', institution: '', startDate: '', endDate: '' }]
+                    });
+                }
+                // ✅ Languages Section
+                else if (sectionId === 'languages') {
+                    onAddNewSection({
+                        type: 'languages',
+                        title: 'Languages',
+                        languages: [{ id: `lang_${Date.now()}`, language: '', level: 'Intermediate' }],
+                        hideProficiency: false
+                    });
+                }
+                // ✅ Internships Section
+                else if (sectionId === 'internships') {
+                    onAddNewSection({
+                        type: 'internships',
+                        title: 'Internships',
+                        internships: [{ id: `intern_${Date.now()}`, jobTitle: '', employer: '', city: '', startDate: '', endDate: '', description: '', isCurrentlyInterning: false }]
+                    });
+                }
+                // ✅ Extra-curricular Activities Section
+                else if (sectionId === 'extra_curricular') {
+                    onAddNewSection({
+                        type: 'activities',
+                        title: 'Extra-curricular Activities',
+                        activities: [{ id: `activity_${Date.now()}`, functionTitle: '', employer: '', city: '', startDate: '', endDate: '', description: '', isCurrentlyActive: false }]
+                    });
+                }
                 // ✅ Other sections use custom advanced format
                 else {
                     onAddNewSection({
@@ -170,7 +231,6 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
     return (
         <div className="mb-4">
             {!showSectionList ? (
-                // Add Section Button
                 <div className="bg-white rounded-xl shadow-sm p-4">
                     <button
                         type="button"
@@ -182,7 +242,6 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
                     </button>
                 </div>
             ) : (
-                // Section Selection View
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
@@ -202,10 +261,9 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {sectionTemplates.map((section) => {
-                            // ✅ Check if section is already added
                             const isAlreadyAdded = 
-                                section.id === 'custom_simple' ? false :  // ✅ Allow multiple simple custom sections
-                                section.id === 'custom_advanced' ? false :  // ✅ Allow multiple advanced custom sections
+                                section.id === 'custom_simple' ? false :
+                                section.id === 'custom_advanced' ? false :
                                 sections.some(s => s.type === section.id);
                             
                             const isDisabled = section.isLocked || isAlreadyAdded;

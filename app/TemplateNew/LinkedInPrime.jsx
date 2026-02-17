@@ -1,324 +1,538 @@
 "use client";
 import React from "react";
+import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { FaLinkedin, FaGlobe } from "react-icons/fa";
 
-const LinkedInPrime = ({ formData, sections, sectionOrder, themeColor, resumeSettings }) => {
+const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const { text, layout } = resumeSettings;
+  const color = themeColor || "#0a66c2";
 
+  // ── Date formatter: ISO string, raw string, Date object — সব handle করে ──
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
+    const strVal = String(dateValue).trim();
+    if (strVal.toLowerCase() === "present") return "Present";
+    if (strVal.toUpperCase() === "PRESENT") return "Present";
 
-    if (typeof dateValue === "string" && dateValue.toLowerCase() === "present") {
-      return "Present";
+    // Try parsing as Date
+    const d = new Date(strVal);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleString("en-US", { month: "short", year: "numeric" });
     }
 
-    const d = new Date(dateValue);
-    if (isNaN(d.getTime())) return null;
-
-    return d.toLocaleString("en-US", {
-      month: "short",
-      year: "numeric",
-    });
+    // Fallback: return raw string (e.g. "Jan 2020" already formatted)
+    return strVal;
   };
 
-  // ===================== DYNAMIC SECTION RENDERERS =====================
-
-  const renderSkillsFromSection = (section) => {
-    return (
-      <section key={section.id} className="mb-6">
-        <h3
-          className="font-bold mb-3 uppercase tracking-wider"
-          style={{
-            color: "#FFFFFF",
-            fontFamily: text.secondaryFont,
-            fontSize: `${text.secondaryHeading}pt`,
-            fontWeight: text.secondaryHeadingWeight,
-          }}
-        >
-          {section.title}
-        </h3>
-        <div
-          className="text-white leading-relaxed space-y-1"
-          style={{
-            fontSize: `${text.body}pt`,
-            fontWeight: text.bodyWeight
-          }}
-        >
-          {section.skills?.map((skill, index) => (
-            <div key={skill.id || index}>
-              {skill.name}
-            </div>
-          ))}
-        </div>
-      </section>
-    );
+  const dateRange = (start, end) => {
+    const s = formatDate(start);
+    const e = formatDate(end);
+    if (s && e) return `${s} – ${e}`;
+    return s || e || "";
   };
 
-  const renderSummaryFromSection = (section) => (
-    <section key={section.id} className="mb-8">
-      <h3
-        className="font-bold uppercase tracking-wider mb-4"
-        style={{
-          color: "#000000",
-          fontFamily: text.secondaryFont,
-          fontSize: `${text.secondaryHeading}pt`,
-          fontWeight: text.secondaryHeadingWeight,
-        }}
-      >
-        {section.title}
-      </h3>
+  const calcDuration = (start, end) => {
+    if (!start) return "";
+    const s = new Date(start);
+    if (isNaN(s.getTime())) return "";
+    const e =
+      !end || String(end).toLowerCase() === "present"
+        ? new Date()
+        : new Date(end);
+    if (isNaN(e.getTime())) return "";
+    const totalMonths =
+      (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+    if (totalMonths <= 0) return "";
+    const yrs = Math.floor(totalMonths / 12);
+    const mos = totalMonths % 12;
+    return [
+      yrs > 0 && `${yrs} yr${yrs > 1 ? "s" : ""}`,
+      mos > 0 && `${mos} mo${mos > 1 ? "s" : ""}`,
+    ]
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  // ── Section divider line ──────────────────────────────────────
+  const Divider = () => <div className="border-t border-gray-200 my-3" />;
+
+  // ── Section Heading ───────────────────────────────────────────
+  const SectionHeading = ({ title }) => (
+    <h3
+      className="font-bold uppercase tracking-wide mb-3"
+      style={{
+        color: "#000000",
+        fontFamily: text.secondaryFont,
+        fontSize: `${text.sectionTitle}pt`,
+        fontWeight: text.sectionTitleWeight,
+      }}
+    >
+      {title}
+    </h3>
+  );
+
+  // ── Separate sections by type ─────────────────────────────────
+  const findSection = (type) => (sections || []).filter((s) => s.type === type);
+  const skillSections        = findSection("skills");
+  const languageSections     = findSection("languages");
+  const summarySections      = findSection("summary");
+  const experienceSections   = findSection("experience");
+  const educationSections    = findSection("education");
+  const certSections         = findSection("certifications");
+  const hobbySections        = findSection("hobbies");
+  const coursesSections      = findSection("courses");
+  const internshipSections   = findSection("internships");
+  const activitySections     = findSection("activities");
+  const customSimpleSections = findSection("custom_simple");
+  const customAdvSections    = findSection("custom");
+
+  // ── RENDERERS ─────────────────────────────────────────────────
+
+  const renderSummary = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
       <div
-        className="leading-relaxed text-gray-800 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
+        className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_p]:mb-1"
         style={{
           fontSize: `${text.body}pt`,
           fontWeight: text.bodyWeight,
-          textAlign: 'justify'
+          textAlign: "justify",
         }}
         dangerouslySetInnerHTML={{ __html: section.summary }}
       />
-      <div 
-        className="w-16 h-0.5 bg-gray-400 mt-6"
-      />
-    </section>
+      <Divider />
+    </div>
   );
 
-  const renderEducationFromSection = (section) => (
-    <section key={section.id} className="mb-8">
-      <h3
-        className="font-bold uppercase tracking-wider mb-4"
-        style={{
-          color: "#000000",
-          fontFamily: text.secondaryFont,
-          fontSize: `${text.secondaryHeading}pt`,
-          fontWeight: text.secondaryHeadingWeight,
-        }}
-      >
-        {section.title}
-      </h3>
-      <div
-        className="flex flex-col"
-        style={{
-          fontSize: `${text.body}pt`,
-          fontWeight: text.bodyWeight,
-          gap: `${layout.betweenEntries}pt`
-        }}
-      >
-        {section.educations?.map((edu, index) => (
-          <div key={edu.id || index}>
-            <h4 className="font-bold text-black text-base">
-              {edu.institute}
-            </h4>
-            <p className="text-gray-700">
-              {edu.degree}
-            </p>
-            {edu.startDate && (
-              <p className="text-gray-600">
-                {formatDate(edu.startDate)}
-                {edu.endDate && (
-                  <>
-                    {" - "}
-                    {formatDate(edu.endDate)}
-                  </>
+  const renderExperience = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-4">
+        {section.experiences?.map((exp, i) => {
+          const dr  = dateRange(exp.startDate, exp.endDate);
+          const dur = calcDuration(exp.startDate, exp.endDate);
+          return (
+            <div key={exp.id || i} className="flex gap-3">
+              <div className="flex-1">
+                <h4
+                  className="font-bold text-black"
+                  style={{ fontSize: `${text.body + 1}pt` }}
+                >
+                  {exp.jobTitle}
+                </h4>
+                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
+                  {exp.company}
+                </p>
+                {dr && (
+                  <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
+                    {dr}
+                    {dur ? ` · ${dur}` : ""}
+                  </p>
                 )}
-              </p>
-            )}
-            {edu.city && (
-              <p className="text-gray-400 italic">
-                {edu.city}
-              </p>
-            )}
-            {edu.description && (
-              <div
-                className="text-gray-700 mt-2 leading-relaxed [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
-                dangerouslySetInnerHTML={{ __html: edu.description }}
-              />
-            )}
-          </div>
-        ))}
+                {exp.city && (
+                  <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
+                    {exp.city}
+                  </p>
+                )}
+                {exp.description && (
+                  <div
+                    className="text-gray-700 mt-2 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_p]:mb-1"
+                    style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
+                    dangerouslySetInnerHTML={{ __html: exp.description }}
+                  />
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </section>
+      <Divider />
+    </div>
   );
 
-  const renderExperienceFromSection = (section) => (
-    <section key={section.id} className="mb-8">
-      <h3
-        className="font-bold uppercase tracking-wider mb-4"
-        style={{
-          color: "#000000",
-          fontFamily: text.secondaryFont,
-          fontSize: `${text.secondaryHeading}pt`,
-          fontWeight: text.secondaryHeadingWeight,
-        }}
-      >
-        {section.title}
-      </h3>
+  const renderEducation = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-4">
+        {section.educations?.map((edu, i) => {
+          const dr = dateRange(edu.startDate, edu.endDate);
+          return (
+            <div key={edu.id || i} className="flex gap-3">
+              <div className="flex-1">
+                <h4
+                  className="font-bold text-black"
+                  style={{ fontSize: `${text.body + 1}pt` }}
+                >
+                  {edu.institute}
+                </h4>
+                {edu.degree && (
+                  <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
+                    {edu.degree}
+                  </p>
+                )}
+                {dr && (
+                  <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
+                    {dr}
+                  </p>
+                )}
+                {edu.city && (
+                  <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
+                    {edu.city}
+                  </p>
+                )}
+                {edu.description && (
+                  <div
+                    className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
+                    style={{ fontSize: `${text.body}pt` }}
+                    dangerouslySetInnerHTML={{ __html: edu.description }}
+                  />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <Divider />
+    </div>
+  );
+
+  const renderSkills = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
       <div
-        className="flex flex-col"
-        style={{
-          fontSize: `${text.body}pt`,
-          fontWeight: text.bodyWeight,
-          gap: `${layout.betweenEntries}pt`
-        }}
+        className="flex flex-wrap gap-2"
+        style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
       >
-        {section.experiences?.map((exp, index) => (
-          <div key={exp.id || index}>
-            <h4 className="font-bold text-black text-base">
-              {exp.company}
-            </h4>
-            <p className="text-gray-700 font-semibold">
-              {exp.jobTitle}
-            </p>
-            {exp.startDate && (
-              <p className="text-gray-600">
-                {formatDate(exp.startDate)}
-                {" - "}
-                {exp.endDate ? formatDate(exp.endDate) : "Present"}
-                {exp.startDate && exp.endDate && (() => {
-                  const start = new Date(exp.startDate);
-                  const end = exp.endDate && exp.endDate.toLowerCase() !== 'present' 
-                    ? new Date(exp.endDate) 
-                    : new Date();
-                  const months = (end.getFullYear() - start.getFullYear()) * 12 + 
-                                (end.getMonth() - start.getMonth());
-                  const years = Math.floor(months / 12);
-                  const remainingMonths = months % 12;
-                  return ` (${years > 0 ? `${years} year${years > 1 ? 's' : ''} ` : ''}${remainingMonths} month${remainingMonths !== 1 ? 's' : ''})`;
-                })()}
-              </p>
-            )}
-            {exp.city && (
-              <p className="text-gray-400 italic">
-                {exp.city}
-              </p>
-            )}
-            {exp.description && (
-              <div
-                className="text-gray-700 mt-2 leading-relaxed [&_p]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
-                style={{ textAlign: 'justify' }}
-                dangerouslySetInnerHTML={{ __html: exp.description }}
-              />
+        {section.skills?.map((skill, i) => (
+          <span
+            key={skill.id || i}
+            className="px-3 py-1 rounded-full border text-gray-700 bg-gray-50 border-gray-200"
+            style={{ fontSize: `${text.body - 1}pt` }}
+          >
+            {skill.name}
+          </span>
+        ))}
+      </div>
+      <Divider />
+    </div>
+  );
+
+ const renderLanguages = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-wrap gap-x-4 gap-y-2" style={{ fontSize: `${text.body}pt` }}>
+        {section.languages?.map((l, i) => (
+          <div key={l.id || i} className="flex items-center gap-1">
+            <span className="font-semibold text-black">{l.language}</span>
+            {!section.hideProficiency && l.level && (
+              <span className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
+                ({l.level})
+              </span>
             )}
           </div>
         ))}
       </div>
-    </section>
+      <Divider />
+    </div>
   );
 
-  // Separate sections for sidebar and main content
-  const sidebarSections = [];
-  const mainSections = [];
+  const renderCertifications = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-3">
+        {section.certifications?.map((cert, i) => (
+          <div key={cert.id || i} className="flex gap-3">
+            <div
+              className="w-10 h-10 rounded flex-shrink-0 flex items-center justify-center text-white text-sm"
+              style={{ backgroundColor: "#0ea5e9", minWidth: "40px" }}
+            >
+              ✓
+            </div>
+            <div>
+              <h4 className="font-bold text-black" style={{ fontSize: `${text.body}pt` }}>
+                {cert.name}
+              </h4>
+              {cert.organization && (
+                <p className="text-gray-600" style={{ fontSize: `${text.body - 1}pt` }}>
+                  {cert.organization}
+                </p>
+              )}
+              {(cert.startYear || cert.endYear) && (
+                <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
+                  {cert.startYear}
+                  {cert.startYear && cert.endYear ? " – " : ""}
+                  {cert.endYear}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      <Divider />
+    </div>
+  );
 
-  sections?.forEach((section) => {
-    if (section.type === "skills") {
-      sidebarSections.push(section);
-    } else {
-      mainSections.push(section);
+  const renderHobbies = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
+        {section.hobbies}
+      </p>
+      <Divider />
+    </div>
+  );
+
+  const renderCourses = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-3">
+        {section.courses?.map((course, i) => (
+          <div key={course.id || i}>
+            <h4 className="font-semibold text-black" style={{ fontSize: `${text.body}pt` }}>
+              {course.course}
+            </h4>
+            {course.institution && (
+              <p className="text-gray-600" style={{ fontSize: `${text.body - 1}pt` }}>
+                {course.institution}
+              </p>
+            )}
+            {dateRange(course.startDate, course.endDate) && (
+              <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
+                {dateRange(course.startDate, course.endDate)}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      <Divider />
+    </div>
+  );
+
+  const renderInternships = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-4">
+        {section.internships?.map((intern, i) => {
+          const dr  = dateRange(intern.startDate, intern.endDate);
+          const dur = calcDuration(intern.startDate, intern.endDate);
+          return (
+            <div key={intern.id || i} className="flex gap-3">
+              <div
+                className="w-10 h-10 rounded flex-shrink-0 flex items-center justify-center text-white font-bold text-sm"
+                style={{ backgroundColor: "#f59e0b", minWidth: "40px" }}
+              >
+                {intern.employer?.[0]?.toUpperCase() || "I"}
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-black" style={{ fontSize: `${text.body + 1}pt` }}>
+                  {intern.jobTitle}
+                </h4>
+                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
+                  {intern.employer}
+                </p>
+                {dr && (
+                  <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
+                    {dr}
+                    {dur ? ` · ${dur}` : ""}
+                  </p>
+                )}
+                {intern.description && (
+                  <div
+                    className="text-gray-700 mt-2 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
+                    style={{ fontSize: `${text.body}pt` }}
+                    dangerouslySetInnerHTML={{ __html: intern.description }}
+                  />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <Divider />
+    </div>
+  );
+
+  const renderActivities = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-3">
+        {section.activities?.map((act, i) => {
+          const dr = dateRange(act.startDate, act.endDate);
+          return (
+            <div key={act.id || i}>
+              <h4 className="font-semibold text-black" style={{ fontSize: `${text.body}pt` }}>
+                {act.functionTitle}
+                {act.employer ? ` · ${act.employer}` : ""}
+              </h4>
+              {dr && (
+                <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
+                  {dr}
+                </p>
+              )}
+              {act.description && (
+                <p className="text-gray-700 mt-1" style={{ fontSize: `${text.body}pt` }}>
+                  {act.description}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <Divider />
+    </div>
+  );
+
+  // Custom Simple — grid style (competencies, achievements)
+  const renderCustomSimple = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div
+        className="flex flex-col gap-1"
+        style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
+      >
+        {section.items?.map((item, i) => {
+          const name = typeof item === "object" ? item.name || item.title : item;
+          return (
+            <div key={i} className="flex items-start gap-2 text-gray-700">
+              <span
+                className="mt-[5px] w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: color }}
+              />
+              {name}
+            </div>
+          );
+        })}
+      </div>
+      <Divider />
+    </div>
+  );
+
+  // Custom Advanced
+  const renderCustomAdvanced = (section) => (
+    <div key={section.id}>
+      <SectionHeading title={section.title} />
+      <div className="flex flex-col gap-3">
+        {section.items?.map((item, i) => {
+          const dr = dateRange(item.startDate, item.endDate);
+          return (
+            <div key={item.id || i}>
+              <div className="flex justify-between items-baseline gap-2">
+                <h4
+                  className="font-semibold text-black"
+                  style={{ fontSize: `${text.body}pt` }}
+                >
+                  {item.title}
+                  {item.city ? ` · ${item.city}` : ""}
+                </h4>
+                {dr && (
+                  <span className="text-gray-400 text-xs flex-shrink-0">{dr}</span>
+                )}
+              </div>
+              {item.description && (
+                <div
+                  className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
+                  style={{ fontSize: `${text.body}pt` }}
+                  dangerouslySetInnerHTML={{ __html: item.description }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <Divider />
+    </div>
+  );
+
+  // ── Contact info: address build করা — duplicate না দেখানোর জন্য smart merge ──
+  // address field এ যদি city/state already থাকে তাহলে city_state আলাদা দেখাবে না
+  const buildAddressLine = () => {
+    const parts = [];
+    if (formData.address) parts.push(formData.address);
+    // city_state শুধু তখনই add করো যদি address এ already নেই
+    if (
+      formData.city_state &&
+      !(formData.address || "").includes(formData.city_state)
+    ) {
+      parts.push(formData.city_state);
     }
-  });
+    if (
+      formData.country &&
+      !(formData.address || "").includes(formData.country)
+    ) {
+      parts.push(formData.country);
+    }
+    return parts.filter(Boolean).join(", ");
+  };
 
-  // ===================== MAIN RENDER LOGIC =====================
+  const addressLine = buildAddressLine();
 
+  // ── MAIN RENDER ───────────────────────────────────────────────
   return (
     <div className="h-screen overflow-y-auto hide-scrollbar">
       <div
-        className="min-h-[297mm] w-full bg-white text-gray-800 font-sans shadow-lg resume-root flex"
-        style={{
-          fontFamily: text.primaryFont,
-          lineHeight: text.lineHeight,
-          fontSize: text.fontSize
-        }}
+        className="min-h-[297mm] w-full bg-white font-sans shadow-lg resume-root"
+        style={{ fontFamily: text.primaryFont, lineHeight: text.lineHeight }}
       >
-        {/* ----------------- LEFT SIDEBAR (Dark Background) ----------------- */}
-        <div 
-          className="w-[35%] text-white p-8"
-          style={{
-            backgroundColor: themeColor || '#3d5a6b',
-            paddingTop: `${layout.topBottom}pt`,
-            paddingBottom: `${layout.topBottom}pt`,
-          }}
-        >
-          {/* Contact Section */}
-          <section className="mb-8">
-            <h3
-              className="font-bold mb-3 uppercase tracking-wider"
-              style={{
-                color: "#FFFFFF",
-                fontFamily: text.secondaryFont,
-                fontSize: `${text.secondaryHeading}pt`,
-                fontWeight: text.secondaryHeadingWeight,
-              }}
-            >
-              Contact
-            </h3>
-            
+
+        {/* ══ 1. COVER PHOTO BANNER ════════════════════════════════ */}
+        <div className="relative">
+          {/* Cover photo area */}
+          {formData.coverImage ? (
+            <img
+              src={formData.coverImage}
+              alt="Cover"
+              className="w-full object-cover"
+              style={{ height: "100pt" }}
+            />
+          ) : (
             <div
-              className="text-white space-y-2"
+              className="w-full"
               style={{
-                fontSize: `${text.body}pt`,
-                fontWeight: text.bodyWeight,
+                height: "100pt",
+                background: `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`,
               }}
-            >
-              {formData.linkedin && (
-                <div>
-                  <a
-                    href={formData.linkedin}
-                    target="_blank"
-                    className="text-white hover:underline break-all"
-                  >
-                    {formData.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
-                  </a>
-                </div>
-              )}
-              {formData.email && (
-                <div>
-                  <a
-                    href={`mailto:${formData.email}`}
-                    className="text-white hover:underline"
-                  >
-                    {formData.email}
-                  </a>
-                </div>
-              )}
-              {formData.phone && (
-                <div className="text-white">
-                  {formData.phone}
-                </div>
-              )}
-              {formData.website && (
-                <div>
-                  <a
-                    href={formData.website}
-                    target="_blank"
-                    className="text-white hover:underline break-all"
-                  >
-                    {formData.website.replace(/^https?:\/\/(www\.)?/, '')}
-                  </a>
-                </div>
-              )}
-            </div>
-          </section>
+            />
+          )}
 
-          {/* Skills Section in Sidebar */}
-          {sidebarSections.map((section) => {
-            if (section.type === "skills") {
-              return renderSkillsFromSection(section);
-            }
-            return null;
-          })}
-
-          {/* Placeholder sections for Languages, Honors-Awards if needed */}
+          {/* Profile photo — overlapping cover */}
+          <div
+            className="absolute left-8 border-4 border-white rounded-full overflow-hidden bg-white"
+            style={{
+              bottom: "-32pt",
+              width: "72pt",
+              height: "72pt",
+            }}
+          >
+            {formData.profileImage ? (
+              <img
+                src={formData.profileImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center text-white font-bold text-2xl"
+                style={{ backgroundColor: color }}
+              >
+                {(formData.first_name?.[0] || "") + (formData.last_name?.[0] || "")}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* ----------------- RIGHT MAIN CONTENT ----------------- */}
-        <div 
-          className="w-[65%] bg-white"
+        {/* Spacer for profile photo overlap */}
+        <div
           style={{
-            padding: `${layout.topBottom}pt ${layout.leftRight}pt`,
+            paddingTop: "38pt",
+            paddingLeft: `${layout.leftRight}pt`,
+            paddingRight: `${layout.leftRight}pt`,
           }}
         >
-          {/* Header with Name */}
-          <div className="mb-6">
+
+          {/* ══ 2. NAME + HEADLINE ═══════════════════════════════════ */}
+          <div className="mb-3">
             <h1
-              className="font-bold text-black"
+              className="font-bold text-black leading-tight"
               style={{
                 fontFamily: text.secondaryFont,
                 fontSize: `${text.primaryHeading}pt`,
@@ -328,44 +542,132 @@ const LinkedInPrime = ({ formData, sections, sectionOrder, themeColor, resumeSet
               {formData.first_name} {formData.last_name}
             </h1>
 
-            {/* Headline/Job Target */}
-            <p
-              className="text-gray-700 mt-2 leading-relaxed"
-              style={{
-                fontSize: `${text.body}pt`,
-                fontWeight: text.bodyWeight,
-              }}
-            >
-              {formData.job_target}
-            </p>
-
-            {/* Location */}
-            {formData.city_state && (
+            {formData.job_target && (
               <p
-                className="text-gray-400 mt-1 italic"
-                style={{
-                  fontSize: `${text.body}pt`,
-                  fontWeight: text.bodyWeight,
-                }}
+                className="mt-1 text-gray-700 leading-snug"
+                style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
               >
-                {formData.city_state}
+                {formData.job_target}
               </p>
             )}
           </div>
 
-          {/* Main Sections (Summary, Experience, Education) */}
-          {mainSections.map((section) => {
-            switch (section.type) {
-              case "summary":
-                return renderSummaryFromSection(section);
-              case "education":
-                return renderEducationFromSection(section);
-              case "experience":
-                return renderExperienceFromSection(section);
-              default:
-                return null;
-            }
-          })}
+          <Divider />
+
+          {/* ══ 3. SUMMARY (if any) ══════════════════════════════════ */}
+          {summarySections.map((s) => renderSummary(s))}
+
+          {/* ══ 4. CONTACT INFORMATION ═══════════════════════════════ */}
+          <div className="mb-3">
+            <SectionHeading title="Contact Information" />
+            <div
+              className="flex flex-col gap-1 text-gray-700"
+              style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
+            >
+              {/* Address — address + city_state + country smart merge */}
+              {addressLine && (
+                <div className="flex items-start gap-2">
+                  <MdLocationOn className="text-gray-400 flex-shrink-0 mt-[2px]" />
+                  <span>{addressLine}</span>
+                </div>
+              )}
+
+              {/* Email */}
+              {formData.email && (
+                <div className="flex items-center gap-2">
+                  <MdEmail className="text-gray-400 flex-shrink-0" />
+                  <a
+                    href={`mailto:${formData.email}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {formData.email}
+                  </a>
+                </div>
+              )}
+
+              {/* Phone */}
+              {formData.phone && (
+                <div className="flex items-center gap-2">
+                  <MdPhone className="text-gray-400 flex-shrink-0" />
+                  <span>{formData.phone}</span>
+                </div>
+              )}
+
+              {/* LinkedIn */}
+              {formData.linkedin && (
+                <div className="flex items-center gap-2">
+                  <FaLinkedin className="text-blue-600 flex-shrink-0" />
+                  <a
+                    href={
+                      formData.linkedin.startsWith("http")
+                        ? formData.linkedin
+                        : `https://${formData.linkedin}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline break-all"
+                  >
+                    {formData.linkedin.replace(/^https?:\/\/(www\.)?/, "")}
+                  </a>
+                </div>
+              )}
+
+              {/* Website */}
+              {formData.website && (
+                <div className="flex items-center gap-2">
+                  <FaGlobe className="text-gray-400 flex-shrink-0" />
+                  <a
+                    href={
+                      formData.website.startsWith("http")
+                        ? formData.website
+                        : `https://${formData.website}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline break-all"
+                  >
+                    {formData.website.replace(/^https?:\/\/(www\.)?/, "")}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Divider />
+
+          {/* ══ 5. EXPERIENCE ════════════════════════════════════════ */}
+          {experienceSections.map((s) => renderExperience(s))}
+
+          {/* ══ 6. EDUCATION ═════════════════════════════════════════ */}
+          {educationSections.map((s) => renderEducation(s))}
+
+          {/* ══ 7. SKILLS ════════════════════════════════════════════ */}
+          {skillSections.map((s) => renderSkills(s))}
+
+          {/* ══ 8. LANGUAGES ═════════════════════════════════════════ */}
+          {languageSections.map((s) => renderLanguages(s))}
+
+          {/* ══ 9. CERTIFICATIONS ════════════════════════════════════ */}
+          {certSections.map((s) => renderCertifications(s))}
+
+          {/* ══ 10. COURSES ══════════════════════════════════════════ */}
+          {coursesSections.map((s) => renderCourses(s))}
+
+          {/* ══ 11. INTERNSHIPS ══════════════════════════════════════ */}
+          {internshipSections.map((s) => renderInternships(s))}
+
+          {/* ══ 12. ACTIVITIES ═══════════════════════════════════════ */}
+          {activitySections.map((s) => renderActivities(s))}
+
+          {/* ══ 13. HOBBIES ══════════════════════════════════════════ */}
+          {hobbySections.map((s) => renderHobbies(s))}
+
+          {/* ══ 14. CUSTOM SIMPLE (Core Competencies, Achievements etc) */}
+          {customSimpleSections.map((s) => renderCustomSimple(s))}
+
+          {/* ══ 15. CUSTOM ADVANCED ══════════════════════════════════ */}
+          {customAdvSections.map((s) => renderCustomAdvanced(s))}
+
         </div>
       </div>
     </div>

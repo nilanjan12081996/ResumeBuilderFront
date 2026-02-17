@@ -13,7 +13,7 @@ const LinkedInExperience = ({
   section,
   sectionIndex,
   handleExpUpdate,
-  handleExpDragStart, 
+  handleExpDragStart,
   handleExpDrop,
   handleAddExperience,
   draggedExpIndex,
@@ -104,18 +104,18 @@ const LinkedInExperience = ({
 
                     {/* Date Section */}
                     <div className='md:col-span-2'>
-                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
+                      <Label className="block text-xs font-semibold !text-gray-500 mb-1">Start & End Date</Label>
                       <div className='flex gap-2 mt-1'>
                         <div className="flex-1">
                           <Datepicker
                             selectedDate={exp.startDate}
-                            onChange={(date) => handleExpUpdate(sectionIndex, exp.id, "startDate", date)}
+                            onChange={(date) => handleExpUpdate(sectionIndex, exp.id, "startDate", date ? date.toString() : "")}
                           />
                         </div>
                         <div className="flex-1">
                           <Datepicker
                             selectedDate={exp.endDate}
-                            onChange={(date) => handleExpUpdate(sectionIndex, exp.id, "endDate", date)}
+                            onChange={(date) => handleExpUpdate(sectionIndex, exp.id, "endDate", date ? date.toString() : "")}
                             disabled={exp.isCurrentlyWorking}
                           />
                         </div>

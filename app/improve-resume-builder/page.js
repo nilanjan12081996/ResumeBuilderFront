@@ -21,6 +21,11 @@ import ImpSummary from './components/ImpSummary';
 import ImpEducation from './components/ImpEducation';
 import ImpCertifications from './components/ImpCertifications';
 import ImpExperience from './components/ImpExperience';
+import ImpHobbies from './components/ImpHobbies';
+import ImpCourses from './components/ImpCourses';
+import ImpLanguages from './components/ImpLanguages';
+import ImpInternships from './components/ImpInternships';
+import ImpActivities from './components/ImpActivities';
 import CustomizeSection from '../ui/CustomizeSection.jsx';
 import ImpCustomSection from './components/ImpCustomSection';
 import AddSectionButton from './components/AddSectionButton';
@@ -84,6 +89,10 @@ const Page = () => {
   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
   const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+  const [draggedCourseIndex, setDraggedCourseIndex] = useState(null);
+  const [draggedLanguageIndex, setDraggedLanguageIndex] = useState(null);
+  const [draggedInternshipIndex, setDraggedInternshipIndex] = useState(null);
+  const [draggedActivityIndex, setDraggedActivityIndex] = useState(null);
   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
   const [deletingSectionIndex, setDeletingSectionIndex] = useState(null);
@@ -300,7 +309,7 @@ const Page = () => {
     }
   }, [savingStatus]);
 
-  
+
   const mapextracteResumeDataToSections = (resumeData) => {
     if (!resumeData) return [];
 
@@ -426,7 +435,7 @@ const Page = () => {
             name: typeof item === "string" ? item : item.name || item.title || "",
             level: typeof item === "object" && item.level ? item.level : 2
           })),
-          hideExperienceLevel: false
+          hideExperienceLevel: true   
         });
       } else {
         // Use custom (advanced) type for complex sections
@@ -927,7 +936,6 @@ const Page = () => {
     );
   };
 
-
   const handleSimpleCustomUpdate = (sectionIndex, itemIndex, field, value) => {
     setSections(prev =>
       prev.map((section, i) => {
@@ -963,6 +971,222 @@ const Page = () => {
     );
   };
 
+  // --- Hobbies Handler ---
+  const handleHobbiesUpdate = (sectionIndex, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : { ...section, [field]: value }
+      )
+    );
+  };
+
+  // --- Courses Handlers ---
+  const handleCourseDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedCourseIndex(index);
+  };
+
+  const handleCourseDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedCourseIndex === null || draggedCourseIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].courses];
+    const [moved] = list.splice(draggedCourseIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].courses = list;
+    setSections(updatedSections);
+    setDraggedCourseIndex(null);
+  };
+
+  const handleCourseUpdate = (sectionIndex, courseId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === 'delete') {
+          return { ...section, courses: section.courses.filter(c => c.id !== courseId) };
+        }
+        return {
+          ...section,
+          courses: section.courses.map(c =>
+            c.id === courseId ? { ...c, [field]: value } : c
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddCourse = (sectionIndex) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : {
+          ...section,
+          courses: [...(section.courses || []), {
+            id: `course_${Date.now()}`,
+            course: '',
+            institution: '',
+            startDate: '',
+            endDate: '',
+          }]
+        }
+      )
+    );
+  };
+
+  // --- Languages Handlers ---
+  const handleLanguageDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedLanguageIndex(index);
+  };
+
+  const handleLanguageDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedLanguageIndex === null || draggedLanguageIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].languages];
+    const [moved] = list.splice(draggedLanguageIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].languages = list;
+    setSections(updatedSections);
+    setDraggedLanguageIndex(null);
+  };
+
+  const handleLanguageUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (itemId === null && field !== 'add') {
+          return { ...section, [field]: value };
+        }
+        if (field === 'add') {
+          return { ...section, languages: [...(section.languages || []), value] };
+        }
+        if (field === 'delete') {
+          return { ...section, languages: section.languages.filter(l => l.id !== itemId) };
+        }
+        return {
+          ...section,
+          languages: section.languages.map(l =>
+            l.id === itemId ? { ...l, [field]: value } : l
+          ),
+        };
+      })
+    );
+  };
+
+  // --- Internships Handlers ---
+  const handleInternshipDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedInternshipIndex(index);
+  };
+
+  const handleInternshipDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedInternshipIndex === null || draggedInternshipIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].internships];
+    const [moved] = list.splice(draggedInternshipIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].internships = list;
+    setSections(updatedSections);
+    setDraggedInternshipIndex(null);
+  };
+
+  const handleInternshipUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === 'delete') {
+          return { ...section, internships: section.internships.filter(item => item.id !== itemId) };
+        }
+        return {
+          ...section,
+          internships: section.internships.map(item =>
+            item.id === itemId ? { ...item, [field]: value } : item
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddInternship = (sectionIndex) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : {
+          ...section,
+          internships: [...(section.internships || []), {
+            id: `intern_${Date.now()}`,
+            jobTitle: '',
+            employer: '',
+            city: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+            isCurrentlyInterning: false,
+          }]
+        }
+      )
+    );
+  };
+
+  // --- Activities Handlers ---
+  const handleActivityDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedActivityIndex(index);
+  };
+
+  const handleActivityDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedActivityIndex === null || draggedActivityIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].activities];
+    const [moved] = list.splice(draggedActivityIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].activities = list;
+    setSections(updatedSections);
+    setDraggedActivityIndex(null);
+  };
+
+  const handleActivityUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === 'delete') {
+          return { ...section, activities: section.activities.filter(a => a.id !== itemId) };
+        }
+        return {
+          ...section,
+          activities: section.activities.map(a =>
+            a.id === itemId ? { ...a, [field]: value } : a
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddActivity = (sectionIndex) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : {
+          ...section,
+          activities: [...(section.activities || []), {
+            id: `activity_${Date.now()}`,
+            functionTitle: '',
+            employer: '',
+            city: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+            isCurrentlyActive: false,
+          }]
+        }
+      )
+    );
+  };
+
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
     const color =
@@ -979,15 +1203,14 @@ const Page = () => {
     }));
   };
 
-  const handleAddNewSection = (newSection) => {
-    const newId = Math.max(...sections.map(s => s.id), -1) + 1;
-    const sectionToAdd = {
-      id: newId,
-      ...newSection
-    };
-    setSections([...sections, sectionToAdd]);
+ const handleAddNewSection = (newSection) => {
+  const newId = Math.max(...sections.map(s => s.id), -1) + 1;
+  const sectionToAdd = {
+    id: newId,
+    ...newSection
   };
-
+  setSections([...sections, sectionToAdd]);
+};
   const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
     const updatedSections = [...sections];
     updatedSections[sectionIndex] = {
@@ -1164,6 +1387,64 @@ const Page = () => {
                                     />
                                   )}
 
+                                  {section.type === "hobbies" && (
+                                    <ImpHobbies
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleHobbiesUpdate}
+                                    />
+                                  )}
+
+                                  {section.type === "courses" && (
+                                    <ImpCourses
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleCourseUpdate}
+                                      handleDragStart={handleCourseDragStart}
+                                      handleDrop={handleCourseDrop}
+                                      handleAddCourse={handleAddCourse}
+                                      draggedIndex={draggedCourseIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+
+                                  {section.type === "languages" && (
+                                    <ImpLanguages
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleLanguageUpdate}
+                                      handleDragStart={handleLanguageDragStart}
+                                      handleDrop={handleLanguageDrop}
+                                      draggedIndex={draggedLanguageIndex}
+                                      setDraggedIndex={setDraggedLanguageIndex}
+                                    />
+                                  )}
+
+                                  {section.type === "internships" && (
+                                    <ImpInternships
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleInternshipUpdate}
+                                      handleDragStart={handleInternshipDragStart}
+                                      handleDrop={handleInternshipDrop}
+                                      handleAddInternship={handleAddInternship}
+                                      draggedIndex={draggedInternshipIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+
+                                  {section.type === "activities" && (
+                                    <ImpActivities
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleActivityUpdate}
+                                      handleDragStart={handleActivityDragStart}
+                                      handleDrop={handleActivityDrop}
+                                      handleAddActivity={handleAddActivity}
+                                      draggedIndex={draggedActivityIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
                                   {section.type === "custom_simple" && (
                                     <ImpSimpleCustomSection
@@ -1176,7 +1457,6 @@ const Page = () => {
                                       setDraggedIndex={setDraggedCustomIndex}
                                     />
                                   )}
-
 
                                   {section.type === "custom" && (
                                     <ImpCustomSection
@@ -1201,7 +1481,7 @@ const Page = () => {
                 </SortableContext>
               </DndContext>
 
-              <AddSectionButton onAddNewSection={handleAddNewSection} />
+              <AddSectionButton onAddNewSection={handleAddNewSection} sections={sections} />
             </div>
           </form>
         ) : (

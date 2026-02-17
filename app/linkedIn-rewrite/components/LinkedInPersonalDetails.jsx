@@ -1,124 +1,297 @@
-import React from 'react';
-import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
+'use client';
+import React, { useState } from "react";
+import { FaUser, FaCamera } from "react-icons/fa";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
+  const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
+
+  const profileImage = watch("profileImage");
+  const coverImage   = watch("coverImage");
+
+  const handleProfileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setValue("profileImage", reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setValue("coverImage", reader.result);
+    reader.readAsDataURL(file);
+  };
 
   return (
-    <div className='acco_section'>
-      <Accordion className='mb-[4px]'>
-        <AccordionPanel>
-          <AccordionTitle className='font-bold text-xl'>Contact</AccordionTitle>
-          <AccordionContent className='pt-0'>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="acco_section bg-white rounded-xl mb-1 overflow-hidden">
 
-              {/* Job Title / Headline */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Headline
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., 2 years experience || React.js || Node.js || MERN Developer"
-                  className="mt-1 w-full rounded-lg"
-                  {...register("job_target")}
-                />
-              </div>
+      {/* ══ Cover + Profile Photo ══════════════════════════════════ */}
+      <div className="relative" style={{ marginBottom: "52px" }}>
 
-              {/* First Name */}
-              <div>
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="First Name"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("first_name")}
-                />
+        {/* ── Cover Photo ── */}
+        <div className="relative group">
+          <label htmlFor="linkedin-cover-upload" className="cursor-pointer block">
+            {coverImage ? (
+              <img
+                src={coverImage}
+                alt="Cover"
+                className="w-full object-cover rounded-t-xl"
+                style={{ height: "90px" }}
+              />
+            ) : (
+              <div
+                className="w-full flex items-center justify-center rounded-t-xl text-white text-sm font-medium gap-2"
+                style={{ height: "90px", background: "linear-gradient(135deg, #0a66c2 0%, #7c3aed 100%)" }}
+              >
+                <FaCamera size={14} />
+                <span>Upload cover photo</span>
               </div>
+            )}
+          </label>
+          <input
+            type="file"
+            id="linkedin-cover-upload"
+            accept="image/*"
+            className="hidden"
+            onChange={handleCoverChange}
+          />
 
-              {/* Last Name */}
-              <div>
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Last Name"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("last_name")}
-                />
-              </div>
+          {/* Cover action buttons — top right corner */}
+          {coverImage && (
+            <div className="absolute top-2 right-2 flex gap-1">
+              <label
+                htmlFor="linkedin-cover-upload"
+                className="cursor-pointer flex items-center gap-1 bg-black/50 hover:bg-black/70 text-white text-xs px-2 py-1 rounded-full transition"
+              >
+                <FaCamera size={10} />
+                Change
+              </label>
+              <button
+                type="button"
+                onClick={() => setValue("coverImage", "")}
+                className="flex items-center gap-1 !bg-red-500/80 hover:!bg-red-600 !text-white text-xs px-2 py-1 rounded-full transition"
+              >
+                ✕ Remove
+              </button>
+            </div>
+          )}
+        </div>
 
-              {/* City, State */}
-              <div className="md:col-span-2">
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  placeholder="City, State, Country"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("city_state")}
-                />
-              </div>
+        {/* ── Profile Photo — overlapping cover ── */}
+        <div className="absolute left-5" style={{ bottom: "-44px" }}>
+          <div className="flex flex-col items-center gap-1">
 
-              {/* Email */}
-              <div>
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("email")}
-                />
+            {/* Circle */}
+            <label htmlFor="linkedin-profile-upload" className="cursor-pointer block relative group">
+              <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden bg-gray-100 shadow">
+                {profileImage ? (
+                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                    <FaUser size={24} />
+                  </div>
+                )}
               </div>
+              {/* Camera hover overlay */}
+              <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
+                <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
+              </div>
+            </label>
+            <input
+              type="file"
+              id="linkedin-profile-upload"
+              accept="image/*"
+              className="hidden"
+              onChange={handleProfileChange}
+            />
 
-              {/* Phone */}
-              <div>
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  placeholder="Phone Number"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("phone")}
-                />
-              </div>
+            {/* Remove text link — below circle */}
+            {profileImage && (
+              <button
+                type="button"
+                onClick={() => setValue("profileImage", "")}
+                className="text-xs !text-red-400 hover:!text-red-600 font-medium leading-none transition"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
-              {/* LinkedIn URL */}
-              <div>
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  LinkedIn URL
-                </label>
-                <input
-                  type="url"
-                  placeholder="linkedin.com/in/yourprofile"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("linkedin")}
-                />
-              </div>
-              
-              {/* Website / Portfolio */}
-              <div>
-                <label className="block !text-sm !font-medium !text-gray-500">
-                  Website / Portfolio
-                </label>
-                <input
-                  type="url"
-                  placeholder="yourwebsite.com"
-                  className="mt-1 w-full rounded-lg border border-gray-300 p-2"
-                  {...register("website")}
-                />
-              </div>
+      {/* ══ Form Fields ══════════════════════════════════════════ */}
+      <div className="p-5 pt-2">
 
-            </form>
-          </AccordionContent>
-        </AccordionPanel>
-      </Accordion>
+        {/* Headline */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Headline</label>
+          <input
+            type="text"
+            placeholder="Frontend Developer || React Js || Next Js..."
+            className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+            {...register("job_target")}
+          />
+          <p className="text-xs text-gray-400 mt-1">Appears below your name like LinkedIn</p>
+        </div>
+
+        {/* First + Last Name */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("first_name")}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+            <input
+              type="text"
+              placeholder="Last Name"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("last_name")}
+            />
+          </div>
+        </div>
+
+        {/* Email + Phone */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              placeholder="email@example.com"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("email")}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input
+              type="text"
+              placeholder="+91 98765 43210"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("phone")}
+            />
+          </div>
+        </div>
+
+        {/* Address + City, State */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <input
+              type="text"
+              placeholder="Street address"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("address")}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">City, State</label>
+            <input
+              type="text"
+              placeholder="Kolkata, West Bengal"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("city_state")}
+            />
+          </div>
+        </div>
+
+        {/* Country + Postal Code */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+            <input
+              type="text"
+              placeholder="India"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("country")}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+            <input
+              type="text"
+              placeholder="700001"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("postal_code")}
+            />
+          </div>
+        </div>
+
+        {/* LinkedIn + Website */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
+            <input
+              type="url"
+              placeholder="linkedin.com/in/yourprofile"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("linkedin")}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Website / Portfolio</label>
+            <input
+              type="url"
+              placeholder="yourportfolio.com"
+              className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+              {...register("website")}
+            />
+          </div>
+        </div>
+
+        {/* Toggle — additional details */}
+        <button
+          type="button"
+          onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+          className="flex items-center gap-2 !text-sm !text-[#800080] hover:!text-[#b98ab9] font-medium transition-colors mb-3"
+        >
+          {showAdditionalDetails ? (
+            <><ChevronUp size={20} /> Hide additional details</>
+          ) : (
+            <><ChevronDown size={20} /> Add more details</>
+          )}
+        </button>
+
+        {showAdditionalDetails && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
+              <input
+                type="url"
+                placeholder="github.com/username"
+                className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+                {...register("github")}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Stack Overflow</label>
+              <input
+                type="url"
+                placeholder="stackoverflow.com/users/..."
+                className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+                {...register("stackoverflow")}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">LeetCode</label>
+              <input
+                type="url"
+                placeholder="leetcode.com/username"
+                className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+                {...register("leetcode")}
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

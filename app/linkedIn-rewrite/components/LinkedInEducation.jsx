@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
 import { TbDragDrop } from 'react-icons/tb';
 import { FaTrash } from 'react-icons/fa';
+import { HiSparkles } from "react-icons/hi2";
 import Datepicker from "../../ui/Datepicker";
+import TipTapEditor from '../../editor/TipTapEditor';
+import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
+import { useSelector } from 'react-redux';
 
 const LinkedInEducation = ({
   section,
@@ -14,11 +18,19 @@ const LinkedInEducation = ({
   draggedEducationIndex,
   handleDragEnd,
 }) => {
+  const [activeEduId, setActiveEduId] = useState(null);
   const [deletingEduIndex, setDeletingEduIndex] = useState(null);
+
+  const { extracteResumeData } = useSelector((state) => state?.dash);
+  const { singleResumeInfo } = useSelector((state) => state?.resume);
+
+  const resumeSource =
+    singleResumeInfo?.data?.data ||
+    extracteResumeData?.resume_data ||
+    null;
 
   const handleDeleteEducation = (eIndex, eduId) => {
     setDeletingEduIndex(eIndex);
-
     setTimeout(() => {
       handleEducationUpdate(sectionIndex, eduId, "delete");
       setDeletingEduIndex(null);
@@ -42,6 +54,7 @@ const LinkedInEducation = ({
           `}
         >
           <div className="flex items-start gap-2">
+            {/* Drag Icon */}
             <span
               className="drag-wrapper mt-5 cursor-grab active:cursor-grabbing"
               draggable
@@ -62,6 +75,7 @@ const LinkedInEducation = ({
 
                 <AccordionContent className="pt-0">
                   <div className="grid grid-cols-2 gap-4 mb-4">
+                    {/* School Name */}
                     <div className="col-span-2">
                       <Label className="!text-sm !font-medium !text-gray-500">School</Label>
                       <input
@@ -74,6 +88,7 @@ const LinkedInEducation = ({
                       />
                     </div>
 
+                    {/* Degree */}
                     <div className="col-span-2">
                       <Label className="!text-sm !font-medium !text-gray-500">Degree</Label>
                       <input
@@ -86,30 +101,45 @@ const LinkedInEducation = ({
                       />
                     </div>
 
+                    {/* Date Section */}
+                    {/* Date Section */}
                     <div className='md:col-span-2'>
-                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">
-                        Start & End Date
-                      </Label>
+                      <Label className="block text-xs font-semibold !text-gray-500 mb-1">Start & End Date</Label>
                       <div className='flex gap-2 mt-1'>
                         <div className="flex-1">
                           <Datepicker
                             selectedDate={edu.startDate}
-                            onChange={(date) =>
-                              handleEducationUpdate(sectionIndex, edu.id, "startDate", date)
-                            }
+                            onChange={(date) => handleEducationUpdate(sectionIndex, edu.id, "startDate", date)}
                           />
                         </div>
                         <div className="flex-1">
                           <Datepicker
                             selectedDate={edu.endDate}
-                            onChange={(date) =>
-                              handleEducationUpdate(sectionIndex, edu.id, "endDate", date)
-                            }
+                            onChange={(date) => handleEducationUpdate(sectionIndex, edu.id, "endDate", date)}
+                            disabled={edu.isCurrentlyStudying} // চেকবক্স ট্রু হলে এটি ডিজেবল থাকবে
                           />
                         </div>
                       </div>
+
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="checkbox"
+                          id={`currently-studying-${edu.id}`}
+                          checked={edu.isCurrentlyStudying || false}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            handleEducationUpdate(sectionIndex, edu.id, "isCurrentlyStudying", isChecked);
+                            handleEducationUpdate(sectionIndex, edu.id, "endDate", isChecked ? 'PRESENT' : '');
+                          }}
+                          className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
+                        />
+                        <label htmlFor={`currently-studying-${edu.id}`} className="text-sm text-gray-700 cursor-pointer">
+                          I currently study here
+                        </label>
+                      </div>
                     </div>
 
+                    {/* Location */}
                     <div className="col-span-2">
                       <Label className="!text-sm !font-medium !text-gray-500">Location</Label>
                       <input
@@ -122,10 +152,45 @@ const LinkedInEducation = ({
                       />
                     </div>
                   </div>
+
+                  {/* Description with TipTap and AI Help */}
+                  <div>
+                    <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                    <TipTapEditor
+                      value={edu.description}
+                      onChange={(html) =>
+                        handleEducationUpdate(sectionIndex, edu.id, "description", html)
+                      }
+                    />
+                    <div className="relative flex justify-end mt-1">
+                      <button
+                        type="button"
+                        onClick={() => setActiveEduId(edu.id)}
+                        className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080]"
+                      >
+                        <HiSparkles className="text-md" />
+                        Get help with writing
+                      </button>
+
+                      {activeEduId === edu.id && (
+                        <GenerateWithAiModal
+                          open={true}
+                          onClose={() => setActiveEduId(null)}
+                          aiType="linkedin_education"
+                          initialText={edu.description || ""}
+                          fullResumeData={resumeSource}
+                          onApply={(text) => {
+                            handleEducationUpdate(sectionIndex, edu.id, "description", text);
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
                 </AccordionContent>
               </AccordionPanel>
             </Accordion>
 
+            {/* Delete Button */}
             <div className="flex justify-end pt-3 mt-4 border-t border-gray-200">
               <FaTrash
                 className="text-sm text-gray-400 cursor-pointer hover:text-red-500 transition-colors"
