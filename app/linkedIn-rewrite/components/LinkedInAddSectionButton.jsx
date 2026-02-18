@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { BiCustomize, BiBriefcase } from "react-icons/bi";
-import { BiAward } from "react-icons/bi";
-import { FaLanguage, FaCertificate, FaPlus, FaList } from "react-icons/fa6";
+import { BiCustomize, BiBriefcase, BiAward } from "react-icons/bi";
+import { MdLocalFlorist, MdVolunteerActivism, MdCardMembership } from "react-icons/md";
+import { FaChessKnight, FaLanguage, FaCertificate, FaPlus, FaList } from "react-icons/fa6";
 import { FaTimes, FaCheck } from "react-icons/fa";
-import { HiAcademicCap } from "react-icons/hi";
+import { HiSpeakerphone, HiAcademicCap } from "react-icons/hi";
 
 const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
     const [showSectionList, setShowSectionList] = useState(false);
@@ -23,132 +23,187 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
             isCustom: true,
             description: 'Full details with dates and descriptions',
         },
-        { id: 'summary',     label: 'Profile Summary', icon: <HiAcademicCap />,  isCustom: false },
-        { id: 'experience',  label: 'Experience',      icon: <BiBriefcase />,     isCustom: false },
-        { id: 'education',   label: 'Education',       icon: <HiAcademicCap />,   isCustom: false },
-        { id: 'skills',      label: 'Skills',          icon: <FaList />,          isCustom: false },
-        { id: 'languages',   label: 'Languages',       icon: <FaLanguage />,      isCustom: false },
-        { id: 'courses',     label: 'Courses',         icon: <HiAcademicCap />,   isCustom: false },
-        { id: 'honors',      label: 'Honors & Awards', icon: <BiAward />,         isCustom: false },
+        { id: 'summary', label: 'Profile Summary', icon: <HiAcademicCap />, isCustom: false },
+        { id: 'skills', label: 'Skills', icon: <FaList />, isCustom: false },
+        { id: 'education', label: 'Education', icon: <HiAcademicCap />, isCustom: false },
+        { id: 'experience', label: 'Experience', icon: <BiBriefcase />, isCustom: false },
+        { id: 'courses', label: 'Courses', icon: <HiAcademicCap />, isCustom: false },
+        { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
+        { id: 'awards', label: 'Honors & awards', icon: <BiAward />, isLocked: false },
+        { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
+        { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
+        { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
+        { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
+        { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
     ];
 
     const handleSelectSection = (sectionId, isAlreadyAdded) => {
-        if (isAlreadyAdded || !onAddNewSection) return;
+        if (isAlreadyAdded) return;
 
-        // ── Custom Simple ──────────────────────────────────────────
-        if (sectionId === 'custom_simple') {
-            const BASE = 'Custom Section (Simple)';
-            const existingTitles = sections.filter(s => s.type === 'custom_simple').map(s => s.title);
-            let uniqueTitle = BASE;
-            let counter = 1;
-            while (existingTitles.includes(uniqueTitle)) {
-                uniqueTitle = `${BASE} ${counter}`;
-                counter++;
+        const selectedTemplate = sectionTemplates.find(s => s.id === sectionId);
+        if (selectedTemplate && !selectedTemplate.isLocked) {
+            if (onAddNewSection) {
+
+                // ✅ Custom Simple — unique title
+                if (sectionId === 'custom_simple') {
+                    const BASE = 'Custom Section (Simple)';
+                    const existingTitles = sections
+                        .filter(s => s.type === 'custom_simple')
+                        .map(s => s.title);
+
+                    let uniqueTitle = BASE;
+                    let counter = 1;
+                    while (existingTitles.includes(uniqueTitle)) {
+                        uniqueTitle = `${BASE} ${counter}`;
+                        counter++;
+                    }
+
+                    onAddNewSection({
+                        type: 'custom_simple',
+                        title: uniqueTitle,
+                        items: [{ id: `simple_${Date.now()}`, name: '', level: 2 }],
+                        hideExperienceLevel: true
+                    });
+                }
+
+                // ✅ Custom Advanced — unique title
+                else if (sectionId === 'custom_advanced') {
+                    const BASE = 'Custom Section (Advanced)';
+                    const existingTitles = sections
+                        .filter(s => s.type === 'custom')
+                        .map(s => s.title);
+
+                    let uniqueTitle = BASE;
+                    let counter = 1;
+                    while (existingTitles.includes(uniqueTitle)) {
+                        uniqueTitle = `${BASE} ${counter}`;
+                        counter++;
+                    }
+
+                    onAddNewSection({
+                        type: 'custom',
+                        title: uniqueTitle,
+                        items: [{
+                            id: `custom_${Date.now()}`,
+                            title: "",
+                            city: "",
+                            startDate: "",
+                            endDate: "",
+                            description: "",
+                        }]
+                    });
+                }
+
+                // ✅ Summary Section
+                else if (sectionId === 'summary') {
+                    onAddNewSection({
+                        type: 'summary',
+                        title: 'Profile Summary',
+                        summary: ''
+                    });
+                }
+                // ✅ Skills Section
+                else if (sectionId === 'skills') {
+                    onAddNewSection({
+                        type: 'skills',
+                        title: 'Skills',
+                        skills: [{
+                            id: `skill_${Date.now()}`,
+                            name: '',
+                            level: 2
+                        }],
+                        hideExperienceLevel: false
+                    });
+                }
+                // ✅ Education Section
+                else if (sectionId === 'education') {
+                    onAddNewSection({
+                        type: 'education',
+                        title: 'Education',
+                        educations: [{
+                            id: `edu_${Date.now()}`,
+                            institute: '',
+                            degree: '',
+                            startDate: '',
+                            endDate: '',
+                            city: '',
+                            description: ''
+                        }]
+                    });
+                }
+                // ✅ Experience Section
+                else if (sectionId === 'experience') {
+                    onAddNewSection({
+                        type: 'experience',
+                        title: 'Experience',
+                        experiences: [{
+                            id: `exp_${Date.now()}`,
+                            jobTitle: '',
+                            company: '',
+                            city: '',
+                            startDate: '',
+                            endDate: '',
+                            description: ''
+                        }]
+                    });
+                }
+                // ✅ Hobbies Section
+                else if (sectionId === 'hobbies') {
+                    onAddNewSection({
+                        type: 'hobbies',
+                        title: 'Hobbies',
+                        hobbies: ''
+                    });
+                }
+                // ✅ Courses Section
+                else if (sectionId === 'courses') {
+                    onAddNewSection({
+                        type: 'courses',
+                        title: 'Courses',
+                        courses: [{ id: `course_${Date.now()}`, course: '', institution: '', startDate: '', endDate: '' }]
+                    });
+                }
+                // ✅ Languages Section
+                else if (sectionId === 'languages') {
+                    onAddNewSection({
+                        type: 'languages',
+                        title: 'Languages',
+                        languages: [{ id: `lang_${Date.now()}`, language: '', level: 'Intermediate' }],
+                        hideProficiency: false
+                    });
+                }
+                else if (sectionId === 'honors' || sectionId === 'awards') {
+                    onAddNewSection({
+                        type: 'honors',
+                        title: 'Honors & Awards',
+                        items: [{
+                            id: `honor_${Date.now()}`,
+                            title: '',   
+                            issuer: '',    
+                            date: '',     
+                            description: ''
+                        }]
+                    });
+                }
+
+                // ✅ Other sections use custom advanced format
+                else {
+                    onAddNewSection({
+                        type: 'custom',
+                        title: selectedTemplate.label,
+                        items: [{
+                            id: `custom_${Date.now()}`,
+                            title: "",
+                            city: "",
+                            startDate: "",
+                            endDate: "",
+                            description: "",
+                        }]
+                    });
+                }
             }
-            onAddNewSection({
-                type: 'custom_simple',
-                title: uniqueTitle,
-                items: [{ id: `simple_${Date.now()}`, name: '', level: 2 }],
-                hideExperienceLevel: true,
-            });
+            setShowSectionList(false);
         }
-
-        // ── Custom Advanced ────────────────────────────────────────
-        else if (sectionId === 'custom_advanced') {
-            const BASE = 'Custom Section (Advanced)';
-            const existingTitles = sections.filter(s => s.type === 'custom').map(s => s.title);
-            let uniqueTitle = BASE;
-            let counter = 1;
-            while (existingTitles.includes(uniqueTitle)) {
-                uniqueTitle = `${BASE} ${counter}`;
-                counter++;
-            }
-            onAddNewSection({
-                type: 'custom',
-                title: uniqueTitle,
-                items: [{
-                    id: `custom_${Date.now()}`,
-                    title: '', city: '', startDate: '', endDate: '', description: '',
-                }],
-            });
-        }
-
-        // ── Profile Summary ────────────────────────────────────────
-        else if (sectionId === 'summary') {
-            onAddNewSection({ type: 'summary', title: 'Profile Summary', summary: '' });
-        }
-
-        // ── Experience ─────────────────────────────────────────────
-        else if (sectionId === 'experience') {
-            onAddNewSection({
-                type: 'experience',
-                title: 'Experience',
-                experiences: [{
-                    id: `exp_${Date.now()}`,
-                    jobTitle: '', company: '', city: '',
-                    startDate: '', endDate: '', description: '',
-                }],
-            });
-        }
-
-        // ── Education ──────────────────────────────────────────────
-        else if (sectionId === 'education') {
-            onAddNewSection({
-                type: 'education',
-                title: 'Education',
-                educations: [{
-                    id: `edu_${Date.now()}`,
-                    institute: '', degree: '', startDate: '',
-                    endDate: '', city: '', description: '',
-                }],
-            });
-        }
-
-        // ── Skills ─────────────────────────────────────────────────
-        else if (sectionId === 'skills') {
-            onAddNewSection({
-                type: 'skills',
-                title: 'Skills',
-                skills: [{ id: `skill_${Date.now()}`, name: '', level: 2 }],
-                hideExperienceLevel: false,
-            });
-        }
-
-        // ── Languages ──────────────────────────────────────────────
-        else if (sectionId === 'languages') {
-            onAddNewSection({
-                type: 'languages',
-                title: 'Languages',
-                languages: [{ id: `lang_${Date.now()}`, language: '', level: 'Intermediate' }],
-                hideProficiency: false,
-            });
-        }
-
-        // ── Courses ────────────────────────────────────────────────
-        else if (sectionId === 'courses') {
-            onAddNewSection({
-                type: 'courses',
-                title: 'Courses',
-                courses: [{
-                    id: `course_${Date.now()}`,
-                    course: '', institution: '', startDate: '', endDate: '',
-                }],
-            });
-        }
-
-        // ── Honors & Awards ────────────────────────────────────────
-        else if (sectionId === 'honors') {
-            onAddNewSection({
-                type: 'honors',
-                title: 'Honors & Awards',
-                items: [{
-                    id: `honor_${Date.now()}`,
-                    title: '', issuer: '', date: '', description: '',
-                }],
-            });
-        }
-
-        setShowSectionList(false);
     };
 
     return (
@@ -184,15 +239,12 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {sectionTemplates.map((section) => {
-                            // custom_simple & custom_advanced can be added multiple times
                             const isAlreadyAdded =
-                                section.id === 'custom_simple'   ? false :
-                                section.id === 'custom_advanced'  ? false :
-                                section.id === 'honors'
-                                    ? sections.some(s => s.type === 'honors')
-                                    : sections.some(s => s.type === section.id);
+                                section.id === 'custom_simple' ? false :
+                                    section.id === 'custom_advanced' ? false :
+                                        sections.some(s => s.type === section.id);
 
-                            const isDisabled = isAlreadyAdded;
+                            const isDisabled = section.isLocked || isAlreadyAdded;
 
                             return (
                                 <button
@@ -206,19 +258,17 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
                                             : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
                                         }`}
                                 >
-                                    <div className={`text-2xl ${
-                                        section.isCustom && !isAlreadyAdded
+                                    <div className={`text-2xl ${section.isCustom && !isAlreadyAdded
                                             ? 'text-[#800080]'
                                             : 'text-gray-400 group-hover:text-gray-600'
-                                    }`}>
+                                        }`}>
                                         {section.icon}
                                     </div>
                                     <div className="flex-1">
-                                        <span className={`font-medium block ${
-                                            section.isCustom && !isAlreadyAdded
+                                        <span className={`font-medium block ${section.isCustom && !isAlreadyAdded
                                                 ? 'text-[#800080]'
                                                 : 'text-gray-700'
-                                        }`}>
+                                            }`}>
                                             {section.label}
                                         </span>
                                         {section.description && (
@@ -226,12 +276,20 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
                                                 {section.description}
                                             </span>
                                         )}
-                                        {isAlreadyAdded && (
+                                        {isAlreadyAdded && !section.isLocked && (
                                             <span className="text-xs text-green-600 flex items-center gap-1 mt-1">
-                                                <FaCheck className="text-xs" /> Already added
+                                                <FaCheck className="text-xs" />
+                                                Already added
                                             </span>
                                         )}
                                     </div>
+                                    {section.isLocked && (
+                                        <div className="text-gray-300">
+                                            <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z"></path>
+                                            </svg>
+                                        </div>
+                                    )}
                                 </button>
                             );
                         })}

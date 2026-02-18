@@ -21,7 +21,7 @@ const LinkedInLanguages = ({
     const [editingIndex, setEditingIndex]   = useState(null);
     const [deletingIndex, setDeletingIndex] = useState(null);
 
-    const hideProficiency = section.hideProficiency ?? false;
+    const hideProficiency = section.hideProficiency ?? true;
 
     const getLevelIndex = (levelName) => {
         const index = levels.indexOf(levelName);

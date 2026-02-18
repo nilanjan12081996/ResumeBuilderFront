@@ -20,7 +20,12 @@ import LinkedInSkills from './components/LinkedInSkills';
 import LinkedInSummary from './components/LinkedInSummary';
 import LinkedInEducation from './components/LinkedInEducation';
 import LinkedInExperience from './components/LinkedInExperience';
-import LinkedInLanguages from './components/LinkedInLanguages'; // ✅ NEW
+import LinkedInLanguages from './components/LinkedInLanguages';
+import LinkedInCourses from './components/LinkedInCourses';
+import LinkedInHonors from './components/LinkedInHonors';
+import LinkedInSimpleCustomSection from './components/LinkedInSimpleCustomSection';
+import LinkedInCustomSection from './components/LinkedInCustomSection';
+import LinkedInAddSectionButton from './components/LinkedInAddSectionButton';
 import CustomizeSection from '../ui/CustomizeSection.jsx';
 
 //  Import Draggable Components
@@ -73,15 +78,43 @@ const LinkedInResumeBuilder = () => {
 
   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
 
+  // ── ATS REFRESH ──
+const handleAtsRefresh = () => {
+    const payload = {
+        ...formValues, 
+        sections,
+        resume_type: "linkedin",
+    };
+    dispatch(checkATS({
+        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+        resume_data: JSON.stringify(payload),
+        Ats_score: 0,
+    }));
+};
+
   // States
-  const [selectedTemplate, setSelectedTemplate]         = useState('linkedin');
-  const [sections, setSections]                         = useState([]);
-  const [draggedSkillIndex, setDraggedSkillIndex]       = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState('linkedin');
+  const [sections, setSections] = useState([]);
+  const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
   const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
-  const [draggedExpIndex, setDraggedExpIndex]           = useState(null);
-  const [draggedLanguageIndex, setDraggedLanguageIndex] = useState(null); // ✅ NEW
-  const [editingSectionIndex, setEditingSectionIndex]   = useState(null);
-  const [resumeSettings, setResumeSettings]             = useState(defaultResumeSettings);
+  const [draggedExpIndex, setDraggedExpIndex] = useState(null);
+  const [draggedLanguageIndex, setDraggedLanguageIndex] = useState(null);
+  const [draggedCourseIndex, setDraggedCourseIndex] = useState(null);
+  const [draggedHonorIndex, setDraggedHonorIndex] = useState(null);
+  const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+  const [draggedCertIndex, setDraggedCertIndex] = useState(null);
+  const [draggedInternshipIndex, setDraggedInternshipIndex] = useState(null);
+  const [draggedActivityIndex, setDraggedActivityIndex] = useState(null);
+  const [editingSectionIndex, setEditingSectionIndex] = useState(null);
+  const linkedInDefaultSettings = {
+    ...defaultResumeSettings,
+    theme: {
+      ...defaultResumeSettings.theme,
+      template: "linkedin",
+      defaultColor: "#293d48",
+    },
+  };
+  const [resumeSettings, setResumeSettings] = useState(linkedInDefaultSettings);
   const [deletingSectionIndex, setDeletingSectionIndex] = useState(null);
   const { activeTab } = useTabs();
 
@@ -127,7 +160,7 @@ const LinkedInResumeBuilder = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const resume_id   = searchParams.get("id");
+  const resume_id = searchParams.get("id");
   const resume_type = searchParams.get("fetch");
 
   //  Handle section drag end (outer DndContext)
@@ -168,7 +201,7 @@ const LinkedInResumeBuilder = () => {
     if (isInitialLoad.current) return;
 
     const currentData = { ...formValues, sections, resumeSettings };
-    const normalized  = JSON.parse(JSON.stringify(currentData));
+    const normalized = JSON.parse(JSON.stringify(currentData));
 
     if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) return;
 
@@ -251,8 +284,8 @@ const LinkedInResumeBuilder = () => {
 
     // 1. Skills
     const techCategories = resumeData?.technical_skills?.categories || {};
-    const allSkills      = Object.values(techCategories).flat();
-    const softSkills     = resumeData?.soft_skills || [];
+    const allSkills = Object.values(techCategories).flat();
+    const softSkills = resumeData?.soft_skills || [];
 
     if (allSkills.length > 0 || softSkills.length > 0) {
       sections.push({
@@ -273,14 +306,14 @@ const LinkedInResumeBuilder = () => {
         languages: languages.map((lang, i) => ({
           id: `lang_${i}_${Date.now()}`,
           language: typeof lang === "string" ? lang : (lang.name || ""),
-          level:    typeof lang === "object"  ? (lang.level || "Intermediate") : "Intermediate",
+          level: typeof lang === "object" ? (lang.level || "Intermediate") : "Intermediate",
         })),
       });
     }
 
     // 3. Profile Summary
     const profileSummaryContent = resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
-    const fallbackSummary       = resumeData?.professional_summary?.summary_text;
+    const fallbackSummary = resumeData?.professional_summary?.summary_text;
     let summaryHtml = "";
 
     if (Array.isArray(profileSummaryContent) && profileSummaryContent.length > 0) {
@@ -315,11 +348,11 @@ const LinkedInResumeBuilder = () => {
         id: id++, title: "Experience", type: "experience",
         experiences: resumeData.work_experience.map((exp, i) => ({
           id: `x_${i}_${Date.now()}`,
-          jobTitle:    exp.job_title    || "",
-          company:     exp.company_name || "",
-          city:        exp.location     || "",
-          startDate:   exp.start_date   || "",
-          endDate:     exp.end_date     || "",
+          jobTitle: exp.job_title || "",
+          company: exp.company_name || "",
+          city: exp.location || "",
+          startDate: exp.start_date || "",
+          endDate: exp.end_date || "",
           description: Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0
             ? `<ul>${exp.responsibilities.map((r) => `<li>${r}</li>`).join("")}</ul>`
             : exp.description || "",
@@ -333,29 +366,34 @@ const LinkedInResumeBuilder = () => {
         id: id++, title: "Education", type: "education",
         educations: resumeData.education.map((edu, i) => ({
           id: `e_${i}_${Date.now()}`,
-          institute:   edu.institution   || "",
-          degree:      `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
-          startDate:   edu.start_date    || "",
-          endDate:     edu.graduation_date || "",
-          city:        edu.location      || "",
-          description: edu.description   || "",
+          institute: edu.institution || "",
+          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
+          startDate: edu.start_date || "",
+          endDate: edu.graduation_date || "",
+          city: edu.location || "",
+          description: edu.description || "",
         })),
       });
     }
 
-    // 7. Achievements
-    const achievements = resumeData?.additional_sections?.["ACHIEVEMENTS"]?.content;
-    if (Array.isArray(achievements) && achievements.length > 0) {
+    // 7. Honors & Awards
+    const honorsAwards = resumeData?.additional_sections?.["Honors-Awards"]?.content;
+    if (Array.isArray(honorsAwards) && honorsAwards.length > 0) {
       sections.push({
-        id: id++, title: "Achievements", type: "custom_simple",
-        hideExperienceLevel: true,
-        items: achievements.map((item, i) => ({
-          id: `ach_${i}_${Date.now()}`,
-          name: typeof item === "string" ? item : (item.name || ""),
-          level: 2,
+        id: id++,
+        title: "Honors & Awards",
+        type: "honors",
+        items: honorsAwards.map((item, i) => ({
+          id: `honor_${i}_${Date.now()}`,
+          title: typeof item === "string" ? item : (item.title || item.name || ""),
+          issuer: typeof item === "object" ? (item.issuer || "") : "",
+          startDate: typeof item === "object" ? (item.startDate || "") : "",
+          endDate: typeof item === "object" ? (item.endDate || "") : "",
+          description: typeof item === "object" ? (item.description || "") : "",
         })),
       });
     }
+
 
     return sections;
   };
@@ -364,33 +402,33 @@ const LinkedInResumeBuilder = () => {
   useEffect(() => {
     if (!resumeSource) return;
 
-    const resumeData      = extracteResumeData?.resume_data || resumeSource;
-    const personal        = resumeData?.personal_information || {};
+    const resumeData = extracteResumeData?.resume_data || resumeSource;
+    const personal = resumeData?.personal_information || {};
     const additionalSections = resumeData?.additional_sections || {};
 
-    const fullName  = personal.full_name || "";
+    const fullName = personal.full_name || "";
     const nameParts = fullName.split(" ");
 
     const headlineText =
       additionalSections?.Headline?.content ||
-      resumeData?.metadata?.current_role    ||
-      resumeSource.job_target               ||
+      resumeData?.metadata?.current_role ||
+      resumeSource.job_target ||
       "";
 
-    const fullAddress     = personal?.location?.full_address || "";
-    const city            = personal?.location?.city  || "";
-    const state           = personal?.location?.state || "";
+    const fullAddress = personal?.location?.full_address || "";
+    const city = personal?.location?.city || "";
+    const state = personal?.location?.state || "";
     const formattedCityState = [city, state].filter(Boolean).join(", ");
 
-    setValue("job_target",  headlineText);
-    setValue("first_name",  nameParts[0] || resumeSource.first_name || "");
-    setValue("last_name",   nameParts.slice(1).join(" ") || resumeSource.last_name || "");
-    setValue("email",       personal.email  || resumeSource.email  || "");
-    setValue("phone",       personal.phone  || resumeSource.phone  || "");
-    setValue("address",     fullAddress     || resumeSource.address || "");
-    setValue("city_state",  formattedCityState || resumeSource.city_state || "");
-    setValue("linkedin",    personal.linkedin  || resumeSource.linkedin   || "");
-    setValue("website",     resumeSource.website || "");
+    setValue("job_target", headlineText);
+    setValue("first_name", nameParts[0] || resumeSource.first_name || "");
+    setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
+    setValue("email", personal.email || resumeSource.email || "");
+    setValue("phone", personal.phone || resumeSource.phone || "");
+    setValue("address", fullAddress || resumeSource.address || "");
+    setValue("city_state", formattedCityState || resumeSource.city_state || "");
+    setValue("linkedin", personal.linkedin || resumeSource.linkedin || "");
+    setValue("website", resumeSource.website || "");
   }, [extracteResumeData, resumeSource, setValue]);
 
   // -------------------- SYNC SUMMARY --------------------
@@ -407,12 +445,12 @@ const LinkedInResumeBuilder = () => {
       const settings = resumeSource.resumeSettings;
       setResumeSettings(settings);
 
-      const template = settings.theme?.template || "professional";
+      const template = settings.theme?.template || "linkedin";
       setSelectedTemplate(template);
 
       const color =
         settings.theme?.templateColors?.[template] ||
-        settings.theme?.defaultColor               ||
+        settings.theme?.defaultColor ||
         defaultResumeSettings.theme.defaultColor;
 
       setThemeColor(color);
@@ -439,9 +477,12 @@ const LinkedInResumeBuilder = () => {
     const history = sections
       .filter(sec => sec.type === "education")
       .flatMap(sec => (sec.educations || []).map(edu => ({
-        school: edu.institute || "", degree: edu.degree || "",
-        startDate: edu.startDate || "", endDate: edu.endDate || "",
-        city_state: edu.city || "", description: edu.description || "",
+        school: edu.institute || "",
+        degree: edu.degree || "",
+        startDate: edu.startDate || "",
+        endDate: edu.endDate || "",
+        city_state: edu.city || "",
+        description: edu.description || "",
       })));
     setValue("educationHistory", history);
   }, [sections, setValue]);
@@ -451,9 +492,12 @@ const LinkedInResumeBuilder = () => {
     const history = sections
       .filter(sec => sec.type === "experience")
       .flatMap(sec => (sec.experiences || []).map(exp => ({
-        job_title: exp.jobTitle || "", employer: exp.company || "",
-        city_state: exp.city || "", startDate: exp.startDate || "",
-        endDate: exp.endDate || "", description: exp.description || "",
+        job_title: exp.jobTitle || "",
+        employer: exp.company || "",
+        city_state: exp.city || "",
+        startDate: exp.startDate || "",
+        endDate: exp.endDate || "",
+        description: exp.description || "",
       })));
     setValue("employmentHistory", history);
   }, [sections, setValue]);
@@ -467,9 +511,9 @@ const LinkedInResumeBuilder = () => {
     e.preventDefault(); e.stopPropagation();
     if (draggedSkillIndex === null || draggedSkillIndex === targetSkillIndex) return;
     setSections(prev => {
-      const updated   = [...prev];
-      const skills    = [...updated[sectionIndex].skills];
-      const [moved]   = skills.splice(draggedSkillIndex, 1);
+      const updated = [...prev];
+      const skills = [...updated[sectionIndex].skills];
+      const [moved] = skills.splice(draggedSkillIndex, 1);
       skills.splice(targetSkillIndex, 0, moved);
       updated[sectionIndex] = { ...updated[sectionIndex], skills };
       return updated;
@@ -487,21 +531,17 @@ const LinkedInResumeBuilder = () => {
   };
 
   // ═══════════════════════════════════════════════════════════════
-  //  LANGUAGE HANDLERS  ✅ NEW
+  //  LANGUAGE HANDLERS
   // ═══════════════════════════════════════════════════════════════
-  const handleLanguageDragStart = (e, index) => {
-    e.stopPropagation();
-    setDraggedLanguageIndex(index);
-  };
+  const handleLanguageDragStart = (e, index) => { e.stopPropagation(); setDraggedLanguageIndex(index); };
 
   const handleLanguageDrop = (e, sectionIndex, targetIndex) => {
     e.preventDefault(); e.stopPropagation();
     if (draggedLanguageIndex === null || draggedLanguageIndex === targetIndex) return;
-
     setSections(prev => {
-      const updated    = [...prev];
-      const langs      = [...(updated[sectionIndex].languages || [])];
-      const [moved]    = langs.splice(draggedLanguageIndex, 1);
+      const updated = [...prev];
+      const langs = [...(updated[sectionIndex].languages || [])];
+      const [moved] = langs.splice(draggedLanguageIndex, 1);
       langs.splice(targetIndex, 0, moved);
       updated[sectionIndex] = { ...updated[sectionIndex], languages: langs };
       return updated;
@@ -509,32 +549,15 @@ const LinkedInResumeBuilder = () => {
     setDraggedLanguageIndex(null);
   };
 
-  // handleLanguageUpdate — handles: field update, delete, add, hideProficiency toggle
   const handleLanguageUpdate = (sectionIndex, itemId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
-
-      // Toggle show/hide proficiency
-      if (field === 'hideProficiency') {
-        return { ...section, hideProficiency: value };
-      }
-
-      // Add new language row
-      if (field === 'add') {
-        return { ...section, languages: [...(section.languages || []), value] };
-      }
-
-      // Delete a language row
-      if (field === 'delete') {
-        return { ...section, languages: (section.languages || []).filter(l => l.id !== itemId) };
-      }
-
-      // Update a specific field on a language row
+      if (field === 'hideProficiency') return { ...section, hideProficiency: value };
+      if (field === 'add') return { ...section, languages: [...(section.languages || []), value] };
+      if (field === 'delete') return { ...section, languages: (section.languages || []).filter(l => l.id !== itemId) };
       return {
         ...section,
-        languages: (section.languages || []).map(l =>
-          l.id === itemId ? { ...l, [field]: value } : l
-        ),
+        languages: (section.languages || []).map(l => l.id === itemId ? { ...l, [field]: value } : l),
       };
     }));
   };
@@ -549,7 +572,7 @@ const LinkedInResumeBuilder = () => {
     if (draggedEducationIndex === null || draggedEducationIndex === targetEduIndex) return;
     setSections(prev => {
       const updated = [...prev];
-      const list    = [...updated[sectionIndex].educations];
+      const list = [...updated[sectionIndex].educations];
       const [moved] = list.splice(draggedEducationIndex, 1);
       list.splice(targetEduIndex, 0, moved);
       updated[sectionIndex] = { ...updated[sectionIndex], educations: list };
@@ -584,7 +607,7 @@ const LinkedInResumeBuilder = () => {
     if (draggedExpIndex === null || draggedExpIndex === targetIndex) return;
     setSections(prev => {
       const updated = [...prev];
-      const list    = [...updated[sectionIndex].experiences];
+      const list = [...updated[sectionIndex].experiences];
       const [moved] = list.splice(draggedExpIndex, 1);
       list.splice(targetIndex, 0, moved);
       updated[sectionIndex] = { ...updated[sectionIndex], experiences: list };
@@ -610,6 +633,266 @@ const LinkedInResumeBuilder = () => {
   };
 
   // ═══════════════════════════════════════════════════════════════
+  //  CERTIFICATIONS HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleCertDragStart = (e, index) => { e.stopPropagation(); setDraggedCertIndex(index); };
+
+  const handleCertDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault(); e.stopPropagation();
+    if (draggedCertIndex === null || draggedCertIndex === targetIndex) return;
+    setSections(prev => {
+      const updated = [...prev];
+      const list = [...updated[sectionIndex].certifications];
+      const [moved] = list.splice(draggedCertIndex, 1);
+      list.splice(targetIndex, 0, moved);
+      updated[sectionIndex] = { ...updated[sectionIndex], certifications: list };
+      return updated;
+    });
+    setDraggedCertIndex(null);
+  };
+
+  const handleCertUpdate = (sectionIndex, certId, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (field === "delete") return { ...section, certifications: section.certifications.filter(c => c.id !== certId) };
+      return { ...section, certifications: section.certifications.map(c => c.id === certId ? { ...c, [field]: value } : c) };
+    }));
+  };
+
+  const handleAddCertification = (sectionIndex) => {
+    setSections(prev => prev.map((section, i) =>
+      i === sectionIndex
+        ? { ...section, certifications: [...section.certifications, { id: `c${Date.now()}`, name: "", organization: "", city: "", startYear: "", endYear: "", description: "" }] }
+        : section
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  HOBBIES HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleHobbiesUpdate = (sectionIndex, field, value) => {
+    setSections(prev => prev.map((section, i) =>
+      i !== sectionIndex ? section : { ...section, [field]: value }
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  INTERNSHIPS HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleInternshipDragStart = (e, index) => { e.stopPropagation(); setDraggedInternshipIndex(index); };
+
+  const handleInternshipDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault(); e.stopPropagation();
+    if (draggedInternshipIndex === null || draggedInternshipIndex === targetIndex) return;
+    setSections(prev => {
+      const updated = [...prev];
+      const list = [...updated[sectionIndex].internships];
+      const [moved] = list.splice(draggedInternshipIndex, 1);
+      list.splice(targetIndex, 0, moved);
+      updated[sectionIndex] = { ...updated[sectionIndex], internships: list };
+      return updated;
+    });
+    setDraggedInternshipIndex(null);
+  };
+
+  const handleInternshipUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (field === 'delete') return { ...section, internships: section.internships.filter(item => item.id !== itemId) };
+      return { ...section, internships: section.internships.map(item => item.id === itemId ? { ...item, [field]: value } : item) };
+    }));
+  };
+
+  const handleAddInternship = (sectionIndex) => {
+    setSections(prev => prev.map((section, i) =>
+      i !== sectionIndex ? section : {
+        ...section,
+        internships: [...(section.internships || []), {
+          id: `intern_${Date.now()}`, jobTitle: '', employer: '', city: '',
+          startDate: '', endDate: '', description: '', isCurrentlyInterning: false,
+        }]
+      }
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  ACTIVITIES HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleActivityDragStart = (e, index) => { e.stopPropagation(); setDraggedActivityIndex(index); };
+
+  const handleActivityDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault(); e.stopPropagation();
+    if (draggedActivityIndex === null || draggedActivityIndex === targetIndex) return;
+    setSections(prev => {
+      const updated = [...prev];
+      const list = [...updated[sectionIndex].activities];
+      const [moved] = list.splice(draggedActivityIndex, 1);
+      list.splice(targetIndex, 0, moved);
+      updated[sectionIndex] = { ...updated[sectionIndex], activities: list };
+      return updated;
+    });
+    setDraggedActivityIndex(null);
+  };
+
+  const handleActivityUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (field === 'delete') return { ...section, activities: section.activities.filter(a => a.id !== itemId) };
+      return { ...section, activities: section.activities.map(a => a.id === itemId ? { ...a, [field]: value } : a) };
+    }));
+  };
+
+  const handleAddActivity = (sectionIndex) => {
+    setSections(prev => prev.map((section, i) =>
+      i !== sectionIndex ? section : {
+        ...section,
+        activities: [...(section.activities || []), {
+          id: `activity_${Date.now()}`, functionTitle: '', employer: '', city: '',
+          startDate: '', endDate: '', description: '', isCurrentlyActive: false,
+        }]
+      }
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  COURSES HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleCourseDragStart = (e, index) => { e.stopPropagation(); setDraggedCourseIndex(index); };
+
+  const handleCourseDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault(); e.stopPropagation();
+    if (draggedCourseIndex === null || draggedCourseIndex === targetIndex) return;
+    setSections(prev => {
+      const updated = [...prev];
+      const list = [...(updated[sectionIndex].courses || [])];
+      const [moved] = list.splice(draggedCourseIndex, 1);
+      list.splice(targetIndex, 0, moved);
+      updated[sectionIndex] = { ...updated[sectionIndex], courses: list };
+      return updated;
+    });
+    setDraggedCourseIndex(null);
+  };
+
+  const handleCourseUpdate = (sectionIndex, courseId, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (field === "delete") return { ...section, courses: (section.courses || []).filter(c => c.id !== courseId) };
+      return { ...section, courses: (section.courses || []).map(c => c.id === courseId ? { ...c, [field]: value } : c) };
+    }));
+  };
+
+  const handleAddCourse = (sectionIndex) => {
+    setSections(prev => prev.map((section, i) =>
+      i === sectionIndex
+        ? { ...section, courses: [...(section.courses || []), { id: `course_${Date.now()}`, course: '', institution: '', startDate: '', endDate: '' }] }
+        : section
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  HONORS HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleHonorDragStart = (e, index) => { e.stopPropagation(); setDraggedHonorIndex(index); };
+
+  const handleHonorDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault(); e.stopPropagation();
+    if (draggedHonorIndex === null || draggedHonorIndex === targetIndex) return;
+    setSections(prev => {
+      const updated = [...prev];
+      const list = [...(updated[sectionIndex].items || [])];
+      const [moved] = list.splice(draggedHonorIndex, 1);
+      list.splice(targetIndex, 0, moved);
+      updated[sectionIndex] = { ...updated[sectionIndex], items: list };
+      return updated;
+    });
+    setDraggedHonorIndex(null);
+  };
+
+  const handleHonorUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (field === "delete") return { ...section, items: (section.items || []).filter(it => it.id !== itemId) };
+      return { ...section, items: (section.items || []).map(it => it.id === itemId ? { ...it, [field]: value } : it) };
+    }));
+  };
+
+  const handleAddHonor = (sectionIndex) => {
+    setSections(prev => prev.map((section, i) =>
+      i === sectionIndex
+        ? {
+          ...section,
+          items: [
+            ...(section.items || []),
+            {
+              id: `honor_${Date.now()}`,
+              title: '',
+              issuer: '',
+              startDate: '',
+              endDate: '',
+              description: ''
+            }
+          ]
+        }
+        : section
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  CUSTOM SIMPLE HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleSimpleCustomUpdate = (sectionIndex, itemIndex, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (itemIndex === null && field !== "add") return { ...section, [field]: value };
+      if (field === "add") return { ...section, items: [...(section.items || []), value] };
+      if (field === "delete") return { ...section, items: (section.items || []).filter((_, idx) => idx !== itemIndex) };
+      return {
+        ...section,
+        items: (section.items || []).map((item, idx) => {
+          if (idx !== itemIndex) return item;
+          const obj = typeof item === 'object' ? item : { name: item, level: 2 };
+          return { ...obj, [field]: value };
+        }),
+      };
+    }));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  //  CUSTOM ADVANCED HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleCustomDragStart = (e, index) => { e.stopPropagation(); setDraggedCustomIndex(index); };
+
+  const handleCustomDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault(); e.stopPropagation();
+    if (draggedCustomIndex === null || draggedCustomIndex === targetIndex) return;
+    setSections(prev => {
+      const updated = [...prev];
+      const list = [...(updated[sectionIndex].items || [])];
+      const [moved] = list.splice(draggedCustomIndex, 1);
+      list.splice(targetIndex, 0, moved);
+      updated[sectionIndex] = { ...updated[sectionIndex], items: list };
+      return updated;
+    });
+    setDraggedCustomIndex(null);
+  };
+
+  const handleCustomUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev => prev.map((section, i) => {
+      if (i !== sectionIndex) return section;
+      if (field === "delete") return { ...section, items: (section.items || []).filter(it => it.id !== itemId) };
+      return { ...section, items: (section.items || []).map(it => it.id === itemId ? { ...it, [field]: value } : it) };
+    }));
+  };
+
+  const handleAddCustomItem = (sectionIndex) => {
+    setSections(prev => prev.map((section, i) =>
+      i === sectionIndex
+        ? { ...section, items: [...(section.items || []), { id: `custom_${Date.now()}`, title: "", city: "", startDate: "", endDate: "", description: "" }] }
+        : section
+    ));
+  };
+
+  // ═══════════════════════════════════════════════════════════════
   //  TEMPLATE / SECTION HANDLERS
   // ═══════════════════════════════════════════════════════════════
   const handleSelectTemplate = (id) => {
@@ -619,6 +902,11 @@ const LinkedInResumeBuilder = () => {
       defaultResumeSettings.theme.defaultColor;
     setThemeColor(color);
     setResumeSettings(prev => ({ ...prev, theme: { ...prev.theme, template: id } }));
+  };
+
+  const handleAddNewSection = (newSection) => {
+    const newId = sections.length > 0 ? Math.max(...sections.map(s => s.id)) + 1 : 0;
+    setSections(prev => [...prev, { id: newId, ...newSection }]);
   };
 
   const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
@@ -637,7 +925,7 @@ const LinkedInResumeBuilder = () => {
     }, 500);
   };
 
-  const handleDragEnd = () => {};
+  const handleDragEnd = () => { };
 
   // ═══════════════════════════════════════════════════════════════
   //  RENDER
@@ -722,7 +1010,6 @@ const LinkedInResumeBuilder = () => {
                                     />
                                   )}
 
-                                  {/* ✅ Languages section */}
                                   {section.type === 'languages' && (
                                     <LinkedInLanguages
                                       section={section}
@@ -740,6 +1027,7 @@ const LinkedInResumeBuilder = () => {
                                       watch={watch} setValue={setValue}
                                       sections={sections} setSections={setSections}
                                       sectionIndex={index}
+                                      onAtsRefresh={handleAtsRefresh}
                                     />
                                   )}
 
@@ -764,6 +1052,53 @@ const LinkedInResumeBuilder = () => {
                                       handleAddExperience={handleAddExperience}
                                       draggedExpIndex={draggedExpIndex}
                                       handleDragEnd={handleDragEnd}
+                                      onAtsRefresh={handleAtsRefresh}
+                                    />
+                                  )}
+
+                                  {section.type === "courses" && (
+                                    <LinkedInCourses
+                                      section={section} sectionIndex={index}
+                                      handleUpdate={handleCourseUpdate}
+                                      handleDragStart={handleCourseDragStart}
+                                      handleDrop={handleCourseDrop}
+                                      handleAddCourse={handleAddCourse}
+                                      draggedIndex={draggedCourseIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+
+                                  {section.type === "honors" && (
+                                    <LinkedInHonors
+                                      section={section} sectionIndex={index}
+                                      handleUpdate={handleHonorUpdate}
+                                      handleDragStart={handleHonorDragStart}
+                                      handleDrop={handleHonorDrop}
+                                      handleAddItem={handleAddHonor}
+                                      draggedIndex={draggedHonorIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+                                  {section.type === "custom_simple" && (
+                                    <LinkedInSimpleCustomSection
+                                      section={section} sectionIndex={index}
+                                      handleUpdate={handleSimpleCustomUpdate}
+                                      handleDragStart={handleCustomDragStart}
+                                      handleDrop={handleCustomDrop}
+                                      draggedIndex={draggedCustomIndex}
+                                      setDraggedIndex={setDraggedCustomIndex}
+                                    />
+                                  )}
+
+                                  {section.type === "custom" && (
+                                    <LinkedInCustomSection
+                                      section={section} sectionIndex={index}
+                                      handleCustomUpdate={handleCustomUpdate}
+                                      handleCustomDragStart={handleCustomDragStart}
+                                      handleCustomDrop={handleCustomDrop}
+                                      handleAddCustomItem={handleAddCustomItem}
+                                      draggedIndex={draggedCustomIndex}
+                                      handleDragEnd={handleDragEnd}
                                     />
                                   )}
 
@@ -777,6 +1112,13 @@ const LinkedInResumeBuilder = () => {
                   </div>
                 </SortableContext>
               </DndContext>
+
+              {/* Add Section Button */}
+              <LinkedInAddSectionButton
+                onAddNewSection={handleAddNewSection}
+                sections={sections}
+              />
+
             </div>
           </form>
         ) : (

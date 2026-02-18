@@ -52,11 +52,11 @@ const JdbasedModal = ({ openModalImproveexistingResume, setOpenModalImproveexist
         return;
       }
 
-      toast.success("Resume extracted successfully!");
+      // toast.success("Resume extracted successfully!");
       router.push("/jd-resume-builder");
 
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      // toast.error("Something went wrong. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);

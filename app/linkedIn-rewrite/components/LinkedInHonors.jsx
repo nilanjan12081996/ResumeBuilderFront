@@ -100,13 +100,22 @@ const LinkedInHonors = ({
                     </div>
 
                     {/* Date received */}
+
                     <div className="col-span-2">
-                      <Label className="block text-xs font-semibold !text-gray-500 mb-1">Date Received</Label>
-                      <div className="w-1/2">
-                        <Datepicker
-                          selectedDate={normalizeDate(item.date)}
-                          onChange={(date) => handleDateChange(item.id, "date", date)}
-                        />
+                      <Label className="block text-xs font-semibold !text-gray-500 mb-1">Start & End Date</Label>
+                      <div className="flex gap-2 mt-1">
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={normalizeDate(item.startDate)}
+                            onChange={(date) => handleDateChange(item.id, "startDate", date)}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <Datepicker
+                            selectedDate={normalizeDate(item.endDate)}
+                            onChange={(date) => handleDateChange(item.id, "endDate", date)}
+                          />
+                        </div>
                       </div>
                     </div>
 

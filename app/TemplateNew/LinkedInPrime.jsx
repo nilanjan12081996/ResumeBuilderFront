@@ -7,7 +7,6 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const { text, layout } = resumeSettings;
   const color = themeColor || "#0a66c2";
 
-  // ── Date formatter: ISO string, raw string, Date object — সব handle করে ──
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
     const strVal = String(dateValue).trim();
@@ -73,18 +72,15 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
 
   // ── Separate sections by type ─────────────────────────────────
   const findSection = (type) => (sections || []).filter((s) => s.type === type);
-  const skillSections        = findSection("skills");
-  const languageSections     = findSection("languages");
-  const summarySections      = findSection("summary");
-  const experienceSections   = findSection("experience");
-  const educationSections    = findSection("education");
-  const certSections         = findSection("certifications");
-  const hobbySections        = findSection("hobbies");
-  const coursesSections      = findSection("courses");
-  const internshipSections   = findSection("internships");
-  const activitySections     = findSection("activities");
+  const skillSections = findSection("skills");
+  const languageSections = findSection("languages");
+  const summarySections = findSection("summary");
+  const experienceSections = findSection("experience");
+  const educationSections = findSection("education");
+  const coursesSections = findSection("courses");
+  const honorsSection = findSection("honors");
   const customSimpleSections = findSection("custom_simple");
-  const customAdvSections    = findSection("custom");
+  const customAdvSections = findSection("custom");
 
   // ── RENDERERS ─────────────────────────────────────────────────
 
@@ -109,7 +105,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
       <SectionHeading title={section.title} />
       <div className="flex flex-col gap-4">
         {section.experiences?.map((exp, i) => {
-          const dr  = dateRange(exp.startDate, exp.endDate);
+          const dr = dateRange(exp.startDate, exp.endDate);
           const dur = calcDuration(exp.startDate, exp.endDate);
           return (
             <div key={exp.id || i} className="flex gap-3">
@@ -217,7 +213,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
     </div>
   );
 
- const renderLanguages = (section) => (
+  const renderLanguages = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
       <div className="flex flex-wrap gap-x-4 gap-y-2" style={{ fontSize: `${text.body}pt` }}>
@@ -236,51 +232,6 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
     </div>
   );
 
-  const renderCertifications = (section) => (
-    <div key={section.id}>
-      <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-3">
-        {section.certifications?.map((cert, i) => (
-          <div key={cert.id || i} className="flex gap-3">
-            <div
-              className="w-10 h-10 rounded flex-shrink-0 flex items-center justify-center text-white text-sm"
-              style={{ backgroundColor: "#0ea5e9", minWidth: "40px" }}
-            >
-              ✓
-            </div>
-            <div>
-              <h4 className="font-bold text-black" style={{ fontSize: `${text.body}pt` }}>
-                {cert.name}
-              </h4>
-              {cert.organization && (
-                <p className="text-gray-600" style={{ fontSize: `${text.body - 1}pt` }}>
-                  {cert.organization}
-                </p>
-              )}
-              {(cert.startYear || cert.endYear) && (
-                <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
-                  {cert.startYear}
-                  {cert.startYear && cert.endYear ? " – " : ""}
-                  {cert.endYear}
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-      <Divider />
-    </div>
-  );
-
-  const renderHobbies = (section) => (
-    <div key={section.id}>
-      <SectionHeading title={section.title} />
-      <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
-        {section.hobbies}
-      </p>
-      <Divider />
-    </div>
-  );
 
   const renderCourses = (section) => (
     <div key={section.id}>
@@ -308,71 +259,33 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
     </div>
   );
 
-  const renderInternships = (section) => (
-    <div key={section.id}>
-      <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-4">
-        {section.internships?.map((intern, i) => {
-          const dr  = dateRange(intern.startDate, intern.endDate);
-          const dur = calcDuration(intern.startDate, intern.endDate);
-          return (
-            <div key={intern.id || i} className="flex gap-3">
-              <div
-                className="w-10 h-10 rounded flex-shrink-0 flex items-center justify-center text-white font-bold text-sm"
-                style={{ backgroundColor: "#f59e0b", minWidth: "40px" }}
-              >
-                {intern.employer?.[0]?.toUpperCase() || "I"}
-              </div>
-              <div className="flex-1">
-                <h4 className="font-bold text-black" style={{ fontSize: `${text.body + 1}pt` }}>
-                  {intern.jobTitle}
-                </h4>
-                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
-                  {intern.employer}
-                </p>
-                {dr && (
-                  <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
-                    {dr}
-                    {dur ? ` · ${dur}` : ""}
-                  </p>
-                )}
-                {intern.description && (
-                  <div
-                    className="text-gray-700 mt-2 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
-                    style={{ fontSize: `${text.body}pt` }}
-                    dangerouslySetInnerHTML={{ __html: intern.description }}
-                  />
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <Divider />
-    </div>
-  );
-
-  const renderActivities = (section) => (
+  const renderHonors = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
       <div className="flex flex-col gap-3">
-        {section.activities?.map((act, i) => {
-          const dr = dateRange(act.startDate, act.endDate);
+        {section.items?.map((item, i) => {
+          const dr = dateRange(item.startDate, item.endDate);
           return (
-            <div key={act.id || i}>
-              <h4 className="font-semibold text-black" style={{ fontSize: `${text.body}pt` }}>
-                {act.functionTitle}
-                {act.employer ? ` · ${act.employer}` : ""}
-              </h4>
-              {dr && (
-                <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
-                  {dr}
+            <div key={item.id || i}>
+              <div className="flex justify-between items-baseline gap-2">
+                <h4 className="font-semibold text-black" style={{ fontSize: `${text.body}pt` }}>
+                  {item.title}
+                </h4>
+                {dr && (
+                  <span className="text-gray-400 text-xs flex-shrink-0">{dr}</span>
+                )}
+              </div>
+              {item.issuer && (
+                <p className="text-gray-600" style={{ fontSize: `${text.body - 1}pt` }}>
+                  {item.issuer}
                 </p>
               )}
-              {act.description && (
-                <p className="text-gray-700 mt-1" style={{ fontSize: `${text.body}pt` }}>
-                  {act.description}
-                </p>
+              {item.description && (
+                <div
+                  className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
+                  style={{ fontSize: `${text.body}pt` }}
+                  dangerouslySetInnerHTML={{ __html: item.description }}
+                />
               )}
             </div>
           );
@@ -489,7 +402,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
               className="w-full"
               style={{
                 height: "100pt",
-                background: `linear-gradient(135deg, ${color} 0%, ${color}99 100%)`,
+                backgroundColor: color,
               }}
             />
           )}
@@ -647,20 +560,11 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
           {/* ══ 8. LANGUAGES ═════════════════════════════════════════ */}
           {languageSections.map((s) => renderLanguages(s))}
 
-          {/* ══ 9. CERTIFICATIONS ════════════════════════════════════ */}
-          {certSections.map((s) => renderCertifications(s))}
-
           {/* ══ 10. COURSES ══════════════════════════════════════════ */}
           {coursesSections.map((s) => renderCourses(s))}
 
-          {/* ══ 11. INTERNSHIPS ══════════════════════════════════════ */}
-          {internshipSections.map((s) => renderInternships(s))}
-
-          {/* ══ 12. ACTIVITIES ═══════════════════════════════════════ */}
-          {activitySections.map((s) => renderActivities(s))}
-
-          {/* ══ 13. HOBBIES ══════════════════════════════════════════ */}
-          {hobbySections.map((s) => renderHobbies(s))}
+          {/* ══ 16. HONORS & AWARDS ══════════════════════════════════ */}
+          {honorsSection.map((s) => renderHonors(s))}
 
           {/* ══ 14. CUSTOM SIMPLE (Core Competencies, Achievements etc) */}
           {customSimpleSections.map((s) => renderCustomSimple(s))}

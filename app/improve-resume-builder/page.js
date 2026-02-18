@@ -81,6 +81,20 @@ const Page = () => {
 
   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
 
+  // ── ATS REFRESH ──
+  const handleAtsRefresh = () => {
+    const payload = {
+      ...formValues,
+      sections,
+      resume_type: "improve",
+    };
+    dispatch(checkATS({
+      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+      resume_data: JSON.stringify(payload),
+      Ats_score: 0,
+    }));
+  };
+
   // States
   const [selectedTemplate, setSelectedTemplate] = useState('ats');
   const [sections, setSections] = useState([]);
@@ -435,7 +449,7 @@ const Page = () => {
             name: typeof item === "string" ? item : item.name || item.title || "",
             level: typeof item === "object" && item.level ? item.level : 2
           })),
-          hideExperienceLevel: true   
+          hideExperienceLevel: true
         });
       } else {
         // Use custom (advanced) type for complex sections
@@ -1203,14 +1217,14 @@ const Page = () => {
     }));
   };
 
- const handleAddNewSection = (newSection) => {
-  const newId = Math.max(...sections.map(s => s.id), -1) + 1;
-  const sectionToAdd = {
-    id: newId,
-    ...newSection
+  const handleAddNewSection = (newSection) => {
+    const newId = Math.max(...sections.map(s => s.id), -1) + 1;
+    const sectionToAdd = {
+      id: newId,
+      ...newSection
+    };
+    setSections([...sections, sectionToAdd]);
   };
-  setSections([...sections, sectionToAdd]);
-};
   const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
     const updatedSections = [...sections];
     updatedSections[sectionIndex] = {
@@ -1345,7 +1359,7 @@ const Page = () => {
                                   )}
 
                                   {section.type === "summary" && (
-                                    <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index} />
+                                    <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index} onAtsRefresh={handleAtsRefresh}/>
                                   )}
 
                                   {section.type === "education" && (
@@ -1384,6 +1398,7 @@ const Page = () => {
                                       handleAddExperience={handleAddExperience}
                                       draggedExpIndex={draggedExpIndex}
                                       handleDragEnd={handleDragEnd}
+                                      onAtsRefresh={handleAtsRefresh}
                                     />
                                   )}
 

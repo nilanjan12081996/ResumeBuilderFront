@@ -151,40 +151,35 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
                         })}
                     />
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                     {guide && (
                         <div className="relative group w-fit">
-                            <div className="flex items-center gap-2 text-[#800080] hover:text-[#e799e7] text-sm font-medium cursor-pointer">
-                                <AiOutlineInfoCircle size={18} />
-                                How to improve your resume?
-                            </div>
-                            {/* <div
-                                className="
-        absolute top-full left-0 mt-2
-        w-[400px] max-h-[60vh] overflow-y-auto
-        bg-white rounded-lg shadow-xl border
-        p-4 text-sm
-        opacity-0 translate-y-2
-        group-hover:opacity-100 group-hover:translate-y-0
-        transition-all duration-200 ease-out
-        z-50
-    "
-                            >
-
-
-
-                                <h3 className="text-[#800080] font-semibold mb-2">
-                                    ATS Improvement Guide
-                                </h3>
-
-                                <div className="space-y-2 text-gray-700">
+                            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-50 text-[#800080] border border-purple-100 hover:bg-purple-100 transition-all duration-200">
+                                <AiOutlineInfoCircle size={14} />
+                                How to improve?
+                            </button>
+                            <div className="
+                                absolute top-full left-0 mt-[2px]
+                                w-[420px] max-h-[55vh] overflow-y-auto
+                                bg-white rounded-xl shadow-2xl border border-gray-100
+                                p-5 text-sm
+                                opacity-0 translate-y-1 pointer-events-none
+                                group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                                transition-all duration-200 ease-out z-50
+                            ">
+                                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+                                    <div className="w-6 h-6 rounded-full bg-purple-50 flex items-center justify-center">
+                                        <AiOutlineInfoCircle size={14} className="text-[#800080]" />
+                                    </div>
+                                    <h3 className="text-sm font-semibold text-gray-800">ATS Improvement Guide</h3>
+                                </div>
+                                <div className="space-y-1 text-gray-600">
                                     {formatGuide(guide)}
                                 </div>
-                            </div> */}
+                            </div>
                         </div>
                     )}
 
-                    {/* EXISTING / CHANGED RESUME */}
                     <div className="flex gap-10">
                         <button className="flex items-center gap-1 text-sm font-thin text-[#800080] hover:text-[#e799e7]">
                             <PiReadCvLogoDuotone className="text-lg" />

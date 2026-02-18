@@ -6,7 +6,8 @@ import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
 import { TbDragDrop } from 'react-icons/tb';
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from "../../ui/Datepicker";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkATS } from '../../reducers/DashboardSlice';
 
 
 const LinkedInExperience = ({
@@ -18,9 +19,11 @@ const LinkedInExperience = ({
   handleAddExperience,
   draggedExpIndex,
   handleDragEnd,
+  onAtsRefresh 
 }) => {
   const [activeExpId, setActiveExpId] = useState(null);
   const [deletingExpIndex, setDeletingExpIndex] = useState(null);
+  const dispatch = useDispatch();
 
   const handleDeleteExperience = (eIndex, expId) => {
     setDeletingExpIndex(eIndex);
@@ -172,15 +175,17 @@ const LinkedInExperience = ({
                         <HiSparkles className="text-md" />
                         Get help with writing
                       </button>
+                      
                       {activeExpId === exp.id && (
                         <GenerateWithAiModal
                           open={true}
                           onClose={() => setActiveExpId(null)}
-                          aiType="linkedin_experience"
+                          aiType="imp_experience"
                           initialText={exp.description || ""}
                           fullResumeData={resumeSource}
                           onApply={(text) => {
                             handleExpUpdate(sectionIndex, exp.id, "description", text);
+                            onAtsRefresh && onAtsRefresh();
                           }}
                         />
                       )}

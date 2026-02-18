@@ -19,6 +19,7 @@ const ImpExperience = ({
   handleAddExperience,
   draggedExpIndex,
   handleDragEnd,
+  onAtsRefresh
 }) => {
   const [activeExpId, setActiveExpId] = useState(null);
   const [deletingExpIndex, setDeletingExpIndex] = useState(null);
@@ -181,6 +182,7 @@ const ImpExperience = ({
                           fullResumeData={resumeSource}
                           onApply={(text) => {
                             handleExpUpdate(sectionIndex, exp.id, "description", text);
+                            onAtsRefresh && onAtsRefresh();
                           }}
                         />
                       )}

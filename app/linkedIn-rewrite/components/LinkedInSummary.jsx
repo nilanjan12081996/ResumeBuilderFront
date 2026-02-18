@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { HiSparkles } from "react-icons/hi2";
 import TipTapEditor from '../../editor/TipTapEditor';
 import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkATS } from '../../reducers/DashboardSlice';
 
-const LinkedInSummary = ({ watch, setValue, sections, setSections, sectionIndex }) => {
+const LinkedInSummary = ({ watch, setValue, sections, setSections, sectionIndex, onAtsRefresh }) => {
   const [open, setOpen] = useState(false);
-
+  const dispatch = useDispatch();
   const summaryValue = watch("summary");
 
   const { extracteResumeData } = useSelector((state) => state?.dash);
@@ -55,11 +56,12 @@ const LinkedInSummary = ({ watch, setValue, sections, setSections, sectionIndex 
           <GenerateWithAiModal
             open={open}
             onClose={() => setOpen(false)}
-            aiType="linkedin_summary"
+            aiType="imp_summary"
             initialText={summaryValue || ""}
             fullResumeData={resumeSource}
             onApply={(text) => {
               handleSummaryChange(text);
+              onAtsRefresh && onAtsRefresh();
             }}
           />
         )}

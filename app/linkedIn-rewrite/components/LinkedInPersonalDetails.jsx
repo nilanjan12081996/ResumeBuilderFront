@@ -230,7 +230,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
             <input
-              type="url"
+              type="text"
               placeholder="linkedin.com/in/yourprofile"
               className="w-full rounded-lg border border-gray-300 p-2 text-sm"
               {...register("linkedin")}
@@ -239,7 +239,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Website / Portfolio</label>
             <input
-              type="url"
+              type="text"
               placeholder="yourportfolio.com"
               className="w-full rounded-lg border border-gray-300 p-2 text-sm"
               {...register("website")}
@@ -265,7 +265,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
               <input
-                type="url"
+                type="text"
                 placeholder="github.com/username"
                 className="w-full rounded-lg border border-gray-300 p-2 text-sm"
                 {...register("github")}
@@ -274,7 +274,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Stack Overflow</label>
               <input
-                type="url"
+                type="text"
                 placeholder="stackoverflow.com/users/..."
                 className="w-full rounded-lg border border-gray-300 p-2 text-sm"
                 {...register("stackoverflow")}
@@ -283,7 +283,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">LeetCode</label>
               <input
-                type="url"
+                type="text"
                 placeholder="leetcode.com/username"
                 className="w-full rounded-lg border border-gray-300 p-2 text-sm"
                 {...register("leetcode")}

@@ -171,8 +171,8 @@ const TemplateAndColors = ({
 
                             {/* Tooltip */}
                             {isDisabled && (
-                                <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg">
-                                    This template is not supported for your resume type.
+                                <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg text-center">
+                                    This template is not supported<br/> for your resume type.
                                 </div>
                             )}
                         </div>
