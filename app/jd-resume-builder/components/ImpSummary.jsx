@@ -7,7 +7,7 @@ import TipTapEditor from '../../editor/TipTapEditor';
 import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
 import { useSelector } from 'react-redux';
 
-const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex }) => {
+const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex, onAtsRefresh }) => {
   const [open, setOpen] = useState(false);
 
   const summaryValue = watch("summary");
@@ -23,6 +23,7 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex }) =>
   const handleSummaryChange = (html) => {
 
     setValue("summary", html);
+
 
     if (setSections && typeof sectionIndex === 'number') {
       setSections(prev =>
@@ -63,6 +64,7 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex }) =>
             fullResumeData={resumeSource}
             onApply={(text) => {
               handleSummaryChange(text);
+              onAtsRefresh && onAtsRefresh();
             }}
           />
         )}

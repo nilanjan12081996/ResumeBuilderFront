@@ -34,7 +34,7 @@ export const defaultResumeSettings = {
   },
   theme: {
     defaultColor: "#2E86C1",
-    template: "professional",
+    template: "ats",
     templateColors: {
       professional: "#2E86C1",
       ats: "#2E86C1",

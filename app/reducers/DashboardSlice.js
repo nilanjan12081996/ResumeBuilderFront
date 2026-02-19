@@ -51,6 +51,20 @@ export const checkATS = createAsyncThunk(
     }
 );
 
+export const checkJdAts = createAsyncThunk(
+    "checkJdAts",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const response = await aiApi.post('/agent/ATS/Score/With/JD', payload);
+            console.log('ATS API response:', response);
+            return response.data;
+
+        } catch (err) {
+            console.error('ATS API error:', err);
+            return rejectWithValue(err?.response?.data || err.message);
+        }
+    }
+);
 
 
 export const jdBasedResume = createAsyncThunk(
@@ -484,30 +498,7 @@ export const improveExperience = createAsyncThunk(
     }
 );
 
-export const checkJdAts = createAsyncThunk(
-    "checkJdAts",
-    async ({ jd_resume_id, raw_data, job_description }, { rejectWithValue }) => {
-        try {
-            const response = await api.post("/api/js-based-resume/check-jd-ats", {
-                jd_resume_id,
-                raw_data,
-                job_description
-            });
 
-            if (response?.data?.status === true) {
-                return response.data;
-            } else {
-                if (response?.data?.errors) {
-                    return rejectWithValue(response.data.errors);
-                } else {
-                    return rejectWithValue("Something went wrong.");
-                }
-            }
-        } catch (err) {
-            return rejectWithValue(err);
-        }
-    }
-);
 
 
 export const jdBasedAtsScoreAnalyze = createAsyncThunk(
@@ -791,6 +782,37 @@ export const fetchMissingSkills = createAsyncThunk(
 );
 
 
+export const summeryGapJd = createAsyncThunk(
+    "dashboard/summeryGapJd",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post("/agent/JD/professional/summary/gap", payload);
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+export const jobDescriptionGapJd = createAsyncThunk(
+    "dashboard/jobDescriptionGapJd",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post("/agent/JD/Experience/Description/gap", payload);
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+
 
 
 
@@ -799,6 +821,7 @@ const initialState = {
     loading: false,
     extracteResumeData: {},
     checkATSData: {},
+    checkJdAtsData: {},
     atsLoading: false,
     jdBasedResumeData: {},
     basiInfo: {},
@@ -822,7 +845,6 @@ const initialState = {
     atsScoreAnalyzeData: {},
     generatedQuestionsData: {},
     improveExperienceData: {},
-    checkJdAtsData: {},
     jdBasedAtsScoreAnalyzeData: {},
     impBasedAtsScoreAnalyzeData: {},
     // IMP chat
@@ -842,19 +864,24 @@ const initialState = {
     improvementExperienceData: {},
 
     generateImpNewSummaryLoading: false,
-    generateImpNewSummaryData:{},
+    generateImpNewSummaryData: {},
 
     generateImpNewExperienceLoading: false,
     generateImpNewExperienceData: {},
 
     generateJdNewSummaryLoading: false,
-    generateJdNewSummaryData:{},
+    generateJdNewSummaryData: {},
 
     generateJdNewExperienceLoading: false,
     generateJdNewExperienceData: {},
 
     missingSkillsData: [],
     jobDescription: "",
+
+    summeryGapJdLoading: false,
+    summeryGapJdData: {},
+    jobDescriptionGapJdData: {},
+    jobDescriptionGapJdLoading: false
 }
 
 const DashboardSlice = createSlice(
@@ -900,6 +927,19 @@ const DashboardSlice = createSlice(
                 .addCase(checkATS.rejected, (state, { payload }) => {
                     state.atsLoading = false;
                     state.error = payload || 'ATS score check failed';
+                })
+
+                .addCase(checkJdAts.pending, (state) => {
+                    state.atsLoading = true;
+                })
+                .addCase(checkJdAts.fulfilled, (state, { payload }) => {
+                    state.atsLoading = false;
+                    state.error = false;
+                    state.checkJdAtsData = payload;
+                })
+                .addCase(checkJdAts.rejected, (state, { payload }) => {
+                    state.atsLoading = false;
+                    state.error = payload;
                 })
 
                 .addCase(jdBasedResume.pending, (state, { payload }) => {
@@ -1196,19 +1236,6 @@ const DashboardSlice = createSlice(
                     state.loading = false
                 })
 
-                .addCase(checkJdAts.pending, (state) => {
-                    state.loading = true;
-                })
-                .addCase(checkJdAts.fulfilled, (state, { payload }) => {
-                    state.loading = false;
-                    state.error = false;
-                    state.checkJdAtsData = payload;
-                })
-                .addCase(checkJdAts.rejected, (state, { payload }) => {
-                    state.loading = false;
-                    state.error = payload;
-                })
-
                 .addCase(jdBasedAtsScoreAnalyze.pending, (state) => {
                     state.loading = true;
                 })
@@ -1373,7 +1400,7 @@ const DashboardSlice = createSlice(
                     state.error = payload;
                 })
 
-            
+
                 .addCase(generateJdNewSummary.pending, (state) => {
                     state.generateJdNewSummaryLoading = true;
                     state.error = false;
@@ -1411,10 +1438,33 @@ const DashboardSlice = createSlice(
                 .addCase(fetchMissingSkills.rejected, (state, action) => {
                     state.loading = false;
                     state.error = action.payload || "Failed to fetch missing skills";
+                })
+
+                .addCase(summeryGapJd.pending, (state) => {
+                    state.summeryGapJdLoading = true;
+                    state.error = null;
+                })
+                .addCase(summeryGapJd.fulfilled, (state, action) => {
+                    state.summeryGapJdLoading = false;
+                    state.summeryGapJdData = action.payload;;
+                })
+                .addCase(summeryGapJd.rejected, (state, action) => {
+                    state.summeryGapJdLoading = false;
+                    state.error = action.payload || "Failed";
+                })
+
+                .addCase(jobDescriptionGapJd.pending, (state) => {
+                    state.jobDescriptionGapJdLoading = true;
+                    state.error = null;
+                })
+                .addCase(jobDescriptionGapJd.fulfilled, (state, action) => {
+                    state.jobDescriptionGapJdLoading = false;
+                    state.jobDescriptionGapJdData = action.payload;;
+                })
+                .addCase(jobDescriptionGapJd.rejected, (state, action) => {
+                    state.jobDescriptionGapJdLoading = false;
+                    state.error = action.payload || "Failed to fetch missing skills";
                 });
-
-
-
         }
     }
 )

@@ -12,7 +12,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
     return d.toLocaleString("en-US", { month: "short", year: "numeric" });
   };
 
-  // ✅ date range helper — কোনো date না থাকলে " — " একা দেখাবে না
+
   const dateRange = (startDate, endDate) => {
     const start = formatDate(startDate);
     const end   = formatDate(endDate);
@@ -573,7 +573,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
   // ===================== MAIN RENDER LOGIC =====================
 
   const renderDynamicSections = () => {
-    // ── Improve Resume: sections array আছে ──
+
     if (sections && sections.length > 0) {
       return sections.map((section) => {
         switch (section.type) {

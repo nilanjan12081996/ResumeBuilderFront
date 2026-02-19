@@ -14,11 +14,12 @@ const ImpExperience = ({
   section,
   sectionIndex,
   handleExpUpdate,
-  handleExpDragStart,
+  handleExpDragStart, 
   handleExpDrop,
   handleAddExperience,
   draggedExpIndex,
   handleDragEnd,
+  onAtsRefresh
 }) => {
   const [activeExpId, setActiveExpId] = useState(null);
   const [deletingExpIndex, setDeletingExpIndex] = useState(null);
@@ -32,14 +33,13 @@ const ImpExperience = ({
     }, 500);
   };
 
-  const { extracteResumeData } = useSelector((state) => state?.dash);
+ const { extracteResumeData } = useSelector((state) => state?.dash);
   const { singleResumeInfo } = useSelector((state) => state?.resume);
 
   const resumeSource =
     singleResumeInfo?.data?.data ||
     extracteResumeData?.resume_data ||
     null;
-
 
   return (
     <>
@@ -106,7 +106,7 @@ const ImpExperience = ({
 
                     {/* Date Section */}
                     <div className='md:col-span-2'>
-                      <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
+                      <Label className="block text-xs font-semibold !text-gray-500 mb-1">Start & End Date</Label>
                       <div className='flex gap-2 mt-1'>
                         <div className="flex-1">
                           <Datepicker
@@ -178,10 +178,11 @@ const ImpExperience = ({
                           open={true}
                           onClose={() => setActiveExpId(null)}
                           aiType="jd_experience"
-                          fullResumeData={resumeSource}
                           initialText={exp.description || ""}
+                          fullResumeData={resumeSource}
                           onApply={(text) => {
                             handleExpUpdate(sectionIndex, exp.id, "description", text);
+                            onAtsRefresh && onAtsRefresh();
                           }}
                         />
                       )}

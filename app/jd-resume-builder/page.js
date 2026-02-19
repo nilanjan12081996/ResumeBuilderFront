@@ -7,6 +7,12 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent } from "flowbite-react";
 import isEqual from 'lodash.isequal';
 import { AiFillSave } from "react-icons/ai";
+import { FaPen, FaTrash } from 'react-icons/fa';
+
+// Import @dnd-kit
+import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+
 // Import components
 import ImpResumeScore from './components/ImpResumeScore';
 import ImpPersonalDetails from './components/ImpPersonalDetails';
@@ -15,8 +21,20 @@ import ImpSummary from './components/ImpSummary';
 import ImpEducation from './components/ImpEducation';
 import ImpCertifications from './components/ImpCertifications';
 import ImpExperience from './components/ImpExperience';
+import ImpHobbies from './components/ImpHobbies';
+import ImpCourses from './components/ImpCourses';
+import ImpLanguages from './components/ImpLanguages';
+import ImpInternships from './components/ImpInternships';
+import ImpActivities from './components/ImpActivities';
 import CustomizeSection from '../ui/CustomizeSection.jsx';
-import ImpCoreCompetencies from "./components/ImpCoreCompetencies";
+import ImpCustomSection from './components/ImpCustomSection';
+import ImpSimpleCustomSection from './components/Impsimplecustomsection';
+import AddSectionButton from './components/AddSectionButton';
+
+// Import Draggable Components
+import DraggableWrapper from './DraggableWrapper';
+import DragIcon from './DragIcon';
+
 // Import templates
 import Professional from "../TemplateNew/Professional";
 import PrimeATS from "../TemplateNew/PrimeATS";
@@ -26,12 +44,8 @@ import VividTemplate from "../TemplateNew/VividTemplate";
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
-import { checkATS } from '../reducers/DashboardSlice';
+import { checkJdAts } from '../reducers/DashboardSlice';
 import { getSingleResume, saveResumeJd } from '../reducers/ResumeSlice';
-import { TbDragDrop } from 'react-icons/tb';
-import ImpCustomSection from './components/ImpCustomSection';
-import AddSectionButton from './components/AddSectionButton';
-import { FaPen, FaTrash } from 'react-icons/fa';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 
 const Page = () => {
@@ -39,14 +53,11 @@ const Page = () => {
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
-  console.log('singleResumeInfo', singleResumeInfo)
-  console.log('extracteResumeData',extracteResumeData)
-  // console.log('singleResumeInfo', singleResumeInfo)
+
   const resumeSource =
     singleResumeInfo?.data?.data ||
     extracteResumeData?.resume_data ||
     null;
-
 
   // Resume ID tracking
   const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
@@ -54,35 +65,65 @@ const Page = () => {
   // Auto-Save State
   const lastSavedData = useRef(null);
   const isInitialLoad = useRef(true);
-  const [savingStatus, setSavingStatus] = useState('unsaved'); // 'saved', 'saving', 'error', 'unsaved'
+  const [savingStatus, setSavingStatus] = useState('unsaved');
 
   useEffect(() => {
     if (!resumeSource) return;
 
+    const targetJD = sessionStorage.getItem("target_jd");
     const atsPayload = {
       security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
       resume_data: JSON.stringify(resumeSource),
-      Ats_score: 0
+      Ats_score: 0,
+      JD: targetJD || ""
     };
 
-    dispatch(checkATS(atsPayload));
+    dispatch(checkJdAts(atsPayload));
   }, [resumeSource, dispatch]);
 
-  const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+  const { checkJdAtsData, atsLoading } = useSelector((state) => state.dash);
+
+  // ATS REFRESH
+  const handleAtsRefresh = () => {
+    const targetJD = sessionStorage.getItem("target_jd");
+    const payload = {
+      ...formValues,
+      sections,
+      resume_type: "jd",
+    };
+    dispatch(checkJdAts({
+      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+      resume_data: JSON.stringify(payload),
+      Ats_score: 0,
+      JD: targetJD || ""
+    }));
+  };
 
   // States
-  const [selectedTemplate, setSelectedTemplate] = useState('Professional');
+  const [selectedTemplate, setSelectedTemplate] = useState('ats');
   const [sections, setSections] = useState([]);
-  const [draggedIndex, setDraggedIndex] = useState(null);
   const [draggedSkillIndex, setDraggedSkillIndex] = useState(null);
   const [draggedEducationIndex, setDraggedEducationIndex] = useState(null);
   const [draggedCertIndex, setDraggedCertIndex] = useState(null);
   const [draggedExpIndex, setDraggedExpIndex] = useState(null);
   const [draggedCustomIndex, setDraggedCustomIndex] = useState(null);
+  const [draggedCourseIndex, setDraggedCourseIndex] = useState(null);
+  const [draggedLanguageIndex, setDraggedLanguageIndex] = useState(null);
+  const [draggedInternshipIndex, setDraggedInternshipIndex] = useState(null);
+  const [draggedActivityIndex, setDraggedActivityIndex] = useState(null);
   const [editingSectionIndex, setEditingSectionIndex] = useState(null);
   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
   const [deletingSectionIndex, setDeletingSectionIndex] = useState(null);
   const { activeTab } = useTabs();
+
+  // Setup sensors for @dnd-kit
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   // Template mapping
   const templateMap = {
     professional: Professional,
@@ -97,7 +138,27 @@ const Page = () => {
     defaultResumeSettings.theme.defaultColor
   );
 
-  const ActiveResume = templateMap[selectedTemplate] || Professional;
+  const handleThemeColorChange = (color) => {
+    setThemeColor(color);
+
+    setResumeSettings(prev => {
+      const template = prev.theme.template;
+
+      return {
+        ...prev,
+        theme: {
+          ...prev.theme,
+          defaultColor: color,
+          templateColors: {
+            ...prev.theme.templateColors,
+            [template]: color,
+          },
+        },
+      };
+    });
+  };
+
+  const ActiveResume = templateMap[selectedTemplate?.toLowerCase()] || PrimeATS;
 
   // Form handling
   const {
@@ -115,12 +176,23 @@ const Page = () => {
   const resume_id = searchParams.get("id");
   const resume_type = searchParams.get("fetch");
 
+  // Handle section drag end (@dnd-kit)
+  const handleSectionDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setSections((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   // -------------------- INITIAL DATA LOAD --------------------
   useEffect(() => {
     if (!resumeSource) return;
 
-    // set resume IDs (EDIT MODE)
     if (resumeSource.mongo_id || resumeSource._id) {
       setResumeIds({
         mongo_id: resumeSource.mongo_id || resumeSource._id,
@@ -132,14 +204,13 @@ const Page = () => {
       JSON.stringify({
         ...resumeSource,
         sections,
+        resumeSettings: resumeSource.resumeSettings || defaultResumeSettings,
       })
     );
 
     setSavingStatus("saved");
     isInitialLoad.current = false;
   }, [resumeSource]);
-
-
 
   // -------------------- AUTO SAVE --------------------
   useEffect(() => {
@@ -148,9 +219,9 @@ const Page = () => {
     const currentData = {
       ...formValues,
       sections,
+      resumeSettings,
     };
 
-    //  compare WITHOUT IDs
     const normalized = JSON.parse(JSON.stringify(currentData));
 
     if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
@@ -162,10 +233,11 @@ const Page = () => {
     const timeoutId = setTimeout(() => {
       const payload = {
         ...currentData,
+        sections,
+        resumeSettings,
         resume_type: "jd",
       };
 
-      //  send IDs ONLY after first save
       if (resumeIds.mongo_id && resumeIds.mysql_id) {
         payload.mongo_id = resumeIds.mongo_id;
         payload.mysql_id = resumeIds.mysql_id;
@@ -176,7 +248,6 @@ const Page = () => {
           setSavingStatus("saved");
           lastSavedData.current = normalized;
 
-          // FIRST SAVE → capture IDs
           if (!resumeIds.mongo_id) {
             const mongo_id = res.payload.sectionsdata?.mongo_id;
             const mysql_id = res.payload.sectionsdata?.mysql_id;
@@ -186,9 +257,7 @@ const Page = () => {
               `/jd-resume-builder?id=${mysql_id}&fetch=jd_resume`,
               { scroll: false }
             );
-
           }
-
         } else {
           setSavingStatus("error");
         }
@@ -196,8 +265,7 @@ const Page = () => {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [formValues, sections]);
-
+  }, [formValues, sections, resumeSettings]);
 
   // -------------------- MANUAL SAVE --------------------
   const onSubmit = (data) => {
@@ -206,6 +274,7 @@ const Page = () => {
     const payload = {
       ...data,
       sections,
+      resumeSettings,
       resume_type: "jd",
     };
 
@@ -219,10 +288,9 @@ const Page = () => {
         setSavingStatus("saved");
 
         lastSavedData.current = JSON.parse(
-          JSON.stringify({ ...data, sections })
+          JSON.stringify({ ...data, sections, resumeSettings })
         );
 
-        // 🧠 FIRST SAVE ONLY
         if (!resumeIds.mongo_id) {
           const mongo_id = res.payload.sectionsdata?.mongo_id;
           const mysql_id = res.payload.sectionsdata?.mysql_id;
@@ -233,9 +301,7 @@ const Page = () => {
             `/jd-resume-builder?id=${mysql_id}&fetch=jd_resume`,
             { scroll: false }
           );
-
         }
-
       } else {
         setSavingStatus("error");
       }
@@ -248,11 +314,10 @@ const Page = () => {
     dispatch(
       getSingleResume({
         id: resume_id,
-        fetch: resume_type, 
+        fetch: resume_type,
       })
     );
   }, [resume_id, resume_type, dispatch]);
-
 
   // -------------------- AUTO HIDE STATUS --------------------
   useEffect(() => {
@@ -268,15 +333,35 @@ const Page = () => {
   const mapextracteResumeDataToSections = (resumeData) => {
     if (!resumeData) return [];
 
-    const sections = [];
     let id = 0;
+
+    const profileSummaryKey = Object.keys(resumeData?.additional_sections || {}).find(
+      k => k.trim().toUpperCase() === "PROFILE SUMMARY"
+    );
+    const profileSummaryContent = profileSummaryKey
+      ? resumeData.additional_sections[profileSummaryKey]?.content
+      : null;
+    const hasProfileSummary = Array.isArray(profileSummaryContent) && profileSummaryContent.length > 0 && profileSummaryContent.some(p => p?.trim());
+
+    const summaryText = hasProfileSummary
+      ? (profileSummaryContent.length > 1
+        ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : profileSummaryContent[0])
+      : (resumeData?.professional_summary?.summary_text || "");
+
+    const summaryTitle = profileSummaryKey || "Professional Summary";
+
+    const summarySection = summaryText
+      ? { id: id++, title: summaryTitle, type: "summary", summary: summaryText }
+      : null;
 
     // ----------------- TECHNICAL SKILLS -----------------
     const techCategories = resumeData?.technical_skills?.categories || {};
     const techSkills = Object.values(techCategories).flat();
+    const skillsSections = [];
 
     if (techSkills.length > 0) {
-      sections.push({
+      skillsSections.push({
         id: id++,
         title: (resumeData?.soft_skills || []).length > 0 ? "Technical Skills" : "Skills",
         type: "skills",
@@ -288,9 +373,8 @@ const Page = () => {
       });
     }
 
-    // ----------------- SOFT SKILLS -----------------
     if ((resumeData?.soft_skills || []).length > 0) {
-      sections.push({
+      skillsSections.push({
         id: id++,
         title: "Soft Skills",
         type: "skills",
@@ -302,21 +386,17 @@ const Page = () => {
       });
     }
 
-    // ----------------- SUMMARY -----------------
-    if (resumeData?.professional_summary?.summary_text) {
-      sections.push({
-        id: id++,
-        title: "Professional Summary",
-        type: "summary",
-        summary: resumeData.professional_summary.summary_text,
-      });
-    }
-
     // ----------------- EDUCATION -----------------
-    if ((resumeData?.education || []).length > 0) {
-      sections.push({
+    // CV তে "EDUCATION" key এর আসল নাম নেবে
+    const educationKey = Object.keys(resumeData?.additional_sections || {}).find(
+      k => k.trim().toUpperCase() === "EDUCATION"
+    );
+    const educationTitle = educationKey || "Education";
+
+    const educationSection = (resumeData?.education || []).length > 0
+      ? {
         id: id++,
-        title: "Education",
+        title: educationTitle,
         type: "education",
         educations: resumeData.education.map((edu, i) => ({
           id: `e_${i}_${Date.now()}`,
@@ -327,14 +407,19 @@ const Page = () => {
           city: edu.location || "",
           description: edu.description || "",
         })),
-      });
-    }
+      }
+      : null;
 
     // ----------------- CERTIFICATIONS -----------------
-    if ((resumeData?.certifications || []).length > 0) {
-      sections.push({
+    const certKey = Object.keys(resumeData?.additional_sections || {}).find(
+      k => k.trim().toUpperCase() === "CERTIFICATIONS"
+    );
+    const certTitle = certKey || "Certifications";
+
+    const certSection = (resumeData?.certifications || []).length > 0
+      ? {
         id: id++,
-        title: "Certifications",
+        title: certTitle,
         type: "certifications",
         certifications: resumeData.certifications.map((c, i) => ({
           id: `c_${i}_${Date.now()}`,
@@ -345,14 +430,20 @@ const Page = () => {
           endYear: "",
           description: "",
         })),
-      });
-    }
+      }
+      : null;
 
     // ----------------- EXPERIENCE -----------------
-    if ((resumeData?.work_experience || []).length > 0) {
-      sections.push({
+    // CV তে "WORK EXPERIENCE" বা "EXPERIENCE" key এর আসল নাম নেবে
+    const experienceKey = Object.keys(resumeData?.additional_sections || {}).find(
+      k => ["WORK EXPERIENCE", "EXPERIENCE"].includes(k.trim().toUpperCase())
+    );
+    const experienceTitle = experienceKey || "Experience";
+
+    const experienceSection = (resumeData?.work_experience || []).length > 0
+      ? {
         id: id++,
-        title: "Experience",
+        title: experienceTitle,
         type: "experience",
         experiences: resumeData.work_experience.map((exp, i) => ({
           id: `x_${i}_${Date.now()}`,
@@ -363,161 +454,183 @@ const Page = () => {
           endDate: exp.end_date || "",
           description: (exp.responsibilities || []).join("<br/>"),
         })),
-      });
-    }
+      }
+      : null;
 
     // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
+    // এই keys গুলো skip — উপরের structured sections এ already handle হয়েছে
+    const SKIP_KEYS = new Set([
+      "PROFILE SUMMARY",
+      "EDUCATION",
+      "CERTIFICATIONS",
+      "WORK EXPERIENCE",
+      "EXPERIENCE",
+      "IT SKILLS",
+      "CONTACT DETAILS",
+    ]);
+
+    const additionalSectionsList = [];
     const additionalSections = resumeData?.additional_sections || {};
-    const hasMainExperience = (resumeData?.work_experience || []).length > 0;
 
     Object.entries(additionalSections).forEach(([key, value]) => {
-      if (!value?.content || value.content.length === 0) return;
+      if (SKIP_KEYS.has(key.trim().toUpperCase())) return;
+      if (!value?.content) return;
+      if (Array.isArray(value.content) && value.content.length === 0) return;
+      if (typeof value.content === "string" && !value.content.trim()) return;
 
-      const normalizedKey = key.toLowerCase().trim();
-
-      // Skip summary, personal info, profile, header
-      // if (
-      //   normalizedKey.includes("summary") ||
-      //   normalizedKey.includes("personal") ||
-      //   normalizedKey.includes("profile") ||
-      //   normalizedKey.includes("header")
-      // ) return;
-
-      // Skip experience if main experience exists
-      // if (
-      //   hasMainExperience &&
-      //   (
-      //     normalizedKey.includes("experience") ||
-      //     normalizedKey.includes("employment") ||
-      //     normalizedKey.includes("career") ||
-      //     normalizedKey.includes("timeline")
-      //   )
-      // ) return;
-
-      // Core competencies
-      if (
-        normalizedKey.includes("core competencies") ||
-        normalizedKey.includes("competencies")
-      ) {
-        sections.push({
-          id: id++,
-          title: key,
-          type: "core_competencies",
-          items: value.content,
-        });
-        return;
-      }
-
-      // Everything else (including achievements) → custom
-      sections.push({
-        id: id++,
-        title: key,
-        type: "custom",
-        items: Array.isArray(value.content)
-          ? value.content.map((item, i) => ({
-            id: `custom_${i}_${Date.now()}`,
-            title: typeof item === "string" ? item : item.title || item.name || "",
-            city: item.city || "",
-            startDate: item.start_date || "",
-            endDate: item.end_date || "",
-            description: item.description || "",
-          }))
-          : [
-            {
-              id: `custom_0_${Date.now()}`,
-              title: typeof value.content === "string" ? value.content : "",
-              city: "",
-              startDate: "",
-              endDate: "",
-              description: "",
-            },
-          ],
+      // Detect simple list
+      const isSimpleList = Array.isArray(value.content) && value.content.every(item => {
+        if (typeof item === 'string') return true;
+        if (typeof item === 'object') {
+          const keys = Object.keys(item);
+          return keys.length <= 2 && (
+            (keys.includes('name') || keys.includes('title')) &&
+            (!keys.includes('description') && !keys.includes('city') && !keys.includes('start_date'))
+          );
+        }
+        return false;
       });
+
+      if (isSimpleList) {
+        additionalSectionsList.push({
+          id: id++,
+          title: key,          // ✅ CV এর আসল key name
+          type: "custom_simple",
+          items: value.content.map((item, i) => ({
+            id: `simple_${i}_${Date.now()}`,
+            name: typeof item === "string" ? item : item.name || item.title || "",
+            level: typeof item === "object" && item.level ? item.level : 2
+          })),
+          hideExperienceLevel: true
+        });
+      } else {
+        additionalSectionsList.push({
+          id: id++,
+          title: key,          // ✅ CV এর আসল key name
+          type: "custom",
+          items: Array.isArray(value.content)
+            ? value.content.map((item, i) => ({
+              id: `custom_${i}_${Date.now()}`,
+              title: typeof item === "string" ? item : item.title || item.name || "",
+              city: item.city || "",
+              startDate: item.start_date || "",
+              endDate: item.end_date || "",
+              description: item.description || "",
+            }))
+            : [
+              {
+                id: `custom_0_${Date.now()}`,
+                title: typeof value.content === "string" ? value.content : "",
+                city: "",
+                startDate: "",
+                endDate: "",
+                description: "",
+              },
+            ],
+        });
+      }
     });
+
+    const sections = [
+      ...(summarySection ? [summarySection] : []),
+      ...skillsSections,
+      ...(educationSection ? [educationSection] : []),
+      ...(certSection ? [certSection] : []),
+      ...(experienceSection ? [experienceSection] : []),
+      ...additionalSectionsList,
+    ];
 
     return sections;
   };
 
   // ----------------- SETTING FORM VALUES -----------------
-useEffect(() => {
-  if (!resumeSource) return;
-
-  const resumeData = extracteResumeData?.resume_data || resumeSource;
-  const personal = resumeData?.personal_information || {};
-  const meta = resumeData?.metadata || {};
-
-  // Profile summary
-  const profileSummaryFromAdditional =
-    resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
-
-  const summaryPoints =
-    Array.isArray(profileSummaryFromAdditional) && profileSummaryFromAdditional.length > 0
-      ? profileSummaryFromAdditional
-      : resumeData?.professional_summary?.summary_text
-        ? [resumeData.professional_summary.summary_text]
-        : [];
-
-  const formattedSummary =
-    summaryPoints.length > 1
-      ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
-      : summaryPoints[0] || "";
-
-  // Name
-  const fullName = personal.full_name || "";
-  const nameParts = fullName.split(" ");
-
-  setValue("job_target", meta.current_role || resumeSource.job_target || "");
-  setValue("first_name", nameParts[0] || resumeSource.first_name || "");
-  setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
-  setValue("email", personal.email || resumeSource.email || "");
-  setValue("phone", personal.phone || resumeSource.phone || "");
-  setValue(
-    "city_state",
-    [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || resumeSource.city_state || ""
-  );
-  setValue("country", personal.location?.country || resumeSource.country || "");
-  setValue("address", personal.location?.full_address || resumeSource.address || "");
-  setValue("summary", formattedSummary || resumeSource.summary || "");
-  setValue("profileImage", resumeSource.profileImage || "");
-  
-  // Additional Details
-  setValue("linkedin", resumeSource.linkedin || "");
-  setValue("github", resumeSource.github || "");
-  setValue("stackoverflow", resumeSource.stackoverflow || "");
-  setValue("leetcode", resumeSource.leetcode || "");
-  setValue("postal_code", resumeSource.postal_code || "");
-  setValue("nationality", resumeSource.nationality || "");
-  setValue("birth_place", resumeSource.birth_place || "");
-  setValue("dob", resumeSource.dob || "");
-  setValue("driving_licence", resumeSource.driving_licence || "");
-  
-}, [extracteResumeData, resumeSource, setValue]);
-
-
-// ----------------- SYNC SUMMARY -----------------
-useEffect(() => {
-  const summarySections = sections.filter(sec => sec.type === "summary");
-  if (summarySections.length > 0) {
-    const summaryText = summarySections[0].summary || "";
-    setValue("summary", summaryText);
-  }
-}, [sections, setValue]);
-
-  // ----------------- MAP SECTIONS -----------------
   useEffect(() => {
     if (!resumeSource) return;
 
-    // IF already saved resume (edit mode)
+    const resumeData = extracteResumeData?.resume_data || resumeSource;
+    const personal = resumeData?.personal_information || {};
+    const meta = resumeData?.metadata || {};
+
+    const profileSummaryFromAdditional = resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
+    const hasProfileSummary = Array.isArray(profileSummaryFromAdditional) && profileSummaryFromAdditional.length > 0 && profileSummaryFromAdditional.some(p => p?.trim());
+
+    const summaryPoints = hasProfileSummary
+      ? profileSummaryFromAdditional
+      : (resumeData?.professional_summary?.summary_text
+        ? [resumeData.professional_summary.summary_text]
+        : []);
+
+    const formattedSummary =
+      summaryPoints.length > 1
+        ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : summaryPoints[0] || "";
+
+    const fullName = personal.full_name || "";
+    const nameParts = fullName.split(" ");
+
+    setValue("job_target", meta.current_role || resumeSource.job_target || "");
+    setValue("first_name", nameParts[0] || resumeSource.first_name || "");
+    setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
+    setValue("email", personal.email || resumeSource.email || "");
+    setValue("phone", personal.phone || resumeSource.phone || "");
+    setValue(
+      "city_state",
+      [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || resumeSource.city_state || ""
+    );
+    setValue("country", personal.location?.country || resumeSource.country || "");
+    setValue("address", personal.location?.full_address || resumeSource.address || "");
+    setValue("summary", formattedSummary || resumeSource.summary || "");
+    setValue("profileImage", resumeSource.profileImage || "");
+
+    // Additional Details
+    setValue("linkedin", resumeSource.linkedin || "");
+    setValue("github", resumeSource.github || "");
+    setValue("stackoverflow", resumeSource.stackoverflow || "");
+    setValue("leetcode", resumeSource.leetcode || "");
+    setValue("postal_code", resumeSource.postal_code || "");
+    setValue("nationality", resumeSource.nationality || "");
+    setValue("birth_place", resumeSource.birth_place || "");
+    setValue("dob", resumeSource.dob || "");
+    setValue("driving_licence", resumeSource.driving_licence || "");
+
+  }, [extracteResumeData, resumeSource, setValue]);
+
+  // ----------------- SYNC SUMMARY -----------------
+  useEffect(() => {
+    const summarySections = sections.filter(sec => sec.type === "summary");
+    if (summarySections.length > 0) {
+      const summaryText = summarySections[0].summary || "";
+      setValue("summary", summaryText);
+    }
+  }, [sections, setValue]);
+
+  // ----------------- MAP SECTIONS + RESTORE SETTINGS -----------------
+  useEffect(() => {
+    if (!resumeSource) return;
+
+    if (resumeSource.resumeSettings) {
+      const settings = resumeSource.resumeSettings;
+      setResumeSettings(settings);
+
+      const template = settings.theme?.template || "professional";
+      setSelectedTemplate(template);
+
+      const color =
+        settings.theme?.templateColors?.[template] ||
+        settings.theme?.defaultColor ||
+        defaultResumeSettings.theme.defaultColor;
+
+      setThemeColor(color);
+    }
+
     if (resumeSource.sections?.length) {
       setSections(resumeSource.sections);
       return;
     }
 
-    // ELSE generated resume (create mode)
     const mappedSections = mapextracteResumeDataToSections(resumeSource);
     setSections(mappedSections);
   }, [resumeSource]);
-
 
   // ----------------- SYNC SKILLS -----------------
   useEffect(() => {
@@ -560,37 +673,6 @@ useEffect(() => {
     setValue("employmentHistory", employmentHistory);
   }, [sections, setValue]);
 
-
-  // Drag handlers for sections
-  const handleDragStart = (e, index) => {
-    setDraggedIndex(index);
-    const sectionEl = e.currentTarget.closest(".section-item");
-    if (sectionEl) {
-      e.dataTransfer.setDragImage(sectionEl, 20, 20);
-    }
-  };
-
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    if (draggedIndex === targetIndex) return;
-
-    const updatedSections = [...sections];
-    const [draggedItem] = updatedSections.splice(draggedIndex, 1);
-    updatedSections.splice(targetIndex, 0, draggedItem);
-
-    setSections(updatedSections);
-    setDraggedIndex(null);
-  };
-
   // Skill handlers
   const handleSkillDragStart = (e, index) => {
     e.stopPropagation();
@@ -615,44 +697,50 @@ useEffect(() => {
   };
 
   const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
-  setSections(prev =>
-    prev.map((section, i) => {
-      if (i !== sectionIndex) return section;
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
 
-      if (field === "add") {
+        if (field === "add") {
+          return {
+            ...section,
+            skills: [...section.skills, value],
+          };
+        }
+        if (field === "addTop") {
+          return {
+            ...section,
+            skills: [value, ...section.skills],
+          };
+        }
+
+        if (skillId === null) {
+          return {
+            ...section,
+            [field]: value,
+          };
+        }
+
+        if (field === "delete") {
+          return {
+            ...section,
+            skills: section.skills.filter(
+              skill => skill.id !== skillId
+            ),
+          };
+        }
+
         return {
           ...section,
-          skills: [...section.skills, value],
-        };
-      }
-
-      if (skillId === null) {
-        return {
-          ...section,
-          [field]: value,
-        };
-      }
-
-      if (field === "delete") {
-        return {
-          ...section,
-          skills: section.skills.filter(
-            skill => skill.id !== skillId
+          skills: section.skills.map(skill =>
+            skill.id === skillId
+              ? { ...skill, [field]: value }
+              : skill
           ),
         };
-      }
-
-      return {
-        ...section,
-        skills: section.skills.map(skill =>
-          skill.id === skillId
-            ? { ...skill, [field]: value }
-            : skill
-        ),
-      };
-    })
-  );
-};
+      })
+    );
+  };
 
   // Education handlers
   const handleEducationDragStart = (e, index) => {
@@ -701,8 +789,6 @@ useEffect(() => {
     );
   };
 
-
-
   const handleAddEducation = (sectionIndex) => {
     const newEducation = {
       id: `e${Date.now()}`,
@@ -717,15 +803,11 @@ useEffect(() => {
     setSections(prev =>
       prev.map((section, i) =>
         i === sectionIndex
-          ? {
-            ...section,
-            educations: [...section.educations, newEducation]
-          }
+          ? { ...section, educations: [...section.educations, newEducation] }
           : section
       )
     );
   };
-
 
   // Certification handlers
   const handleCertDragStart = (e, index) => {
@@ -776,8 +858,6 @@ useEffect(() => {
     );
   };
 
-
-
   const handleAddCertification = (sectionIndex) => {
     const newCert = {
       id: `c${Date.now()}`,
@@ -792,15 +872,11 @@ useEffect(() => {
     setSections(prev =>
       prev.map((section, i) =>
         i === sectionIndex
-          ? {
-            ...section,
-            certifications: [...section.certifications, newCert]
-          }
+          ? { ...section, certifications: [...section.certifications, newCert] }
           : section
       )
     );
   };
-
 
   // Experience handlers
   const handleExpDragStart = (e, index) => {
@@ -848,8 +924,6 @@ useEffect(() => {
     );
   };
 
-
-
   const handleAddExperience = (sectionIndex) => {
     setSections(prevSections =>
       prevSections.map((section, sIndex) => {
@@ -874,7 +948,7 @@ useEffect(() => {
     );
   };
 
-
+  // Custom section handlers
   const handleCustomDragStart = (e, index) => {
     e.stopPropagation();
     setDraggedCustomIndex(index);
@@ -904,9 +978,7 @@ useEffect(() => {
         if (field === "delete") {
           return {
             ...section,
-            items: section.items.filter(
-              item => item.id !== itemId
-            ),
+            items: section.items.filter(item => item.id !== itemId),
           };
         }
         return {
@@ -921,7 +993,6 @@ useEffect(() => {
     );
   };
 
-
   const handleAddCustomItem = (sectionIndex) => {
     const newItem = {
       id: `custom_${Date.now()}`,
@@ -935,29 +1006,28 @@ useEffect(() => {
     setSections(prev =>
       prev.map((section, i) =>
         i === sectionIndex
-          ? {
-            ...section,
-            items: [...section.items, newItem]
-          }
+          ? { ...section, items: [...section.items, newItem] }
           : section
       )
     );
   };
 
-
-  const handleCoreCompetencyUpdate = (sectionIndex, itemIndex, field, value) => {
+  // Simple custom section handler
+  const handleSimpleCustomUpdate = (sectionIndex, itemIndex, field, value) => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
 
-        if (itemIndex === null) {
+        if (itemIndex === null && field !== "add") {
+          return { ...section, [field]: value };
+        }
+        if (field === "add") {
           return {
             ...section,
-            [field]: value,
+            items: [...(section.items || []), value]
           };
         }
 
-        // delete
         if (field === "delete") {
           return {
             ...section,
@@ -965,7 +1035,35 @@ useEffect(() => {
           };
         }
 
-        // update name / level
+        return {
+          ...section,
+          items: section.items.map((item, idx) => {
+            if (idx !== itemIndex) return item;
+            const itemObj = typeof item === 'object' ? item : { name: item, level: 2 };
+            return { ...itemObj, [field]: value };
+          }),
+        };
+      })
+    );
+  };
+
+  // Core competencies handler
+  const handleCoreCompetencyUpdate = (sectionIndex, itemIndex, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+
+        if (itemIndex === null) {
+          return { ...section, [field]: value };
+        }
+
+        if (field === "delete") {
+          return {
+            ...section,
+            items: section.items.filter((_, idx) => idx !== itemIndex),
+          };
+        }
+
         return {
           ...section,
           items: section.items.map((item, idx) =>
@@ -976,9 +1074,221 @@ useEffect(() => {
     );
   };
 
+  // Hobbies handler
+  const handleHobbiesUpdate = (sectionIndex, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : { ...section, [field]: value }
+      )
+    );
+  };
 
+  // Courses handlers
+  const handleCourseDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedCourseIndex(index);
+  };
 
+  const handleCourseDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedCourseIndex === null || draggedCourseIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].courses];
+    const [moved] = list.splice(draggedCourseIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].courses = list;
+    setSections(updatedSections);
+    setDraggedCourseIndex(null);
+  };
 
+  const handleCourseUpdate = (sectionIndex, courseId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === 'delete') {
+          return { ...section, courses: section.courses.filter(c => c.id !== courseId) };
+        }
+        return {
+          ...section,
+          courses: section.courses.map(c =>
+            c.id === courseId ? { ...c, [field]: value } : c
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddCourse = (sectionIndex) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : {
+          ...section,
+          courses: [...(section.courses || []), {
+            id: `course_${Date.now()}`,
+            course: '',
+            institution: '',
+            startDate: '',
+            endDate: '',
+          }]
+        }
+      )
+    );
+  };
+
+  // Languages handlers
+  const handleLanguageDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedLanguageIndex(index);
+  };
+
+  const handleLanguageDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedLanguageIndex === null || draggedLanguageIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].languages];
+    const [moved] = list.splice(draggedLanguageIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].languages = list;
+    setSections(updatedSections);
+    setDraggedLanguageIndex(null);
+  };
+
+  const handleLanguageUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (itemId === null && field !== 'add') {
+          return { ...section, [field]: value };
+        }
+        if (field === 'add') {
+          return { ...section, languages: [...(section.languages || []), value] };
+        }
+        if (field === 'delete') {
+          return { ...section, languages: section.languages.filter(l => l.id !== itemId) };
+        }
+        return {
+          ...section,
+          languages: section.languages.map(l =>
+            l.id === itemId ? { ...l, [field]: value } : l
+          ),
+        };
+      })
+    );
+  };
+
+  // Internships handlers
+  const handleInternshipDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedInternshipIndex(index);
+  };
+
+  const handleInternshipDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedInternshipIndex === null || draggedInternshipIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].internships];
+    const [moved] = list.splice(draggedInternshipIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].internships = list;
+    setSections(updatedSections);
+    setDraggedInternshipIndex(null);
+  };
+
+  const handleInternshipUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === 'delete') {
+          return { ...section, internships: section.internships.filter(item => item.id !== itemId) };
+        }
+        return {
+          ...section,
+          internships: section.internships.map(item =>
+            item.id === itemId ? { ...item, [field]: value } : item
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddInternship = (sectionIndex) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : {
+          ...section,
+          internships: [...(section.internships || []), {
+            id: `intern_${Date.now()}`,
+            jobTitle: '',
+            employer: '',
+            city: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+            isCurrentlyInterning: false,
+          }]
+        }
+      )
+    );
+  };
+
+  // Activities handlers
+  const handleActivityDragStart = (e, index) => {
+    e.stopPropagation();
+    setDraggedActivityIndex(index);
+  };
+
+  const handleActivityDrop = (e, sectionIndex, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedActivityIndex === null || draggedActivityIndex === targetIndex) return;
+    const updatedSections = [...sections];
+    const list = [...updatedSections[sectionIndex].activities];
+    const [moved] = list.splice(draggedActivityIndex, 1);
+    list.splice(targetIndex, 0, moved);
+    updatedSections[sectionIndex].activities = list;
+    setSections(updatedSections);
+    setDraggedActivityIndex(null);
+  };
+
+  const handleActivityUpdate = (sectionIndex, itemId, field, value) => {
+    setSections(prev =>
+      prev.map((section, i) => {
+        if (i !== sectionIndex) return section;
+        if (field === 'delete') {
+          return { ...section, activities: section.activities.filter(a => a.id !== itemId) };
+        }
+        return {
+          ...section,
+          activities: section.activities.map(a =>
+            a.id === itemId ? { ...a, [field]: value } : a
+          ),
+        };
+      })
+    );
+  };
+
+  const handleAddActivity = (sectionIndex) => {
+    setSections(prev =>
+      prev.map((section, i) =>
+        i !== sectionIndex ? section : {
+          ...section,
+          activities: [...(section.activities || []), {
+            id: `activity_${Date.now()}`,
+            functionTitle: '',
+            employer: '',
+            city: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+            isCurrentlyActive: false,
+          }]
+        }
+      )
+    );
+  };
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
@@ -987,16 +1297,21 @@ useEffect(() => {
       defaultResumeSettings.theme.defaultColor;
 
     setThemeColor(color);
+    setResumeSettings(prev => ({
+      ...prev,
+      theme: {
+        ...prev.theme,
+        template: id,
+      },
+    }));
   };
 
   const handleAddNewSection = (newSection) => {
     const newId = Math.max(...sections.map(s => s.id), -1) + 1;
-    const sectionToAdd = {
-      id: newId,
-      ...newSection
-    };
+    const sectionToAdd = { id: newId, ...newSection };
     setSections([...sections, sectionToAdd]);
   };
+
   const handleSectionTitleUpdate = (sectionIndex, newTitle) => {
     const updatedSections = [...sections];
     updatedSections[sectionIndex] = {
@@ -1020,6 +1335,8 @@ useEffect(() => {
     }, 500);
   };
 
+  // Dummy handler for child components
+  const handleDragEnd = () => { };
 
   return (
     <div className='lg:flex gap-1 pb-0'>
@@ -1032,194 +1349,253 @@ useEffect(() => {
             <div className='mb-10'>
 
               {/* Resume Score */}
-
               <ImpResumeScore
-                score={checkATSData?.ATS_Score}
+                score={checkJdAtsData?.ATS_Score}
                 loading={atsLoading}
-                guide={checkATSData?.Improvment_Guide}
+                guide={checkJdAtsData?.Improvment_Guide}
               />
 
               {/* Personal Details */}
               <ImpPersonalDetails register={register} watch={watch} selectedTemplate={selectedTemplate} setValue={setValue} />
 
-              {/* Dynamic Sections */}
-              <div className="space-y-2">
-                {sections.map((section, index) => (
-                  <div
-                    key={section.id}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, index)}
-                    className={`
-                      mb-[4px] transition-all duration-200 bg-white rounded-xl section-item
-                      ${draggedIndex === index
-                        ? "opacity-20 border-cyan-500 scale-95"
-                        : "opacity-100 border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-300"
-                      }`}
-                  >
-                    <div
-                      className={`
-                      acco_section
-                      transition-all duration-300 ease-in-out
-                      ${deletingSectionIndex === index
-                          ? "!bg-red-400 !-translate-x-6 !opacity-0"
-                          : "!bg-white !opacity-100 !translate-x-0"}
-                      `}
-                    >
-                      <Accordion flush={true}>
-                        <AccordionPanel>
-                          <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
-                            <div className="flex items-center gap-2 flex-1">
+              {/* Dynamic Sections with @dnd-kit */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleSectionDragEnd}
+              >
+                <SortableContext
+                  items={sections.map(s => s.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {sections.map((section, index) => (
+                      <DraggableWrapper key={section.id} id={section.id}>
+                        <div
+                          className={`
+                            mb-[4px] transition-all duration-200 bg-white rounded-xl section-item
+                            ${deletingSectionIndex === index
+                              ? "!bg-red-400 !-translate-x-6 !opacity-0"
+                              : "!bg-white !opacity-100 !translate-x-0"}
+                          `}
+                        >
+                          <div className="acco_section">
+                            <Accordion flush={true}>
+                              <AccordionPanel>
+                                <AccordionTitle className="group font-bold text-xl flex items-center justify-between">
+                                  <div className="flex items-center gap-2 flex-1">
+                                    <DragIcon />
 
-                              <span
-                                className="drag-wrapper cursor-grab active:cursor-grabbing"
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, index)}
-                                onDragEnd={handleDragEnd}
-                              >
-                                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-                              </span>
+                                    {editingSectionIndex === index ? (
+                                      <input
+                                        autoFocus
+                                        defaultValue={section.title}
+                                        onBlur={(e) => {
+                                          setEditingSectionIndex(null);
+                                          if (e.target.value.trim()) {
+                                            handleSectionTitleUpdate(index, e.target.value.trim());
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") e.target.blur();
+                                        }}
+                                        className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
+                                      />
+                                    ) : (
+                                      <span
+                                        className="cursor-pointer"
+                                        onClick={() => setEditingSectionIndex(index)}
+                                      >
+                                        {section.title}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="
+                                      flex items-center gap-3
+                                      opacity-0 translate-x-2
+                                      group-hover:opacity-100 group-hover:translate-x-0
+                                      transition-all duration-200
+                                    "
+                                  >
+                                    <FaPen
+                                      className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingSectionIndex(index);
+                                      }}
+                                    />
+                                    <FaTrash
+                                      className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAnimatedDeleteSection(index);
+                                      }}
+                                    />
+                                  </div>
+                                </AccordionTitle>
 
-                              {editingSectionIndex === index ? (
-                                <input
-                                  autoFocus
-                                  defaultValue={section.title}
-                                  onBlur={(e) => {
-                                    setEditingSectionIndex(null);
-                                    if (e.target.value.trim()) {
-                                      handleSectionTitleUpdate(index, e.target.value.trim());
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") e.target.blur();
-                                  }}
-                                  className="bg-transparent border-b border-gray-300 outline-none text-xl font-bold w-full"
-                                />
-                              ) : (
-                                <span
-                                  className="cursor-pointer"
-                                  onClick={() => setEditingSectionIndex(index)}
-                                >
-                                  {section.title}
-                                </span>
-                              )}
-                            </div>
-                            <div
-                              className="
-                                flex items-center gap-3
-                                opacity-0 translate-x-2
-                                group-hover:opacity-100 group-hover:translate-x-0
-                                transition-all duration-200
-                              "
-                            >
-                              <FaPen
-                                className="text-sm text-gray-400 hover:text-purple-600 cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingSectionIndex(index);
-                                }}
-                              />
+                                <AccordionContent className='pt-0'>
 
-                              <FaTrash
-                                className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAnimatedDeleteSection(index);
-                                }}
-                              />
-                            </div>
-                          </AccordionTitle>
+                                  {section.type === 'skills' && (
+                                    <ImpSkills
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleSkillUpdate={handleSkillUpdate}
+                                      handleSkillDragStart={handleSkillDragStart}
+                                      handleSkillDrop={handleSkillDrop}
+                                      draggedSkillIndex={draggedSkillIndex}
+                                      setDraggedSkillIndex={setDraggedSkillIndex}
+                                    />
+                                  )}
 
-                          <AccordionContent className='pt-0'>
+                                  {section.type === "summary" && (
+                                    <ImpSummary
+                                      watch={watch}
+                                      setValue={setValue}
+                                      sections={sections}
+                                      setSections={setSections}
+                                      sectionIndex={index}
+                                      onAtsRefresh={handleAtsRefresh}
+                                    />
+                                  )}
 
-                            {section.type === 'skills' && (
-                              <ImpSkills
-                                section={section}
-                                sectionIndex={index}
-                                handleSkillUpdate={handleSkillUpdate}
-                                handleSkillDragStart={handleSkillDragStart}
-                                handleSkillDrop={handleSkillDrop}
-                                draggedSkillIndex={draggedSkillIndex}
-                                setDraggedSkillIndex={setDraggedSkillIndex}
-                              />
-                            )}
+                                  {section.type === "education" && (
+                                    <ImpEducation
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleEducationUpdate={handleEducationUpdate}
+                                      handleEducationDragStart={handleEducationDragStart}
+                                      handleEducationDrop={handleEducationDrop}
+                                      handleAddEducation={handleAddEducation}
+                                      draggedEducationIndex={draggedEducationIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
-                            {section.type === "summary" && (
-                              <ImpSummary watch={watch} setValue={setValue} sections={sections} setSections={setSections} sectionIndex={index}/>
-                            )}
+                                  {section.type === "certifications" && (
+                                    <ImpCertifications
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleCertUpdate={handleCertUpdate}
+                                      handleCertDragStart={handleCertDragStart}
+                                      handleCertDrop={handleCertDrop}
+                                      handleAddCertification={handleAddCertification}
+                                      draggedCertIndex={draggedCertIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
-                            {section.type === "education" && (
-                              <ImpEducation
-                                section={section}
-                                sectionIndex={index}
-                                handleEducationUpdate={handleEducationUpdate}
-                                handleEducationDragStart={handleEducationDragStart}
-                                handleEducationDrop={handleEducationDrop}
-                                handleAddEducation={handleAddEducation}
-                                draggedEducationIndex={draggedEducationIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
+                                  {section.type === "experience" && (
+                                    <ImpExperience
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleExpUpdate={handleExpUpdate}
+                                      handleExpDragStart={handleExpDragStart}
+                                      handleExpDrop={handleExpDrop}
+                                      handleAddExperience={handleAddExperience}
+                                      draggedExpIndex={draggedExpIndex}
+                                      handleDragEnd={handleDragEnd}
+                                      onAtsRefresh={handleAtsRefresh}
+                                    />
+                                  )}
 
-                            {section.type === "certifications" && (
-                              <ImpCertifications
-                                section={section}
-                                sectionIndex={index}
-                                handleCertUpdate={handleCertUpdate}
-                                handleCertDragStart={handleCertDragStart}
-                                handleCertDrop={handleCertDrop}
-                                handleAddCertification={handleAddCertification}
-                                draggedCertIndex={draggedCertIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
+                                  {section.type === "hobbies" && (
+                                    <ImpHobbies
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleHobbiesUpdate}
+                                    />
+                                  )}
 
-                            {section.type === "experience" && (
-                              <ImpExperience
-                                section={section}
-                                sectionIndex={index}
-                                handleExpUpdate={handleExpUpdate}
-                                handleExpDragStart={handleExpDragStart}
-                                handleExpDrop={handleExpDrop}
-                                handleAddExperience={handleAddExperience}
-                                draggedExpIndex={draggedExpIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
-                            {section.type === "core_competencies" && (
-                              <ImpCoreCompetencies
-                                section={section}
-                                sectionIndex={index}
-                                handleUpdate={handleCoreCompetencyUpdate}
-                                handleDragStart={handleCustomDragStart}
-                                handleDrop={handleCustomDrop}
-                                draggedIndex={draggedCustomIndex}
-                                setDraggedIndex={setDraggedCustomIndex}
-                              />
-                            )}
+                                  {section.type === "courses" && (
+                                    <ImpCourses
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleCourseUpdate}
+                                      handleDragStart={handleCourseDragStart}
+                                      handleDrop={handleCourseDrop}
+                                      handleAddCourse={handleAddCourse}
+                                      draggedIndex={draggedCourseIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
-                            {section.type === "custom" && (
-                              <ImpCustomSection
-                                section={section}
-                                sectionIndex={index}
-                                handleCustomUpdate={handleCustomUpdate}
-                                handleCustomDragStart={handleCustomDragStart}
-                                handleCustomDrop={handleCustomDrop}
-                                handleAddCustomItem={handleAddCustomItem}
-                                draggedIndex={draggedCustomIndex}
-                                handleDragEnd={handleDragEnd}
-                              />
-                            )}
+                                  {section.type === "languages" && (
+                                    <ImpLanguages
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleLanguageUpdate}
+                                      handleDragStart={handleLanguageDragStart}
+                                      handleDrop={handleLanguageDrop}
+                                      draggedIndex={draggedLanguageIndex}
+                                      setDraggedIndex={setDraggedLanguageIndex}
+                                    />
+                                  )}
 
+                                  {section.type === "internships" && (
+                                    <ImpInternships
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleInternshipUpdate}
+                                      handleDragStart={handleInternshipDragStart}
+                                      handleDrop={handleInternshipDrop}
+                                      handleAddInternship={handleAddInternship}
+                                      draggedIndex={draggedInternshipIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
+                                  {section.type === "activities" && (
+                                    <ImpActivities
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleActivityUpdate}
+                                      handleDragStart={handleActivityDragStart}
+                                      handleDrop={handleActivityDrop}
+                                      handleAddActivity={handleAddActivity}
+                                      draggedIndex={draggedActivityIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
 
-                          </AccordionContent>
-                        </AccordionPanel>
-                      </Accordion>
-                    </div>
+                                  {section.type === "custom_simple" && (
+                                    <ImpSimpleCustomSection
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleUpdate={handleSimpleCustomUpdate}
+                                      handleDragStart={handleCustomDragStart}
+                                      handleDrop={handleCustomDrop}
+                                      draggedIndex={draggedCustomIndex}
+                                      setDraggedIndex={setDraggedCustomIndex}
+                                    />
+                                  )}
+
+                                  {section.type === "custom" && (
+                                    <ImpCustomSection
+                                      section={section}
+                                      sectionIndex={index}
+                                      handleCustomUpdate={handleCustomUpdate}
+                                      handleCustomDragStart={handleCustomDragStart}
+                                      handleCustomDrop={handleCustomDrop}
+                                      handleAddCustomItem={handleAddCustomItem}
+                                      draggedIndex={draggedCustomIndex}
+                                      handleDragEnd={handleDragEnd}
+                                    />
+                                  )}
+
+                                </AccordionContent>
+                              </AccordionPanel>
+                            </Accordion>
+                          </div>
+                        </div>
+                      </DraggableWrapper>
+                    ))}
                   </div>
-                ))}
-                <AddSectionButton onAddNewSection={handleAddNewSection} />
-              </div>
+                </SortableContext>
+              </DndContext>
+
+              <AddSectionButton onAddNewSection={handleAddNewSection} sections={sections} />
             </div>
           </form>
         ) : (
@@ -1228,12 +1604,13 @@ useEffect(() => {
               selectedTemplate={selectedTemplate}
               onSelectTemplate={handleSelectTemplate}
               themeColor={themeColor}
-              setThemeColor={setThemeColor}
+              setThemeColor={handleThemeColorChange}
               resumeSettings={resumeSettings}
               setResumeSettings={setResumeSettings}
             />
           </div>
         )}
+
         <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
           {savingStatus === 'saving' && (
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
@@ -1261,7 +1638,13 @@ useEffect(() => {
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
         <div className='h-screen overflow-y-scroll'>
           <div ref={componentRef}>
-            <ActiveResume formData={formValues} sections={sections} themeColor={themeColor} setValue={setValue} resumeSettings={resumeSettings} />
+            <ActiveResume
+              formData={formValues}
+              sections={sections}
+              themeColor={themeColor}
+              setValue={setValue}
+              resumeSettings={resumeSettings}
+            />
           </div>
         </div>
       </div>
