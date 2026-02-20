@@ -50,6 +50,7 @@ import { defaultResumeSettings } from "../config/defaultResumeSettings";
 
 const Page = () => {
   const componentRef = useRef();
+  const templateTextSettings = useRef({});
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
@@ -1290,21 +1291,51 @@ const Page = () => {
     );
   };
 
-  const handleSelectTemplate = (id) => {
-    setSelectedTemplate(id);
-    const color =
-      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
-      defaultResumeSettings.theme.defaultColor;
+  // const handleSelectTemplate = (id) => {
+  //   setSelectedTemplate(id);
+  //   const color =
+  //     defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+  //     defaultResumeSettings.theme.defaultColor;
 
-    setThemeColor(color);
-    setResumeSettings(prev => ({
-      ...prev,
-      theme: {
-        ...prev.theme,
-        template: id,
-      },
-    }));
-  };
+  //   setThemeColor(color);
+  //   setResumeSettings(prev => ({
+  //     ...prev,
+  //     theme: {
+  //       ...prev.theme,
+  //       template: id,
+  //     },
+  //   }));
+  // };
+
+  const handleSelectTemplate = (id) => {
+      const templateKey = id.toLowerCase();
+  
+      const currentTemplate = resumeSettings.theme?.template;
+      if (currentTemplate) {
+        templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
+      }
+  
+      setSelectedTemplate(id);
+  
+      const color =
+        defaultResumeSettings.theme.templateColors[templateKey] ||
+        defaultResumeSettings.theme.defaultColor;
+      setThemeColor(color);
+  
+      const savedTextForTemplate = templateTextSettings.current[templateKey];
+      const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
+  
+      const newText = savedTextForTemplate
+        ? savedTextForTemplate
+        : { ...defaultResumeSettings.text, ...textOverrides };
+  
+      setResumeSettings(prev => ({
+        ...prev,
+        theme: { ...prev.theme, template: id },
+        text: newText,
+      }));
+    };
+  
 
   const handleAddNewSection = (newSection) => {
     const newId = Math.max(...sections.map(s => s.id), -1) + 1;

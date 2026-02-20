@@ -50,21 +50,6 @@ export default function RootLayout({ children }) {
             </ClientLayoutWrapper>
           </Providers>
         </GoogleOAuthProvider>
-
-        {/* <Providers>
-          <main>
-            <div className="lg:flex gap-10 bg-[#F3F3F3] p-5">
-              <div className="sidebar_area w-2/12">
-                <Sidebar />
-              </div>
-              <div className="content_area w-full lg:w-10/12">
-                <Insideheader />
-                {children}
-              </div>
-            </div>
-          </main>
-        </Providers> */}
-
       </body>
     </html>
   );

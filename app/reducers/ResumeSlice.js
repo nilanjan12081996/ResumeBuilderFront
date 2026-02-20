@@ -224,7 +224,7 @@ export const saveTemplate = createAsyncThunk(
 
 export const getSingleResume = createAsyncThunk(
     'getSingleResume',
-    async ({ id ,fetch}, { rejectWithValue }) => {
+    async ({ id, fetch }, { rejectWithValue }) => {
         try {
             const response = await api.get(`/api/resume/single-data?id=${id}&fetch=${fetch}`);
             if (response?.data?.statusCode === 200) {
@@ -364,6 +364,63 @@ export const saveResumeLinkedIn = createAsyncThunk(
     }
 )
 
+export const generatePDF = createAsyncThunk(
+    'generatePDF',
+    async (htmlContent, { rejectWithValue }) => {
+        try {
+
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pdf/convert`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: htmlContent,
+                }
+            );
+
+            if (!response.ok) {
+                return rejectWithValue(`Server error: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            return blob;
+
+        } catch (err) {
+            return rejectWithValue(err?.message || 'PDF generation failed');
+        }
+    }
+)
+export const generateDocx = createAsyncThunk(
+    'generateDocx',
+    async (htmlContent, { rejectWithValue }) => {
+        try {
+
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pdf/convert/doc`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: htmlContent,
+                }
+            );
+
+            if (!response.ok) {
+                return rejectWithValue(`Server error: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            return blob;
+
+        } catch (err) {
+            return rejectWithValue(err?.message || 'PDF generation failed');
+        }
+    }
+)
+
 const initialState = {
     loading: false,
     error: false,
@@ -378,7 +435,11 @@ const initialState = {
     saveTemplateInfo: "",
     singleResumeInfo: "",
     updateBasicInfoData: "",
-    saveResumeData: ""
+    saveResumeData: "",
+    pdfLoading: false,
+    pdfError: null,
+    docxLoading: false,
+    docxError: null,
 }
 const ResumeSlice = createSlice(
     {
@@ -530,7 +591,7 @@ const ResumeSlice = createSlice(
                     state.loading = false
                     state.error = payload
                 })
-                 .addCase(saveResumeImprove.pending, (state) => {
+                .addCase(saveResumeImprove.pending, (state) => {
                     state.loading = true
                 })
                 .addCase(saveResumeImprove.fulfilled, (state, { payload }) => {
@@ -543,7 +604,7 @@ const ResumeSlice = createSlice(
                     state.error = payload
                 })
 
-                 .addCase(saveResumeJd.pending, (state) => {
+                .addCase(saveResumeJd.pending, (state) => {
                     state.loading = true
                 })
                 .addCase(saveResumeJd.fulfilled, (state, { payload }) => {
@@ -569,6 +630,31 @@ const ResumeSlice = createSlice(
                     state.error = payload
                 })
 
+                .addCase(generatePDF.pending, (state) => {
+                    state.pdfLoading = true;
+                    state.pdfError = null;
+                })
+                .addCase(generatePDF.fulfilled, (state) => {
+                    state.pdfLoading = false;
+                    state.pdfError = null;
+                })
+                .addCase(generatePDF.rejected, (state, { payload }) => {
+                    state.pdfLoading = false;
+                    state.pdfError = payload;
+                })
+
+                .addCase(generateDocx.pending, (state) => {
+                    state.docxLoading = true;
+                    state.docxError = null;
+                })
+                .addCase(generateDocx.fulfilled, (state) => {
+                    state.docxLoading = false;
+                    state.docxError = null;
+                })
+                .addCase(generateDocx.rejected, (state, { payload }) => {
+                    state.docxLoading = false;
+                    state.docxError = payload;
+                })
         }
     }
 )

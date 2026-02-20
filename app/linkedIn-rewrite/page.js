@@ -49,6 +49,7 @@ import { defaultResumeSettings } from "../config/defaultResumeSettings";
 
 const LinkedInResumeBuilder = () => {
   const componentRef = useRef();
+  const templateTextSettings = useRef({});
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
@@ -79,18 +80,18 @@ const LinkedInResumeBuilder = () => {
   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
 
   // ── ATS REFRESH ──
-const handleAtsRefresh = () => {
+  const handleAtsRefresh = () => {
     const payload = {
-        ...formValues, 
-        sections,
-        resume_type: "linkedin",
+      ...formValues,
+      sections,
+      resume_type: "linkedin",
     };
     dispatch(checkATS({
-        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-        resume_data: JSON.stringify(payload),
-        Ats_score: 0,
+      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+      resume_data: JSON.stringify(payload),
+      Ats_score: 0,
     }));
-};
+  };
 
   // States
   const [selectedTemplate, setSelectedTemplate] = useState('linkedin');
@@ -895,14 +896,44 @@ const handleAtsRefresh = () => {
   // ═══════════════════════════════════════════════════════════════
   //  TEMPLATE / SECTION HANDLERS
   // ═══════════════════════════════════════════════════════════════
+  // const handleSelectTemplate = (id) => {
+  //   setSelectedTemplate(id);
+  //   const color =
+  //     defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+  //     defaultResumeSettings.theme.defaultColor;
+  //   setThemeColor(color);
+  //   setResumeSettings(prev => ({ ...prev, theme: { ...prev.theme, template: id } }));
+  // };
+
   const handleSelectTemplate = (id) => {
+    const templateKey = id.toLowerCase();
+
+    const currentTemplate = resumeSettings.theme?.template;
+    if (currentTemplate) {
+      templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
+    }
+
     setSelectedTemplate(id);
+
     const color =
-      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+      defaultResumeSettings.theme.templateColors[templateKey] ||
       defaultResumeSettings.theme.defaultColor;
     setThemeColor(color);
-    setResumeSettings(prev => ({ ...prev, theme: { ...prev.theme, template: id } }));
+
+    const savedTextForTemplate = templateTextSettings.current[templateKey];
+    const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
+
+    const newText = savedTextForTemplate
+      ? savedTextForTemplate
+      : { ...defaultResumeSettings.text, ...textOverrides };
+
+    setResumeSettings(prev => ({
+      ...prev,
+      theme: { ...prev.theme, template: id },
+      text: newText,
+    }));
   };
+
 
   const handleAddNewSection = (newSection) => {
     const newId = sections.length > 0 ? Math.max(...sections.map(s => s.id)) + 1 : 0;

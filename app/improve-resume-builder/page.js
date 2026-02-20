@@ -44,12 +44,14 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
 import { checkATS } from '../reducers/DashboardSlice';
-import { getSingleResume, saveResumeImprove } from '../reducers/ResumeSlice';
+import { generatePDF, getSingleResume, saveResumeImprove } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ImpSimpleCustomSection from './components/Impsimplecustomsection';
+import { useDownload } from '../hooks/useDownload';
 
 const Page = () => {
   const componentRef = useRef();
+  const templateTextSettings = useRef({});
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
@@ -343,8 +345,8 @@ const Page = () => {
 
     const summaryText = hasProfileSummary
       ? (profileSummaryContent.length > 1
-          ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
-          : profileSummaryContent[0])
+        ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : profileSummaryContent[0])
       : (resumeData?.professional_summary?.summary_text || "");
 
     const summaryTitle = profileSummaryKey || "Professional Summary";
@@ -392,19 +394,19 @@ const Page = () => {
 
     const educationSection = (resumeData?.education || []).length > 0
       ? {
-          id: id++,
-          title: educationTitle,
-          type: "education",
-          educations: resumeData.education.map((edu, i) => ({
-            id: `e_${i}_${Date.now()}`,
-            institute: edu.institution || "",
-            degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
-            startDate: edu.start_date || "",
-            endDate: edu.graduation_date || "",
-            city: edu.location || "",
-            description: edu.description || "",
-          })),
-        }
+        id: id++,
+        title: educationTitle,
+        type: "education",
+        educations: resumeData.education.map((edu, i) => ({
+          id: `e_${i}_${Date.now()}`,
+          institute: edu.institution || "",
+          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
+          startDate: edu.start_date || "",
+          endDate: edu.graduation_date || "",
+          city: edu.location || "",
+          description: edu.description || "",
+        })),
+      }
       : null;
 
     // ----------------- CERTIFICATIONS -----------------
@@ -415,19 +417,19 @@ const Page = () => {
 
     const certSection = (resumeData?.certifications || []).length > 0
       ? {
-          id: id++,
-          title: certTitle,
-          type: "certifications",
-          certifications: resumeData.certifications.map((c, i) => ({
-            id: `c_${i}_${Date.now()}`,
-            name: c.name || "",
-            organization: c.organization || "",
-            city: "",
-            startYear: "",
-            endYear: "",
-            description: "",
-          })),
-        }
+        id: id++,
+        title: certTitle,
+        type: "certifications",
+        certifications: resumeData.certifications.map((c, i) => ({
+          id: `c_${i}_${Date.now()}`,
+          name: c.name || "",
+          organization: c.organization || "",
+          city: "",
+          startYear: "",
+          endYear: "",
+          description: "",
+        })),
+      }
       : null;
 
     // ----------------- EXPERIENCE -----------------
@@ -438,19 +440,19 @@ const Page = () => {
 
     const experienceSection = (resumeData?.work_experience || []).length > 0
       ? {
-          id: id++,
-          title: experienceTitle,
-          type: "experience",
-          experiences: resumeData.work_experience.map((exp, i) => ({
-            id: `x_${i}_${Date.now()}`,
-            jobTitle: exp.job_title || "",
-            company: exp.company_name || "",
-            city: exp.location || "",
-            startDate: exp.start_date || "",
-            endDate: exp.end_date || "",
-            description: (exp.responsibilities || []).join("<br/>"),
-          })),
-        }
+        id: id++,
+        title: experienceTitle,
+        type: "experience",
+        experiences: resumeData.work_experience.map((exp, i) => ({
+          id: `x_${i}_${Date.now()}`,
+          jobTitle: exp.job_title || "",
+          company: exp.company_name || "",
+          city: exp.location || "",
+          startDate: exp.start_date || "",
+          endDate: exp.end_date || "",
+          description: (exp.responsibilities || []).join("<br/>"),
+        })),
+      }
       : null;
 
     // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
@@ -527,7 +529,7 @@ const Page = () => {
       }
     });
 
-    // ✅ Summary সবার আগে
+
     const sections = [
       ...(summarySection ? [summarySection] : []),
       ...skillsSections,
@@ -562,8 +564,8 @@ const Page = () => {
     const summaryPoints = hasProfileSummary
       ? profileSummaryContent
       : (resumeData?.professional_summary?.summary_text
-          ? [resumeData.professional_summary.summary_text]
-          : []);
+        ? [resumeData.professional_summary.summary_text]
+        : []);
 
     const formattedSummary =
       summaryPoints.length > 1
@@ -1261,18 +1263,31 @@ const Page = () => {
   };
 
   const handleSelectTemplate = (id) => {
-    setSelectedTemplate(id);
-    const color =
-      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
-      defaultResumeSettings.theme.defaultColor;
+    const templateKey = id.toLowerCase();
 
+    const currentTemplate = resumeSettings.theme?.template;
+    if (currentTemplate) {
+      templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
+    }
+
+    setSelectedTemplate(id);
+
+    const color =
+      defaultResumeSettings.theme.templateColors[templateKey] ||
+      defaultResumeSettings.theme.defaultColor;
     setThemeColor(color);
+
+    const savedTextForTemplate = templateTextSettings.current[templateKey];
+    const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
+
+    const newText = savedTextForTemplate
+      ? savedTextForTemplate
+      : { ...defaultResumeSettings.text, ...textOverrides };
+
     setResumeSettings(prev => ({
       ...prev,
-      theme: {
-        ...prev.theme,
-        template: id,
-      },
+      theme: { ...prev.theme, template: id },
+      text: newText,
     }));
   };
 
@@ -1307,6 +1322,8 @@ const Page = () => {
 
   // Dummy handler for child components
   const handleDragEnd = () => { };
+
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
 
   return (
     <div className='lg:flex gap-1 pb-0'>

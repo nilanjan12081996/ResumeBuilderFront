@@ -62,6 +62,7 @@ import { FaLock } from 'react-icons/fa';
 
 const page = () => {
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
+  const templateTextSettings = useRef({});
   const { loading } = useSelector((state) => state?.resume)
   const { profileData } = useSelector((state) => state?.profile)
   const [openModalAnalyzeResume, setOpenModalAnalyzeResume] = useState(false);
@@ -90,14 +91,44 @@ const page = () => {
     defaultResumeSettings.theme.defaultColor
   );
 
-  const handleSelectTemplate = (id) => {
-    setSelectedTemplate(id);
-    const color =
-      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
-      defaultResumeSettings.theme.defaultColor;
+  // const handleSelectTemplate = (id) => {
+  //   setSelectedTemplate(id);
+  //   const color =
+  //     defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+  //     defaultResumeSettings.theme.defaultColor;
 
-    setThemeColor(color);
-  };
+  //   setThemeColor(color);
+  // };
+
+  const handleSelectTemplate = (id) => {
+      const templateKey = id.toLowerCase();
+  
+      const currentTemplate = resumeSettings.theme?.template;
+      if (currentTemplate) {
+        templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
+      }
+  
+      setSelectedTemplate(id);
+  
+      const color =
+        defaultResumeSettings.theme.templateColors[templateKey] ||
+        defaultResumeSettings.theme.defaultColor;
+      setThemeColor(color);
+  
+      const savedTextForTemplate = templateTextSettings.current[templateKey];
+      const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
+  
+      const newText = savedTextForTemplate
+        ? savedTextForTemplate
+        : { ...defaultResumeSettings.text, ...textOverrides };
+  
+      setResumeSettings(prev => ({
+        ...prev,
+        theme: { ...prev.theme, template: id },
+        text: newText,
+      }));
+    };
+  
   const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
 

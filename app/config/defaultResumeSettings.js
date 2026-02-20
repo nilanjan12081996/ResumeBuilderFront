@@ -10,17 +10,23 @@ export const defaultResumeSettings = {
     // Font scale: 0 = S, 1 = M, 2 = L
     fontScale: 1,
 
-    // Font sizes (Prime ATS)
+
     primaryHeading: 24.5,
     secondaryHeading: 18.5,
-    body: 10,
+    body: 9,
     sectionTitle: 12,
 
-    // Font weights (Prime ATS)
+
     primaryHeadingWeight: "700", // Bold
     secondaryHeadingWeight: "700", // Bold
     bodyWeight: "400", // Regular
     sectionTitleWeight: "600", // Semibold
+  },
+
+  templateTextOverrides: {
+    professional: {
+      secondaryHeading: 9,
+    },
   },
 
   layout: {
@@ -42,7 +48,7 @@ export const defaultResumeSettings = {
       clear: "#4B0082",
       vivid: "#FF6F61",
       corporate: "#0B3D91",
-      linkedin:"#293d48"
+      linkedin: "#293d48"
     },
   },
 };

@@ -17,8 +17,10 @@ const FONT_CONTROLS = [
   { key: "sectionTitle", label: "Section Titles", min: 6, max: 35, step: 0.5, unit: "pt" },
 ];
 
-const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
-  const defaultSettings = defaultResumeSettings.text;
+const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedTemplate}) => {
+   const baseDefaults = defaultResumeSettings.text;
+  const templateOverrides = defaultResumeSettings.templateTextOverrides?.[selectedTemplate?.toLowerCase()] || {};
+  const defaultSettings = { ...baseDefaults, ...templateOverrides };
   const lineHeightIndex = LINE_HEIGHT_STEPS.indexOf(textSettings.lineHeight);
 
   const getLineHeightPercent = (value) => {
@@ -64,7 +66,7 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
             }
             className="w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-[#800080]"
           >
-            <option>Roboto Mono</option>
+            <option>Lato</option>
             <option>Inter</option>
             <option>Roboto</option>
             <option>Arial</option>
@@ -109,110 +111,110 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp }) => {
         </span>
       </div>
 
-        <div className="space-y-6">
-          <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
-            Font Size
-          </p>
+      <div className="space-y-6">
+        <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
+          Font Size
+        </p>
 
-          {FONT_CONTROLS.map((item) => {
-            const value = textSettings[item.key];
-            const defaultValue = defaultSettings[item.key]; // get default
-            const percent = ((value - item.min) / (item.max - item.min)) * 100;
+        {FONT_CONTROLS.map((item) => {
+          const value = textSettings[item.key];
+          const defaultValue = defaultSettings[item.key]; // get default
+          const percent = ((value - item.min) / (item.max - item.min)) * 100;
 
-            return (
-              <div className="flex items-center gap-4">
-                <label className="w-36 text-sm font-medium text-gray-600">
-                  {item.label}
-                </label>
-
-                <div className="relative flex-1">
-                  <input
-                    type="range"
-                    min={item.min}
-                    max={item.max}
-                    step={item.step}
-                    value={value}
-                    onChange={(e) =>
-                      setTextSettings({
-                        ...textSettings,
-                        [item.key]: Number(e.target.value),
-                      })
-                    }
-                    style={{ "--fill": `${percent}%` }}
-                    className="step-slider w-full"
-                  />
-                </div>
-
-                {/* Value display */}
-                <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                  {value} {item.unit}
-                </span>
-
-                {/* Set as Default button */}
-                <button
-                  type="button"
-                  className={`px-2 py-1 text-xs font-semibold rounded transition-colors
-    ${value === defaultSettings[item.key]
-                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      : "bg-green-500 text-white hover:bg-green-600"
-                    }`}
-                  onClick={() =>
-                    setTextSettings({
-                      ...textSettings,
-                      [item.key]: defaultSettings[item.key],
-                    })
-                  }
-                  disabled={value === defaultSettings[item.key]} // disable if already default
-                >
-                  Set as Default
-                </button>
-
-              </div>
-
-            );
-          })}
-        </div>
-
-      {/* FONT WEIGHT */}
-        <div className="space-y-6">
-          <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
-            Font Weight
-          </p>
-
-          {[
-            { key: "primaryHeadingWeight", label: "Primary Heading" },
-            { key: "secondaryHeadingWeight", label: "Secondary Heading" },
-            { key: "bodyWeight", label: "Body" },
-            { key: "sectionTitleWeight", label: "Section Titles" },
-          ].map((item) => (
-            <div key={item.key} className="flex items-center gap-4">
+          return (
+            <div className="flex items-center gap-4">
               <label className="w-36 text-sm font-medium text-gray-600">
                 {item.label}
               </label>
 
-              <select
-                value={textSettings[item.key]}
-                onChange={(e) =>
+              <div className="relative flex-1">
+                <input
+                  type="range"
+                  min={item.min}
+                  max={item.max}
+                  step={item.step}
+                  value={value}
+                  onChange={(e) =>
+                    setTextSettings({
+                      ...textSettings,
+                      [item.key]: Number(e.target.value),
+                    })
+                  }
+                  style={{ "--fill": `${percent}%` }}
+                  className="step-slider w-full"
+                />
+              </div>
+
+              {/* Value display */}
+              <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                {value} {item.unit}
+              </span>
+
+              {/* Set as Default button */}
+              <button
+                type="button"
+                className={`px-2 py-1 text-xs font-semibold rounded transition-colors
+    ${value === defaultSettings[item.key]
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-green-500 text-white hover:bg-green-600"
+                  }`}
+                onClick={() =>
                   setTextSettings({
                     ...textSettings,
-                    [item.key]: e.target.value,
+                    [item.key]: defaultSettings[item.key],
                   })
                 }
-                className="flex-1 rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-[#800080]"
+                disabled={value === defaultSettings[item.key]} // disable if already default
               >
-                {FONT_WEIGHT_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              {/* Default breakpoint badge */}
-              <span className={`ml-2 text-xs px-1 rounded ${isDefault(item.key, textSettings[item.key]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
-                {isDefault(item.key, textSettings[item.key]) ? 'Default' : 'Changed'}
-              </span>
+                Set as Default
+              </button>
+
             </div>
-          ))}
-        </div>
+
+          );
+        })}
+      </div>
+
+      {/* FONT WEIGHT */}
+      <div className="space-y-6">
+        <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
+          Font Weight
+        </p>
+
+        {[
+          { key: "primaryHeadingWeight", label: "Primary Heading" },
+          { key: "secondaryHeadingWeight", label: "Secondary Heading" },
+          { key: "bodyWeight", label: "Body" },
+          { key: "sectionTitleWeight", label: "Section Titles" },
+        ].map((item) => (
+          <div key={item.key} className="flex items-center gap-4">
+            <label className="w-36 text-sm font-medium text-gray-600">
+              {item.label}
+            </label>
+
+            <select
+              value={textSettings[item.key]}
+              onChange={(e) =>
+                setTextSettings({
+                  ...textSettings,
+                  [item.key]: e.target.value,
+                })
+              }
+              className="flex-1 rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-[#800080]"
+            >
+              {FONT_WEIGHT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {/* Default breakpoint badge */}
+            <span className={`ml-2 text-xs px-1 rounded ${isDefault(item.key, textSettings[item.key]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
+              {isDefault(item.key, textSettings[item.key]) ? 'Default' : 'Changed'}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

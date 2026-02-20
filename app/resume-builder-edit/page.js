@@ -97,7 +97,7 @@ const page = () => {
   const resume_type = searchParams.get('fetch')
   console.log("resume_id", resume_id);
   console.log("resume_type", resume_type);
-
+  const templateTextSettings = useRef({});
   const user_id = localStorage.getItem('user_id')
   const parseUserId = JSON.parse(user_id)
   const [selectedTemplate, setSelectedTemplate] = useState('ats');
@@ -114,14 +114,44 @@ const page = () => {
     defaultResumeSettings.theme.defaultColor
   );
 
-  const handleSelectTemplate = (id) => {
-    setSelectedTemplate(id);
-    const color =
-      defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
-      defaultResumeSettings.theme.defaultColor;
+  // const handleSelectTemplate = (id) => {
+  //   setSelectedTemplate(id);
+  //   const color =
+  //     defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
+  //     defaultResumeSettings.theme.defaultColor;
 
+  //   setThemeColor(color);
+  // };
+
+  const handleSelectTemplate = (id) => {
+    const templateKey = id.toLowerCase();
+
+    const currentTemplate = resumeSettings.theme?.template;
+    if (currentTemplate) {
+      templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
+    }
+
+    setSelectedTemplate(id);
+
+    const color =
+      defaultResumeSettings.theme.templateColors[templateKey] ||
+      defaultResumeSettings.theme.defaultColor;
     setThemeColor(color);
+
+    const savedTextForTemplate = templateTextSettings.current[templateKey];
+    const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
+
+    const newText = savedTextForTemplate
+      ? savedTextForTemplate
+      : { ...defaultResumeSettings.text, ...textOverrides };
+
+    setResumeSettings(prev => ({
+      ...prev,
+      theme: { ...prev.theme, template: id },
+      text: newText,
+    }));
   };
+
 
 
   const ActiveResume = templateMap[selectedTemplate] || Professional;
@@ -260,8 +290,8 @@ const page = () => {
 
     const dataToSave = {
       ...data,
-      activeSections: activeSections,  
-      sectionOrder: sectionOrder,    
+      activeSections: activeSections,
+      sectionOrder: sectionOrder,
       resume_type: resume_type || "scratch",
       mongo_id: resumeIds.mongo_id,
       mysql_id: resumeIds.mysql_id
@@ -405,7 +435,7 @@ const page = () => {
       }
 
       // ✅ Load Simple Custom Sections
-      const simpleCustomKeys = Object.keys(resumeData).filter(key => 
+      const simpleCustomKeys = Object.keys(resumeData).filter(key =>
         key.startsWith('customSimpleHistory_custom_simple_')
       );
 
@@ -442,7 +472,7 @@ const page = () => {
       }
 
       // ✅ Load Advanced Custom Sections
-      const advancedCustomKeys = Object.keys(resumeData).filter(key => 
+      const advancedCustomKeys = Object.keys(resumeData).filter(key =>
         key.startsWith('customAdvancedHistory_custom_advanced_')
       );
 
@@ -535,11 +565,11 @@ const page = () => {
 
   const handleAddNewSection = (sectionData) => {
     const timestamp = Date.now();
-    
+
     if (sectionData.id === 'custom_simple') {
       // ✅ Simple custom section with smart auto-incrementing name
       const newSectionId = `custom_simple_${timestamp}`;
-      
+
       // Get all existing simple custom section titles
       const existingTitles = activeSections
         .filter(id => typeof id === 'string' && id.startsWith('custom_simple_'))
@@ -548,20 +578,20 @@ const page = () => {
           return watch(titleKey) || "";
         })
         .filter(title => title.trim() !== "");
-      
+
       // Generate unique title
       let defaultTitle = "Custom Section (Simple)";
       let counter = 1;
-      
+
       // Check if base title exists
       while (existingTitles.includes(defaultTitle)) {
         defaultTitle = `Custom Section (Simple) ${counter}`;
         counter++;
       }
-      
+
       setActiveSections((prev) => [...prev, newSectionId]);
       setSectionOrder((prev) => [...prev, newSectionId]);
-      
+
       // Initialize with default data
       setValue(`customSimpleHistory_${newSectionId}`, [{
         name: "",
@@ -569,11 +599,11 @@ const page = () => {
       }]);
       setValue(`customSimpleTitle_${newSectionId}`, defaultTitle);
       setValue(`customSimpleHideLevel_${newSectionId}`, true);
-      
+
     } else if (sectionData.id === 'custom_advanced') {
       // ✅ Advanced custom section with smart auto-incrementing name
       const newSectionId = `custom_advanced_${timestamp}`;
-      
+
       // Get all existing advanced custom section titles
       const existingTitles = activeSections
         .filter(id => typeof id === 'string' && id.startsWith('custom_advanced_'))
@@ -582,20 +612,20 @@ const page = () => {
           return watch(titleKey) || "";
         })
         .filter(title => title.trim() !== "");
-      
+
       // Generate unique title
       let defaultTitle = "Custom Section (Advanced)";
       let counter = 1;
-      
+
       // Check if base title exists
       while (existingTitles.includes(defaultTitle)) {
         defaultTitle = `Custom Section (Advanced) ${counter}`;
         counter++;
       }
-      
+
       setActiveSections((prev) => [...prev, newSectionId]);
       setSectionOrder((prev) => [...prev, newSectionId]);
-      
+
       // Initialize with default data
       setValue(`customAdvancedHistory_${newSectionId}`, [{
         title: "",
@@ -606,7 +636,7 @@ const page = () => {
         isOngoing: false
       }]);
       setValue(`customAdvancedTitle_${newSectionId}`, defaultTitle);
-      
+
     } else {
       // Existing sections
       if (!activeSections.includes(sectionData.id)) {
@@ -991,15 +1021,15 @@ const page = () => {
                             // Static section titles
                             sectionTitle =
                               sectionId === 'employment' ? (watch('employmentSectionTitle') || "Employment History") :
-                              sectionId === 'education' ? (watch('educationSectionTitle') || "Education") :
-                              sectionId === 'skills' ? (watch('skillSectionTitle') || "Skills") :
-                              sectionId === 'summary' ? (watch('summarySectionTitle') || "Personal Summary") :
-                              sectionId === 'courses' ? (watch('coursesSectionTitle') || "Courses") :
-                              sectionId === 'hobbies' ? (watch('hobbiesSectionTitle') || "Hobbies") :
-                              sectionId === 'activities' ? (watch('activitiesSectionTitle') || "Activities") :
-                              sectionId === 'languages' ? (watch('languagesSectionTitle') || "Languages") :
-                              sectionId === 'internships' ? (watch('internshipsSectionTitle') || "Internships") :
-                              "Section";
+                                sectionId === 'education' ? (watch('educationSectionTitle') || "Education") :
+                                  sectionId === 'skills' ? (watch('skillSectionTitle') || "Skills") :
+                                    sectionId === 'summary' ? (watch('summarySectionTitle') || "Personal Summary") :
+                                      sectionId === 'courses' ? (watch('coursesSectionTitle') || "Courses") :
+                                        sectionId === 'hobbies' ? (watch('hobbiesSectionTitle') || "Hobbies") :
+                                          sectionId === 'activities' ? (watch('activitiesSectionTitle') || "Activities") :
+                                            sectionId === 'languages' ? (watch('languagesSectionTitle') || "Languages") :
+                                              sectionId === 'internships' ? (watch('internshipsSectionTitle') || "Internships") :
+                                                "Section";
                           }
 
                           return (
@@ -1145,7 +1175,7 @@ const page = () => {
                                     noHeader={true}
                                   />
                                 )}
-                                
+
                                 {/* ✅ Simple Custom Section */}
                                 {isSimpleCustom && (
                                   <DynamicSimpleCustomSection
@@ -1175,9 +1205,9 @@ const page = () => {
                         })}
                       </SortableContext>
                     </DndContext>
-                    
-                    <AddSectionEdit 
-                      onAddNewSection={handleAddNewSection} 
+
+                    <AddSectionEdit
+                      onAddNewSection={handleAddNewSection}
                       activeSections={activeSections}
                     />
                   </div>
@@ -1235,7 +1265,7 @@ const page = () => {
 // ✅ Wrapper component for Simple Custom Section with dynamic useFieldArray
 const DynamicSimpleCustomSection = ({ sectionId, register, watch, setValue, control, noHeader }) => {
   const historyFieldName = `customSimpleHistory_${sectionId}`;
-  
+
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: historyFieldName,
@@ -1260,7 +1290,7 @@ const DynamicSimpleCustomSection = ({ sectionId, register, watch, setValue, cont
 // ✅ Wrapper component for Advanced Custom Section with dynamic useFieldArray
 const DynamicAdvancedCustomSection = ({ sectionId, register, watch, control, setValue, noHeader }) => {
   const historyFieldName = `customAdvancedHistory_${sectionId}`;
-  
+
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: historyFieldName,

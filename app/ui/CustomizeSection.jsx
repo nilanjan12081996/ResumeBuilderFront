@@ -44,6 +44,7 @@ const CustomizeSection = ({
         {activeTab === "Text" && (
           <TemplateText
             textSettings={resumeSettings.text}
+            selectedTemplate={selectedTemplate}
             setTextSettings={(text) =>
               setResumeSettings((prev) => ({
                 ...prev,
