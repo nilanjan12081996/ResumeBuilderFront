@@ -525,6 +525,9 @@ const LinkedInResumeBuilder = () => {
   const handleSkillUpdate = (sectionIndex, skillId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, skills: value };
+      }
       if (skillId === null) return { ...section, [field]: value };
       if (field === "delete") return { ...section, skills: section.skills.filter(s => s.id !== skillId) };
       return { ...section, skills: section.skills.map(s => s.id === skillId ? { ...s, [field]: value } : s) };
@@ -553,6 +556,9 @@ const LinkedInResumeBuilder = () => {
   const handleLanguageUpdate = (sectionIndex, itemId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, languages: value };
+      }
       if (field === 'hideProficiency') return { ...section, hideProficiency: value };
       if (field === 'add') return { ...section, languages: [...(section.languages || []), value] };
       if (field === 'delete') return { ...section, languages: (section.languages || []).filter(l => l.id !== itemId) };
@@ -585,6 +591,9 @@ const LinkedInResumeBuilder = () => {
   const handleEducationUpdate = (sectionIndex, eduId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, educations: value };
+      }
       if (field === "delete") return { ...section, educations: section.educations.filter(e => e.id !== eduId) };
       return { ...section, educations: section.educations.map(e => e.id === eduId ? { ...e, [field]: value } : e) };
     }));
@@ -620,6 +629,9 @@ const LinkedInResumeBuilder = () => {
   const handleExpUpdate = (sectionIndex, expId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, experiences: value };
+      }
       if (field === "delete") return { ...section, experiences: section.experiences.filter(e => e.id !== expId) };
       return { ...section, experiences: section.experiences.map(e => e.id === expId ? { ...e, [field]: value } : e) };
     }));
@@ -777,6 +789,9 @@ const LinkedInResumeBuilder = () => {
   const handleCourseUpdate = (sectionIndex, courseId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, courses: value };
+      }
       if (field === "delete") return { ...section, courses: (section.courses || []).filter(c => c.id !== courseId) };
       return { ...section, courses: (section.courses || []).map(c => c.id === courseId ? { ...c, [field]: value } : c) };
     }));
@@ -812,6 +827,7 @@ const LinkedInResumeBuilder = () => {
   const handleHonorUpdate = (sectionIndex, itemId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") return { ...section, items: value };
       if (field === "delete") return { ...section, items: (section.items || []).filter(it => it.id !== itemId) };
       return { ...section, items: (section.items || []).map(it => it.id === itemId ? { ...it, [field]: value } : it) };
     }));
@@ -844,6 +860,9 @@ const LinkedInResumeBuilder = () => {
   const handleSimpleCustomUpdate = (sectionIndex, itemIndex, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, items: value };
+      }
       if (itemIndex === null && field !== "add") return { ...section, [field]: value };
       if (field === "add") return { ...section, items: [...(section.items || []), value] };
       if (field === "delete") return { ...section, items: (section.items || []).filter((_, idx) => idx !== itemIndex) };
@@ -880,6 +899,9 @@ const LinkedInResumeBuilder = () => {
   const handleCustomUpdate = (sectionIndex, itemId, field, value) => {
     setSections(prev => prev.map((section, i) => {
       if (i !== sectionIndex) return section;
+      if (field === "reorder") {
+        return { ...section, items: value };
+      }
       if (field === "delete") return { ...section, items: (section.items || []).filter(it => it.id !== itemId) };
       return { ...section, items: (section.items || []).map(it => it.id === itemId ? { ...it, [field]: value } : it) };
     }));
@@ -968,7 +990,7 @@ const LinkedInResumeBuilder = () => {
       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
         {activeTab === 'edit' ? (
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='mb-10'>
+            <div className=''>
               <LinkedInResumeScore
                 score={checkATSData?.ATS_Score}
                 loading={atsLoading}

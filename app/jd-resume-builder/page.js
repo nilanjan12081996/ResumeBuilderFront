@@ -701,7 +701,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
-
+        if (field === "reorder") {
+          return { ...section, skills: value };
+        }
         if (field === "add") {
           return {
             ...section,
@@ -911,6 +913,9 @@ const Page = () => {
     setSections(prevSections =>
       prevSections.map((section, sIndex) => {
         if (sIndex !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, experiences: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -1400,7 +1405,7 @@ const Page = () => {
       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
         {activeTab === 'edit' ? (
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='mb-10'>
+            <div className=''>
 
               {/* Resume Score */}
               <ImpResumeScore

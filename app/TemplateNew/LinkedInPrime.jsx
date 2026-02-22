@@ -252,6 +252,13 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
                 {dateRange(course.startDate, course.endDate)}
               </p>
             )}
+            {course.description && (
+              <div
+                className="resume-content"
+                style={{ fontSize: `${text.body}pt`, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+                dangerouslySetInnerHTML={{ __html: course.description }}
+              />
+            )}
           </div>
         ))}
       </div>
@@ -262,28 +269,26 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderHonors = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {section.items?.map((item, i) => {
           const dr = dateRange(item.startDate, item.endDate);
           return (
             <div key={item.id || i}>
-              <div className="flex justify-between items-baseline gap-2">
-                <h4 className="font-semibold text-black" style={{ fontSize: `${text.body}pt` }}>
-                  {item.title}
-                </h4>
-                {dr && (
-                  <span className="text-gray-400 text-xs flex-shrink-0">{dr}</span>
-                )}
-              </div>
+              <h4 className="font-bold text-black" style={{ fontSize: `${text.body + 1}pt` }}>
+                {item.title}
+              </h4>
               {item.issuer && (
-                <p className="text-gray-600" style={{ fontSize: `${text.body - 1}pt` }}>
+                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
                   {item.issuer}
                 </p>
+              )}
+              {dr && (
+                <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>{dr}</p>
               )}
               {item.description && (
                 <div
                   className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
-                  style={{ fontSize: `${text.body}pt` }}
+                  style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 />
               )}
@@ -299,19 +304,27 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderCustomSimple = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div
-        className="flex flex-col gap-1"
-        style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-      >
+      <div className="flex flex-col gap-2" style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}>
         {section.items?.map((item, i) => {
           const name = typeof item === "object" ? item.name || item.title : item;
+          const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
+          const levelName = typeof item === "object" && !section.hideExperienceLevel && item.level != null
+            ? levels[item.level]
+            : null;
           return (
             <div key={i} className="flex items-start gap-2 text-gray-700">
               <span
                 className="mt-[5px] w-1.5 h-1.5 rounded-full flex-shrink-0"
                 style={{ backgroundColor: color }}
               />
-              {name}
+              <span>
+                {name}
+                {levelName && (
+                  <span className="text-gray-400 ml-1" style={{ fontSize: `${text.body - 1}pt` }}>
+                    ({levelName})
+                  </span>
+                )}
+              </span>
             </div>
           );
         })}
@@ -324,27 +337,26 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderCustomAdvanced = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {section.items?.map((item, i) => {
           const dr = dateRange(item.startDate, item.endDate);
           return (
             <div key={item.id || i}>
-              <div className="flex justify-between items-baseline gap-2">
-                <h4
-                  className="font-semibold text-black"
-                  style={{ fontSize: `${text.body}pt` }}
-                >
-                  {item.title}
-                  {item.city ? ` · ${item.city}` : ""}
-                </h4>
-                {dr && (
-                  <span className="text-gray-400 text-xs flex-shrink-0">{dr}</span>
-                )}
-              </div>
+              <h4 className="font-bold text-black" style={{ fontSize: `${text.body + 1}pt` }}>
+                {item.title}
+              </h4>
+              {item.city && (
+                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
+                  {item.city}
+                </p>
+              )}
+              {dr && (
+                <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>{dr}</p>
+              )}
               {item.description && (
                 <div
                   className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
-                  style={{ fontSize: `${text.body}pt` }}
+                  style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 />
               )}
@@ -395,7 +407,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
               src={formData.coverImage}
               alt="Cover"
               className="w-full object-cover"
-              style={{ height: "100pt" }}
+              style={{ aspectRatio: "4 / 1" }}
             />
           ) : (
             <div

@@ -1,10 +1,9 @@
 'use client';
 import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
 import { useState } from "react";
+import { FaPlus, FaTrash } from "react-icons/fa6";
 import { Controller, useFormContext } from "react-hook-form";
-import { FaPen, FaTrash } from 'react-icons/fa';
 import Datepicker from "../ui/Datepicker";
-import TipTapEditor from "../editor/TipTapEditor";
 
 import {
   DndContext,
@@ -20,9 +19,21 @@ import {
 import DraggableWrapper from "./DraggableWrapper";
 import DragIcon from "./DragIcon";
 
-const Activities = ({ register, watch, control, fields, append, remove, move }) => {
+const AdvancedCustomSection = ({
+  sectionId,
+  register,
+  watch,
+  control,
+  setValue,
+  fields,
+  append,
+  remove,
+  move,
+}) => {
   const [deletingId, setDeletingId] = useState(null);
-  const { setValue } = useFormContext();
+
+  // Field names based on sectionId
+  const historyFieldName = `customAdvancedHistory_${sectionId}`;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -46,23 +57,34 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
     }, 200);
   };
 
+  const handleAdd = () => {
+    append({
+      title: "",
+      city: "",
+      startDate: "",
+      endDate: "",
+      description: "",
+      isOngoing: false,
+    });
+  };
+
   return (
     <>
-      <div className='mb-4'>
-        <h2 className='text-xl font-bold text-black pb-1'>Extra-curricular Activities</h2>
-        <p className='text-sm text-[#808897] font-medium'>
-          Add activities like volunteering, clubs, or sports.
-        </p>
-      </div>
-
-      <div className='acco_section'>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+      <div className="acco_section">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={fields.map((f) => f.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <div className="space-y-3">
               {fields.map((item, index) => {
-                const watchedTitle = watch(`activityHistory.${index}.functionTitle`);
-                const watchedEmployer = watch(`activityHistory.${index}.employer`);
-                const isOngoing = watch(`activityHistory.${index}.isOngoing`);
+                const watchedTitle = watch(`${historyFieldName}.${index}.title`);
+                const watchedCity = watch(`${historyFieldName}.${index}.city`);
+                const isOngoing = watch(`${historyFieldName}.${index}.isOngoing`);
 
                 return (
                   <DraggableWrapper key={item.id} id={item.id}>
@@ -78,56 +100,54 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
 
                         <div className="flex-1">
                           <div className="flex items-start gap-2 w-full">
-                            <Accordion collapseAll className="!border w-full !border-gray-300 rounded-lg !overflow-hidden bg-white shadow-sm">
+                            <Accordion
+                              collapseAll
+                              className="!border w-full !border-gray-300 rounded-lg !overflow-hidden bg-white shadow-sm"
+                            >
                               <AccordionPanel>
                                 <AccordionTitle className="p-4 font-semibold text-sm">
-                                  {watchedTitle || watchedEmployer
-                                    ? `${watchedTitle || ''}${watchedEmployer ? ' at ' + watchedEmployer : ''}`
+                                  {watchedTitle || watchedCity
+                                    ? `${watchedTitle || ""}${watchedCity ? ", " + watchedCity : ""}`
                                     : "(Not specified)"}
                                 </AccordionTitle>
 
                                 <AccordionContent className="pt-0">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    {/* Function Title */}
-                                    <div>
-                                      <label className="block text-xs font-semibold text-gray-500">Function Title</label>
+                                    {/* Title */}
+                                    <div className="md:col-span-2">
+                                      <label className="block text-xs font-semibold text-gray-500 uppercase">
+                                        Title
+                                      </label>
                                       <input
                                         type="text"
-                                        placeholder="e.g. Volunteer Coordinator"
+                                        placeholder="e.g. Project Lead, Award Name, etc."
                                         className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register(`activityHistory.${index}.functionTitle`)}
-                                      />
-                                    </div>
-
-                                    {/* Employer */}
-                                    <div>
-                                      <label className="block text-xs font-semibold text-gray-500">Employer / Organization</label>
-                                      <input
-                                        type="text"
-                                        placeholder="e.g. Red Cross"
-                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register(`activityHistory.${index}.employer`)}
+                                        {...register(`${historyFieldName}.${index}.title`)}
                                       />
                                     </div>
 
                                     {/* Start & End Date */}
-                                    <div className='md:col-span-2'>
-                                      <label className="block text-xs font-semibold text-gray-500">Start & End Date</label>
-                                      <div className='flex gap-2 mt-1'>
+                                    <div className="md:col-span-2">
+                                      <label className="block text-xs font-semibold text-gray-500 uppercase">
+                                        Start & End Date
+                                      </label>
+                                      <div className="flex gap-2 mt-1">
                                         <div className="flex-1">
                                           <Controller
                                             control={control}
-                                            name={`activityHistory.${index}.startDate`}
+                                            name={`${historyFieldName}.${index}.startDate`}
                                             render={({ field }) => (
-                                              <Datepicker selectedDate={field.value} onChange={field.onChange} />
+                                              <Datepicker
+                                                selectedDate={field.value}
+                                                onChange={field.onChange}
+                                              />
                                             )}
                                           />
                                         </div>
                                         <div className="flex-1">
                                           <Controller
                                             control={control}
-                                            name={`activityHistory.${index}.endDate`}
+                                            name={`${historyFieldName}.${index}.endDate`}
                                             render={({ field }) => (
                                               <Datepicker
                                                 selectedDate={field.value}
@@ -143,44 +163,52 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
                                       <div className="flex items-center gap-2 mt-2">
                                         <input
                                           type="checkbox"
-                                          id={`ongoing-activity-${item.id}`}
+                                          id={`ongoing-advanced-${item.id}`}
                                           checked={isOngoing || false}
                                           onChange={(e) => {
                                             const isChecked = e.target.checked;
-                                            setValue(`activityHistory.${index}.isOngoing`, isChecked);
-                                            setValue(`activityHistory.${index}.endDate`, isChecked ? 'PRESENT' : '');
+                                            setValue(`${historyFieldName}.${index}.isOngoing`, isChecked);
+                                            setValue(
+                                              `${historyFieldName}.${index}.endDate`,
+                                              isChecked ? "PRESENT" : ""
+                                            );
                                           }}
                                           className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080] !focus:ring-[#800080]"
                                         />
-                                        <label htmlFor={`ongoing-activity-${item.id}`} className="text-sm text-gray-700 cursor-pointer">
-                                          Currently active
+                                        <label
+                                          htmlFor={`ongoing-advanced-${item.id}`}
+                                          className="text-sm text-gray-700 cursor-pointer"
+                                        >
+                                          Ongoing (Present)
                                         </label>
                                       </div>
                                     </div>
 
                                     {/* City */}
                                     <div className="md:col-span-2">
-                                      <label className="block text-xs font-semibold text-gray-500">City</label>
+                                      <label className="block text-xs font-semibold text-gray-500 uppercase">
+                                        City
+                                      </label>
                                       <input
                                         type="text"
-                                        placeholder="e.g. Dhaka, Bangladesh"
+                                        placeholder="e.g. New York"
                                         className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                        {...register(`activityHistory.${index}.city`)}
+                                        {...register(`${historyFieldName}.${index}.city`)}
                                       />
                                     </div>
 
-                                    {/* Description with TipTap */}
+                                    {/* Description */}
                                     <div className="md:col-span-2">
-                                      <label className="block text-xs font-semibold text-gray-500">Description</label>
-                                      <Controller
-                                        name={`activityHistory.${index}.description`}
-                                        control={control}
-                                        render={({ field }) => (
-                                          <TipTapEditor value={field.value} onChange={field.onChange} />
-                                        )}
+                                      <label className="block text-xs font-semibold text-gray-500 uppercase">
+                                        Description
+                                      </label>
+                                      <textarea
+                                        rows="4"
+                                        placeholder="Describe details..."
+                                        className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                        {...register(`${historyFieldName}.${index}.description`)}
                                       />
                                     </div>
-
                                   </div>
                                 </AccordionContent>
                               </AccordionPanel>
@@ -190,7 +218,7 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
                             <div className="mt-4">
                               <FaTrash
                                 className="text-sm text-gray-400 cursor-pointer hover:text-red-500 transition-colors"
-                                title="Delete this activity"
+                                title="Delete this item"
                                 onClick={() => handleDelete(index, item.id)}
                               />
                             </div>
@@ -207,14 +235,14 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
 
         <button
           type="button"
-          onClick={() => append({})}
+          onClick={handleAdd}
           className="text-sm !text-[#800080] font-medium mt-4 hover:underline inline-block"
         >
-          + Add one more activity
+          + Add one more item
         </button>
       </div>
     </>
   );
 };
 
-export default Activities;
+export default AdvancedCustomSection;

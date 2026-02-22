@@ -1,53 +1,58 @@
 'use client';
 import React, { useState } from 'react';
-import { TbDragDrop } from 'react-icons/tb';
 import { FaPen, FaPlus, FaTrash } from 'react-icons/fa';
 import { Tab, Tabs, TabList } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import DraggableWrapper from "../DraggableWrapper";
+import DragIcon from "../DragIcon";
 
-const LinkedInLanguages = ({
-    section,
-    sectionIndex,
-    handleLanguageUpdate,
-    handleLanguageDragStart,
-    handleLanguageDrop,
-    draggedLanguageIndex,
-    setDraggedLanguageIndex,
-}) => {
+const LinkedInLanguages = ({ section, sectionIndex, handleLanguageUpdate }) => {
     const levels = ['Basic', 'Conversational', 'Intermediate', 'Advanced', 'Fluent', 'Native'];
     const tabColors = ['#ffeaec', '#feebe3', '#fff2cc', '#e7f4ed', '#f1f2ff', '#e0e7ff'];
     const textColor  = ['#fe7d8b', '#f68559', '#ec930c', '#48ba75', '#9ba1fb', '#818cf8'];
 
-    const [editingIndex, setEditingIndex]   = useState(null);
-    const [deletingIndex, setDeletingIndex] = useState(null);
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     const hideProficiency = section.hideProficiency ?? true;
 
     const getLevelIndex = (levelName) => {
         const index = levels.indexOf(levelName);
-        return index !== -1 ? index : 2; // default → Intermediate
+        return index !== -1 ? index : 2;
     };
 
-    // ── Animated delete ────────────────────────────────────────
-    const handleDelete = (index, itemId) => {
-        setDeletingIndex(index);
+    const handleDelete = (itemId) => {
+        setDeletingId(itemId);
         setTimeout(() => {
             handleLanguageUpdate(sectionIndex, itemId, 'delete');
-            setDeletingIndex(null);
-        }, 500);
+            setDeletingId(null);
+        }, 200);
     };
 
-    // ── Add new blank language row ─────────────────────────────
     const handleAddLanguage = () => {
         handleLanguageUpdate(sectionIndex, null, 'add', {
             id: `lang_${Date.now()}`,
             language: '',
             level: 'Intermediate',
         });
-        // focus the new row's input after state update
         setTimeout(() => {
             setEditingIndex((section.languages || []).length);
         }, 50);
+    };
+
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        const langs = section.languages || [];
+        const oldIndex = langs.findIndex(l => l.id === active.id);
+        const newIndex = langs.findIndex(l => l.id === over.id);
+        if (oldIndex !== -1 && newIndex !== -1) {
+            handleLanguageUpdate(sectionIndex, null, "reorder", arrayMove(langs, oldIndex, newIndex));
+        }
     };
 
     return (
@@ -56,7 +61,6 @@ const LinkedInLanguages = ({
                 Choose languages you speak and indicate your proficiency level.
             </p>
 
-            {/* ── Show/Hide proficiency toggle ─────────────────── */}
             <div className="flex items-center gap-2 mb-4">
                 <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -82,115 +86,103 @@ const LinkedInLanguages = ({
                 </label>
             </div>
 
-            {/* ── Language rows ─────────────────────────────────── */}
-            <div className="space-y-1">
-                {(section.languages || []).map((item, index) => {
-                    const levelIndex = getLevelIndex(item.level || 'Intermediate');
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext
+                    items={(section.languages || []).map(l => l.id)}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <div className="space-y-1">
+                        {(section.languages || []).map((item, index) => {
+                            const levelIndex = getLevelIndex(item.level || 'Intermediate');
 
-                    return (
-                        <div
-                            key={item.id}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => handleLanguageDrop(e, sectionIndex, index)}
-                            className={`
-                                group flex items-center justify-between gap-4 p-2
-                                border-b border-gray-200
-                                transition-all duration-300
-                                ${draggedLanguageIndex === index ? 'opacity-20 scale-95' : ''}
-                                ${deletingIndex === index ? '-translate-x-6 opacity-0' : ''}
-                            `}
-                        >
-                            {/* Drag handle */}
-                            <span
-                                draggable
-                                onDragStart={(e) => handleLanguageDragStart(e, index)}
-                                onDragEnd={() => setDraggedLanguageIndex(null)}
-                                className="cursor-grab active:cursor-grabbing"
-                            >
-                                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-                            </span>
-
-                            {/* Language name — inline edit */}
-                            <div className="flex-1">
-                                {editingIndex === index ? (
-                                    <input
-                                        autoFocus
-                                        value={item.language || ''}
-                                        onChange={(e) =>
-                                            handleLanguageUpdate(sectionIndex, item.id, 'language', e.target.value)
-                                        }
-                                        onBlur={() => {
-                                            setEditingIndex(null);
-                                            if (!item.language?.trim()) handleDelete(index, item.id);
-                                        }}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') e.target.blur();
-                                        }}
-                                        className="w-full text-sm font-medium border-b border-[#800080] outline-none bg-transparent px-1"
-                                        placeholder="e.g. English, Spanish"
-                                    />
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium text-gray-800">
-                                            {item.language || 'Language'}
-                                        </span>
-                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                                            <FaPen
-                                                className="text-xs text-gray-400 cursor-pointer hover:text-[#800080]"
-                                                onClick={() => setEditingIndex(index)}
-                                            />
-                                            <FaTrash
-                                                className="text-xs text-gray-400 cursor-pointer hover:text-red-500"
-                                                onClick={() => handleDelete(index, item.id)}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Proficiency level tabs */}
-                            {!hideProficiency && (
-                                <div className="flex flex-col items-center gap-1">
-                                    <span className="text-[12px] font-bold text-gray-500">
-                                        {item.level || 'Intermediate'}
-                                    </span>
-                                    <Tabs
-                                        selectedIndex={levelIndex}
-                                        onSelect={(tabIndex) =>
-                                            handleLanguageUpdate(sectionIndex, item.id, 'level', levels[tabIndex])
-                                        }
+                            return (
+                                <DraggableWrapper key={item.id} id={item.id}>
+                                    <div
+                                        className={`
+                                            group flex items-center justify-between gap-4 p-2
+                                            border-b border-gray-200
+                                            transition-all duration-200
+                                            ${deletingId === item.id ? '-translate-x-6 opacity-0' : ''}
+                                        `}
                                     >
-                                        <TabList className="flex gap-1">
-                                            {levels.map((lvl, i) => (
-                                                <Tab key={i} className="outline-none">
-                                                    <div
-                                                        className={`
-                                                            w-7 h-7 flex items-center justify-center rounded-full
-                                                            cursor-pointer transition-all duration-300 text-sm font-bold
-                                                            ${levelIndex === i
-                                                                ? 'scale-110 border-1 border-[#800080] shadow-md'
-                                                                : 'opacity-60 hover:opacity-100'}
-                                                        `}
-                                                        style={{
-                                                            backgroundColor: tabColors[i],
-                                                            color: textColor[i],
-                                                        }}
-                                                        title={lvl}
-                                                    >
-                                                        {i + 1}
-                                                    </div>
-                                                </Tab>
-                                            ))}
-                                        </TabList>
-                                    </Tabs>
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+                                        <DragIcon />
 
-            {/* ── Add button ────────────────────────────────────── */}
+                                        <div className="flex-1">
+                                            {editingIndex === index ? (
+                                                <input
+                                                    autoFocus
+                                                    value={item.language || ''}
+                                                    onChange={(e) =>
+                                                        handleLanguageUpdate(sectionIndex, item.id, 'language', e.target.value)
+                                                    }
+                                                    onBlur={() => {
+                                                        setEditingIndex(null);
+                                                        if (!item.language?.trim()) handleDelete(item.id);
+                                                    }}
+                                                    onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+                                                    className="w-full text-sm font-medium border-b border-[#800080] outline-none bg-transparent px-1"
+                                                    placeholder="e.g. English, Spanish"
+                                                />
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-gray-800">
+                                                        {item.language || 'Language'}
+                                                    </span>
+                                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                                                        <FaPen
+                                                            className="text-xs text-gray-400 cursor-pointer hover:text-[#800080]"
+                                                            onClick={() => setEditingIndex(index)}
+                                                        />
+                                                        <FaTrash
+                                                            className="text-xs text-gray-400 cursor-pointer hover:text-red-500"
+                                                            onClick={() => handleDelete(item.id)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {!hideProficiency && (
+                                            <div className="flex flex-col items-center gap-1">
+                                                <span className="text-[12px] font-bold text-gray-500">
+                                                    {item.level || 'Intermediate'}
+                                                </span>
+                                                <Tabs
+                                                    selectedIndex={levelIndex}
+                                                    onSelect={(tabIndex) =>
+                                                        handleLanguageUpdate(sectionIndex, item.id, 'level', levels[tabIndex])
+                                                    }
+                                                >
+                                                    <TabList className="flex gap-1">
+                                                        {levels.map((lvl, i) => (
+                                                            <Tab key={i} className="outline-none">
+                                                                <div
+                                                                    className={`
+                                                                        w-7 h-7 flex items-center justify-center rounded-full
+                                                                        cursor-pointer transition-all duration-300 text-sm font-bold
+                                                                        ${levelIndex === i
+                                                                            ? 'scale-110 border-1 border-[#800080] shadow-md'
+                                                                            : 'opacity-60 hover:opacity-100'}
+                                                                    `}
+                                                                    style={{ backgroundColor: tabColors[i], color: textColor[i] }}
+                                                                    title={lvl}
+                                                                >
+                                                                    {i + 1}
+                                                                </div>
+                                                            </Tab>
+                                                        ))}
+                                                    </TabList>
+                                                </Tabs>
+                                            </div>
+                                        )}
+                                    </div>
+                                </DraggableWrapper>
+                            );
+                        })}
+                    </div>
+                </SortableContext>
+            </DndContext>
+
             <button
                 type="button"
                 onClick={handleAddLanguage}
