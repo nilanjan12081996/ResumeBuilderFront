@@ -21,7 +21,6 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
 
   const skillLevels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
 
-  // ── Shared styles ──
   const sectionHeadingStyle = {
     color: themeColor,
     borderBottom: `1px solid ${themeColor}`,
@@ -42,12 +41,10 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
     fontWeight: text.bodyWeight,
   };
 
-  // ── Section Heading Component ──
   const SectionHeading = ({ title }) => (
     <div style={sectionHeadingStyle}>{title}</div>
   );
 
-  // ── Two-column row (title left, date right) using table ──
   const TwoColRow = ({ left, right }) => (
     <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
       <colgroup>
@@ -74,6 +71,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
       <section key="summary">
         <SectionHeading title={formData.summarySectionTitle || "Profile"} />
         <div
+          className="resume-content"
           style={{ ...bodyStyle, lineHeight: text.lineHeight, color: "#374151", textAlign: "justify" }}
           dangerouslySetInnerHTML={{ __html: formData.summary }}
         />
@@ -97,6 +95,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             />
             {job.description && (
               <div
+                className="resume-content"
                 style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
                 dangerouslySetInnerHTML={{ __html: job.description }}
               />
@@ -123,6 +122,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             />
             {edu.description && (
               <div
+                className="resume-content"
                 style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}
                 dangerouslySetInnerHTML={{ __html: edu.description }}
               />
@@ -143,15 +143,15 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               const s2 = formData.newSkillHistory[rowIdx * 2 + 1];
               return (
                 <tr key={rowIdx}>
-                  <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", borderBottom: "1px solid #f3f4f6", color: "#1f2937", verticalAlign: "middle" }}>
+                  <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", color: "#1f2937", verticalAlign: "middle" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <tbody><tr>
                         <td>{s1?.skill}</td>
-                        {!formData.hideExperienceLevel && <td style={{ textAlign: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "capatalize" }}>{typeof s1?.level === "number" ? skillLevels[s1.level] : s1?.level || ""}</td>}
+                        {!formData.hideExperienceLevel && <td style={{ textAlign: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "capitalize" }}>{typeof s1?.level === "number" ? skillLevels[s1.level] : s1?.level || ""}</td>}
                       </tr></tbody>
                     </table>
                   </td>
-                  <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", borderBottom: "1px solid #f3f4f6", color: "#1f2937", verticalAlign: "middle" }}>
+                  <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", color: "#1f2937", verticalAlign: "middle" }}>
                     {s2 && (
                       <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <tbody><tr>
@@ -201,6 +201,13 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               left={<strong style={{ color: "#000" }}>{course.course}{course.institution ? `, ${course.institution}` : ""}</strong>}
               right={dateRange(course.startDate, course.endDate)}
             />
+            {course.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+                dangerouslySetInnerHTML={{ __html: course.description }}
+              />
+            )}
           </div>
         ))}
       </section>
@@ -216,7 +223,13 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               left={<strong style={{ color: "#000" }}>{act.functionTitle}{act.employer ? `, ${act.employer}` : ""}{act.city ? `, ${act.city}` : ""}</strong>}
               right={dateRange(act.startDate, act.endDate)}
             />
-            {act.description && <p style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}>{act.description}</p>}
+            {act.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+                dangerouslySetInnerHTML={{ __html: act.description }}
+              />
+            )}
           </div>
         ))}
       </section>
@@ -232,7 +245,13 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               left={<strong style={{ color: "#000" }}>{intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ""}{intern.city ? `, ${intern.city}` : ""}</strong>}
               right={dateRange(intern.startDate, intern.endDate)}
             />
-            {intern.description && <p style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}>{intern.description}</p>}
+            {intern.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+                dangerouslySetInnerHTML={{ __html: intern.description }}
+              />
+            )}
           </div>
         ))}
       </section>
@@ -253,7 +272,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               const s2 = skills[rowIdx * 2 + 1];
               return (
                 <tr key={rowIdx}>
-                  <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", borderBottom: "1px solid #f3f4f6", color: "#1f2937", verticalAlign: "middle" }}>
+                  <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", color: "#1f2937", verticalAlign: "middle" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <tbody><tr>
                         <td>{s1?.name}</td>
@@ -261,7 +280,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
                       </tr></tbody>
                     </table>
                   </td>
-                  <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", borderBottom: "1px solid #f3f4f6", color: "#1f2937", verticalAlign: "middle" }}>
+                  <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", color: "#1f2937", verticalAlign: "middle" }}>
                     {s2 && (
                       <table style={{ width: "100%", borderCollapse: "collapse" }}>
                         <tbody><tr>
@@ -284,6 +303,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
     <section key={section.id}>
       <SectionHeading title={section.title} />
       <div
+        className="resume-content"
         style={{ ...bodyStyle, lineHeight: text.lineHeight, color: "#374151", textAlign: "justify" }}
         dangerouslySetInnerHTML={{ __html: section.summary }}
       />
@@ -305,7 +325,11 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             right={dateRange(edu.startDate, edu.endDate)}
           />
           {edu.description && (
-            <div style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }} dangerouslySetInnerHTML={{ __html: edu.description }} />
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}
+              dangerouslySetInnerHTML={{ __html: edu.description }}
+            />
           )}
         </div>
       ))}
@@ -327,7 +351,11 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             right={dateRange(exp.startDate, exp.endDate)}
           />
           {exp.description && (
-            <div style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }} dangerouslySetInnerHTML={{ __html: exp.description }} />
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+              dangerouslySetInnerHTML={{ __html: exp.description }}
+            />
           )}
         </div>
       ))}
@@ -338,12 +366,22 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
     <section key={section.id}>
       <SectionHeading title={section.title} />
       {section.certifications?.map((cert, i) => (
-        <div key={cert.id || i} style={{ marginBottom: "4pt" }}>
+        <div key={cert.id || i} style={{ marginBottom: "8pt" }}>
           <TwoColRow
-            left={<strong style={{ color: "#000" }}>{cert.name}{cert.organization ? ` — ${cert.organization}` : ""}</strong>}
-            right={cert.startYear && cert.endYear ? `${cert.startYear} — ${cert.endYear}` : cert.startYear || cert.endYear || ""}
+            left={
+              <strong style={{ color: "#000" }}>
+                {cert.name}{cert.city ? `, ${cert.city}` : ""}
+              </strong>
+            }
+            right={dateRange(cert.startYear, cert.endYear)}
           />
-          {cert.description && <p style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}>{cert.description}</p>}
+          {cert.description && (
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+              dangerouslySetInnerHTML={{ __html: cert.description }}
+            />
+          )}
         </div>
       ))}
     </section>
@@ -365,6 +403,13 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             left={<strong style={{ color: "#000" }}>{course.course}{course.institution ? `, ${course.institution}` : ""}</strong>}
             right={dateRange(course.startDate, course.endDate)}
           />
+          {course.description && (
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+              dangerouslySetInnerHTML={{ __html: course.description }}
+            />
+          )}
         </div>
       ))}
     </section>
@@ -392,7 +437,13 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             left={<strong style={{ color: "#000" }}>{intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ""}{intern.city ? `, ${intern.city}` : ""}</strong>}
             right={dateRange(intern.startDate, intern.endDate)}
           />
-          {intern.description && <p style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}>{intern.description}</p>}
+          {intern.description && (
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+              dangerouslySetInnerHTML={{ __html: intern.description }}
+            />
+          )}
         </div>
       ))}
     </section>
@@ -407,7 +458,13 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             left={<strong style={{ color: "#000" }}>{act.functionTitle}{act.employer ? `, ${act.employer}` : ""}{act.city ? `, ${act.city}` : ""}</strong>}
             right={dateRange(act.startDate, act.endDate)}
           />
-          {act.description && <p style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}>{act.description}</p>}
+          {act.description && (
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
+              dangerouslySetInnerHTML={{ __html: act.description }}
+            />
+          )}
         </div>
       ))}
     </section>
@@ -421,21 +478,18 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
         <SectionHeading title={section.title} />
         <table style={{ width: "100%", borderCollapse: "collapse", ...bodyStyle }}>
           <tbody>
-            {Array.from({ length: Math.ceil(items.length / 2) }, (_, rowIdx) => {
-              const it1 = items[rowIdx * 2];
-              const it2 = items[rowIdx * 2 + 1];
-              const n1 = typeof it1 === "object" ? it1?.name || it1?.title : it1;
-              const n2 = it2 ? (typeof it2 === "object" ? it2?.name || it2?.title : it2) : "";
+            {items.map((item, idx) => {
+              const name = typeof item === "object" ? item?.name || item?.title : item;
               return (
-                <tr key={rowIdx}>
-                  <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", borderBottom: "1px solid #f3f4f6", color: "#1f2937" }}>
-                    {n1}
-                    {showLevel && it1 && <span style={{ float: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "capitalize" }}>{skillLevels[it1?.level ?? 2]}</span>}
+                <tr key={idx}>
+                  <td style={{ width: showLevel ? "80%" : "100%", padding: "2pt 0", color: "#1f2937" }}>
+                    {name}
                   </td>
-                  <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", borderBottom: "1px solid #f3f4f6", color: "#1f2937" }}>
-                    {n2}
-                    {showLevel && it2 && <span style={{ float: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "capitalize" }}>{skillLevels[it2?.level ?? 2]}</span>}
-                  </td>
+                  {showLevel && item && (
+                    <td style={{ width: "20%", padding: "2pt 0", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "capitalize", textAlign: "right" }}>
+                      {skillLevels[item?.level ?? 2]}
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -455,7 +509,11 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             right={dateRange(item.startDate, item.endDate)}
           />
           {item.description && (
-            <div style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }} dangerouslySetInnerHTML={{ __html: item.description }} />
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}
+              dangerouslySetInnerHTML={{ __html: item.description }}
+            />
           )}
         </div>
       ))}
@@ -468,24 +526,23 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
     if (sections && sections.length > 0) {
       return sections.map((section) => {
         switch (section.type) {
-          case "skills":         return renderSkillsFromSection(section);
-          case "summary":        return renderSummaryFromSection(section);
-          case "education":      return renderEducationFromSection(section);
+          case "skills": return renderSkillsFromSection(section);
+          case "summary": return renderSummaryFromSection(section);
+          case "education": return renderEducationFromSection(section);
           case "certifications": return renderCertificationsFromSection(section);
-          case "experience":     return renderExperienceFromSection(section);
-          case "hobbies":        return renderHobbiesFromSection(section);
-          case "courses":        return renderCoursesFromSection(section);
-          case "languages":      return renderLanguagesFromSection(section);
-          case "internships":    return renderInternshipsFromSection(section);
-          case "activities":     return renderActivitiesFromSection(section);
-          case "custom_simple":  return renderCustomSimpleFromSection(section);
-          case "custom":         return renderCustomAdvancedFromSection(section);
-          default:               return null;
+          case "experience": return renderExperienceFromSection(section);
+          case "hobbies": return renderHobbiesFromSection(section);
+          case "courses": return renderCoursesFromSection(section);
+          case "languages": return renderLanguagesFromSection(section);
+          case "internships": return renderInternshipsFromSection(section);
+          case "activities": return renderActivitiesFromSection(section);
+          case "custom_simple": return renderCustomSimpleFromSection(section);
+          case "custom": return renderCustomAdvancedFromSection(section);
+          default: return null;
         }
       });
     }
 
-    // Scratch resume
     const sectionRenderers = {
       summary: renderSummary,
       employment: renderEmployment,
@@ -517,11 +574,11 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
                   const it2 = items[rowIdx * 2 + 1];
                   return (
                     <tr key={rowIdx}>
-                      <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", borderBottom: "1px solid #f3f4f6", color: "#1f2937" }}>
+                      <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", color: "#1f2937" }}>
                         {it1?.name}
                         {!hideLevel && <span style={{ float: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "uppercase" }}>{skillLevels[it1?.level ?? 2]}</span>}
                       </td>
-                      <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", borderBottom: "1px solid #f3f4f6", color: "#1f2937" }}>
+                      <td style={{ width: "50%", padding: "2pt 0 2pt 8pt", color: "#1f2937" }}>
                         {it2?.name}
                         {!hideLevel && it2 && <span style={{ float: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "uppercase" }}>{skillLevels[it2?.level ?? 2]}</span>}
                       </td>
@@ -548,7 +605,11 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
                   right={dateRange(item.startDate, item.endDate)}
                 />
                 {item.description && (
-                  <div style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }} dangerouslySetInnerHTML={{ __html: item.description }} />
+                  <div
+                    className="resume-content"
+                    style={{ ...bodyStyle, color: "#374151", marginTop: "2pt" }}
+                    dangerouslySetInnerHTML={{ __html: item.description }}
+                  />
                 )}
               </div>
             ))}
@@ -560,12 +621,19 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
     });
   };
 
-  // ── Header alignment ──
   const headerAlign = layout.headerAlignment || "left";
   const headerTextAlign = headerAlign === "center" ? "center" : headerAlign === "right" ? "right" : "left";
 
   return (
     <div style={{ overflowY: "auto" }}>
+      <style>{`
+        .resume-content ul { list-style-type: disc; padding-left: 16pt; margin: 2pt 0; }
+        .resume-content ol { list-style-type: decimal; padding-left: 16pt; margin: 2pt 0; }
+        .resume-content li { margin-bottom: 2pt; }
+        .resume-content strong { font-weight: bold; }
+        .resume-content em { font-style: italic; }
+        .resume-content p { margin-bottom: 2pt; }
+      `}</style>
       <div
         style={{
           minHeight: "297mm",
@@ -578,7 +646,6 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
           boxSizing: "border-box",
         }}
       >
-        {/* ── Header using table ── */}
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8pt" }}>
           <tbody>
             <tr>
@@ -644,7 +711,6 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
           </tbody>
         </table>
 
-        {/* ── Sections ── */}
         {renderDynamicSections()}
       </div>
     </div>

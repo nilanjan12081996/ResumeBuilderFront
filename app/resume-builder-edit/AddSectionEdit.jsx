@@ -58,7 +58,7 @@ const AddSectionEdit = ({ onAddNewSection, activeSections = [] }) => {
     };
 
     return (
-        <div className="mb-4">
+        <div className="">
             {!showSectionList ? (
                 // Add Section Button
                 <div className="bg-white rounded-xl shadow-sm p-4">

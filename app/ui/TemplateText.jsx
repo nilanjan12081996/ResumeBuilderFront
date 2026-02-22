@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 
 const LINE_HEIGHT_STEPS = [1, 1.25, 1.5, 1.75, 2];
@@ -17,8 +17,30 @@ const FONT_CONTROLS = [
   { key: "sectionTitle", label: "Section Titles", min: 6, max: 35, step: 0.5, unit: "pt" },
 ];
 
-const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedTemplate}) => {
-   const baseDefaults = defaultResumeSettings.text;
+const GOOGLE_FONT_MAP = {
+  "Arial": null,
+  "Lato": "https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap",
+  "Inter": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+  "Roboto": "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap",
+  "Open Sans": "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap",
+  "Montserrat": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
+  "Poppins": "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap",
+  "Raleway": "https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap",
+  "Nunito": "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap",
+  "Source Sans 3": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
+  "Merriweather": "https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap",
+  "Playfair Display": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap",
+  "EB Garamond": "https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap",
+  "Libre Baskerville": "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap",
+  "DM Sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
+  "Josefin Sans": "https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;500;600;700&display=swap",
+  "Cabin": "https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap",
+};
+
+const FONT_OPTIONS = Object.keys(GOOGLE_FONT_MAP);
+
+const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedTemplate }) => {
+  const baseDefaults = defaultResumeSettings.text;
   const templateOverrides = defaultResumeSettings.templateTextOverrides?.[selectedTemplate?.toLowerCase()] || {};
   const defaultSettings = { ...baseDefaults, ...templateOverrides };
   const lineHeightIndex = LINE_HEIGHT_STEPS.indexOf(textSettings.lineHeight);
@@ -27,7 +49,22 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
     return Math.round(((value - 1) / (2 - 1)) * 100 + 50);
   };
 
-  const isDefault = (key, value) => defaultSettings[key] === value; // to check if current = default
+  const isDefault = (key, value) => defaultSettings[key] === value;
+
+  useEffect(() => {
+    [textSettings.primaryFont, textSettings.secondaryFont].forEach((font) => {
+      const url = GOOGLE_FONT_MAP[font];
+      if (!url) return;
+      const id = `font-${font.replace(/\s+/g, "-")}`;
+      if (!document.getElementById(id)) {
+        const link = document.createElement("link");
+        link.id = id;
+        link.rel = "stylesheet";
+        link.href = url;
+        document.head.appendChild(link);
+      }
+    });
+  }, [textSettings.primaryFont, textSettings.secondaryFont]);
 
   return (
     <div className="space-y-10">
@@ -45,10 +82,9 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
             }
             className="w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-[#800080]"
           >
-            <option>Lato</option>
-            <option>Inter</option>
-            <option>Roboto</option>
-            <option>Arial</option>
+            {FONT_OPTIONS.map((font) => (
+              <option key={font} value={font}>{font}</option>
+            ))}
           </select>
         </div>
 
@@ -59,17 +95,13 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
           <select
             value={textSettings.secondaryFont}
             onChange={(e) =>
-              setTextSettings({
-                ...textSettings,
-                secondaryFont: e.target.value,
-              })
+              setTextSettings({ ...textSettings, secondaryFont: e.target.value })
             }
             className="w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-[#800080]"
           >
-            <option>Lato</option>
-            <option>Inter</option>
-            <option>Roboto</option>
-            <option>Arial</option>
+            {FONT_OPTIONS.map((font) => (
+              <option key={font} value={font}>{font}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -111,6 +143,7 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
         </span>
       </div>
 
+      {/* FONT SIZE */}
       <div className="space-y-6">
         <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
           Font Size
@@ -118,11 +151,10 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
 
         {FONT_CONTROLS.map((item) => {
           const value = textSettings[item.key];
-          const defaultValue = defaultSettings[item.key]; // get default
           const percent = ((value - item.min) / (item.max - item.min)) * 100;
 
           return (
-            <div className="flex items-center gap-4">
+            <div key={item.key} className="flex items-center gap-4">
               <label className="w-36 text-sm font-medium text-gray-600">
                 {item.label}
               </label>
@@ -145,16 +177,14 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
                 />
               </div>
 
-              {/* Value display */}
               <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
                 {value} {item.unit}
               </span>
 
-              {/* Set as Default button */}
               <button
                 type="button"
                 className={`px-2 py-1 text-xs font-semibold rounded transition-colors
-    ${value === defaultSettings[item.key]
+                  ${value === defaultSettings[item.key]
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                     : "bg-green-500 text-white hover:bg-green-600"
                   }`}
@@ -164,13 +194,11 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
                     [item.key]: defaultSettings[item.key],
                   })
                 }
-                disabled={value === defaultSettings[item.key]} // disable if already default
+                disabled={value === defaultSettings[item.key]}
               >
                 Set as Default
               </button>
-
             </div>
-
           );
         })}
       </div>
@@ -208,13 +236,14 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
                 </option>
               ))}
             </select>
-            {/* Default breakpoint badge */}
-            <span className={`ml-2 text-xs px-1 rounded ${isDefault(item.key, textSettings[item.key]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
-              {isDefault(item.key, textSettings[item.key]) ? 'Default' : 'Changed'}
+
+            <span className={`ml-2 text-xs px-1 rounded ${isDefault(item.key, textSettings[item.key]) ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-400"}`}>
+              {isDefault(item.key, textSettings[item.key]) ? "Default" : "Changed"}
             </span>
           </div>
         ))}
       </div>
+
     </div>
   );
 };

@@ -3,12 +3,23 @@ import { useDispatch } from 'react-redux';
 import { generatePDF, generateDocx } from '../reducers/ResumeSlice';
 
 const GOOGLE_FONT_MAP = {
+  "Arial": "https://fonts.googleapis.com/css2?family=Arial&display=swap", // system font, no Google version
   "Lato": "https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap",
   "Inter": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
   "Roboto": "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap",
-  "Arial": null,
-  "Georgia": null,
-  "Times New Roman": null,
+  "Open Sans": "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap",
+  "Montserrat": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
+  "Poppins": "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap",
+  "Raleway": "https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap",
+  "Nunito": "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap",
+  "Source Sans 3": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
+  "Merriweather": "https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap",
+  "Playfair Display": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap",
+  "Georgia": "https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap",
+  "Times New Roman": "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap",
+  "DM Sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
+  "Josefin Sans": "https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;500;600;700&display=swap",
+  "Cabin": "https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap",
 };
 
 const getFontLink = (fontName) => {

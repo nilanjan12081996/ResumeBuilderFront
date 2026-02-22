@@ -456,7 +456,6 @@ const Page = () => {
       : null;
 
     // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
-    // এই keys গুলো skip — উপরের structured sections এ already handle হয়েছে
     const SKIP_KEYS = new Set([
       "PROFILE SUMMARY",
       "EDUCATION",
@@ -707,7 +706,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
-
+        if (field === "reorder") {
+          return { ...section, skills: value };
+        }
         if (field === "add") {
           return {
             ...section,
@@ -770,6 +771,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, educations: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -837,7 +841,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
-
+        if (field === "reorder") {
+          return { ...section, certifications: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -906,6 +912,9 @@ const Page = () => {
     setSections(prevSections =>
       prevSections.map((section, sIndex) => {
         if (sIndex !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, experiences: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -975,6 +984,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, items: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -1016,6 +1028,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, items: value };
+        }
 
         if (itemIndex === null && field !== "add") {
           return { ...section, [field]: value };
@@ -1045,6 +1060,7 @@ const Page = () => {
       })
     );
   };
+
 
   // --- Hobbies Handler ---
   const handleHobbiesUpdate = (sectionIndex, field, value) => {
@@ -1078,6 +1094,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, courses: value };
+        }
         if (field === 'delete') {
           return { ...section, courses: section.courses.filter(c => c.id !== courseId) };
         }
@@ -1131,6 +1150,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, languages: value };
+        }
         if (itemId === null && field !== 'add') {
           return { ...section, [field]: value };
         }
@@ -1173,6 +1195,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, internships: value };
+        }
         if (field === 'delete') {
           return { ...section, internships: section.internships.filter(item => item.id !== itemId) };
         }
@@ -1231,6 +1256,9 @@ const Page = () => {
         if (i !== sectionIndex) return section;
         if (field === 'delete') {
           return { ...section, activities: section.activities.filter(a => a.id !== itemId) };
+        }
+        if (field === "reorder") {
+          return { ...section, activities: value };
         }
         return {
           ...section,
@@ -1332,7 +1360,7 @@ const Page = () => {
       <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
         {activeTab === 'edit' ? (
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='mb-10'>
+            <div>
               <ImpResumeScore
                 score={checkATSData?.ATS_Score}
                 loading={atsLoading}

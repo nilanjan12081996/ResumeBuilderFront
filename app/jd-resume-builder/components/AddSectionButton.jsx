@@ -9,17 +9,17 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
     const [showSectionList, setShowSectionList] = useState(false);
 
     const sectionTemplates = [
-        { 
-            id: 'custom_simple', 
-            label: 'Custom Section (Simple)', 
-            icon: <FaList />, 
+        {
+            id: 'custom_simple',
+            label: 'Custom Section (Simple)',
+            icon: <FaList />,
             isCustom: true,
             description: 'For lists like technologies, tools, skill'
         },
-        { 
-            id: 'custom_advanced', 
-            label: 'Custom Section (Advanced)', 
-            icon: <BiCustomize />, 
+        {
+            id: 'custom_advanced',
+            label: 'Custom Section (Advanced)',
+            icon: <BiCustomize />,
             isCustom: true,
             description: 'Full details with dates and descriptions'
         },
@@ -229,7 +229,7 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
     };
 
     return (
-        <div className="mb-4">
+        <div className="">
             {!showSectionList ? (
                 <div className="bg-white rounded-xl shadow-sm p-4">
                     <button
@@ -261,11 +261,18 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {sectionTemplates.map((section) => {
-                            const isAlreadyAdded = 
-                                section.id === 'custom_simple' ? false :
-                                section.id === 'custom_advanced' ? false :
-                                sections.some(s => s.type === section.id);
-                            
+                            const typeMap = {
+                                extra_curricular: 'activities',
+                                custom_simple: null,
+                                custom_advanced: null,
+                            };
+
+                            const isAlreadyAdded = (() => {
+                                if (section.id === 'custom_simple' || section.id === 'custom_advanced') return false;
+                                const typeToCheck = typeMap[section.id] ?? section.id;
+                                return sections.some(s => s.type === typeToCheck);
+                            })();
+
                             const isDisabled = section.isLocked || isAlreadyAdded;
 
                             return (
@@ -280,19 +287,17 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
                                             : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
                                         }`}
                                 >
-                                    <div className={`text-2xl ${
-                                        section.isCustom && !isAlreadyAdded 
-                                            ? 'text-[#800080]' 
+                                    <div className={`text-2xl ${section.isCustom && !isAlreadyAdded
+                                            ? 'text-[#800080]'
                                             : 'text-gray-400 group-hover:text-gray-600'
-                                    }`}>
+                                        }`}>
                                         {section.icon}
                                     </div>
                                     <div className="flex-1">
-                                        <span className={`font-medium block ${
-                                            section.isCustom && !isAlreadyAdded 
-                                                ? 'text-[#800080]' 
+                                        <span className={`font-medium block ${section.isCustom && !isAlreadyAdded
+                                                ? 'text-[#800080]'
                                                 : 'text-gray-700'
-                                        }`}>
+                                            }`}>
                                             {section.label}
                                         </span>
                                         {section.description && (

@@ -1,39 +1,52 @@
 'use client';
 import React, { useState } from 'react';
-import { TbDragDrop } from 'react-icons/tb';
 import { FaPen, FaPlus, FaTrash } from 'react-icons/fa';
 import { Tab, Tabs, TabList } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import DraggableWrapper from "../DraggableWrapper";
+import DragIcon from "../DragIcon";
 
 const ImpLanguages = ({
     section,
     sectionIndex,
     handleUpdate,
-    handleDragStart,
-    handleDrop,
-    draggedIndex,
-    setDraggedIndex,
 }) => {
     const levels = ['Basic', 'Conversational', 'Intermediate', 'Advanced', 'Fluent', 'Native'];
     const tabColors = ['#ffeaec', '#feebe3', '#fff2cc', '#e7f4ed', '#f1f2ff', '#e0e7ff'];
     const textColor = ['#fe7d8b', '#f68559', '#ec930c', '#48ba75', '#9ba1fb', '#818cf8'];
 
     const [editingIndex, setEditingIndex] = useState(null);
-    const [deletingIndex, setDeletingIndex] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     const hideProficiency = section.hideProficiency ?? false;
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+    );
 
     const getLevelIndex = (levelName) => {
         const index = levels.indexOf(levelName);
         return index !== -1 ? index : 2;
     };
 
-    const handleDelete = (index, itemId) => {
-        setDeletingIndex(index);
+    const handleDelete = (itemId) => {
+        setDeletingId(itemId);
         setTimeout(() => {
             handleUpdate(sectionIndex, itemId, 'delete');
-            setDeletingIndex(null);
-        }, 500);
+            setDeletingId(null);
+        }, 200);
     };
 
     const handleAddLanguage = () => {
@@ -46,6 +59,19 @@ const ImpLanguages = ({
             setEditingIndex((section.languages || []).length);
         }, 50);
     };
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        const languages = section.languages || [];
+        const oldIndex = languages.findIndex((l) => l.id === active.id);
+        const newIndex = languages.findIndex((l) => l.id === over.id);
+        if (oldIndex !== -1 && newIndex !== -1) {
+            handleUpdate(sectionIndex, null, "reorder", arrayMove(languages, oldIndex, newIndex));
+        }
+    };
+
+    const languageIds = (section.languages || []).map((l) => l.id);
 
     return (
         <>
@@ -67,91 +93,86 @@ const ImpLanguages = ({
                 </label>
             </div>
 
-            <div className="space-y-1">
-                {(section.languages || []).map((item, index) => {
-                    const levelIndex = getLevelIndex(item.level || 'Intermediate');
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={languageIds} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-1">
+                        {(section.languages || []).map((item, index) => {
+                            const levelIndex = getLevelIndex(item.level || 'Intermediate');
 
-                    return (
-                        <div
-                            key={item.id}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => handleDrop(e, sectionIndex, index)}
-                            className={`
-                                group flex items-center justify-between gap-4 p-2 border-b border-gray-200
-                                transition-all duration-300
-                                ${draggedIndex === index ? 'opacity-20 scale-95' : ''}
-                                ${deletingIndex === index ? '-translate-x-6 opacity-0' : ''}
-                            `}
-                        >
-                            <span
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, index)}
-                                onDragEnd={() => setDraggedIndex(null)}
-                                className="cursor-grab active:cursor-grabbing"
-                            >
-                                <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-                            </span>
-
-                            <div className="flex-1">
-                                {editingIndex === index ? (
-                                    <input
-                                        autoFocus
-                                        value={item.language || ''}
-                                        onChange={(e) => handleUpdate(sectionIndex, item.id, 'language', e.target.value)}
-                                        onBlur={() => {
-                                            setEditingIndex(null);
-                                            if (!item.language?.trim()) handleDelete(index, item.id);
-                                        }}
-                                        className="w-full text-sm font-medium border-b border-[#800080] outline-none bg-transparent px-1"
-                                        placeholder="e.g. English, Spanish"
-                                    />
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium text-gray-800">
-                                            {item.language || 'Language'}
-                                        </span>
-                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                                            <FaPen
-                                                className="text-xs text-gray-400 cursor-pointer hover:text-[#800080]"
-                                                onClick={() => setEditingIndex(index)}
-                                            />
-                                            <FaTrash
-                                                className="text-xs text-gray-400 cursor-pointer hover:text-red-500"
-                                                onClick={() => handleDelete(index, item.id)}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {!hideProficiency && (
-                                <div className="flex flex-col items-center gap-1">
-                                    <span className="text-[12px] font-bold text-gray-500">{item.level || 'Intermediate'}</span>
-                                    <Tabs
-                                        selectedIndex={levelIndex}
-                                        onSelect={(tabIndex) => handleUpdate(sectionIndex, item.id, 'level', levels[tabIndex])}
+                            return (
+                                <DraggableWrapper key={item.id} id={item.id}>
+                                    <div
+                                        className={`
+                                            group flex items-center justify-between gap-4 p-2 border-b border-gray-200
+                                            transition-all duration-200
+                                            ${deletingId === item.id ? '-translate-x-6 opacity-0' : ''}
+                                        `}
                                     >
-                                        <TabList className="flex gap-1">
-                                            {levels.map((lvl, i) => (
-                                                <Tab key={i} className="outline-none">
-                                                    <div
-                                                        className={`w-7 h-7 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300 text-sm font-bold
-                                                            ${levelIndex === i ? 'scale-110 border-2 border-[#800080] shadow-md' : 'opacity-60 hover:opacity-100'}`}
-                                                        style={{ backgroundColor: tabColors[i], color: textColor[i] }}
-                                                        title={lvl}
-                                                    >
-                                                        {i + 1}
+                                        <DragIcon />
+
+                                        <div className="flex-1">
+                                            {editingIndex === index ? (
+                                                <input
+                                                    autoFocus
+                                                    value={item.language || ''}
+                                                    onChange={(e) => handleUpdate(sectionIndex, item.id, 'language', e.target.value)}
+                                                    onBlur={() => {
+                                                        setEditingIndex(null);
+                                                        if (!item.language?.trim()) handleDelete(item.id);
+                                                    }}
+                                                    className="w-full text-sm font-medium border-b border-[#800080] outline-none bg-transparent px-1"
+                                                    placeholder="e.g. English, Spanish"
+                                                />
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-gray-800">
+                                                        {item.language || 'Language'}
+                                                    </span>
+                                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                                                        <FaPen
+                                                            className="text-xs text-gray-400 cursor-pointer hover:text-[#800080]"
+                                                            onClick={() => setEditingIndex(index)}
+                                                        />
+                                                        <FaTrash
+                                                            className="text-xs text-gray-400 cursor-pointer hover:text-red-500"
+                                                            onClick={() => handleDelete(item.id)}
+                                                        />
                                                     </div>
-                                                </Tab>
-                                            ))}
-                                        </TabList>
-                                    </Tabs>
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {!hideProficiency && (
+                                            <div className="flex flex-col items-center gap-1">
+                                                <span className="text-[12px] font-bold text-gray-500">{item.level || 'Intermediate'}</span>
+                                                <Tabs
+                                                    selectedIndex={levelIndex}
+                                                    onSelect={(tabIndex) => handleUpdate(sectionIndex, item.id, 'level', levels[tabIndex])}
+                                                >
+                                                    <TabList className="flex gap-1">
+                                                        {levels.map((lvl, i) => (
+                                                            <Tab key={i} className="outline-none">
+                                                                <div
+                                                                    className={`w-7 h-7 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300 text-sm font-bold
+                                                                        ${levelIndex === i ? 'scale-110 border-2 border-[#800080] shadow-md' : 'opacity-60 hover:opacity-100'}`}
+                                                                    style={{ backgroundColor: tabColors[i], color: textColor[i] }}
+                                                                    title={lvl}
+                                                                >
+                                                                    {i + 1}
+                                                                </div>
+                                                            </Tab>
+                                                        ))}
+                                                    </TabList>
+                                                </Tabs>
+                                            </div>
+                                        )}
+                                    </div>
+                                </DraggableWrapper>
+                            );
+                        })}
+                    </div>
+                </SortableContext>
+            </DndContext>
 
             <button
                 type="button"

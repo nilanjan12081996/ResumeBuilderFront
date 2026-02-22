@@ -770,6 +770,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, educations: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -837,7 +840,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
-
+        if (field === "reorder") {
+          return { ...section, certifications: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -976,6 +981,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, items: value };
+        }
         if (field === "delete") {
           return {
             ...section,
@@ -1018,6 +1026,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, items: value };
+        }
 
         if (itemIndex === null && field !== "add") {
           return { ...section, [field]: value };
@@ -1107,6 +1118,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, courses: value };
+        }
         if (field === 'delete') {
           return { ...section, courses: section.courses.filter(c => c.id !== courseId) };
         }
@@ -1160,6 +1174,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, languages: value };
+        }
         if (itemId === null && field !== 'add') {
           return { ...section, [field]: value };
         }
@@ -1202,6 +1219,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, internships: value };
+        }
         if (field === 'delete') {
           return { ...section, internships: section.internships.filter(item => item.id !== itemId) };
         }
@@ -1258,6 +1278,9 @@ const Page = () => {
     setSections(prev =>
       prev.map((section, i) => {
         if (i !== sectionIndex) return section;
+        if (field === "reorder") {
+          return { ...section, activities: value };
+        }
         if (field === 'delete') {
           return { ...section, activities: section.activities.filter(a => a.id !== itemId) };
         }
@@ -1308,34 +1331,34 @@ const Page = () => {
   // };
 
   const handleSelectTemplate = (id) => {
-      const templateKey = id.toLowerCase();
-  
-      const currentTemplate = resumeSettings.theme?.template;
-      if (currentTemplate) {
-        templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
-      }
-  
-      setSelectedTemplate(id);
-  
-      const color =
-        defaultResumeSettings.theme.templateColors[templateKey] ||
-        defaultResumeSettings.theme.defaultColor;
-      setThemeColor(color);
-  
-      const savedTextForTemplate = templateTextSettings.current[templateKey];
-      const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
-  
-      const newText = savedTextForTemplate
-        ? savedTextForTemplate
-        : { ...defaultResumeSettings.text, ...textOverrides };
-  
-      setResumeSettings(prev => ({
-        ...prev,
-        theme: { ...prev.theme, template: id },
-        text: newText,
-      }));
-    };
-  
+    const templateKey = id.toLowerCase();
+
+    const currentTemplate = resumeSettings.theme?.template;
+    if (currentTemplate) {
+      templateTextSettings.current[currentTemplate] = { ...resumeSettings.text };
+    }
+
+    setSelectedTemplate(id);
+
+    const color =
+      defaultResumeSettings.theme.templateColors[templateKey] ||
+      defaultResumeSettings.theme.defaultColor;
+    setThemeColor(color);
+
+    const savedTextForTemplate = templateTextSettings.current[templateKey];
+    const textOverrides = defaultResumeSettings.templateTextOverrides?.[templateKey] || {};
+
+    const newText = savedTextForTemplate
+      ? savedTextForTemplate
+      : { ...defaultResumeSettings.text, ...textOverrides };
+
+    setResumeSettings(prev => ({
+      ...prev,
+      theme: { ...prev.theme, template: id },
+      text: newText,
+    }));
+  };
+
 
   const handleAddNewSection = (newSection) => {
     const newId = Math.max(...sections.map(s => s.id), -1) + 1;

@@ -207,7 +207,7 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
     };
 
     return (
-        <div className="mb-4">
+        <div className="">
             {!showSectionList ? (
                 <div className="bg-white rounded-xl shadow-sm p-4">
                     <button
