@@ -293,11 +293,11 @@ const page = () => {
   }, [activeSections]);
 
   const onSubmit = (data) => {
-    console.log("Manual Save / Final data:", data);
     setSavingStatus('saving');
 
     const dataToSave = {
       ...data,
+      resumeSettings,
       activeSections: activeSections,
       sectionOrder: sectionOrder,
       resume_type: resume_type || "scratch",
@@ -363,7 +363,17 @@ const page = () => {
     if (singleResumeInfo?.data?.data) {
       const resumeData = singleResumeInfo.data.data;
       reset(resumeData);
-
+      if (resumeData.resumeSettings) {
+        setResumeSettings(resumeData.resumeSettings);
+        const savedTemplate = resumeData.resumeSettings.theme?.template;
+        if (savedTemplate) {
+          setSelectedTemplate(savedTemplate);
+          const color =
+            defaultResumeSettings.theme.templateColors[savedTemplate.toLowerCase()] ||
+            defaultResumeSettings.theme.defaultColor;
+          setThemeColor(color);
+        }
+      }
       // Update local states for accordion lists
       if (resumeData.employmentHistory?.length > 0) {
         setEmpHistory(resumeData.employmentHistory.map((_, i) => ({ id: i + 1 })));
@@ -521,8 +531,12 @@ const page = () => {
   }, [singleResumeInfo, reset, setValue]);
 
   // --- Auto-Save Effect ---
+
   useEffect(() => {
-    const currentDataNormalized = JSON.parse(JSON.stringify(formValues));
+    const currentDataNormalized = JSON.parse(JSON.stringify({
+      ...formValues,
+      resumeSettings,
+    }));
 
     if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
       return;
@@ -530,7 +544,10 @@ const page = () => {
 
     setSavingStatus('saving');
     const timeoutId = setTimeout(() => {
-      const currentData = JSON.parse(JSON.stringify(formValues));
+      const currentData = JSON.parse(JSON.stringify({
+        ...formValues,
+        resumeSettings,
+      }));
 
       const dataToSave = {
         ...currentData,
@@ -564,7 +581,8 @@ const page = () => {
     }, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [formValues, activeSections, sectionOrder, resumeIds, resume_type, dispatch]);
+  }, [formValues, resumeSettings, activeSections, sectionOrder, resumeIds, resume_type, dispatch]);
+
 
   useEffect(() => {
     if (savingStatus === 'saved') {
@@ -808,7 +826,7 @@ const page = () => {
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <div>
-                  <div className='bg-white rounded-sm p-5 mb-[4px]'>
+                  {/* <div className='bg-white rounded-sm p-5 mb-[4px]'>
                     <div className='flex justify-between items-center'>
                       <div className='flex items-center gap-2 mb-2'>
                         <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
@@ -822,7 +840,7 @@ const page = () => {
                     <div className="flex flex-col gap-2">
                       <Progress progress={10} size="sm" />
                     </div>
-                  </div>
+                  </div> */}
 
                   <div>
                     <div className='bg-white p-5 rounded-lg'>
@@ -1066,7 +1084,7 @@ const page = () => {
                                     sectionId === 'summary' ? (watch('summarySectionTitle') || "Personal Summary") :
                                       sectionId === 'courses' ? (watch('coursesSectionTitle') || "Courses") :
                                         sectionId === 'hobbies' ? (watch('hobbiesSectionTitle') || "Hobbies") :
-                                          sectionId === 'activities' ? (watch('activitiesSectionTitle') || "Activities") :
+                                          sectionId === 'activities' ? (watch('activitiesSectionTitle') || "Extra-curricular Activities") :
                                             sectionId === 'languages' ? (watch('languagesSectionTitle') || "Languages") :
                                               sectionId === 'internships' ? (watch('internshipsSectionTitle') || "Internships") :
                                                 "Section";
@@ -1251,28 +1269,6 @@ const page = () => {
                       activeSections={activeSections}
                     />
                   </div>
-
-                  <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
-                    {savingStatus === 'saving' && (
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
-                        <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                        Saving changes...
-                      </div>
-                    )}
-
-                    {savingStatus === 'saved' && (
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
-                        <AiFillSave className="text-sm" />
-                        Saved successfully
-                      </div>
-                    )}
-
-                    {savingStatus === 'error' && (
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
-                        ❌ Save failed
-                      </div>
-                    )}
-                  </div>
                 </div>
               </form>
             </FormProvider>
@@ -1286,15 +1282,35 @@ const page = () => {
               setResumeSettings={setResumeSettings}
             />
           }
+          <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
+            {savingStatus === 'saving' && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+                <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Saving changes...
+              </div>
+            )}
+
+            {savingStatus === 'saved' && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-600 text-white text-xs font-medium shadow-lg animate-fade-in">
+                <AiFillSave className="text-sm" />
+                Saved successfully
+              </div>
+            )}
+
+            {savingStatus === 'error' && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-xs font-medium shadow-lg animate-shake">
+                ❌ Save failed
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px]'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-1 mb-2 lg:mb-0'></div>
-            <div className='lg:flex items-center gap-3'></div>
-          </div>
-          <div ref={componentRef} className='border border-[#E5E5E5] rounded-[8px] mb-4'>
+        <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+          <div className='h-screen overflow-y-scroll hide-scrollbar'>
+          
+          <div ref={componentRef}>
             <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} resumeSettings={resumeSettings} />
+          </div>
           </div>
         </div>
       </div>

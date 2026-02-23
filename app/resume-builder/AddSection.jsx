@@ -28,7 +28,7 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
     { id: 'internships', label: 'Internships', icon: <BiBriefcase />, isCustom: false },
     { id: 'hobbies', label: 'Hobbies', icon: <FaChessKnight />, isCustom: false },
     { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
-    { id: 'references', label: 'References', icon: <HiSpeakerphone />, isCustom: false },
+    { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
     { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
     { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
     { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
@@ -46,7 +46,7 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
 
   return (
     <div className="">
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white rounded-xl shadow-md">
         <div className="mb-6">
           <h2 className="text-xl font-bold text-black pb-1">Add Additional Sections</h2>
           <p className="text-sm text-[#808897] font-medium">

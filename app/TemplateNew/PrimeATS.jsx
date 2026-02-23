@@ -688,12 +688,16 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
                   </div>
                 )}
 
-                {(formData.dob || formData.nationality) && (
+                {(formData.dob || formData.birth_place || formData.nationality || formData.driving_licence) && (
                   <div style={{ fontSize: `${text.body}pt`, color: "#4b5563", marginTop: "2pt" }}>
-                    {formData.dob && <span>{formData.dob}</span>}
-                    {formData.birth_place && <span> | {formData.birth_place}</span>}
-                    {formData.nationality && <span> | {formData.nationality}</span>}
-                    {formData.driving_licence && <span> | {formData.driving_licence}</span>}
+                    {[
+                      formData.dob,
+                      formData.birth_place,
+                      formData.nationality,
+                      formData.driving_licence,
+                    ]
+                      .filter(Boolean)
+                      .join(" | ")}
                   </div>
                 )}
               </td>

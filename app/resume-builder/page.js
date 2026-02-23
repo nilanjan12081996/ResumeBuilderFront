@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
 import { AiFillSave } from "react-icons/ai";
-import { FaUser, FaCamera } from "react-icons/fa6";
+import { FaUser, FaCamera, FaPen } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 import resume_sections_view from "../assets/imagesource/resume_sections_view.png";
 import resume_score2 from "../assets/imagesource/resume_score2.png";
@@ -61,6 +61,40 @@ import ImageCropModal from '../ui/ImageCropModal';
 import { useTabs } from '../context/TabsContext';
 import { defaultResumeSettings } from '../config/defaultResumeSettings';
 import { FaLock } from 'react-icons/fa';
+
+
+// ── Editable Section Title (hover করলে pen দেখাবে, click করলে edit হবে) ──
+const EditableSectionTitle = ({ titleKey, defaultTitle, subtitle, register, watch }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const currentTitle = watch(titleKey) || defaultTitle;
+
+  return (
+    <div className="mb-4">
+      <div className="flex items-center gap-2 pb-1 group">
+        {isEditing ? (
+          <input
+            type="text"
+            {...register(titleKey)}
+            autoFocus
+            onBlur={() => setIsEditing(false)}
+            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+            className="text-xl font-bold text-black border-b-2 border-[#800080] outline-none bg-transparent w-full max-w-xs focus:ring-0"
+            placeholder={defaultTitle}
+          />
+        ) : (
+          <h2
+            className="text-xl font-bold text-black flex items-center gap-2 cursor-pointer select-none"
+            onClick={() => setIsEditing(true)}
+          >
+            {currentTitle}
+            <FaPen className="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150 hover:text-[#800080]" />
+          </h2>
+        )}
+      </div>
+      <p className="text-sm text-[#808897] font-medium">{subtitle}</p>
+    </div>
+  );
+};
 
 
 // ── Dynamic wrapper for SimpleCustomSection (own useFieldArray) ──
@@ -145,15 +179,6 @@ const page = () => {
     defaultResumeSettings.theme.defaultColor
   );
 
-  // const handleSelectTemplate = (id) => {
-  //   setSelectedTemplate(id);
-  //   const color =
-  //     defaultResumeSettings.theme.templateColors[id.toLowerCase()] ||
-  //     defaultResumeSettings.theme.defaultColor;
-
-  //   setThemeColor(color);
-  // };
-
   const handleSelectTemplate = (id) => {
       const templateKey = id.toLowerCase();
   
@@ -210,12 +235,11 @@ const page = () => {
       employmentHistory: [{}],
       educationHistory: [{}],
       newSkillHistory: [{}],
-      coursesHistory: [{}],
-      activityHistory: [{}],
-      languageHistory: [{}],
-      internshipHistory: [{}],
-      internshipHistory: [{}],
-      customSectionHistory: [{}],
+      coursesHistory: [],
+      activityHistory: [],
+      languageHistory: [],
+      internshipHistory: [],
+      customSectionHistory: [],
       customSectionTitle: "Custom Section",
       profileImage: "",
       hobbies: ""
@@ -231,7 +255,7 @@ const page = () => {
     formState: { errors },
   } = methods;
 
-  // ── NEW: watch profileImage from form directly ──
+  // ── watch profileImage from form directly ──
   const profileImage = watch("profileImage");
 
   // Track which optional sections are active
@@ -251,7 +275,6 @@ const page = () => {
     { id: 'courses', title: 'Courses', component: Courses },
     { id: 'hobbies', title: 'Hobbies', component: Hobbies },
     { id: 'extra_curricular', title: 'Extra-curricular Activities', component: Activities },
-    // { id: 'languages', title: 'Languages', component: Languages },
     { id: 'languages', title: 'Languages', component: Languages },
     { id: 'internships', title: 'Internships', component: Internships },
   ];
@@ -260,7 +283,6 @@ const page = () => {
   const getSteps = () => {
     let steps = [...BASE_STEPS];
 
-    // Add active optional sections
     activeSections.forEach((sectionId) => {
       const config = OPTIONAL_SECTIONS_CONFIG.find(c => c.id === sectionId);
       if (config) {
@@ -272,13 +294,12 @@ const page = () => {
       }
     });
 
-    // Always add "Add Section" at the end
     steps.push({ id: steps.length + 1, title: "Add Section", isAddSectionStep: true });
 
     return steps;
   };
   const formValues = watch();
-  const STEPS = React.useMemo(() => getSteps(), [activeSections, formValues]);
+  const STEPS = React.useMemo(() => getSteps(), [activeSections]);
 
   const [step, setStep] = useState(1);
 
@@ -334,13 +355,11 @@ const page = () => {
   const prevStep = () => setStep((prev) => prev - 1);
 
   const onSubmit = (data) => {
-    // Determine if we are on the last step
     const isLastStep = step === STEPS.length;
 
-    // 1. Initial Save (If we don't have IDs yet)
     if (!resumeIds.mongo_id) {
       setSavingStatus('saving');
-      const dataToSave = { ...data, resume_type: "scratch" };
+      const dataToSave = { ...data, resume_type: "scratch", resumeSettings};
 
       dispatch(saveResumeNew(dataToSave)).then((res) => {
         if (res.payload && res.payload.status_code === 200) {
@@ -353,11 +372,10 @@ const page = () => {
               mysql_id: newMysqlId
             });
 
-            lastSavedData.current = JSON.parse(JSON.stringify(data));
+            lastSavedData.current = JSON.parse(JSON.stringify({ ...data, resumeSettings }));
             setSavingStatus('saved');
 
             if (isLastStep) {
-              // Jodi prothom save-ei user finish click kore thake
               router.push(`/resume-builder-edit?id=${newMysqlId}&fetch=scratch_resume`);
             } else {
               nextStep();
@@ -371,11 +389,8 @@ const page = () => {
           toast.error("Error saving resume");
         }
       });
-    }
-    // 2. Update Mode (Already have IDs)
-    else {
+    } else {
       if (isLastStep) {
-        // Jodi itomoddhei auto-save hoye thake, tahole direct redirect
         if (resumeIds.mysql_id) {
           router.push(`/resume-builder-edit?id=${resumeIds.mysql_id}&fetch=scratch_resume`);
         } else {
@@ -390,43 +405,46 @@ const page = () => {
   // Auto-Save Effect
   useEffect(() => {
     if (resumeIds.mongo_id && resumeIds.mysql_id) {
-      // Normalize formValues to ensure fair comparison
-      // JSON stringify removes undefined values, matching our lastSavedData structure
-      const currentDataNormalized = JSON.parse(JSON.stringify(formValues));
+      // resumeSettings সহ comparison করা হচ্ছে
+      const currentDataNormalized = JSON.parse(JSON.stringify({
+        ...formValues,
+        resumeSettings,
+      }));
 
-      // Check if data is actually different from last saved
       if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
-        return; // Data hasn't changed, don't save.
+        return;
       }
 
       setSavingStatus('saving');
       const timeoutId = setTimeout(() => {
-        // Capture current values for the API call and for updating the ref on success
-        // Use deep copy to ensure we have a snapshot that won't mutate
-        const currentData = JSON.parse(JSON.stringify(formValues));
+        // resumeSettings সহ currentData — comparison ও payload দুটোই consistent
+        const currentData = JSON.parse(JSON.stringify({
+          ...formValues,
+          resumeSettings,
+        }));
 
         const dataToSave = {
           ...currentData,
           resume_type: "scratch",
-          ...resumeIds // Include IDs for update
+          ...resumeIds
         };
 
         dispatch(saveResumeNew(dataToSave)).then((res) => {
           if (res.payload && res.payload.status_code === 200) {
             setSavingStatus('saved');
-            lastSavedData.current = currentData; // Update the ref to the data we just successfully saved
+            lastSavedData.current = currentData; // resumeSettings সহ save
           } else {
             setSavingStatus('error');
           }
         });
-      }, 2000); // 2 second debounce
+      }, 2000);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [formValues, resumeIds]);
+  }, [formValues, resumeSettings, resumeIds]);
 
 
-  // ── UPDATED: Profile image handlers with crop + 1MB validation ──
+  // ── Profile image handlers with crop + 1MB validation ──
   const handleImageChange = (e) => {
     setProfileError("");
     const file = e.target.files[0];
@@ -470,7 +488,7 @@ const page = () => {
   return (
     <div>
 
-      {/* ── NEW: Profile Crop Modal ── */}
+      {/* Profile Crop Modal */}
       {profileCropSrc && (
         <ImageCropModal
           imageSrc={profileCropSrc}
@@ -493,23 +511,7 @@ const page = () => {
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                   <div className=''>
-                    <div className='bg-white rounded-sm p-5 mb-[4px]'>
-                      <div className='flex justify-between items-center'>
-                        <div className='flex items-center gap-2 mb-2'>
-                          <span className='bg-[#f6efff] rounded-[5px] px-2 py-1 text-[14px] text-[#800080] font-bold'>10%</span>
-                          <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Resume completeness</span>
-                        </div>
-                        <div className='flex items-center gap-2 mb-2'>
-                          <span className='bg-[#e7f4ed] rounded-[5px] px-2 py-1 text-[14px] text-[#477d62] font-bold'>+10%</span>
-                          <span className='text-[#828ba2] text-[14px] leading-[20px] font-normal'>Add job title</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <Progress progress={10} size="sm" />
-                      </div>
-                    </div>
-
-                    <div className='h-full overflow-y-scroll bg-white p-5 rounded-lg'>
+                    <div className='h-full overflow-y-scroll bg-white p-4 rounded-lg acco_section'>
                       {
                         step === 1 && (
                           <div className=''>
@@ -518,7 +520,7 @@ const page = () => {
                               <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
                             </div>
 
-                            <div className='acco_section'>
+                            <div className=''>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
                                   <div
@@ -540,7 +542,7 @@ const page = () => {
                                       </>
                                     ) : (
                                       <>
-                                        {/* ── UPDATED: Profile Photo with Crop Modal ── */}
+                                        {/* Profile Photo with Crop Modal */}
                                         <label
                                           htmlFor="profile-upload"
                                           className="cursor-pointer flex flex-col items-center gap-2 relative group"
@@ -775,13 +777,11 @@ const page = () => {
                                       <>
                                         Hide additional details
                                         <ChevronUp size={20} />
-
                                       </>
                                     ) : (
                                       <>
                                         Add more details
                                         <ChevronDown size={20} />
-
                                       </>
                                     )}
                                   </button>
@@ -805,16 +805,15 @@ const page = () => {
 
                                     {/* Date of Birth */}
                                     <div>
-                                      <label className="block text-sm font-medium text-gray-700">
+                                      <label className="block !text-sm !font-medium !text-gray-500">
                                         Date of Birth
                                       </label>
                                       <input
-                                        type="text"
+                                        type="date"
                                         className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                         {...register("dob")}
                                       />
                                     </div>
-
                                     {/* Place of Birth */}
                                     <div>
                                       <label className="block text-sm font-medium text-gray-700">
@@ -838,11 +837,8 @@ const page = () => {
                                         placeholder="Nationality"
                                         className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
                                         {...register("nationality")}
-
                                       />
                                     </div>
-
-
                                   </>
                                 )}
 
@@ -998,30 +994,18 @@ const page = () => {
                             </div>
                           );
                         }
-                        if (currentStepObj && currentStepObj.sectionId === 'internships') {
-                          return (
-                            <div>
-                              <Internships
-                                register={register}
-                                watch={watch}
-                                control={control}
-                                fields={internshipFields}
-                                append={internshipAppend}
-                                remove={internshipRemove}
-                                move={internshipMove}
-                              />
-                            </div>
-                          );
-                        }
 
                         // ── Simple Custom Section ──
                         if (currentStepObj && typeof currentStepObj.sectionId === 'string' && currentStepObj.sectionId.startsWith('custom_simple_')) {
                           return (
                             <div>
-                              <div className='mb-4'>
-                                <h2 className='text-xl font-bold text-black pb-1'>Custom Section (Simple)</h2>
-                                <p className='text-sm text-[#808897] font-medium'>Add a simple list-based custom section.</p>
-                              </div>
+                              <EditableSectionTitle
+                                titleKey={`customSimpleTitle_${currentStepObj.sectionId}`}
+                                defaultTitle="Custom Section (Simple)"
+                                subtitle="Add a simple list-based custom section."
+                                register={register}
+                                watch={watch}
+                              />
                               <DynamicSimpleCustomSection
                                 key={currentStepObj.sectionId}
                                 sectionId={currentStepObj.sectionId}
@@ -1039,10 +1023,13 @@ const page = () => {
                         if (currentStepObj && typeof currentStepObj.sectionId === 'string' && currentStepObj.sectionId.startsWith('custom_advanced_')) {
                           return (
                             <div>
-                              <div className='mb-4'>
-                                <h2 className='text-xl font-bold text-black pb-1'>Custom Section (Advanced)</h2>
-                                <p className='text-sm text-[#808897] font-medium'>Add custom activities, achievements, or experiences with full details.</p>
-                              </div>
+                              <EditableSectionTitle
+                                titleKey={`customAdvancedTitle_${currentStepObj.sectionId}`}
+                                defaultTitle="Custom Section (Advanced)"
+                                subtitle="Add custom activities, achievements, or experiences with full details."
+                                register={register}
+                                watch={watch}
+                              />
                               <DynamicAdvancedCustomSection
                                 key={currentStepObj.sectionId}
                                 sectionId={currentStepObj.sectionId}
@@ -1171,30 +1158,23 @@ const page = () => {
             </div>
           </div>
 
-          <div className='lg:w-6/12 bg-[#ffffff] rounded-[8px]'>
-            <div className='flex items-center justify-between'>
-              <div className='lg:flex items-center gap-3'>
-              </div>
-            </div>
+             <div className='lg:w-6/12 bg-[#ffffff] px-0 '>
+          <div className='h-screen overflow-y-scroll hide-scrollbar'>
             <div ref={componentRef} className=''>
               <ActiveResume 
-  formData={formValues} 
-  empHistory={empHistory} 
-  themeColor={themeColor} 
-  resumeSettings={resumeSettings}
-  sectionOrder={[
-    "summary",
-    "employment", 
-    "education",
-    "skills",
-    "courses",
-    "hobbies",
-    "activities",
-    "languages",
-    "internships",
-    ...activeSections,
-  ]}
-/>
+                formData={formValues} 
+                empHistory={empHistory} 
+                themeColor={themeColor} 
+                resumeSettings={resumeSettings}
+                sectionOrder={[
+                  "summary",
+                  "employment", 
+                  "education",
+                  "skills",  
+                  ...activeSections.map(id => id === "extra_curricular" ? "activities" : id),
+                ]}
+              />
+            </div>
             </div>
           </div>
         </div>

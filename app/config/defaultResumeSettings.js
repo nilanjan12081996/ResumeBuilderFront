@@ -45,7 +45,7 @@ export const defaultResumeSettings = {
       professional: "#2E86C1",
       ats: "#2E86C1",
       clean: "#1C1C1C",
-      clear: "#4B0082",
+      clear: "#77c092",
       vivid: "#FF6F61",
       corporate: "#0B3D91",
       linkedin: "#293d48"

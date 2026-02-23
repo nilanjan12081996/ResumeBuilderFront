@@ -1695,7 +1695,7 @@ const Page = () => {
 
       {/* Right Panel - Resume Preview */}
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
-        <div className='h-screen overflow-y-scroll'>
+        <div className='h-screen overflow-y-scroll hide-scrollbar'>
           <div ref={componentRef}>
             <ActiveResume
               formData={formValues}

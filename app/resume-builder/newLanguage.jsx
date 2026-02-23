@@ -1,174 +1,187 @@
 'use client';
-import { Accordion, AccordionContent, AccordionPanel, AccordionTitle } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
-import { RiDraggable } from "react-icons/ri";
-import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import React, { useState } from "react";
+import { Tab, Tabs, TabList } from "react-tabs";
+import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
+import 'react-tabs/style/react-tabs.css';
+import { useFormContext } from "react-hook-form";
 
-const Languages = ({ register, watch, control, fields, append, remove, move }) => {
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  const [isHandleHovered, setIsHandleHovered] = useState(false);
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import DraggableWrapper from "./DraggableWrapper";
+import DragIcon from "./DragIcon";
 
-  const levels = [
-    "Native speaker",
-    "Highly proficient",
-    "Very good command",
-    "Good working knowledge",
-    "Working knowledge"
-  ];
+const Languages = ({ register, watch, fields, append, remove, move }) => {
+  const levels = ["Basic", "Conversational", "Intermediate", "Advanced", "Fluent", "Native"];
+  const tabColors = ["#ffeaec", "#feebe3", "#fff2cc", "#e7f4ed", "#f1f2ff", "#e0e7ff"];
+  const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb", "#818cf8"];
 
-  const handleDragStart = (e, index) => {
-    if (!isHandleHovered) {
-      e.preventDefault();
-      return;
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const { setValue } = useFormContext();
+
+  const hideProficiency = watch('hideLanguageProficiency') ?? true;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = fields.findIndex((f) => f.id === active.id);
+    const newIndex = fields.findIndex((f) => f.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      move(oldIndex, newIndex);
     }
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setIsHandleHovered(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
-
-    move(draggedIndex, targetIndex);
-    setDraggedIndex(null);
-  };
-
-  const addMore = () => {
-    append({ level: "Select level" }); 
-  };
-
-  const deleteItem = (index) => {
-    if (fields.length > 1) {
+  const handleDelete = (index, id) => {
+    setDeletingId(id);
+    setTimeout(() => {
       remove(index);
-    }
+      setDeletingId(null);
+    }, 500);
+  };
+
+  const getLevelIndex = (levelName) => {
+    const index = levels.indexOf(levelName);
+    return index !== -1 ? index : 2;
   };
 
   return (
     <>
-      <div className='mb-4'>
-        <h2 className='text-xl font-bold text-black pb-1'>Languages</h2>
-        <p className='text-sm text-[#808897] font-medium'>
-            Enter the languages you speak and your proficiency level.
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-black pb-1">Languages</h2>
+        <p className="text-sm font-medium text-[#808897]">
+          Choose languages you speak and indicate your proficiency level.
         </p>
+
+        <div className="flex items-center gap-2 my-3">
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={!hideProficiency}
+              onChange={(e) => {
+                setValue('hideLanguageProficiency', !e.target.checked, { shouldDirty: true });
+              }}
+            />
+            <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#800080] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#800080]"></div>
+            <span className="ml-3 text-sm font-medium text-gray-700">
+              Show proficiency level
+            </span>
+          </label>
+        </div>
       </div>
 
-      <div className='acco_section'>
-        <div className="space-y-3">
-          {fields.map((item, index) => {
-            const watchedLanguage = watch(`languageHistory.${index}.language`);
-            const watchedLevel = watch(`languageHistory.${index}.level`);
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-1">
+            {fields.map((item, index) => {
+              const isEditing = editingIndex === index;
+              const watchedLanguage = watch(`languageHistory.${index}.language`);
+              const watchedLevelName = watch(`languageHistory.${index}.level`) || "Intermediate";
+              const watchedLevelIndex = getLevelIndex(watchedLevelName);
 
-            return (
-              <div
-                key={item.id}
-                draggable={isHandleHovered}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, index)}
-                className={`transition-all duration-200 bg-white rounded-xl border ${
-                  draggedIndex === index 
-                    ? "opacity-20 border-cyan-500 scale-95" 
-                    : "opacity-100 border-gray-200 shadow-sm hover:border-cyan-300"
-                } cursor-default`}
-              >
-                <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-cyan-300 overflow-hidden">
-                <Accordion flush={true}>
-                  <AccordionPanel>
-                    <AccordionTitle className="p-4">
-                      <div className="flex items-center gap-3">
-                        {/* Drag Handle */}
-                        <button
-                          type="button"
-                          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-                          onMouseEnter={() => setIsHandleHovered(true)}
-                          onMouseLeave={() => setIsHandleHovered(false)}
-                        >
-                          <RiDraggable className="text-xl text-gray-400" />
-                        </button>
+              return (
+                <DraggableWrapper key={item.id} id={item.id}>
+                  <div
+                    className={`
+                      group flex items-center justify-between gap-4 p-2 border-b border-gray-200
+                      transition-all duration-300 ease-in-out
+                      ${deletingId === item.id ? "-translate-x-6 opacity-0" : ""}
+                    `}
+                  >
+                    <span className="cursor-grab active:cursor-grabbing">
+                      <DragIcon />
+                    </span>
 
-                        <div className="flex flex-col text-left">
-                            <span className="font-bold text-sm text-gray-700">
-                            {watchedLanguage || "(Not specified)"}
-                            </span>
-                             {watchedLevel && watchedLevel !== "Select level" && (
-                                <span className="text-xs text-gray-400 font-normal">
-                                    {watchedLevel}
-                                </span>
-                            )}
-                         </div>
-                      </div>
-                    </AccordionTitle>
-                    <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                          {/* Language */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Language
-                            </label>
-                            <input
-                              type="text"
-                              className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                              placeholder="e.g. English"
-                              {...register(`languageHistory.${index}.language`)}
+                    <div className="flex-1">
+                      {isEditing ? (
+                        <input
+                          {...register(`languageHistory.${index}.language`)}
+                          autoFocus
+                          onBlur={() => {
+                            setEditingIndex(null);
+                            if (!watchedLanguage?.trim()) handleDelete(index, item.id);
+                          }}
+                          className="w-full text-sm font-medium border-b border-[#800080] outline-none bg-transparent px-1"
+                          placeholder="e.g. English, Spanish"
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-800">
+                            {watchedLanguage || "Language"}
+                          </span>
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200">
+                            <FaPen
+                              className="text-xs text-gray-400 cursor-pointer hover:text-[#800080]"
+                              onClick={() => setEditingIndex(index)}
+                            />
+                            <FaTrash
+                              className="text-xs text-gray-400 cursor-pointer hover:text-red-500"
+                              onClick={() => handleDelete(index, item.id)}
                             />
                           </div>
-
-                          {/* Level */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Level
-                            </label>
-                            <select
-                                className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm bg-gray-50 text-gray-700 focus:ring-blue-500 focus:border-blue-500"
-                                {...register(`languageHistory.${index}.level`)}
-                            >
-                                <option value="Select level" disabled>Select level</option>
-                                {levels.map(level => (
-                                    <option key={level} value={level}>{level}</option>
-                                ))}
-                            </select>
-                          </div>
-
-                          {/* Delete Button inside the Content */}
-                        <div className="md:col-span-2 flex justify-end pt-2 border-t mt-2 delete_point">
-                          <button 
-                            type="button" 
-                            onClick={() => deleteItem(index)}
-                            className="flex items-center gap-1 text-red-500 hover:text-red-700 text-sm font-medium"
-                          >
-                            <MdDelete className='text-lg' /> 
-                          </button>
                         </div>
+                      )}
+                    </div>
 
+                    {!hideProficiency && (
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[12px] font-bold text-gray-500 tracking-tight">
+                          {watchedLevelName}
+                        </span>
+                        <Tabs
+                          selectedIndex={watchedLevelIndex}
+                          onSelect={(tabIndex) => {
+                            setValue(`languageHistory.${index}.level`, levels[tabIndex], { shouldDirty: true });
+                          }}
+                        >
+                          <TabList className="flex gap-1">
+                            {levels.map((lvl, i) => (
+                              <Tab key={i} className="outline-none">
+                                <div
+                                  className={`
+                                    w-7 h-7 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300 text-sm font-bold
+                                    ${watchedLevelIndex === i ? "scale-110 border-2 border-[#800080] shadow-md" : "opacity-60 hover:opacity-100"}
+                                  `}
+                                  style={{ backgroundColor: tabColors[i], color: textColor[i] }}
+                                  title={lvl}
+                                >
+                                  {i + 1}
+                                </div>
+                              </Tab>
+                            ))}
+                          </TabList>
+                        </Tabs>
                       </div>
-                  </AccordionContent>
-                </AccordionPanel>
-              </Accordion>
-              </div>
-            </div>
-            )
-          })}
-        </div>
-          
-          <div className='mt-4'>
-            <button type="button" onClick={addMore} className='flex items-center gap-2 text-blue-500 font-bold'>
-                <FaPlus /> Add one more language
-            </button>
+                    )}
+                  </div>
+                </DraggableWrapper>
+              );
+            })}
           </div>
-        </div >
+        </SortableContext>
+      </DndContext>
+
+      <button
+        type="button"
+        onClick={() => append({ language: "", level: "Intermediate" })}
+        className="flex items-center gap-2 text-sm !text-[#800080] font-medium mt-4 hover:underline"
+      >
+        <FaPlus size={12} /> Add one more language
+      </button>
     </>
   );
 };
