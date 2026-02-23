@@ -1,10 +1,22 @@
 'use client';
 import React, { useState } from "react";
-import { TbDragDrop } from "react-icons/tb";
 import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { Tabs, Tab, TabList } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import DraggableWrapper from "./DraggableWrapper";
+import DragIcon from "./DragIcon";
 
 const SimpleCustomSectionEdit = ({ 
   sectionId,
@@ -23,10 +35,8 @@ const SimpleCustomSectionEdit = ({
   const textColor = ["#fe7d8b", "#f68559", "#ec930c", "#48ba75", "#9ba1fb"];
 
   const [editingIndex, setEditingIndex] = useState(null);
-  const [deletingIndex, setDeletingIndex] = useState(null);
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  
-  // Field names based on sectionId
+  const [deletingId, setDeletingId] = useState(null);
+
   const historyFieldName = `customSimpleHistory_${sectionId}`;
   const titleFieldName = `customSimpleTitle_${sectionId}`;
   const hideExperienceLevelFieldName = `customSimpleHideLevel_${sectionId}`;
@@ -34,50 +44,40 @@ const SimpleCustomSectionEdit = ({
   const hideExperienceLevel = watch(hideExperienceLevelFieldName) ?? true;
   const sectionTitle = watch(titleFieldName) || "Custom Section";
 
-  // Dynamic helper text based on section title
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = fields.findIndex((f) => f.id === active.id);
+    const newIndex = fields.findIndex((f) => f.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      move(oldIndex, newIndex);
+    }
+  };
+
   const getHelperText = () => {
     const title = sectionTitle?.toLowerCase() || "";
-    
-    if (title.includes("competenc")) {
-      return "Highlight your strongest competencies relevant to the role.";
-    } else if (title.includes("technolog") || title.includes("tech")) {
-      return "List the technologies you're proficient in.";
-    } else if (title.includes("tool")) {
-      return "Add tools and software you can work with.";
-    } else if (title.includes("framework")) {
-      return "Include frameworks you have experience with.";
-    } else if (title.includes("language")) {
-      return "List programming or spoken languages you know.";
-    }
-    
+    if (title.includes("competenc")) return "Highlight your strongest competencies relevant to the role.";
+    else if (title.includes("technolog") || title.includes("tech")) return "List the technologies you're proficient in.";
+    else if (title.includes("tool")) return "Add tools and software you can work with.";
+    else if (title.includes("framework")) return "Include frameworks you have experience with.";
+    else if (title.includes("language")) return "List programming or spoken languages you know.";
     return "Add items for this section.";
   };
 
-  const handleDelete = (index) => {
-    setDeletingIndex(index);
+  const handleDelete = (index, id) => {
+    setDeletingId(id);
     setTimeout(() => {
       remove(index);
-      setDeletingIndex(null);
+      setDeletingId(null);
     }, 500);
   };
 
   const addItem = () => {
-    append({
-      name: "",
-      level: 2 // Default: Skillful
-    });
-  };
-
-  const handleDragStart = (e, index) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
-    move(draggedIndex, targetIndex);
-    setDraggedIndex(null);
+    append({ name: "", level: 2 });
   };
 
   const updateField = (index, field, value) => {
@@ -108,103 +108,97 @@ const SimpleCustomSectionEdit = ({
         </div>
       </div>
 
-      {fields.map((item, i) => {
-        const isEditing = editingIndex === i;
-        const displayName = watch(`${historyFieldName}.${i}.name`) || "";
-        const currentLevel = watch(`${historyFieldName}.${i}.level`) ?? 2;
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+          {fields.map((item, i) => {
+            const isEditing = editingIndex === i;
+            const displayName = watch(`${historyFieldName}.${i}.name`) || "";
+            const currentLevel = watch(`${historyFieldName}.${i}.level`) ?? 2;
 
-        return (
-          <div
-            key={item.id}
-            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={(e) => handleDrop(e, i)}
-            className={`
-              group
-              flex items-center justify-between gap-4 p-2 !border-b !border-gray-300
-              transition-all duration-300 ease-in-out
-              ${draggedIndex === i ? "opacity-20 scale-95" : ""}
-              ${deletingIndex === i ? "-translate-x-6 opacity-0 bg-red-50" : "bg-white"}
-            `}
-          >
-            <span
-              draggable
-              onDragStart={(e) => handleDragStart(e, i)}
-              onDragEnd={() => setDraggedIndex(null)}
-              className="cursor-grab active:cursor-grabbing"
-            >
-              <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-            </span>
-
-            <div className="flex-1">
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={displayName}
-                  autoFocus
-                  onChange={(e) => updateField(i, "name", e.target.value)}
-                  onBlur={() => {
-                    setEditingIndex(null);
-                    if (!displayName?.trim()) handleDelete(i);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setEditingIndex(null);
-                    }
-                  }}
-                  className="w-full text-sm font-medium border-b outline-none bg-transparent px-1"
-                  placeholder="Enter name..."
-                />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">{displayName || "Click to edit"}</span>
-                  <div className="flex items-center gap-2 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
-                    <FaPen 
-                      className="text-sm text-gray-400 cursor-pointer hover:text-purple-600" 
-                      onClick={() => setEditingIndex(i)} 
-                    />
-                    <FaTrash 
-                      className="text-sm text-gray-400 cursor-pointer hover:text-red-500" 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        handleDelete(i); 
-                      }} 
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {!hideExperienceLevel && (
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-xs font-medium text-gray-600">
-                  {levels[currentLevel]}
-                </span>
-                <Tabs
-                  selectedIndex={currentLevel}
-                  onSelect={(tabIndex) => updateField(i, "level", tabIndex)}
+            return (
+              <DraggableWrapper key={item.id} id={item.id}>
+                <div
+                  className={`
+                    group flex items-center justify-between gap-4 p-2 !border-b !border-gray-300
+                    transition-all duration-300 ease-in-out
+                    ${deletingId === item.id ? "-translate-x-6 opacity-0 bg-red-50" : "bg-white"}
+                  `}
                 >
-                  <TabList className="flex gap-1">
-                    {levels.map((lvl, idx) => (
-                      <Tab key={idx} className="outline-none">
-                        <div
-                          className={`
-                            w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300
-                            ${currentLevel === idx ? "scale-110 border border-[#800080] shadow-md" : "opacity-60 hover:opacity-100"}
-                          `}
-                          style={{ backgroundColor: tabColors[idx], color: textColor[idx] }}
-                          title={lvl}
-                        >
-                          {idx + 1}
+                  <span className="cursor-grab active:cursor-grabbing">
+                    <DragIcon />
+                  </span>
+
+                  <div className="flex-1">
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={displayName}
+                        autoFocus
+                        onChange={(e) => updateField(i, "name", e.target.value)}
+                        onBlur={() => {
+                          setEditingIndex(null);
+                          if (!displayName?.trim()) handleDelete(i, item.id);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") setEditingIndex(null);
+                        }}
+                        className="w-full text-sm font-medium border-b outline-none bg-transparent px-1"
+                        placeholder="Enter name..."
+                      />
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{displayName || "Click to edit"}</span>
+                        <div className="flex items-center gap-2 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+                          <FaPen
+                            className="text-sm text-gray-400 cursor-pointer hover:text-purple-600"
+                            onClick={() => setEditingIndex(i)}
+                          />
+                          <FaTrash
+                            className="text-sm text-gray-400 cursor-pointer hover:text-red-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(i, item.id);
+                            }}
+                          />
                         </div>
-                      </Tab>
-                    ))}
-                  </TabList>
-                </Tabs>
-              </div>
-            )}
-          </div>
-        );
-      })}
+                      </div>
+                    )}
+                  </div>
+
+                  {!hideExperienceLevel && (
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-xs font-medium text-gray-600">
+                        {levels[currentLevel]}
+                      </span>
+                      <Tabs
+                        selectedIndex={currentLevel}
+                        onSelect={(tabIndex) => updateField(i, "level", tabIndex)}
+                      >
+                        <TabList className="flex gap-1">
+                          {levels.map((lvl, idx) => (
+                            <Tab key={idx} className="outline-none">
+                              <div
+                                className={`
+                                  w-6 h-6 flex items-center justify-center rounded-full cursor-pointer transition-all duration-300
+                                  ${currentLevel === idx ? "scale-110 border border-[#800080] shadow-md" : "opacity-60 hover:opacity-100"}
+                                `}
+                                style={{ backgroundColor: tabColors[idx], color: textColor[idx] }}
+                                title={lvl}
+                              >
+                                {idx + 1}
+                              </div>
+                            </Tab>
+                          ))}
+                        </TabList>
+                      </Tabs>
+                    </div>
+                  )}
+                </div>
+              </DraggableWrapper>
+            );
+          })}
+        </SortableContext>
+      </DndContext>
 
       <button
         type="button"

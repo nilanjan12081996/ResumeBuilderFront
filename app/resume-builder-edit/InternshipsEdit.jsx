@@ -7,11 +7,24 @@ import {
   AccordionContent,
   Label,
 } from "flowbite-react";
-import { TbDragDrop } from "react-icons/tb";
 import { FaTrash } from "react-icons/fa";
 import { Controller } from "react-hook-form";
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
+
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import DraggableWrapper from "./DraggableWrapper";
+import DragIcon from "./DragIcon";
 
 const InternshipsEdit = ({
   register,
@@ -24,26 +37,27 @@ const InternshipsEdit = ({
   setValue,
   noHeader,
 }) => {
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  const [deletingIndex, setDeletingIndex] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const handleDragStart = (e, index) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = fields.findIndex((f) => f.id === active.id);
+    const newIndex = fields.findIndex((f) => f.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      move(oldIndex, newIndex);
+    }
   };
 
-  const handleDrop = (e, targetIndex) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
-    move(draggedIndex, targetIndex);
-    setDraggedIndex(null);
-  };
-
-  const handleDelete = (index) => {
-    setDeletingIndex(index);
+  const handleDelete = (index, id) => {
+    setDeletingId(id);
     setTimeout(() => {
       remove(index);
-      setDeletingIndex(null);
+      setDeletingId(null);
     }, 400);
   };
 
@@ -58,160 +72,146 @@ const InternshipsEdit = ({
         </p>
       </div>
 
-      <div className="space-y-3">
-        {fields.map((item, index) => {
-          const jobTitle = watch(`internshipHistory.${index}.jobTitle`);
-          const employer = watch(`internshipHistory.${index}.employer`);
-          const isCurrentlyInterning = watch(`internshipHistory.${index}.isCurrentlyInterning`);
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-3">
+            {fields.map((item, index) => {
+              const jobTitle = watch(`internshipHistory.${index}.jobTitle`);
+              const employer = watch(`internshipHistory.${index}.employer`);
+              const isCurrentlyInterning = watch(`internshipHistory.${index}.isCurrentlyInterning`);
 
-          return (
-            <div
-              key={item.id}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => handleDrop(e, index)}
-              className={`transition-all duration-500 mb-3 ${
-                deletingIndex === index ? "-translate-x-6 opacity-0" : ""
-              }`}
-            >
-              <div className="flex items-start gap-2">
-                {/* Drag Handle */}
-                <span
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  className="mt-5 cursor-grab active:cursor-grabbing"
-                >
-                  <TbDragDrop className="text-xl text-[#656e83] hover:text-[#800080]" />
-                </span>
+              return (
+                <DraggableWrapper key={item.id} id={item.id}>
+                  <div
+                    className={`transition-all duration-500 mb-3
+                      ${deletingId === item.id ? "-translate-x-6 opacity-0" : ""}
+                    `}
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="mt-5">
+                        <DragIcon />
+                      </span>
 
-                <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden bg-white">
-                  <AccordionPanel>
-                    <AccordionTitle className="font-semibold text-sm">
-                      {jobTitle?.trim()
-                        ? `${jobTitle}${employer ? " at " + employer : ""}`
-                        : "(Not specified)"}
-                    </AccordionTitle>
+                      <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden bg-white">
+                        <AccordionPanel>
+                          <AccordionTitle className="font-semibold text-sm">
+                            {jobTitle?.trim()
+                              ? `${jobTitle}${employer ? " at " + employer : ""}`
+                              : "(Not specified)"}
+                          </AccordionTitle>
 
-                    <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <Label className="!text-sm !text-gray-500 font-semibold">Job Title</Label>
-                          <input
-                            {...register(`internshipHistory.${index}.jobTitle`)}
-                            className="w-full rounded-md border p-2 text-sm mt-1"
-                            placeholder="e.g. Frontend Intern"
-                          />
-                        </div>
+                          <AccordionContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                              <div>
+                                <Label className="!text-sm !text-gray-500 font-semibold">Job Title</Label>
+                                <input
+                                  {...register(`internshipHistory.${index}.jobTitle`)}
+                                  className="w-full rounded-md border p-2 text-sm mt-1"
+                                  placeholder="e.g. Frontend Intern"
+                                />
+                              </div>
 
-                        <div>
-                          <Label className="!text-sm !text-gray-500 font-semibold">Employer</Label>
-                          <input
-                            {...register(`internshipHistory.${index}.employer`)}
-                            className="w-full rounded-md border p-2 text-sm mt-1"
-                            placeholder="e.g. Google"
-                          />
-                        </div>
+                              <div>
+                                <Label className="!text-sm !text-gray-500 font-semibold">Employer</Label>
+                                <input
+                                  {...register(`internshipHistory.${index}.employer`)}
+                                  className="w-full rounded-md border p-2 text-sm mt-1"
+                                  placeholder="e.g. Google"
+                                />
+                              </div>
 
-                        <div className="md:col-span-2">
-                          <Label className="!text-sm !text-gray-500 font-semibold">
-                            Start & End Date
-                          </Label>
-                          <div className="flex gap-2 mt-1">
-                            <div className="flex-1">
-                              <Controller
-                                control={control}
-                                name={`internshipHistory.${index}.startDate`}
-                                render={({ field }) => (
-                                  <Datepicker
-                                    selectedDate={field.value}
-                                    onChange={field.onChange}
-                                  />
-                                )}
-                              />
-                            </div>
-
-                            <div className="flex-1 relative">
-                              <Controller
-                                control={control}
-                                name={`internshipHistory.${index}.endDate`}
-                                render={({ field }) => (
-                                  <>
-                                    <Datepicker
-                                      selectedDate={isCurrentlyInterning ? null : field.value}
-                                      onChange={field.onChange}
-                                      disabled={isCurrentlyInterning}
+                              <div className="md:col-span-2">
+                                <Label className="!text-sm !text-gray-500 font-semibold">Start & End Date</Label>
+                                <div className="flex gap-2 mt-1">
+                                  <div className="flex-1">
+                                    <Controller
+                                      control={control}
+                                      name={`internshipHistory.${index}.startDate`}
+                                      render={({ field }) => (
+                                        <Datepicker selectedDate={field.value} onChange={field.onChange} />
+                                      )}
                                     />
-                                    {isCurrentlyInterning && (
-                                      <div className="absolute inset-0 flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-gray-300 rounded-md pointer-events-none">
-                                        Present
-                                      </div>
-                                    )}
-                                  </>
-                                )}
-                              />
+                                  </div>
+
+                                  <div className="flex-1 relative">
+                                    <Controller
+                                      control={control}
+                                      name={`internshipHistory.${index}.endDate`}
+                                      render={({ field }) => (
+                                        <>
+                                          <Datepicker
+                                            selectedDate={isCurrentlyInterning ? null : field.value}
+                                            onChange={field.onChange}
+                                            disabled={isCurrentlyInterning}
+                                          />
+                                          {isCurrentlyInterning && (
+                                            <div className="absolute inset-0 flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-gray-300 rounded-md pointer-events-none">
+                                              Present
+                                            </div>
+                                          )}
+                                        </>
+                                      )}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 mt-2">
+                                  <input
+                                    type="checkbox"
+                                    id={`currently-interning-${item.id}`}
+                                    checked={!!isCurrentlyInterning}
+                                    onChange={(e) => {
+                                      const checked = e.target.checked;
+                                      setValue(`internshipHistory.${index}.isCurrentlyInterning`, checked);
+                                      setValue(`internshipHistory.${index}.endDate`, checked ? "Present" : "");
+                                    }}
+                                    className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080]"
+                                  />
+                                  <label
+                                    htmlFor={`currently-interning-${item.id}`}
+                                    className="text-sm text-gray-700 cursor-pointer"
+                                  >
+                                    I currently intern here
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div>
+                                <Label className="!text-sm !text-gray-500 font-semibold">City, State</Label>
+                                <input
+                                  {...register(`internshipHistory.${index}.city`)}
+                                  className="w-full rounded-md border p-2 text-sm mt-1"
+                                  placeholder="e.g. San Francisco, CA"
+                                />
+                              </div>
+
+                              <div className="md:col-span-2">
+                                <Label className="!text-sm !text-gray-500 font-semibold">Description</Label>
+                                <Controller
+                                  control={control}
+                                  name={`internshipHistory.${index}.description`}
+                                  render={({ field }) => (
+                                    <TipTapEditor value={field.value} onChange={field.onChange} />
+                                  )}
+                                />
+                              </div>
                             </div>
-                          </div>
+                          </AccordionContent>
+                        </AccordionPanel>
+                      </Accordion>
 
-                          <div className="flex items-center gap-2 mt-2">
-                            <input
-                              type="checkbox"
-                              id={`currently-interning-${index}`}
-                              checked={!!isCurrentlyInterning}
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                setValue(`internshipHistory.${index}.isCurrentlyInterning`, checked);
-                                if (checked) {
-                                  setValue(`internshipHistory.${index}.endDate`, "Present");
-                                } else {
-                                  setValue(`internshipHistory.${index}.endDate`, "");
-                                }
-                              }}
-                              className="!w-4 !h-4 !rounded !border-gray-300 !text-[#800080]"
-                            />
-                            <label
-                              htmlFor={`currently-interning-${index}`}
-                              className="text-sm text-gray-700 cursor-pointer"
-                            >
-                              I currently intern here
-                            </label>
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label className="!text-sm !text-gray-500 font-semibold">City, State</Label>
-                          <input
-                            {...register(`internshipHistory.${index}.city`)}
-                            className="w-full rounded-md border p-2 text-sm mt-1"
-                            placeholder="e.g. San Francisco, CA"
-                          />
-                        </div>
-
-                        <div className="md:col-span-2">
-                          <Label className="!text-sm !text-gray-500 font-semibold">Description</Label>
-                          <Controller
-                            control={control}
-                            name={`internshipHistory.${index}.description`}
-                            render={({ field }) => (
-                              <TipTapEditor
-                                value={field.value}
-                                onChange={field.onChange}
-                              />
-                            )}
-                          />
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionPanel>
-                </Accordion>
-
-                <FaTrash
-                  onClick={() => handleDelete(index)}
-                  className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                      <FaTrash
+                        onClick={() => handleDelete(index, item.id)}
+                        className="mt-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors flex-shrink-0"
+                      />
+                    </div>
+                  </div>
+                </DraggableWrapper>
+              );
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       <button
         type="button"
