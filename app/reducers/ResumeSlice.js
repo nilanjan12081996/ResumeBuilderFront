@@ -1,6 +1,7 @@
 'use client';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from './api';
+import resumeApi from './resumeApi';
 
 
 export const savePersonalInfo = createAsyncThunk(
@@ -226,7 +227,7 @@ export const getSingleResume = createAsyncThunk(
     'getSingleResume',
     async ({ id, fetch }, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/api/resume/single-data?id=${id}&fetch=${fetch}`);
+            const response = await resumeApi.get(`/api/resume/single-data?id=${id}&fetch=${fetch}`);
             if (response?.data?.statusCode === 200) {
                 return response.data;
             } else {
@@ -287,7 +288,7 @@ export const saveResumeNew = createAsyncThunk(
     'saveResumeNew',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/scatch/resume/save', userInput);
+            const response = await resumeApi.post('/api/scatch/resume/save', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -307,7 +308,7 @@ export const saveResumeImprove = createAsyncThunk(
     'saveResumeImprove',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/imp/resume/save', userInput);
+            const response = await resumeApi.post('/api/imp/resume/save', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -327,7 +328,7 @@ export const saveResumeJd = createAsyncThunk(
     'saveResumeJd',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/jd/resume/save', userInput);
+            const response = await resumeApi.post('/api/jd/resume/save', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -348,7 +349,7 @@ export const saveResumeLinkedIn = createAsyncThunk(
     'saveResumeLinkedIn',
     async (userInput, { rejectWithValue }) => {
         try {
-            const response = await api.post('/api/linkdin/resume/save', userInput);
+            const response = await resumeApi.post('/api/linkdin/resume/save', userInput);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -370,7 +371,7 @@ export const generatePDF = createAsyncThunk(
         try {
 
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pdf/convert`,
+                `${process.env.NEXT_PUBLIC_API_RESUME_URL}/api/pdf/convert`,
                 {
                     method: 'POST',
                     headers: {
@@ -398,7 +399,7 @@ export const generateDocx = createAsyncThunk(
         try {
 
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/pdf/convert/doc`,
+                `${process.env.NEXT_PUBLIC_API_RESUME_URL}/api/pdf/convert/doc`,
                 {
                     method: 'POST',
                     headers: {

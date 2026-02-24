@@ -45,6 +45,7 @@ import { useTabs } from '../context/TabsContext.js';
 import { checkATS } from '../reducers/DashboardSlice';
 import { getSingleResume, saveResumeLinkedIn } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
+import ResumeCompareModal from '../modal/ResumeCompareModal';
 
 
 const LinkedInResumeBuilder = () => {
@@ -53,6 +54,7 @@ const LinkedInResumeBuilder = () => {
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
+  const { checkATSData, atsLoading } = useSelector((state) => state.dash);
 
   const resumeSource =
     singleResumeInfo?.data?.data ||
@@ -66,6 +68,9 @@ const LinkedInResumeBuilder = () => {
   const lastSavedData = useRef(null);
   const isInitialLoad = useRef(true);
   const [savingStatus, setSavingStatus] = useState('unsaved');
+  const [showCompare, setShowCompare] = useState(false);
+  const [originalResumeData, setOriginalResumeData] = useState(null);
+  const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
   useEffect(() => {
     if (!resumeSource) return;
@@ -77,7 +82,23 @@ const LinkedInResumeBuilder = () => {
     dispatch(checkATS(atsPayload));
   }, [resumeSource, dispatch]);
 
-  const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+
+  useEffect(() => {
+    if (resumeSource && !originalResumeData) {
+      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+      const initialSettings = clonedSource.resumeSettings || linkedInDefaultSettings;
+      const initialSections = mapLinkedInDataToSections(clonedSource);
+
+      setOriginalResumeData({
+        ...clonedSource,
+        sections: initialSections,
+        oldResumeSettings: initialSettings
+      });
+    }
+    if (!atsLoading && checkATSData?.ATS_Score > 0 && originalAtsScore === null) {
+      setOriginalAtsScore(checkATSData.ATS_Score);
+    }
+  }, [resumeSource, checkATSData, atsLoading, originalAtsScore, originalResumeData]);
 
   // ── ATS REFRESH ──
   const handleAtsRefresh = () => {
@@ -995,6 +1016,8 @@ const LinkedInResumeBuilder = () => {
                 score={checkATSData?.ATS_Score}
                 loading={atsLoading}
                 guide={checkATSData?.Improvment_Guide}
+                isComparingLoading={originalAtsScore === null}
+                onCompareClick={() => originalAtsScore !== null && setShowCompare(true)}
               />
 
               <LinkedInPersonalDetails register={register} watch={watch} setValue={setValue} />
@@ -1222,6 +1245,20 @@ const LinkedInResumeBuilder = () => {
           </div>
         </div>
       </div>
+      <ResumeCompareModal
+        isOpen={showCompare}
+        onClose={() => setShowCompare(false)}
+        oldData={originalResumeData}
+        newData={formValues}
+        oldScore={originalAtsScore}
+        newScore={checkATSData?.ATS_Score}
+        currentTemplate={selectedTemplate}
+        sections={sections}
+        themeColor={themeColor}
+        oldResumeSettings={originalResumeData?.oldResumeSettings}
+        resumeSettings={resumeSettings}
+        defaultOldTemplate="linkedin"
+      />
     </div>
   );
 };

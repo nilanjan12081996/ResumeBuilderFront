@@ -31,8 +31,8 @@ export const defaultResumeSettings = {
 
   layout: {
     pageFormat: "A4",            // default page format
-    topBottom: 36,               // 0.50 in × 72 = 36pt
-    leftRight: 36,               // 0.50 in × 72 = 36pt
+    topBottom: 25,               // 0.50 in × 72 = 36pt
+    leftRight: 25,               
     betweenSections: 16,         // pt
     betweenTitlesContent: 3,     // pt  
     columnGap: 20,               // keep same as before
@@ -42,7 +42,7 @@ export const defaultResumeSettings = {
     defaultColor: "#2E86C1",
     template: "ats",
     templateColors: {
-      professional: "#2E86C1",
+      professional: "#7c3aed",
       ats: "#2E86C1",
       clean: "#1C1C1C",
       clear: "#77c092",

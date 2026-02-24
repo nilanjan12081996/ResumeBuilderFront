@@ -56,7 +56,7 @@ const LinkedInSummary = ({ watch, setValue, sections, setSections, sectionIndex,
           <GenerateWithAiModal
             open={open}
             onClose={() => setOpen(false)}
-            aiType="imp_summary"
+            aiType="linkdin_summary"
             initialText={summaryValue || ""}
             fullResumeData={resumeSource}
             onApply={(text) => {

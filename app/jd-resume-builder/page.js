@@ -30,6 +30,7 @@ import CustomizeSection from '../ui/CustomizeSection.jsx';
 import ImpCustomSection from './components/ImpCustomSection';
 import ImpSimpleCustomSection from './components/Impsimplecustomsection';
 import AddSectionButton from './components/AddSectionButton';
+import ResumeCompareModal from '../modal/ResumeCompareModal';
 
 // Import Draggable Components
 import DraggableWrapper from './DraggableWrapper';
@@ -54,6 +55,7 @@ const Page = () => {
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
+  const { checkJdAtsData, atsLoading } = useSelector((state) => state.dash);
 
   const resumeSource =
     singleResumeInfo?.data?.data ||
@@ -67,6 +69,9 @@ const Page = () => {
   const lastSavedData = useRef(null);
   const isInitialLoad = useRef(true);
   const [savingStatus, setSavingStatus] = useState('unsaved');
+  const [showCompare, setShowCompare] = useState(false);
+  const [originalResumeData, setOriginalResumeData] = useState(null);
+  const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
   useEffect(() => {
     if (!resumeSource) return;
@@ -82,7 +87,25 @@ const Page = () => {
     dispatch(checkJdAts(atsPayload));
   }, [resumeSource, dispatch]);
 
-  const { checkJdAtsData, atsLoading } = useSelector((state) => state.dash);
+
+useEffect(() => {
+    if (resumeSource && !originalResumeData) {
+        const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+        const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
+        const initialSections = mapextracteResumeDataToSections(clonedSource);
+
+        setOriginalResumeData({
+            ...clonedSource,
+            sections: initialSections,
+            oldResumeSettings: initialSettings 
+        });
+    }
+    if (!atsLoading && checkJdAtsData?.ATS_Score > 0 && originalAtsScore === null) {
+        setOriginalAtsScore(checkJdAtsData.ATS_Score);
+    }
+
+}, [resumeSource, checkJdAtsData, atsLoading, originalAtsScore, originalResumeData]);
+
 
   // ATS REFRESH
   const handleAtsRefresh = () => {
@@ -1412,6 +1435,8 @@ const Page = () => {
                 score={checkJdAtsData?.ATS_Score}
                 loading={atsLoading}
                 guide={checkJdAtsData?.Improvment_Guide}
+                isComparingLoading={originalAtsScore === null}
+                onCompareClick={() => originalAtsScore !== null && setShowCompare(true)}
               />
 
               {/* Personal Details */}
@@ -1707,6 +1732,19 @@ const Page = () => {
           </div>
         </div>
       </div>
+      <ResumeCompareModal
+        isOpen={showCompare}
+        onClose={() => setShowCompare(false)}
+        oldData={originalResumeData}
+        newData={formValues}
+        oldScore={originalAtsScore}
+        newScore={checkJdAtsData?.ATS_Score}
+        currentTemplate={selectedTemplate}
+        sections={sections}
+        themeColor={themeColor}
+        oldResumeSettings={originalResumeData?.oldResumeSettings}
+        resumeSettings={resumeSettings}
+      />
     </div>
   );
 };

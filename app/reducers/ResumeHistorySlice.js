@@ -1,6 +1,7 @@
 'use client';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from './api';
+import resumeApi from './resumeApi';
 
 export const getResumeHistory=createAsyncThunk(
     'getResumeHistory',
@@ -18,7 +19,7 @@ export const getResumeHistory=createAsyncThunk(
             //     }
             //     const response = await api.get(url);
            // const response = await api.get(`/api/resume-history/list?page=${page}&limit=${limit}&searchQuery=${searchQuery}`);
-                const response = await api.get(`/api/resume/list`);
+                const response = await resumeApi.get(`/api/resume/list`);
            
            if (response?.data?.statusCode === 200) {
                 return response.data;

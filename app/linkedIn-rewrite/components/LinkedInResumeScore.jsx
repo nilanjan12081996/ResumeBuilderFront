@@ -93,7 +93,7 @@ const formatGuide = (text) => {
 
 
 
-const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
+const ImpResumeScore = ({ score = 0, loading = false, guide = "", onCompareClick, isComparingLoading }) => {
     const safeScore = Math.min(100, Math.max(0, Number(score) || 0));
     const [progress, setProgress] = useState(0);
 
@@ -180,19 +180,32 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "" }) => {
                         </div>
                     )}
 
-                    <div className="flex gap-10">
-                        <button className="flex items-center gap-1 text-sm font-thin text-[#800080] hover:text-[#e799e7]">
-                            <PiReadCvLogoDuotone className="text-lg" />
-                            Existing Resume
-                        </button>
-
-                        <button className="flex items-center gap-1 text-sm font-thin text-[#800080] hover:text-[#e799e7]">
-                            <MdOutlinePublishedWithChanges className="text-lg" />
-                            Changed Resume
+                    <div className="flex">
+                        <button
+                            onClick={onCompareClick}
+                            disabled={isComparingLoading}
+                            className={`flex items-center gap-2 px-3 py-1.5 cursor-pointer text-xs border rounded-md transition duration-200 
+                                    ${isComparingLoading
+                                    ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                                    : "text-[#800080] border-[#800080] hover:bg-[#800080] hover:text-white"
+                                }`}
+                        >
+                            {isComparingLoading ? (
+                                <>
+                                    <span className="w-3 h-3 border-2 border-[#800080]/30 border-t-[#800080] rounded-full animate-spin" />
+                                    Calculating Initial Score...
+                                </>
+                            ) : (
+                                <>
+                                    <MdOutlinePublishedWithChanges className="text-sm" />
+                                    Compare Resume
+                                    <span className="text-[10px] opacity-80">(Existing vs Updated)</span>
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>
-                
+
             </div>
 
         </div>

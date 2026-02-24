@@ -176,9 +176,9 @@ const Page = () => {
                           <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
                             {resume.resume_name}
                           </h3>
-                          <p className="text-[#7D7D7D] text-xs lg:text-sm">
+                          {/* <p className="text-[#7D7D7D] text-xs lg:text-sm">
                             Created on {formatDate(resume.created_at)}
-                          </p>
+                          </p> */}
                         </div>
                       </div>
                       <div>

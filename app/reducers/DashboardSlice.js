@@ -766,6 +766,42 @@ export const generateJdNewExperience = createAsyncThunk(
     }
 );
 
+export const improvementJdSummary = createAsyncThunk(
+    "dashboard/improvementJdSummary",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post(
+                "/agent/JD/professional/summary/improvement",
+                payload
+            );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
+export const improvementJdExperience = createAsyncThunk(
+    "dashboard/improvementJdExperience",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const res = await aiApi.post(
+                "/agent/JD/Experience/Description/improvement",
+                payload
+            );
+            if (res?.status === 200) {
+                return res?.data;
+            }
+            return rejectWithValue(res?.data?.errors || "Something went wrong.");
+        } catch (e) {
+            return rejectWithValue(e?.response?.data || "Network error");
+        }
+    }
+);
+
 export const fetchMissingSkills = createAsyncThunk(
     "dashboard/fetchMissingSkills",
     async (payload, { rejectWithValue }) => {
@@ -874,6 +910,12 @@ const initialState = {
 
     generateJdNewExperienceLoading: false,
     generateJdNewExperienceData: {},
+
+    improvementJdSummaryLoading: false,
+    improvementJdSummaryData: {},
+
+    improvementJdExperienceLoading: false,
+    improvementJdExperienceData: {},
 
     missingSkillsData: [],
     jobDescription: "",
@@ -1424,6 +1466,32 @@ const DashboardSlice = createSlice(
                 })
                 .addCase(generateJdNewExperience.rejected, (state, { payload }) => {
                     state.generateJdNewExperienceLoading = false;
+                    state.error = payload;
+                })
+
+                .addCase(improvementJdSummary.pending, (state) => {
+                    state.improvementJdSummaryLoading = true;
+                    state.error = false;
+                })
+                .addCase(improvementJdSummary.fulfilled, (state, { payload }) => {
+                    state.improvementJdSummaryLoading = false;
+                    state.improvementJdSummaryData = payload;
+                })
+                .addCase(improvementJdSummary.rejected, (state, { payload }) => {
+                    state.improvementJdSummaryLoading = false;
+                    state.error = payload;
+                })
+
+                .addCase(improvementJdExperience.pending, (state) => {
+                    state.improvementJdExperienceLoading = true;
+                    state.error = false;
+                })
+                .addCase(improvementJdExperience.fulfilled, (state, { payload }) => {
+                    state.improvementJdExperienceLoading = false;
+                    state.improvementJdExperienceData = payload;
+                })
+                .addCase(improvementJdExperience.rejected, (state, { payload }) => {
+                    state.improvementJdExperienceLoading = false;
                     state.error = payload;
                 })
 

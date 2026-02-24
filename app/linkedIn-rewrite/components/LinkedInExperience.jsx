@@ -173,7 +173,7 @@ const LinkedInExperience = ({
                               <GenerateWithAiModal
                                 open={true}
                                 onClose={() => setActiveExpId(null)}
-                                aiType="imp_experience"
+                                aiType="linkdin_experience"
                                 initialText={exp.description || ""}
                                 fullResumeData={resumeSource}
                                 onApply={(text) => {
