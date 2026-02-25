@@ -27,12 +27,18 @@ export const defaultResumeSettings = {
     professional: {
       secondaryHeading: 9,
     },
+    clear: {
+      secondaryHeading: 10,
+    },
+    vivid: {
+      secondaryHeading: 10,
+    },
   },
 
   layout: {
     pageFormat: "A4",            // default page format
     topBottom: 25,               // 0.50 in × 72 = 36pt
-    leftRight: 25,               
+    leftRight: 25,
     betweenSections: 16,         // pt
     betweenTitlesContent: 3,     // pt  
     columnGap: 20,               // keep same as before
@@ -50,5 +56,9 @@ export const defaultResumeSettings = {
       corporate: "#0B3D91",
       linkedin: "#293d48"
     },
+  },
+  ai: {
+    summary_count: 5,
+    experience_count: 5,
   },
 };

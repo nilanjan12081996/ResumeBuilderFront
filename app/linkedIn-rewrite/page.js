@@ -46,6 +46,7 @@ import { checkATS } from '../reducers/DashboardSlice';
 import { getSingleResume, saveResumeLinkedIn } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ResumeCompareModal from '../modal/ResumeCompareModal';
+import { useDownload } from '../hooks/useDownload';
 
 
 const LinkedInResumeBuilder = () => {
@@ -72,14 +73,19 @@ const LinkedInResumeBuilder = () => {
   const [originalResumeData, setOriginalResumeData] = useState(null);
   const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
+  const hasInitialAtsCalled = useRef(false);
+
   useEffect(() => {
-    if (!resumeSource) return;
-    const atsPayload = {
-      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-      resume_data: JSON.stringify(resumeSource),
-      Ats_score: 0
-    };
-    dispatch(checkATS(atsPayload));
+    if (resumeSource && !hasInitialAtsCalled.current) {
+      const atsPayload = {
+        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+        resume_data: JSON.stringify(resumeSource),
+        Ats_score: 0
+      };
+
+      dispatch(checkATS(atsPayload));
+      hasInitialAtsCalled.current = true;
+    }
   }, [resumeSource, dispatch]);
 
 
@@ -1000,6 +1006,8 @@ const LinkedInResumeBuilder = () => {
   };
 
   const handleDragEnd = () => { };
+
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
 
   // ═══════════════════════════════════════════════════════════════
   //  RENDER

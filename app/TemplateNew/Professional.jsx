@@ -445,24 +445,29 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     </section>
   );
 
-  const renderCertificationsFromSection = (section) => (
-    <section key={section.id}>
-      <span style={mainHeadingStyle}>{section.title}</span>
-      {section.certifications?.map((cert, i) => (
-        <div key={cert.id || i} style={{ marginBottom: '6pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {cert.name}{cert.organization ? `, ${cert.organization}` : ''}
-          </div>
-          {(cert.startYear || cert.endYear) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-              {cert.startYear && cert.endYear ? `${cert.startYear} — ${cert.endYear}` : cert.startYear || cert.endYear}
-            </div>
-          )}
-          {cert.description && <p style={{ ...bodyStyle, color: '#374151', margin: '2pt 0' }}>{cert.description}</p>}
+ const renderCertificationsFromSection = (section) => (
+  <section key={section.id}>
+    <span style={mainHeadingStyle}>{section.title}</span>
+    {section.certifications?.map((cert, i) => (
+      <div key={cert.id || i} style={{ marginBottom: '8pt' }}>
+        <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
+          {cert.name}{cert.organization ? `, ${cert.organization}` : ''}
         </div>
-      ))}
-    </section>
-  );
+        {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear) && (
+          <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
+            {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}
+          </div>
+        )}
+        {cert.description && (
+          <div
+            style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight }}
+            dangerouslySetInnerHTML={{ __html: cert.description }}
+          />
+        )}
+      </div>
+    ))}
+  </section>
+);
 
   const renderCoursesFromSection = (section) => (
     <section key={section.id}>
@@ -593,10 +598,10 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         .filter(s => SIDEBAR_TYPES.has(s.type))
         .map(section => {
           switch (section.type) {
-            case 'skills':    return renderSkillsFromSection(section);
-            case 'hobbies':   return renderHobbiesFromSectionSidebar(section);
+            case 'skills': return renderSkillsFromSection(section);
+            case 'hobbies': return renderHobbiesFromSectionSidebar(section);
             case 'languages': return renderLanguagesFromSection(section);
-            default:          return null;
+            default: return null;
           }
         });
     }
@@ -611,17 +616,17 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         .filter(s => !SIDEBAR_TYPES.has(s.type))
         .map(section => {
           switch (section.type) {
-            case 'summary':        return renderSummaryFromSection(section);
-            case 'experience':     return renderExperienceFromSection(section);
-            case 'education':      return renderEducationFromSection(section);
+            case 'summary': return renderSummaryFromSection(section);
+            case 'experience': return renderExperienceFromSection(section);
+            case 'education': return renderEducationFromSection(section);
             case 'certifications': return renderCertificationsFromSection(section);
-            case 'courses':        return renderCoursesFromSection(section);
-            case 'internships':    return renderInternshipsFromSection(section);
-            case 'activities':     return renderActivitiesFromSection(section);
-            case 'hobbies':        return renderHobbiesFromSection(section);
-            case 'custom_simple':  return renderCustomSimpleFromSection(section);
-            case 'custom':         return renderCustomAdvancedFromSection(section);
-            default:               return null;
+            case 'courses': return renderCoursesFromSection(section);
+            case 'internships': return renderInternshipsFromSection(section);
+            case 'activities': return renderActivitiesFromSection(section);
+            case 'hobbies': return renderHobbiesFromSection(section);
+            case 'custom_simple': return renderCustomSimpleFromSection(section);
+            case 'custom': return renderCustomAdvancedFromSection(section);
+            default: return null;
           }
         });
     }
@@ -721,7 +726,17 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
                     <img
                       src={formData.profileImage}
                       alt="Profile"
-                      style={{ width: '80pt', height: '80pt', objectFit: 'cover', borderRadius: '50%', border: '2pt solid rgba(255,255,255,0.6)' }}
+                      style={{
+                        width: '80pt',
+                        height: '80pt',
+                        objectFit: 'cover',
+                        borderRadius: '50%',
+                        border: '2pt solid rgba(255,255,255,0.6)',
+                        // Nicher property gulo add koro:
+                        display: 'block',
+                        marginLeft: 'auto',
+                        marginRight: 'auto'
+                      }}
                     />
                   </div>
                 )}

@@ -21,6 +21,7 @@ import {
   getIpData,
   getPlans,
   cancelSubscription,
+  resetAiCount,
 } from "../reducers/PlanSlice";
 
 const Page = () => {
@@ -176,6 +177,7 @@ const Page = () => {
             await dispatch(verifyOrder(userData));
             toast.success("Payment Successful");
             dispatch(currentSubscription(ip));
+            dispatch(resetAiCount());
           } catch (err) {
             toast.error("Payment verification failed.");
           }

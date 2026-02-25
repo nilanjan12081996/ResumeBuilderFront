@@ -12,14 +12,10 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
     const strVal = String(dateValue).trim();
     if (strVal.toLowerCase() === "present") return "Present";
     if (strVal.toUpperCase() === "PRESENT") return "Present";
-
-    // Try parsing as Date
     const d = new Date(strVal);
     if (!isNaN(d.getTime())) {
       return d.toLocaleString("en-US", { month: "short", year: "numeric" });
     }
-
-    // Fallback: return raw string (e.g. "Jan 2020" already formatted)
     return strVal;
   };
 
@@ -53,21 +49,25 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   };
 
   // ── Section divider line ──────────────────────────────────────
-  const Divider = () => <div className="border-t border-gray-200 my-3" />;
+  const Divider = () => (
+    <div style={{ borderTop: "1pt solid #e5e7eb", margin: "10pt 0" }} />
+  );
 
   // ── Section Heading ───────────────────────────────────────────
   const SectionHeading = ({ title }) => (
-    <h3
-      className="font-bold uppercase tracking-wide mb-3"
+    <div
       style={{
         color: "#000000",
         fontFamily: text.secondaryFont,
         fontSize: `${text.sectionTitle}pt`,
         fontWeight: text.sectionTitleWeight,
+        textTransform: "uppercase",
+        letterSpacing: "0.05em",
+        marginBottom: "8pt",
       }}
     >
       {title}
-    </h3>
+    </div>
   );
 
   // ── Separate sections by type ─────────────────────────────────
@@ -82,18 +82,22 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const customSimpleSections = findSection("custom_simple");
   const customAdvSections = findSection("custom");
 
+  const bodyStyle = {
+    fontFamily: text.primaryFont,
+    fontSize: `${text.body}pt`,
+    fontWeight: text.bodyWeight,
+    lineHeight: text.lineHeight,
+    color: "#374151",
+  };
+
   // ── RENDERERS ─────────────────────────────────────────────────
 
   const renderSummary = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
       <div
-        className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_p]:mb-1"
-        style={{
-          fontSize: `${text.body}pt`,
-          fontWeight: text.bodyWeight,
-          textAlign: "justify",
-        }}
+        className="resume-content"
+        style={{ ...bodyStyle, color: "#374151", textAlign: "justify" }}
         dangerouslySetInnerHTML={{ __html: section.summary }}
       />
       <Divider />
@@ -103,45 +107,45 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderExperience = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-4">
-        {section.experiences?.map((exp, i) => {
-          const dr = dateRange(exp.startDate, exp.endDate);
-          const dur = calcDuration(exp.startDate, exp.endDate);
-          return (
-            <div key={exp.id || i} className="flex gap-3">
-              <div className="flex-1">
-                <h4
-                  className="font-bold text-black"
-                  style={{ fontSize: `${text.body + 1}pt` }}
-                >
-                  {exp.jobTitle}
-                </h4>
-                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
-                  {exp.company}
-                </p>
-                {dr && (
-                  <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
-                    {dr}
-                    {dur ? ` · ${dur}` : ""}
-                  </p>
-                )}
-                {exp.city && (
-                  <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
-                    {exp.city}
-                  </p>
-                )}
-                {exp.description && (
-                  <div
-                    className="text-gray-700 mt-2 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_p]:mb-1"
-                    style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-                    dangerouslySetInnerHTML={{ __html: exp.description }}
-                  />
-                )}
-              </div>
+      {section.experiences?.map((exp, i) => {
+        const dr = dateRange(exp.startDate, exp.endDate);
+        const dur = calcDuration(exp.startDate, exp.endDate);
+        return (
+          <div key={exp.id || i} style={{ marginBottom: "10pt" }}>
+            <div style={{
+              fontFamily: text.secondaryFont || text.primaryFont,
+              fontSize: `${text.body + 1}pt`,
+              fontWeight: "700",
+              color: "#111",
+              marginBottom: "1pt",
+            }}>
+              {exp.jobTitle}
             </div>
-          );
-        })}
-      </div>
+            {exp.company && (
+              <div style={{ ...bodyStyle, color: "#374151", marginBottom: "1pt" }}>
+                {exp.company}
+              </div>
+            )}
+            {dr && (
+              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#6b7280", marginBottom: "1pt" }}>
+                {dr}{dur ? ` · ${dur}` : ""}
+              </div>
+            )}
+            {exp.city && (
+              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#9ca3af", marginBottom: "1pt" }}>
+                {exp.city}
+              </div>
+            )}
+            {exp.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, marginTop: "4pt" }}
+                dangerouslySetInnerHTML={{ __html: exp.description }}
+              />
+            )}
+          </div>
+        );
+      })}
       <Divider />
     </div>
   );
@@ -149,45 +153,44 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderEducation = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-4">
-        {section.educations?.map((edu, i) => {
-          const dr = dateRange(edu.startDate, edu.endDate);
-          return (
-            <div key={edu.id || i} className="flex gap-3">
-              <div className="flex-1">
-                <h4
-                  className="font-bold text-black"
-                  style={{ fontSize: `${text.body + 1}pt` }}
-                >
-                  {edu.institute}
-                </h4>
-                {edu.degree && (
-                  <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
-                    {edu.degree}
-                  </p>
-                )}
-                {dr && (
-                  <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
-                    {dr}
-                  </p>
-                )}
-                {edu.city && (
-                  <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
-                    {edu.city}
-                  </p>
-                )}
-                {edu.description && (
-                  <div
-                    className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
-                    style={{ fontSize: `${text.body}pt` }}
-                    dangerouslySetInnerHTML={{ __html: edu.description }}
-                  />
-                )}
-              </div>
+      {section.educations?.map((edu, i) => {
+        const dr = dateRange(edu.startDate, edu.endDate);
+        return (
+          <div key={edu.id || i} style={{ marginBottom: "10pt" }}>
+            <div style={{
+              fontFamily: text.secondaryFont || text.primaryFont,
+              fontSize: `${text.body + 1}pt`,
+              fontWeight: "700",
+              color: "#111",
+              marginBottom: "1pt",
+            }}>
+              {edu.institute}
             </div>
-          );
-        })}
-      </div>
+            {edu.degree && (
+              <div style={{ ...bodyStyle, color: "#374151", marginBottom: "1pt" }}>
+                {edu.degree}
+              </div>
+            )}
+            {dr && (
+              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#6b7280", marginBottom: "1pt" }}>
+                {dr}
+              </div>
+            )}
+            {edu.city && (
+              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#9ca3af", marginBottom: "1pt" }}>
+                {edu.city}
+              </div>
+            )}
+            {edu.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, marginTop: "4pt" }}
+                dangerouslySetInnerHTML={{ __html: edu.description }}
+              />
+            )}
+          </div>
+        );
+      })}
       <Divider />
     </div>
   );
@@ -195,16 +198,20 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderSkills = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div
-        className="flex flex-wrap gap-2"
-        style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-      >
+      <div>
         {section.skills?.map((skill, i) => (
-          <span
-            key={skill.id || i}
-            className="px-3 py-1 rounded-full border text-gray-700 bg-gray-50 border-gray-200"
-            style={{ fontSize: `${text.body - 1}pt` }}
-          >
+          <span key={skill.id || i} style={{
+            display: "inline-block",
+            border: "1pt solid #e5e7eb",
+            borderRadius: "20pt",
+            backgroundColor: "#f9fafb",
+            padding: "2pt 8pt",
+            fontSize: `${text.body - 1}pt`,
+            color: "#374151",
+            fontFamily: text.primaryFont,
+            marginRight: "4pt",
+            marginBottom: "4pt",
+          }}>
             {skill.name}
           </span>
         ))}
@@ -216,52 +223,67 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderLanguages = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-wrap gap-x-4 gap-y-2" style={{ fontSize: `${text.body}pt` }}>
-        {section.languages?.map((l, i) => (
-          <div key={l.id || i} className="flex items-center gap-1">
-            <span className="font-semibold text-black">{l.language}</span>
-            {!section.hideProficiency && l.level && (
-              <span className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>
-                ({l.level})
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
+      <table style={{ borderCollapse: "collapse" }}>
+        <tbody>
+          {Array.from({ length: Math.ceil((section.languages?.length || 0) / 3) }).map((_, rowIdx) => (
+            <tr key={rowIdx}>
+              {[0, 1, 2].map(colIdx => {
+                const l = section.languages?.[rowIdx * 3 + colIdx];
+                if (!l) return <td key={colIdx} style={{ paddingRight: "16pt", paddingBottom: "4pt" }} />;
+                return (
+                  <td key={colIdx} style={{ paddingRight: "16pt", paddingBottom: "4pt", verticalAlign: "top" }}>
+                    <span style={{ fontWeight: "600", color: "#111", fontFamily: text.primaryFont, fontSize: `${text.body}pt` }}>
+                      {l.language}
+                    </span>
+                    {!section.hideProficiency && l.level && (
+                      <span style={{ color: "#6b7280", fontSize: `${text.body - 1}pt`, marginLeft: "4pt", fontFamily: text.primaryFont }}>
+                        ({l.level})
+                      </span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <Divider />
     </div>
   );
 
-
   const renderCourses = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-3">
-        {section.courses?.map((course, i) => (
-          <div key={course.id || i}>
-            <h4 className="font-semibold text-black" style={{ fontSize: `${text.body}pt` }}>
-              {course.course}
-            </h4>
-            {course.institution && (
-              <p className="text-gray-600" style={{ fontSize: `${text.body - 1}pt` }}>
-                {course.institution}
-              </p>
-            )}
-            {dateRange(course.startDate, course.endDate) && (
-              <p className="text-gray-400" style={{ fontSize: `${text.body - 1}pt` }}>
-                {dateRange(course.startDate, course.endDate)}
-              </p>
-            )}
-            {course.description && (
-              <div
-                className="resume-content"
-                style={{ fontSize: `${text.body}pt`, color: "#374151", marginTop: "2pt", lineHeight: text.lineHeight }}
-                dangerouslySetInnerHTML={{ __html: course.description }}
-              />
-            )}
+      {section.courses?.map((course, i) => (
+        <div key={course.id || i} style={{ marginBottom: "8pt" }}>
+          <div style={{
+            fontFamily: text.secondaryFont || text.primaryFont,
+            fontSize: `${text.body}pt`,
+            fontWeight: "600",
+            color: "#111",
+            marginBottom: "1pt",
+          }}>
+            {course.course}
           </div>
-        ))}
-      </div>
+          {course.institution && (
+            <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#6b7280", marginBottom: "1pt" }}>
+              {course.institution}
+            </div>
+          )}
+          {dateRange(course.startDate, course.endDate) && (
+            <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#9ca3af", marginBottom: "1pt" }}>
+              {dateRange(course.startDate, course.endDate)}
+            </div>
+          )}
+          {course.description && (
+            <div
+              className="resume-content"
+              style={{ ...bodyStyle, marginTop: "2pt" }}
+              dangerouslySetInnerHTML={{ __html: course.description }}
+            />
+          )}
+        </div>
+      ))}
       <Divider />
     </div>
   );
@@ -269,123 +291,128 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   const renderHonors = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-4">
-        {section.items?.map((item, i) => {
-          const dr = dateRange(item.startDate, item.endDate);
-          return (
-            <div key={item.id || i}>
-              <h4 className="font-bold text-black" style={{ fontSize: `${text.body + 1}pt` }}>
-                {item.title}
-              </h4>
-              {item.issuer && (
-                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
-                  {item.issuer}
-                </p>
-              )}
-              {dr && (
-                <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>{dr}</p>
-              )}
-              {item.description && (
-                <div
-                  className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
-                  style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-                  dangerouslySetInnerHTML={{ __html: item.description }}
-                />
-              )}
+      {section.items?.map((item, i) => {
+        const dr = dateRange(item.startDate, item.endDate);
+        return (
+          <div key={item.id || i} style={{ marginBottom: "10pt" }}>
+            <div style={{
+              fontFamily: text.secondaryFont || text.primaryFont,
+              fontSize: `${text.body + 1}pt`,
+              fontWeight: "700",
+              color: "#111",
+              marginBottom: "1pt",
+            }}>
+              {item.title}
             </div>
-          );
-        })}
-      </div>
+            {item.issuer && (
+              <div style={{ ...bodyStyle, color: "#374151", marginBottom: "1pt" }}>
+                {item.issuer}
+              </div>
+            )}
+            {dr && (
+              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#6b7280", marginBottom: "1pt" }}>
+                {dr}
+              </div>
+            )}
+            {item.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, marginTop: "4pt" }}
+                dangerouslySetInnerHTML={{ __html: item.description }}
+              />
+            )}
+          </div>
+        );
+      })}
       <Divider />
     </div>
   );
 
-  // Custom Simple — grid style (competencies, achievements)
-  const renderCustomSimple = (section) => (
-    <div key={section.id}>
-      <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-2" style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}>
+  // Custom Simple — bullet dot style
+  const renderCustomSimple = (section) => {
+    const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
+    return (
+      <div key={section.id}>
+        <SectionHeading title={section.title} />
         {section.items?.map((item, i) => {
           const name = typeof item === "object" ? item.name || item.title : item;
-          const levels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
-          const levelName = typeof item === "object" && !section.hideExperienceLevel && item.level != null
-            ? levels[item.level]
-            : null;
+          const levelName =
+            typeof item === "object" && !section.hideExperienceLevel && item.level != null
+              ? levels[item.level]
+              : null;
           return (
-            <div key={i} className="flex items-start gap-2 text-gray-700">
-              <span
-                className="mt-[5px] w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: color }}
-              />
-              <span>
-                {name}
-                {levelName && (
-                  <span className="text-gray-400 ml-1" style={{ fontSize: `${text.body - 1}pt` }}>
-                    ({levelName})
-                  </span>
-                )}
-              </span>
-            </div>
+            <table key={i} style={{ borderCollapse: "collapse" }}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: "top" }}>
+                    <span style={{ ...bodyStyle, color: "#374151" }}>
+                      {name}
+                      {levelName && (
+                        <span style={{ color: "#9ca3af", marginLeft: "4pt", fontSize: `${text.body - 1}pt` }}>
+                          ({levelName})
+                        </span>
+                      )}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           );
         })}
+        <Divider />
       </div>
-      <Divider />
-    </div>
-  );
+    );
+  };
 
   // Custom Advanced
   const renderCustomAdvanced = (section) => (
     <div key={section.id}>
       <SectionHeading title={section.title} />
-      <div className="flex flex-col gap-4">
-        {section.items?.map((item, i) => {
-          const dr = dateRange(item.startDate, item.endDate);
-          return (
-            <div key={item.id || i}>
-              <h4 className="font-bold text-black" style={{ fontSize: `${text.body + 1}pt` }}>
-                {item.title}
-              </h4>
-              {item.city && (
-                <p className="text-gray-700" style={{ fontSize: `${text.body}pt` }}>
-                  {item.city}
-                </p>
-              )}
-              {dr && (
-                <p className="text-gray-500" style={{ fontSize: `${text.body - 1}pt` }}>{dr}</p>
-              )}
-              {item.description && (
-                <div
-                  className="text-gray-700 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1"
-                  style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-                  dangerouslySetInnerHTML={{ __html: item.description }}
-                />
-              )}
+      {section.items?.map((item, i) => {
+        const dr = dateRange(item.startDate, item.endDate);
+        return (
+          <div key={item.id || i} style={{ marginBottom: "10pt" }}>
+            <div style={{
+              fontFamily: text.secondaryFont || text.primaryFont,
+              fontSize: `${text.body + 1}pt`,
+              fontWeight: "700",
+              color: "#111",
+              marginBottom: "1pt",
+            }}>
+              {item.title}
             </div>
-          );
-        })}
-      </div>
+            {item.city && (
+              <div style={{ ...bodyStyle, color: "#374151", marginBottom: "1pt" }}>
+                {item.city}
+              </div>
+            )}
+            {dr && (
+              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#6b7280", marginBottom: "1pt" }}>
+                {dr}
+              </div>
+            )}
+            {item.description && (
+              <div
+                className="resume-content"
+                style={{ ...bodyStyle, marginTop: "4pt" }}
+                dangerouslySetInnerHTML={{ __html: item.description }}
+              />
+            )}
+          </div>
+        );
+      })}
       <Divider />
     </div>
   );
 
-  // ── Contact info: address build করা — duplicate না দেখানোর জন্য smart merge ──
-  // address field এ যদি city/state already থাকে তাহলে city_state আলাদা দেখাবে না
+  // ── Contact address build ─────────────────────────────────────
   const buildAddressLine = () => {
     const parts = [];
     if (formData.address) parts.push(formData.address);
-    // city_state শুধু তখনই add করো যদি address এ already নেই
-    if (
-      formData.city_state &&
-      !(formData.address || "").includes(formData.city_state)
-    ) {
+    if (formData.city_state && !(formData.address || "").includes(formData.city_state))
       parts.push(formData.city_state);
-    }
-    if (
-      formData.country &&
-      !(formData.address || "").includes(formData.country)
-    ) {
+    if (formData.country && !(formData.address || "").includes(formData.country))
       parts.push(formData.country);
-    }
     return parts.filter(Boolean).join(", ");
   };
 
@@ -393,169 +420,191 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
 
   // ── MAIN RENDER ───────────────────────────────────────────────
   return (
-    <div className="h-screen overflow-y-auto hide-scrollbar">
+    <div style={{ overflowY: "auto" }}>
+      <style>{`
+        .resume-content ul { list-style-type: disc; padding-left: 14pt; margin: 2pt 0; }
+        .resume-content ol { list-style-type: decimal; padding-left: 14pt; margin: 2pt 0; }
+        .resume-content li { margin-bottom: 2pt; }
+        .resume-content strong { font-weight: bold; }
+        .resume-content em { font-style: italic; }
+        .resume-content p { margin-bottom: 2pt; }
+      `}</style>
       <div
-        className="min-h-[297mm] w-full bg-white font-sans shadow-lg resume-root"
-        style={{ fontFamily: text.primaryFont, lineHeight: text.lineHeight }}
+        style={{
+          minHeight: "297mm",
+          width: "100%",
+          backgroundColor: "#fff",
+          fontFamily: text.primaryFont,
+          lineHeight: text.lineHeight,
+          fontSize: `${text.body}pt`,
+        }}
       >
 
         {/* ══ 1. COVER PHOTO BANNER ════════════════════════════════ */}
-        <div className="relative">
+        <div style={{ position: "relative", width: "100%" }}>
           {/* Cover photo area */}
           {formData.coverImage ? (
             <img
               src={formData.coverImage}
               alt="Cover"
-              className="w-full object-cover"
-              style={{ aspectRatio: "4 / 1" }}
+              style={{ width: "100%", display: "block", height: "100pt", objectFit: "cover" }}
             />
           ) : (
-            <div
-              className="w-full"
-              style={{
-                height: "100pt",
-                backgroundColor: color,
-              }}
-            />
+            <div style={{ width: "100%", height: "100pt", backgroundColor: color }} />
           )}
 
-          {/* Profile photo — overlapping cover */}
-          <div
-            className="absolute left-8 border-4 border-white rounded-full overflow-hidden bg-white"
-            style={{
-              bottom: "-32pt",
-              width: "72pt",
-              height: "72pt",
-            }}
-          >
+          {/* Profile photo — overlapping cover, position absolute */}
+          <div style={{
+            position: "absolute",
+            bottom: "-32pt",
+            left: `${layout.leftRight || 20}pt`,
+            width: "72pt",
+            height: "72pt",
+            borderRadius: "50%",
+            overflow: "hidden",
+            border: "4pt solid #fff",
+            backgroundColor: "#fff",
+          }}>
             {formData.profileImage ? (
               <img
                 src={formData.profileImage}
                 alt="Profile"
-                className="w-full h-full object-cover"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center text-white font-bold text-2xl"
-                style={{ backgroundColor: color }}
-              >
-                {(formData.first_name?.[0] || "") + (formData.last_name?.[0] || "")}
+              <div style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: color,
+                display: "table",
+              }}>
+                <div style={{ display: "table-cell", verticalAlign: "middle", textAlign: "center" }}>
+                  <span style={{ color: "#fff", fontWeight: "700", fontSize: "18pt" }}>
+                    {(formData.first_name?.[0] || "") + (formData.last_name?.[0] || "")}
+                  </span>
+                </div>
               </div>
             )}
           </div>
         </div>
 
         {/* Spacer for profile photo overlap */}
-        <div
-          style={{
-            paddingTop: "38pt",
-            paddingLeft: `${layout.leftRight}pt`,
-            paddingRight: `${layout.leftRight}pt`,
-          }}
-        >
+        <div style={{
+          paddingTop: "38pt",
+          paddingLeft: `${layout.leftRight || 20}pt`,
+          paddingRight: `${layout.leftRight || 20}pt`,
+          paddingBottom: `${layout.topBottom || 20}pt`,
+        }}>
 
           {/* ══ 2. NAME + HEADLINE ═══════════════════════════════════ */}
-          <div className="mb-3">
-            <h1
-              className="font-bold text-black leading-tight"
-              style={{
-                fontFamily: text.secondaryFont,
-                fontSize: `${text.primaryHeading}pt`,
-                fontWeight: text.primaryHeadingWeight,
-              }}
-            >
+          <div style={{ marginBottom: "10pt" }}>
+            <div style={{
+              fontFamily: text.secondaryFont,
+              fontSize: `${text.primaryHeading}pt`,
+              fontWeight: text.primaryHeadingWeight,
+              color: "#111",
+              lineHeight: 1.1,
+              marginBottom: "3pt",
+            }}>
               {formData.first_name} {formData.last_name}
-            </h1>
-
+            </div>
             {formData.job_target && (
-              <p
-                className="mt-1 text-gray-700 leading-snug"
-                style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-              >
+              <div style={{ ...bodyStyle, color: "#374151" }}>
                 {formData.job_target}
-              </p>
+              </div>
             )}
           </div>
 
           <Divider />
 
-          {/* ══ 3. SUMMARY (if any) ══════════════════════════════════ */}
+          {/* ══ 3. SUMMARY ═══════════════════════════════════════════ */}
           {summarySections.map((s) => renderSummary(s))}
 
           {/* ══ 4. CONTACT INFORMATION ═══════════════════════════════ */}
-          <div className="mb-3">
+          <div style={{ marginBottom: "8pt" }}>
             <SectionHeading title="Contact Information" />
-            <div
-              className="flex flex-col gap-1 text-gray-700"
-              style={{ fontSize: `${text.body}pt`, fontWeight: text.bodyWeight }}
-            >
-              {/* Address — address + city_state + country smart merge */}
-              {addressLine && (
-                <div className="flex items-start gap-2">
-                  <MdLocationOn className="text-gray-400 flex-shrink-0 mt-[2px]" />
-                  <span>{addressLine}</span>
-                </div>
-              )}
-
-              {/* Email */}
-              {formData.email && (
-                <div className="flex items-center gap-2">
-                  <MdEmail className="text-gray-400 flex-shrink-0" />
-                  <a
-                    href={`mailto:${formData.email}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {formData.email}
-                  </a>
-                </div>
-              )}
-
-              {/* Phone */}
-              {formData.phone && (
-                <div className="flex items-center gap-2">
-                  <MdPhone className="text-gray-400 flex-shrink-0" />
-                  <span>{formData.phone}</span>
-                </div>
-              )}
-
-              {/* LinkedIn */}
-              {formData.linkedin && (
-                <div className="flex items-center gap-2">
-                  <FaLinkedin className="text-blue-600 flex-shrink-0" />
-                  <a
-                    href={
-                      formData.linkedin.startsWith("http")
-                        ? formData.linkedin
-                        : `https://${formData.linkedin}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline break-all"
-                  >
-                    {formData.linkedin.replace(/^https?:\/\/(www\.)?/, "")}
-                  </a>
-                </div>
-              )}
-
-              {/* Website */}
-              {formData.website && (
-                <div className="flex items-center gap-2">
-                  <FaGlobe className="text-gray-400 flex-shrink-0" />
-                  <a
-                    href={
-                      formData.website.startsWith("http")
-                        ? formData.website
-                        : `https://${formData.website}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline break-all"
-                  >
-                    {formData.website.replace(/^https?:\/\/(www\.)?/, "")}
-                  </a>
-                </div>
-              )}
-            </div>
+            {addressLine && (
+              <table style={{ borderCollapse: "collapse", marginBottom: "4pt" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: "top", paddingRight: "6pt", paddingTop: "1pt" }}>
+                      <MdLocationOn style={{ color: "#9ca3af", fontSize: `${text.body + 2}pt` }} />
+                    </td>
+                    <td style={{ verticalAlign: "top" }}>
+                      <span style={{ ...bodyStyle, color: "#374151" }}>{addressLine}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+            {formData.email && (
+              <table style={{ borderCollapse: "collapse", marginBottom: "4pt" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: "top", paddingRight: "6pt", paddingTop: "1pt" }}>
+                      <MdEmail style={{ color: "#9ca3af", fontSize: `${text.body + 2}pt` }} />
+                    </td>
+                    <td style={{ verticalAlign: "top" }}>
+                      <a href={`mailto:${formData.email}`} style={{ ...bodyStyle, color: "#2563eb", textDecoration: "none" }}>
+                        {formData.email}
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+            {formData.phone && (
+              <table style={{ borderCollapse: "collapse", marginBottom: "4pt" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: "top", paddingRight: "6pt", paddingTop: "1pt" }}>
+                      <MdPhone style={{ color: "#9ca3af", fontSize: `${text.body + 2}pt` }} />
+                    </td>
+                    <td style={{ verticalAlign: "top" }}>
+                      <span style={{ ...bodyStyle, color: "#374151" }}>{formData.phone}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+            {formData.linkedin && (
+              <table style={{ borderCollapse: "collapse", marginBottom: "4pt" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: "top", paddingRight: "6pt", paddingTop: "1pt" }}>
+                      <FaLinkedin style={{ color: "#2563eb", fontSize: `${text.body + 2}pt` }} />
+                    </td>
+                    <td style={{ verticalAlign: "top" }}>
+                      <a
+                        href={formData.linkedin.startsWith("http") ? formData.linkedin : `https://${formData.linkedin}`}
+                        style={{ ...bodyStyle, color: "#2563eb", textDecoration: "none", wordBreak: "break-all" }}
+                      >
+                        {formData.linkedin.replace(/^https?:\/\/(www\.)?/, "")}
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+            {formData.website && (
+              <table style={{ borderCollapse: "collapse", marginBottom: "4pt" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ verticalAlign: "top", paddingRight: "6pt", paddingTop: "1pt" }}>
+                      <FaGlobe style={{ color: "#9ca3af", fontSize: `${text.body + 2}pt` }} />
+                    </td>
+                    <td style={{ verticalAlign: "top" }}>
+                      <a
+                        href={formData.website.startsWith("http") ? formData.website : `https://${formData.website}`}
+                        style={{ ...bodyStyle, color: "#2563eb", textDecoration: "none", wordBreak: "break-all" }}
+                      >
+                        {formData.website.replace(/^https?:\/\/(www\.)?/, "")}
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
           </div>
 
           <Divider />
@@ -578,7 +627,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
           {/* ══ 16. HONORS & AWARDS ══════════════════════════════════ */}
           {honorsSection.map((s) => renderHonors(s))}
 
-          {/* ══ 14. CUSTOM SIMPLE (Core Competencies, Achievements etc) */}
+          {/* ══ 14. CUSTOM SIMPLE ════════════════════════════════════ */}
           {customSimpleSections.map((s) => renderCustomSimple(s))}
 
           {/* ══ 15. CUSTOM ADVANCED ══════════════════════════════════ */}

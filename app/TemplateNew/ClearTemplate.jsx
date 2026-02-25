@@ -7,6 +7,8 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
   const color = themeColor || "#94a3b8";
   const text = resumeSettings?.text || {};
   const layout = resumeSettings?.layout || {};
+  const topBottom = layout.topBottom ?? 0;
+  const leftRight = layout.leftRight ?? 0;
 
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
@@ -609,17 +611,17 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
       return sections
         .filter(s => SIDEBAR_IDS.has(s.type))
         .map(s => {
-          if (s.type === "skills")    return renderSkillsFromSection(s);
+          if (s.type === "skills") return renderSkillsFromSection(s);
           if (s.type === "languages") return renderLanguagesFromSection(s);
-          if (s.type === "hobbies")   return renderHobbiesFromSection(s);
+          if (s.type === "hobbies") return renderHobbiesFromSection(s);
           return null;
         });
     }
     const order = sectionOrder || ["skills", "languages", "hobbies"];
     const map = {
-      skills:    renderSkillsSidebar,
+      skills: renderSkillsSidebar,
       languages: renderLanguagesSidebar,
-      hobbies:   renderHobbiesSidebar,
+      hobbies: renderHobbiesSidebar,
     };
     return order.filter(id => SIDEBAR_IDS.has(id)).map(id => map[id]?.() ?? null);
   };
@@ -630,16 +632,16 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
         .filter(s => !SIDEBAR_IDS.has(s.type))
         .map(s => {
           switch (s.type) {
-            case "summary":        return renderSummaryFromSection(s);
-            case "experience":     return renderExperienceFromSection(s);
-            case "education":      return renderEducationFromSection(s);
+            case "summary": return renderSummaryFromSection(s);
+            case "experience": return renderExperienceFromSection(s);
+            case "education": return renderEducationFromSection(s);
             case "certifications": return renderCertificationsFromSection(s);
-            case "courses":        return renderCoursesFromSection(s);
-            case "internships":    return renderInternshipsFromSection(s);
-            case "activities":     return renderActivitiesFromSection(s);
-            case "custom_simple":  return renderCustomSimpleFromSection(s);
-            case "custom":         return renderCustomAdvancedFromSection(s);
-            default:               return null;
+            case "courses": return renderCoursesFromSection(s);
+            case "internships": return renderInternshipsFromSection(s);
+            case "activities": return renderActivitiesFromSection(s);
+            case "custom_simple": return renderCustomSimpleFromSection(s);
+            case "custom": return renderCustomAdvancedFromSection(s);
+            default: return null;
           }
         });
     }
@@ -649,17 +651,17 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
       "internships", "activities", "courses",
     ];
     const map = {
-      summary:     renderSummary,
-      employment:  renderEmployment,
-      education:   renderEducation,
+      summary: renderSummary,
+      employment: renderEmployment,
+      education: renderEducation,
       internships: renderInternships,
-      activities:  renderActivities,
-      courses:     renderCourses,
+      activities: renderActivities,
+      courses: renderCourses,
     };
     return order
       .filter(id => !SIDEBAR_IDS.has(id))
       .map(id => {
-        if (id.startsWith("custom_simple_"))   return renderCustomSimpleScratch(id);
+        if (id.startsWith("custom_simple_")) return renderCustomSimpleScratch(id);
         if (id.startsWith("custom_advanced_")) return renderCustomAdvancedScratch(id);
         return map[id]?.() ?? null;
       });
@@ -667,15 +669,18 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
 
   // Links
   const links = [];
-  if (formData.linkedin)      links.push({ label: "LinkedIn",       url: formData.linkedin });
-  if (formData.github)        links.push({ label: "GitHub",         url: formData.github });
+  if (formData.linkedin) links.push({ label: "LinkedIn", url: formData.linkedin });
+  if (formData.github) links.push({ label: "GitHub", url: formData.github });
   if (formData.stackoverflow) links.push({ label: "Stack Overflow", url: formData.stackoverflow });
-  if (formData.leetcode)      links.push({ label: "LeetCode",       url: formData.leetcode });
-  if (formData.website)       links.push({ label: "Portfolio",      url: formData.website });
+  if (formData.leetcode) links.push({ label: "LeetCode", url: formData.leetcode });
+  if (formData.website) links.push({ label: "Portfolio", url: formData.website });
 
   // ─────────────────────────────────────────────────────────────
-  //  RENDER — table layout throughout, no flexbox
+  //  RENDER
   // ─────────────────────────────────────────────────────────────
+
+  const hasPhoto = !!formData.profileImage;
+  const PHOTO_WIDTH = 120; // pt
 
   return (
     <div style={{ overflowY: "auto" }}>
@@ -696,164 +701,245 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
         fontSize: `${text.body || 9}pt`,
         lineHeight: text.lineHeight || 1.4,
         boxSizing: "border-box",
+        paddingBottom: `${topBottom}pt`,
       }}>
 
         {/* ── HEADER ── */}
-        <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: color }}>
-          <tbody>
-            <tr>
-              {/* Profile photo — left, full height, no border */}
-              {formData.profileImage && (
-                <td style={{ width: "120pt", verticalAlign: "top", padding: "0" }}>
-                  <img
-                    src={formData.profileImage}
-                    alt="Profile"
-                    style={{
-                      width: "120pt",
-                      height: "100%",
-                      minHeight: "90pt",
-                      objectFit: "cover",
-                      objectPosition: "center",
-                      display: "block",
-                      borderRadius: "0",
-                    }}
-                  />
-                </td>
+        {hasPhoto ? (
+          /* ── Photo mode: position:absolute so image stretches full header height ── */
+          <div style={{
+            position: "relative",
+            width: "100%",
+            backgroundColor: color,
+            display: "table",   /* shrink-wraps to content height */
+          }}>
+            {/* Photo — absolute, full height of header */}
+            <div style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: `${PHOTO_WIDTH}pt`,
+              bottom: 0,
+              overflow: "hidden",
+            }}>
+              <img
+                src={formData.profileImage}
+                alt="Profile"
+                style={{
+                  width: `${PHOTO_WIDTH}pt`,
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                  borderRadius: 0,
+                }}
+              />
+            </div>
+
+            {/* Content — pushed right past the photo */}
+            <div style={{
+              paddingLeft: `${PHOTO_WIDTH + 16 + leftRight}pt`,
+              paddingRight: `${18 + leftRight}pt`,
+              paddingTop: "16pt",
+              paddingBottom: "13pt",
+            }}>
+              {/* Name */}
+              <div style={{
+                fontSize: `${text.primaryHeading || 20}pt`,
+                fontWeight: text.primaryHeadingWeight || "800",
+                fontFamily: text.secondaryFont || text.primaryFont || "Arial",
+                color: "#111",
+                lineHeight: "1.1",
+                marginBottom: "3pt",
+              }}>
+                {formData.first_name} {formData.last_name}
+              </div>
+
+              {/* Job target */}
+              {formData.job_target && (
+                <div style={{
+                  fontSize: `${text.secondaryHeading || 8.5}pt`,
+                  fontWeight: text.secondaryHeadingWeight || "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  color: "#333",
+                  marginBottom: "6pt",
+                }}>
+                  {formData.job_target}
+                </div>
               )}
 
-              {/* Right: Name + contact */}
-              <td style={{ verticalAlign: "top", padding: "16pt 18pt 13pt 16pt" }}>
-                {/* Name */}
-                <div style={{
-                  fontSize: `${text.primaryHeading || 20}pt`,
-                  fontWeight: text.primaryHeadingWeight || "800",
-                  fontFamily: text.secondaryFont || text.primaryFont || "Arial",
-                  color: "#111",
-                  lineHeight: "1.1",
-                  marginBottom: "3pt",
+              {/* Contact */}
+              <table style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    {(formData.city_state || formData.country) && (
+                      <td style={{ ...bodyStyle, color: "#333", paddingRight: "10pt", whiteSpace: "nowrap" }}>
+                        {formData.city_state}
+                        {formData.city_state && formData.country ? ", " : ""}
+                        {formData.country}
+                      </td>
+                    )}
+                  </tr>
+                  <tr>
+                    {formData.phone && (
+                      <td style={{ ...bodyStyle, color: "#333", paddingRight: "10pt", whiteSpace: "nowrap" }}>
+                        {formData.phone}
+                      </td>
+                    )}
+                    {formData.email && (
+                      <td style={{ ...bodyStyle, color: "#333", whiteSpace: "nowrap" }}>
+                        · {formData.email}
+                      </td>
+                    )}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          /* ── No-photo mode: original table layout ── */
+          <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: color }}>
+            <tbody>
+              <tr>
+                <td style={{
+                  verticalAlign: "top",
+                  padding: `16pt ${18 + leftRight}pt 13pt ${16 + leftRight}pt`,
                 }}>
-                  {formData.first_name} {formData.last_name}
-                </div>
-
-                {/* Job target */}
-                {formData.job_target && (
+                  {/* Name */}
                   <div style={{
-                    fontSize: `${text.secondaryHeading || 8.5}pt`,
-                    fontWeight: text.secondaryHeadingWeight || "600",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    color: "#333",
-                    marginBottom: "6pt",
+                    fontSize: `${text.primaryHeading || 20}pt`,
+                    fontWeight: text.primaryHeadingWeight || "800",
+                    fontFamily: text.secondaryFont || text.primaryFont || "Arial",
+                    color: "#111",
+                    lineHeight: "1.1",
+                    marginBottom: "3pt",
                   }}>
-                    {formData.job_target}
+                    {formData.first_name} {formData.last_name}
                   </div>
-                )}
 
-                {/* Contact — table, no flexbox */}
-                <table style={{ borderCollapse: "collapse" }}>
-                  <tbody>
-                    <tr>
-                      {(formData.city_state || formData.country) && (
-                        <td style={{ ...bodyStyle, color: "#333", paddingRight: "10pt", whiteSpace: "nowrap" }}>
-                          {formData.city_state}
-                          {formData.city_state && formData.country ? ", " : ""}
-                          {formData.country}
-                        </td>
-                      )}
-                    </tr>
-                    <tr>
-                      {formData.phone && (
-                        <td style={{ ...bodyStyle, color: "#333", paddingRight: "10pt", whiteSpace: "nowrap" }}>
-                          {formData.phone}
-                        </td>
-                      )}
-                      {formData.email && (
-                        <td style={{ ...bodyStyle, color: "#333", whiteSpace: "nowrap" }}>
-                          · {formData.email}
-                        </td>
-                      )}
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  {/* Job target */}
+                  {formData.job_target && (
+                    <div style={{
+                      fontSize: `${text.secondaryHeading || 8.5}pt`,
+                      fontWeight: text.secondaryHeadingWeight || "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                      color: "#333",
+                      marginBottom: "6pt",
+                    }}>
+                      {formData.job_target}
+                    </div>
+                  )}
+
+                  {/* Contact */}
+                  <table style={{ borderCollapse: "collapse" }}>
+                    <tbody>
+                      <tr>
+                        {(formData.city_state || formData.country) && (
+                          <td style={{ ...bodyStyle, color: "#333", paddingRight: "10pt", whiteSpace: "nowrap" }}>
+                            {formData.city_state}
+                            {formData.city_state && formData.country ? ", " : ""}
+                            {formData.country}
+                          </td>
+                        )}
+                      </tr>
+                      <tr>
+                        {formData.phone && (
+                          <td style={{ ...bodyStyle, color: "#333", paddingRight: "10pt", whiteSpace: "nowrap" }}>
+                            {formData.phone}
+                          </td>
+                        )}
+                        {formData.email && (
+                          <td style={{ ...bodyStyle, color: "#333", whiteSpace: "nowrap" }}>
+                            · {formData.email}
+                          </td>
+                        )}
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        )}
 
         {/* ── TWO-COLUMN BODY ── */}
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <colgroup>
-            <col style={{ width: "32%" }} />
-            <col style={{ width: "68%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              {/* LEFT SIDEBAR */}
-              <td style={{
-                verticalAlign: "top",
-                padding: "12pt 10pt 14pt 14pt",
-                backgroundColor: "#f7f7f7",
-                borderRight: "1pt solid #e5e5e5",
-              }}>
+        <div style={{ paddingLeft: `${leftRight}pt`, paddingRight: `${leftRight}pt` }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <colgroup>
+              <col style={{ width: "32%" }} />
+              <col style={{ width: "68%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                {/* LEFT SIDEBAR */}
+                <td style={{
+                  verticalAlign: "top",
+                  padding: `${topBottom}pt 14pt 14pt 0pt`,
+                  backgroundColor: "#f7f7f7",
+                  borderRight: "1pt solid #e5e5e5",
+                }}>
 
-                {/* Links */}
-                {links.length > 0 && (
-                  <div>
-                    <SidebarHeading title="Links" />
-                    {links.map((link, i) => (
-                      <div key={i} style={{ ...bodyStyle, marginBottom: "2pt" }}>
-                        <a href={link.url} style={{ color: color, textDecoration: "none" }}>
-                          {link.label}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  {/* Links */}
+                  {links.length > 0 && (
+                    <div>
+                      <SidebarHeading title="Links" />
+                      {links.map((link, i) => (
+                        <div key={i} style={{ ...bodyStyle, marginBottom: "2pt" }}>
+                          <a href={link.url} style={{ color: color, textDecoration: "none" }}>
+                            {link.label}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                {/* Personal Details */}
-                {(formData.dob || formData.birth_place || formData.nationality || formData.driving_licence) && (
-                  <div>
-                    <SidebarHeading title="Details" />
-                    {formData.dob && (
-                      <div style={{ marginBottom: "4pt" }}>
-                        <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                          Date of Birth
+                  {/* Personal Details */}
+                  {(formData.dob || formData.birth_place || formData.nationality || formData.driving_licence) && (
+                    <div>
+                      <SidebarHeading title="Details" />
+                      {formData.dob && (
+                        <div style={{ marginBottom: "4pt" }}>
+                          <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Date of Birth
+                          </div>
+                          <div style={{ ...bodyStyle, color: "#333" }}>
+                            {formData.dob}{formData.birth_place ? `, ${formData.birth_place}` : ""}
+                          </div>
                         </div>
-                        <div style={{ ...bodyStyle, color: "#333" }}>
-                          {formData.dob}{formData.birth_place ? `, ${formData.birth_place}` : ""}
+                      )}
+                      {formData.nationality && (
+                        <div style={{ marginBottom: "4pt" }}>
+                          <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Nationality
+                          </div>
+                          <div style={{ ...bodyStyle, color: "#333" }}>{formData.nationality}</div>
                         </div>
-                      </div>
-                    )}
-                    {formData.nationality && (
-                      <div style={{ marginBottom: "4pt" }}>
-                        <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                          Nationality
+                      )}
+                      {formData.driving_licence && (
+                        <div style={{ marginBottom: "4pt" }}>
+                          <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            Driving License
+                          </div>
+                          <div style={{ ...bodyStyle, color: "#333" }}>{formData.driving_licence}</div>
                         </div>
-                        <div style={{ ...bodyStyle, color: "#333" }}>{formData.nationality}</div>
-                      </div>
-                    )}
-                    {formData.driving_licence && (
-                      <div style={{ marginBottom: "4pt" }}>
-                        <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                          Driving License
-                        </div>
-                        <div style={{ ...bodyStyle, color: "#333" }}>{formData.driving_licence}</div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
 
-                {/* Skills / Languages / Hobbies */}
-                {renderSidebarContent()}
-              </td>
+                  {/* Skills / Languages / Hobbies */}
+                  {renderSidebarContent()}
+                </td>
 
-              {/* RIGHT MAIN CONTENT */}
-              <td style={{ verticalAlign: "top", padding: "12pt 16pt 14pt 12pt" }}>
-                {renderMainContent()}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                {/* RIGHT MAIN CONTENT */}
+                <td style={{ verticalAlign: "top", padding: `${topBottom}pt 0pt 14pt 14pt` }}>
+                  {renderMainContent()}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -263,7 +263,11 @@ const initialState = {
 const PlanSlice = createSlice({
   name: "plan",
   initialState,
-  reducers: {},
+  reducers: {
+    resetAiCount: (state) => {
+      state.aiCountReset = true;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getPlans.pending, (state) => {
@@ -393,4 +397,6 @@ const PlanSlice = createSlice({
 
   },
 });
+
+export const {resetAiCount} = PlanSlice.actions;
 export default PlanSlice.reducer;

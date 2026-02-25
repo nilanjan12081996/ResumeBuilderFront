@@ -2,87 +2,717 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { generatePDF, generateDocx } from '../reducers/ResumeSlice';
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  GOOGLE FONT MAP
+// ─────────────────────────────────────────────────────────────────────────────
 const GOOGLE_FONT_MAP = {
-  "Arial": "https://fonts.googleapis.com/css2?family=Arial&display=swap", // system font, no Google version
-  "Lato": "https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap",
-  "Inter": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
-  "Roboto": "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap",
-  "Open Sans": "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap",
-  "Montserrat": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
-  "Poppins": "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap",
-  "Raleway": "https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap",
-  "Nunito": "https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap",
-  "Source Sans 3": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap",
-  "Merriweather": "https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap",
-  "Playfair Display": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap",
-  "Georgia": "https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap",
-  "Times New Roman": "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap",
-  "DM Sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap",
-  "Josefin Sans": "https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;500;600;700&display=swap",
+  "Arial": "https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap",
+  "Lato": "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;600;700;800;900&display=swap",
+  "Inter": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap",
+  "Roboto": "https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&display=swap",
+  "Open Sans": "https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap",
+  "Montserrat": "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap",
+  "Poppins": "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap",
+  "Raleway": "https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&display=swap",
+  "Nunito": "https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap",
+  "Source Sans 3": "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700;800;900&display=swap",
+  "Merriweather": "https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap",
+  "Playfair Display": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap",
+  "DM Sans": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap",
+  "Josefin Sans": "https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap",
   "Cabin": "https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap",
+  "Georgia": "https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&display=swap",
+  "Times New Roman": "https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap",
 };
 
-const getFontLink = (fontName) => {
-  const url = GOOGLE_FONT_MAP[fontName];
-  if (!url) return "";
-  return `<link rel="stylesheet" href="${url}"/>`;
-};
+const getFontLinks = (...fontNames) =>
+  [...new Set(fontNames.filter(Boolean))]
+    .map(f => GOOGLE_FONT_MAP[f] ? `<link rel="stylesheet" href="${GOOGLE_FONT_MAP[f]}"/>` : '')
+    .filter(Boolean)
+    .join('\n');
 
 const fontStack = (fontName) => {
-  const safe = fontName || "Arial";
-  return `'${safe}', Arial, sans-serif`;
+  if (fontName === "Arial") {
+    return `'Arimo', Arial, sans-serif`;
+  }
+  return `'${fontName || "Arial"}', Arial, sans-serif`;
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  TWO-COLUMN TEMPLATE DETECTION
+//  Templates that have a sidebar (skills/languages/hobbies on the left)
+// ─────────────────────────────────────────────────────────────────────────────
+//  'professional' = Professional   (colored left sidebar)
+//  'clean'        = CleanTemplate  (white/gray left sidebar)
+//  'corporate'    = CorporateTemplate (light bg left sidebar)
+//  'clear'        = ClearTemplate  (colored header + gray left sidebar)
+const TWO_COL_TEMPLATES = new Set(['professional', 'clean', 'corporate', 'clear']);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+const e = (s) => {
+  if (!s) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+};
+
+const strip = (html) => {
+  if (!html) return '';
+  return html
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<\/p>/gi, ' ')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<\/li>/gi, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const fmt = (d) => {
+  if (!d) return '';
+  if (String(d).toLowerCase() === 'present') return 'Present';
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return String(d);
+  return dt.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+};
+
+const dr = (s, end) => [fmt(s), fmt(end)].filter(Boolean).join(' \u2013 ');
+
+const skillLevels = ['Novice', 'Beginner', 'Skillful', 'Experienced', 'Expert'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DOCX: UNIVERSAL SECTION BODY RENDERER
+// ─────────────────────────────────────────────────────────────────────────────
+const renderSectionBody = (sec, bodyPt, bodyW, lh) => {
+  let out = '';
+
+  if (sec.type === 'summary') {
+    out += `<p class="body-text">${e(strip(sec.summary))}</p>`;
+
+  } else if (sec.type === 'experience') {
+    (sec.experiences || []).forEach(exp => {
+      const heading = [exp.jobTitle, exp.company, exp.city].filter(Boolean).map(e).join(', ');
+      const range = e(dr(exp.startDate, exp.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${exp.description ? `<p class="desc">${e(strip(exp.description))}</p>` : ''}
+      </div>`;
+    });
+
+  } else if (sec.type === 'education') {
+    (sec.educations || []).forEach(edu => {
+      const heading = [edu.degree, edu.institute || edu.school, edu.city].filter(Boolean).map(e).join(', ');
+      const range = e(dr(edu.startDate, edu.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${edu.description ? `<p class="desc">${e(strip(edu.description))}</p>` : ''}
+      </div>`;
+    });
+
+  } else if (sec.type === 'certifications') {
+    (sec.certifications || []).forEach(cert => {
+      const heading = [cert.name, cert.organization].filter(Boolean).map(e).join(', ');
+      const range = e(dr(cert.startDate || cert.startYear, cert.endDate || cert.endYear));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${cert.description ? `<p class="desc">${e(cert.description)}</p>` : ''}
+      </div>`;
+    });
+
+  } else if (sec.type === 'courses') {
+    (sec.courses || []).forEach(c => {
+      const heading = [c.course, c.institution].filter(Boolean).map(e).join(', ');
+      const range = e(dr(c.startDate, c.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+      </div>`;
+    });
+
+  } else if (sec.type === 'internships') {
+    (sec.internships || []).forEach(intern => {
+      const heading = [intern.jobTitle, intern.employer, intern.city].filter(Boolean).map(e).join(', ');
+      const range = e(dr(intern.startDate, intern.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${intern.description ? `<p class="desc">${e(strip(intern.description))}</p>` : ''}
+      </div>`;
+    });
+
+  } else if (sec.type === 'activities') {
+    (sec.activities || []).forEach(act => {
+      const heading = [act.functionTitle, act.employer, act.city].filter(Boolean).map(e).join(', ');
+      const range = e(dr(act.startDate, act.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${act.description ? `<p class="desc">${e(strip(act.description))}</p>` : ''}
+      </div>`;
+    });
+
+  } else if (sec.type === 'skills') {
+    const skills = sec.skills || [];
+    const showLevel = sec.hideExperienceLevel === false;
+    out += `<table class="skills-table"><tbody>`;
+    for (let i = 0; i < skills.length; i += 2) {
+      const s1 = skills[i];
+      const s2 = skills[i + 1];
+      const lvl1 = showLevel && s1?.level !== undefined ? ` <span class="level">${skillLevels[s1.level]}</span>` : '';
+      const lvl2 = showLevel && s2?.level !== undefined ? ` <span class="level">${skillLevels[s2.level]}</span>` : '';
+      out += `<tr>
+        <td class="skill-cell">${e(s1?.name || '')}${lvl1}</td>
+        <td class="skill-cell">${s2 ? `${e(s2.name || '')}${lvl2}` : ''}</td>
+      </tr>`;
+    }
+    out += `</tbody></table>`;
+
+  } else if (sec.type === 'languages') {
+    const langs = sec.languages || [];
+    out += `<table class="skills-table"><tbody>`;
+    for (let i = 0; i < langs.length; i += 2) {
+      const l1 = langs[i];
+      const l2 = langs[i + 1];
+      const lb1 = l1 ? `${e(l1.language)}${!sec.hideProficiency && l1.level ? ` (${e(l1.level)})` : ''}` : '';
+      const lb2 = l2 ? `${e(l2.language)}${!sec.hideProficiency && l2.level ? ` (${e(l2.level)})` : ''}` : '';
+      out += `<tr>
+        <td class="skill-cell">${lb1}</td>
+        <td class="skill-cell">${lb2}</td>
+      </tr>`;
+    }
+    out += `</tbody></table>`;
+
+  } else if (sec.type === 'hobbies') {
+    out += `<p class="body-text">${e(sec.hobbies)}</p>`;
+
+  } else if (sec.type === 'honors') {
+    (sec.items || []).forEach(item => {
+      const heading = [item.title, item.issuer].filter(Boolean).map(e).join(', ');
+      const range = e(dr(item.startDate, item.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${item.description ? `<p class="desc">${e(strip(item.description))}</p>` : ''}
+      </div>`;
+    });
+
+  } else if (sec.type === 'custom_simple') {
+    const items = sec.items || [];
+    const showLevel = sec.hideExperienceLevel === false;
+    out += `<table class="skills-table"><tbody>`;
+    for (let i = 0; i < items.length; i += 2) {
+      const getN = (it) => it ? (typeof it === 'object' ? (it.name || it.title || '') : String(it)) : '';
+      const getLvl = (it) =>
+        showLevel && it && typeof it === 'object' && it.level !== undefined
+          ? ` <span class="level">${skillLevels[it.level]}</span>`
+          : '';
+      out += `<tr>
+        <td class="skill-cell">${e(getN(items[i]))}${getLvl(items[i])}</td>
+        <td class="skill-cell">${e(getN(items[i + 1]))}${getLvl(items[i + 1])}</td>
+      </tr>`;
+    }
+    out += `</tbody></table>`;
+
+  } else if (sec.type === 'custom') {
+    (sec.items || []).forEach(item => {
+      const heading = [item.title, item.city].filter(Boolean).map(e).join(', ');
+      const range = e(dr(item.startDate, item.endDate));
+      out += `<div class="entry">
+        <table class="entry-table"><tbody><tr>
+          <td class="entry-left"><strong>${heading}</strong></td>
+          <td class="entry-right">${range}</td>
+        </tr></tbody></table>
+        ${item.description ? `<p class="desc">${e(strip(item.description))}</p>` : ''}
+      </div>`;
+    });
+  }
+
+  return out;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SHARED CSS SNIPPET (injected into every DOCX HTML)
+// ─────────────────────────────────────────────────────────────────────────────
+const sharedCss = (bodyPt, bodyW, lh) => `
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; font-size: ${bodyPt}pt; font-weight: ${bodyW}; line-height: ${lh}; color: #333; }
+  .entry { margin-bottom: 8pt; }
+  .entry-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .entry-left  { width: 70%; vertical-align: top; font-size: ${bodyPt}pt; }
+  .entry-right { width: 30%; vertical-align: top; text-align: right; font-size: ${bodyPt}pt; font-weight: bold; color: #555; white-space: nowrap; }
+  .desc { font-size: ${bodyPt}pt; color: #374151; line-height: ${lh}; margin: 3pt 0 4pt 0; }
+  .body-text { font-size: ${bodyPt}pt; color: #374151; line-height: ${lh}; margin: 2pt 0; }
+  .skills-table { width: 100%; border-collapse: collapse; margin-top: 4pt; }
+  .skill-cell { width: 50%; padding: 2pt 8pt 2pt 0; font-size: ${bodyPt}pt; color: #1f2937; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+  .level { color: #9ca3af; font-size: ${bodyPt - 1}pt; }
+  p, .body-text { font-size: ${bodyPt}pt; color: #374151; line-height: ${lh}; margin: 2pt 0; }
+  strong { font-weight: bold; }
+  a { color: #2b6cb0; text-decoration: none; }
+`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DOCX HTML BUILDER: TWO-COLUMN TEMPLATES
+//  professional, clean, corporate, clear
+// ─────────────────────────────────────────────────────────────────────────────
+const buildTwoColDocxHtml = ({ formValues, sections, resumeSettings, themeColor, template }) => {
+  const text = resumeSettings?.text || {};
+  const layout = resumeSettings?.layout || {};
+
+  const primaryFont = text.primaryFont || 'Arial';
+  const secondaryFont = text.secondaryFont || primaryFont;
+  const bodyPt = text.body || 9;
+  const bodyW = text.bodyWeight || 400;
+  const lh = text.lineHeight || 1.5;
+  const h1Pt = text.primaryHeading || 22;
+  const h1W = text.primaryHeadingWeight || 700;
+  const subPt = text.secondaryHeading || 11;
+  const subW = text.secondaryHeadingWeight || 600;
+  const secPt = text.sectionTitle || 10;
+  const secW = text.sectionTitleWeight || 700;
+  const color = themeColor || '#2c3e50';
+  const topBottom = layout.topBottom || 20;
+  const leftRight = layout.leftRight || 20;
+
+  const isProfessional = template === 'professional';
+  const isClear = template === 'clear';
+  // clean and corporate use light sidebar (no color)
+
+  // Sidebar styling based on template
+  const sidebarBg = (isProfessional || isClear) ? color : '#f7f7f7';
+  const sidebarColor = (isProfessional || isClear) ? '#ffffff' : '#111111';
+  const sideBodyColor = (isProfessional || isClear) ? '#d1d5db' : '#444444';
+  const sideBorder = (isProfessional || isClear) ? 'none' : '1px solid #e0e0e0';
+  const sideHeadingBorder = (isProfessional || isClear) ? 'rgba(255,255,255,0.3)' : '#dddddd';
+
+  // SIDEBAR_TYPES: sections that go into the left sidebar
+  const SIDEBAR_TYPES = new Set(['skills', 'languages', 'hobbies']);
+  const sidebarSections = (sections || []).filter(s => SIDEBAR_TYPES.has(s.type));
+  const mainSections = (sections || []).filter(s => !SIDEBAR_TYPES.has(s.type));
+
+  // ── Sidebar content ──
+  let sidebarHtml = '';
+
+  // Name + title (not for 'clear' which has a full-width header)
+  if (!isClear) {
+    sidebarHtml += `
+    <div style="margin-bottom:14pt;${isProfessional ? 'text-align:center;' : ''}">
+      <div style="font-family:${fontStack(secondaryFont)};font-size:${h1Pt}pt;font-weight:${h1W};color:${sidebarColor};line-height:1.15;margin-bottom:4pt;">
+        ${e(formValues.first_name)} ${e(formValues.last_name)}
+      </div>
+      ${formValues.job_target ? `
+      <div style="font-size:${subPt}pt;font-weight:${subW};color:${isProfessional ? 'rgba(255,255,255,0.8)' : '#555'};text-transform:uppercase;letter-spacing:0.06em;">
+        ${e(formValues.job_target)}
+      </div>` : ''}
+    </div>`;
+  }
+
+  // Contact details
+  const contactRows = [
+    (formValues.address || formValues.city_state || formValues.country) ? `
+      <div style="margin-bottom:3pt;">
+        ${formValues.address ? `${e(formValues.address)}<br/>` : ''}
+        ${[formValues.city_state, formValues.country].filter(Boolean).map(e).join(', ')}
+        ${formValues.postal_code ? `<br/>${e(formValues.postal_code)}` : ''}
+      </div>` : '',
+    formValues.email ? `<div style="margin-bottom:3pt;word-break:break-all;">${e(formValues.email)}</div>` : '',
+    formValues.phone ? `<div style="margin-bottom:3pt;">${e(formValues.phone)}</div>` : '',
+    formValues.linkedin ? `<div style="margin-bottom:3pt;">LinkedIn</div>` : '',
+    formValues.github ? `<div style="margin-bottom:3pt;">GitHub</div>` : '',
+    formValues.stackoverflow ? `<div style="margin-bottom:3pt;">Stack Overflow</div>` : '',
+    formValues.leetcode ? `<div style="margin-bottom:3pt;">LeetCode</div>` : '',
+    formValues.driving_licence ? `<div style="margin-bottom:3pt;"><span style="font-size:${bodyPt - 1}pt;text-transform:uppercase;opacity:0.7;">Driving License</span><br/>${e(formValues.driving_licence)}</div>` : '',
+    formValues.nationality ? `<div style="margin-bottom:3pt;"><span style="font-size:${bodyPt - 1}pt;text-transform:uppercase;opacity:0.7;">Nationality</span><br/>${e(formValues.nationality)}</div>` : '',
+    formValues.dob ? `<div style="margin-bottom:3pt;"><span style="font-size:${bodyPt - 1}pt;text-transform:uppercase;opacity:0.7;">Date of Birth</span><br/>${e(formValues.dob)}</div>` : '',
+    formValues.birth_place ? `<div style="margin-bottom:3pt;"><span style="font-size:${bodyPt - 1}pt;text-transform:uppercase;opacity:0.7;">Place of Birth</span><br/>${e(formValues.birth_place)}</div>` : '',
+  ].filter(Boolean).join('');
+
+  if (contactRows) {
+    sidebarHtml += `
+    <div style="margin-bottom:14pt;">
+      <div class="side-heading">Details</div>
+      <div style="font-size:${bodyPt}pt;color:${sideBodyColor};line-height:${lh};">${contactRows}</div>
+    </div>`;
+  }
+
+  // Links section
+  const links = [
+    formValues.linkedin && 'LinkedIn',
+    formValues.github && 'GitHub',
+    formValues.stackoverflow && 'Stack Overflow',
+    formValues.leetcode && 'LeetCode',
+    formValues.website && 'Portfolio',
+  ].filter(Boolean);
+
+  if (links.length && !contactRows.includes('LinkedIn')) {
+    sidebarHtml += `
+    <div style="margin-bottom:14pt;">
+      <div class="side-heading">Links</div>
+      ${links.map(l => `<div style="font-size:${bodyPt}pt;color:${sideBodyColor};margin-bottom:3pt;">${l}</div>`).join('')}
+    </div>`;
+  }
+
+  // Sidebar sections: skills, languages, hobbies
+  sidebarSections.forEach(sec => {
+    let secBody = '';
+    if (sec.type === 'skills') {
+      const showLevel = sec.hideExperienceLevel === false;
+      (sec.skills || []).forEach(sk => {
+        const lvl = showLevel && sk.level !== undefined ? ` (${skillLevels[sk.level]})` : '';
+        secBody += `<div style="font-size:${bodyPt}pt;color:${sideBodyColor};margin-bottom:4pt;">${e(sk.name)}${lvl}</div>`;
+      });
+    } else if (sec.type === 'languages') {
+      (sec.languages || []).forEach(l => {
+        const lvl = !sec.hideProficiency && l.level ? ` (${e(l.level)})` : '';
+        secBody += `<div style="font-size:${bodyPt}pt;color:${sideBodyColor};margin-bottom:4pt;">${e(l.language)}${lvl}</div>`;
+      });
+    } else if (sec.type === 'hobbies' && sec.hobbies) {
+      secBody = `<div style="font-size:${bodyPt}pt;color:${sideBodyColor};line-height:${lh};">${e(sec.hobbies)}</div>`;
+    }
+    if (secBody) {
+      sidebarHtml += `
+      <div style="margin-bottom:14pt;">
+        <div class="side-heading">${e(sec.title)}</div>
+        ${secBody}
+      </div>`;
+    }
+  });
+
+  // ── Main content ──
+  let mainHtml = '';
+  mainSections.forEach(sec => {
+    const body = renderSectionBody(sec, bodyPt, bodyW, lh);
+    if (!body) return;
+    mainHtml += `
+    <div style="margin-bottom:12pt;">
+      <div class="main-heading">${e(sec.title)}</div>
+      ${body}
+    </div>`;
+  });
+
+  // ── Full header row (only for 'clear' template) ──
+  const headerRow = isClear ? `
+  <tr>
+    <td colspan="2" style="background:${color};padding:16pt ${leftRight}pt 14pt ${leftRight}pt;">
+      <div style="font-family:${fontStack(secondaryFont)};font-size:${h1Pt}pt;font-weight:${h1W};color:#111;line-height:1.1;margin-bottom:4pt;">
+        ${e(formValues.first_name)} ${e(formValues.last_name)}
+      </div>
+      ${formValues.job_target ? `<div style="font-size:${subPt}pt;font-weight:${subW};color:#333;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6pt;">${e(formValues.job_target)}</div>` : ''}
+      <div style="font-size:${bodyPt}pt;color:#333;">
+        ${[formValues.city_state, formValues.country].filter(Boolean).map(e).join(', ')}
+        ${formValues.phone ? ` &nbsp;&middot;&nbsp; ${e(formValues.phone)}` : ''}
+        ${formValues.email ? ` &nbsp;&middot;&nbsp; ${e(formValues.email)}` : ''}
+      </div>
+    </td>
+  </tr>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Resume</title>
+  ${getFontLinks(primaryFont, secondaryFont)}
+  <style>
+    ${sharedCss(bodyPt, bodyW, lh)}
+    body { font-family: ${fontStack(primaryFont)}; }
+    .layout-table { width: 100%; border-collapse: collapse; }
+    .sidebar-td {
+      width: 32%;
+      background: ${sidebarBg};
+      vertical-align: top;
+      padding: ${topBottom}pt 14pt ${topBottom}pt 14pt;
+      border-right: ${sideBorder};
+    }
+    .main-td {
+      width: 68%;
+      background: #ffffff;
+      vertical-align: top;
+      padding: ${topBottom}pt 18pt ${topBottom}pt 18pt;
+    }
+    .side-heading {
+      font-family: ${fontStack(secondaryFont)};
+      font-size: ${secPt}pt;
+      font-weight: ${secW};
+      color: ${sidebarColor};
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      border-bottom: 1px solid ${sideHeadingBorder};
+      padding-bottom: 3pt;
+      margin-bottom: 6pt;
+      margin-top: 12pt;
+      display: block;
+    }
+    .side-heading:first-child { margin-top: 0; }
+    .main-heading {
+      font-family: ${fontStack(secondaryFont)};
+      font-size: ${secPt}pt;
+      font-weight: ${secW};
+      color: #111;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 3pt;
+      margin-bottom: 8pt;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<table class="layout-table">
+  <tbody>
+    ${headerRow}
+    <tr>
+      <td class="sidebar-td">${sidebarHtml}</td>
+      <td class="main-td">${mainHtml}</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>`;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DOCX HTML BUILDER: SINGLE-COLUMN TEMPLATES
+//  PrimeATS, VividTemplate, LinkedInPrime, CorporateTemplate (header-style),
+//  and any other flat / full-width layout
+// ─────────────────────────────────────────────────────────────────────────────
+const buildSingleColDocxHtml = ({ formValues, sections, resumeSettings, themeColor, template }) => {
+  const text = resumeSettings?.text || {};
+  const layout = resumeSettings?.layout || {};
+
+  const primaryFont = text.primaryFont || 'Arial';
+  const secondaryFont = text.secondaryFont || primaryFont;
+  const bodyPt = text.body || 9;
+  const bodyW = text.bodyWeight || 400;
+  const lh = text.lineHeight || 1.5;
+  const h1Pt = text.primaryHeading || 22;
+  const h1W = text.primaryHeadingWeight || 700;
+  const subPt = text.secondaryHeading || 11;
+  const subW = text.secondaryHeadingWeight || 600;
+  const secPt = text.sectionTitle || 10;
+  const secW = text.sectionTitleWeight || 700;
+  const color = themeColor || '#2c3e50';
+  const topBottom = layout.topBottom || 20;
+  const leftRight = layout.leftRight || 20;
+  const headerAlign = layout.headerAlignment || 'left';
+
+  const isLinkedIn = template === 'linkedin';
+  const isVivid = template === 'vivid';
+  const isCorporate = template === 'corporate'; // corporate also has this path when called single-col
+
+  // Header alignment
+  const hAlign = headerAlign === 'center' ? 'center' : headerAlign === 'right' ? 'right' : 'left';
+
+  // Contact line
+  const addressLine = [
+    formValues.address,
+    [formValues.city_state, formValues.postal_code].filter(Boolean).join(', '),
+    formValues.country,
+  ].filter(Boolean).map(e).join(', ');
+
+  const inlineContacts = [
+    formValues.email ? e(formValues.email) : '',
+    formValues.phone ? e(formValues.phone) : '',
+    formValues.linkedin ? 'LinkedIn' : '',
+    formValues.github ? 'GitHub' : '',
+    formValues.stackoverflow ? 'Stack Overflow' : '',
+    formValues.leetcode ? 'LeetCode' : '',
+  ].filter(Boolean).join(' &nbsp;|&nbsp; ');
+
+  const personalLine = [
+    formValues.dob,
+    formValues.birth_place,
+    formValues.nationality,
+    formValues.driving_licence,
+  ].filter(Boolean).map(e).join(' | ');
+
+  // ── Header ──
+  let headerHtml = '';
+
+  if (isLinkedIn) {
+    // LinkedIn: colored banner header
+    headerHtml = `
+    <div style="background:${color};height:70pt;width:100%;"></div>
+    <div style="padding:10pt ${leftRight}pt 0 ${leftRight}pt;">
+      <div style="font-family:${fontStack(secondaryFont)};font-size:${h1Pt}pt;font-weight:${h1W};color:#111;line-height:1.1;margin-bottom:4pt;">
+        ${e(formValues.first_name)} ${e(formValues.last_name)}
+      </div>
+      ${formValues.job_target ? `<div style="font-size:${bodyPt}pt;color:#374151;margin-bottom:6pt;">${e(formValues.job_target)}</div>` : ''}
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:8pt 0;"/>
+    </div>`;
+  } else if (isCorporate) {
+    // Corporate: centered header
+    headerHtml = `
+    <div style="text-align:center;padding:${topBottom}pt ${leftRight}pt ${Math.round(topBottom * 0.6)}pt;border-bottom:1px solid #f3f4f6;">
+      <div style="font-family:${fontStack(secondaryFont)};font-size:${h1Pt}pt;font-weight:${h1W};color:#111;line-height:1.1;margin-bottom:6pt;">
+        ${e(formValues.first_name)} ${e(formValues.last_name)}
+      </div>
+      <div style="font-size:${bodyPt}pt;color:#6b7280;">
+        ${[formValues.job_target, addressLine, formValues.phone].filter(Boolean).map(e).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>`;
+  } else {
+    // PrimeATS, Vivid, default
+    headerHtml = `
+    <div style="text-align:${hAlign};padding:${topBottom}pt ${leftRight}pt ${Math.round(topBottom * 0.5)}pt;">
+      <div style="font-family:${fontStack(secondaryFont)};font-size:${h1Pt}pt;font-weight:${h1W};color:${color};text-transform:uppercase;letter-spacing:-0.02em;line-height:1.1;margin-bottom:4pt;">
+        ${e(formValues.first_name)} ${e(formValues.last_name)}
+      </div>
+      ${formValues.job_target ? `<div style="font-size:${subPt}pt;font-weight:${subW};color:#444;text-transform:uppercase;margin-bottom:4pt;">${e(formValues.job_target)}</div>` : ''}
+      ${(addressLine || inlineContacts) ? `<div style="font-size:${bodyPt}pt;color:#4b5563;margin-top:3pt;">${[addressLine, inlineContacts].filter(Boolean).join(' &nbsp;|&nbsp; ')}</div>` : ''}
+      ${personalLine ? `<div style="font-size:${bodyPt}pt;color:#4b5563;margin-top:2pt;">${personalLine}</div>` : ''}
+    </div>`;
+  }
+
+  // ── Section heading style ──
+  const sectionHeadingStyle = isVivid
+    // Vivid: black badge label
+    ? `display:inline-block;background:#111;color:#fff;font-family:${fontStack(secondaryFont)};font-size:${secPt}pt;font-weight:${secW};letter-spacing:0.1em;text-transform:uppercase;padding:2pt 8pt;margin-bottom:6pt;`
+    : isLinkedIn
+      // LinkedIn: plain uppercase with underline
+      ? `color:#000;font-family:${fontStack(secondaryFont)};font-size:${secPt}pt;font-weight:${secW};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8pt;display:block;`
+      : isCorporate
+        // Corporate: icon-less UPPERCASE + bottom border
+        ? `font-family:${fontStack(secondaryFont)};font-size:${secPt}pt;font-weight:${secW};color:#111;text-transform:uppercase;letter-spacing:0.12em;border-bottom:1px solid #e5e7eb;padding-bottom:3pt;margin-bottom:8pt;margin-top:14pt;display:block;`
+        // Default (PrimeATS, etc.): colored top+bottom border
+        : `color:${color};border-top:1px solid ${color};border-bottom:1px solid ${color};font-family:${fontStack(secondaryFont)};font-size:${secPt}pt;font-weight:${secW};text-transform:uppercase;letter-spacing:0.05em;padding:3pt 0;margin-bottom:8pt;margin-top:14pt;display:block;`;
+
+  // ── Sections body ──
+  let sectionsHtml = '';
+  (sections || []).forEach(sec => {
+    const body = renderSectionBody(sec, bodyPt, bodyW, lh);
+    if (!body) return;
+
+    if (isLinkedIn && sec.type === 'skills') {
+      // LinkedIn: pill-style skills chips
+      const pills = (sec.skills || [])
+        .map(sk => `<span style="display:inline-block;border:1px solid #e5e7eb;border-radius:20pt;background:#f9fafb;padding:2pt 8pt;font-size:${bodyPt - 1}pt;color:#374151;margin:2pt 3pt 2pt 0;">${e(sk.name)}</span>`)
+        .join('');
+      sectionsHtml += `
+      <div style="margin-bottom:10pt;">
+        <div style="${sectionHeadingStyle}">${e(sec.title)}</div>
+        <div>${pills}</div>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:8pt 0;"/>
+      </div>`;
+    } else if (isLinkedIn) {
+      sectionsHtml += `
+      <div style="margin-bottom:10pt;">
+        <div style="${sectionHeadingStyle}">${e(sec.title)}</div>
+        ${body}
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:8pt 0;"/>
+      </div>`;
+    } else {
+      sectionsHtml += `
+      <section>
+        <div style="${sectionHeadingStyle}">${e(sec.title)}</div>
+        ${body}
+      </section>`;
+    }
+  });
+
+  const bodyPadding = isLinkedIn
+    ? `padding:0 ${leftRight}pt ${topBottom}pt ${leftRight}pt;`
+    : `padding:0 ${leftRight}pt ${topBottom}pt ${leftRight}pt;`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Resume</title>
+  ${getFontLinks(primaryFont, secondaryFont)}
+  <style>
+    ${sharedCss(bodyPt, bodyW, lh)}
+    body { font-family: ${fontStack(primaryFont)}; max-width: 800px; }
+    section { margin-bottom: 4pt; }
+  </style>
+</head>
+<body>
+  ${headerHtml}
+  <div style="${bodyPadding}">${sectionsHtml}</div>
+</body>
+</html>`;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MAIN HOOK
+// ─────────────────────────────────────────────────────────────────────────────
 export const useDownload = ({ componentRef, formValues, resumeSettings, sections, themeColor }) => {
   const dispatch = useDispatch();
 
-  // ── PDF: clone DOM → send to backend ──
+  // ── PDF: clone DOM → strip overflow → backend ──────────────────────────
   const handleDownloadPDF = async () => {
     try {
       const resumeEl = componentRef.current;
       if (!resumeEl) return;
 
       const cloned = resumeEl.cloneNode(true);
-      cloned.querySelectorAll("*").forEach(el => {
-        const cls = el.className || "";
-        if (typeof cls !== "string") return;
+
+      // Remove all overflow constraints so the full page renders
+      cloned.querySelectorAll('*').forEach(el => {
+        const s = el.style;
+        const cn = typeof el.className === 'string' ? el.className : '';
         if (
-          cls.includes("overflow-y-auto") ||
-          cls.includes("overflow-y-scroll") ||
-          cls.includes("hide-scrollbar")
+          s.overflow === 'auto' || s.overflow === 'scroll' ||
+          s.overflowY === 'auto' || s.overflowY === 'scroll' ||
+          cn.includes('overflow-y-auto') ||
+          cn.includes('overflow-y-scroll') ||
+          cn.includes('h-screen') ||
+          cn.includes('hide-scrollbar')
         ) {
-          el.style.overflow = "visible";
-          el.style.height = "auto";
-        }
-        if (cls.includes("h-screen")) {
-          el.style.height = "auto";
-          el.style.overflow = "visible";
+          s.overflow = 'visible';
+          s.overflowY = 'visible';
+          s.height = 'auto';
+          s.maxHeight = 'none';
         }
       });
 
-      const primaryFont   = resumeSettings?.text?.primaryFont   || "Arial";
+      const primaryFont = resumeSettings?.text?.primaryFont || 'Arial';
       const secondaryFont = resumeSettings?.text?.secondaryFont || primaryFont;
 
-      const fontsToLoad = [...new Set([primaryFont, secondaryFont])]
-        .map(getFontLink)
-        .filter(Boolean)
-        .join("\n");
-
       const fullHtml = [
-        '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>',
-        fontsToLoad,
+        '<!DOCTYPE html><html lang="en"><head>',
+        '<meta charset="UTF-8"/>',
+        getFontLinks(primaryFont, secondaryFont),
         '<style>',
-        '* { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-sizing: border-box; }',
-        `body { margin: 0; padding: 0; font-family: ${fontStack(primaryFont)}; }`,
-        '@page { size: A4; margin: 0; }',
-        'table { border-collapse: collapse; }',
-        'td { vertical-align: top; }',
-        'a { color: #2b6cb0; text-decoration: underline; }',
-        'ul { list-style-type: disc; padding-left: 1.2rem; margin: 0.25rem 0; }',
-        'li { margin-bottom: 0.2rem; }',
-        '</style></head><body><div>',
-        cloned.innerHTML,
-        '</div></body></html>',
+        '  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }',
+        `  body { margin: 0; padding: 0; font-family: ${fontStack(primaryFont)}!important; }`,
+        `  td, p, div, span, h1, h2, h3, h4, li { font-family: ${fontStack(primaryFont)} !important; }`,
+        '  @page { size: A4; margin: 0; }',
+        '  table { border-collapse: collapse; }',
+        '  td { vertical-align: top; }',
+        '  a { color: inherit; text-decoration: none; }',
+        '  ul { list-style-type: disc; padding-left: 1.2rem; margin: 0.25rem 0; }',
+        '  ol { list-style-type: decimal; padding-left: 1.2rem; margin: 0.25rem 0; }',
+        '  li { margin-bottom: 0.15rem; }',
+        '  p  { margin: 0.1rem 0; }',
+        '</style>',
+        '</head><body>',
+        cloned.outerHTML,
+        '</body></html>',
       ].join('');
 
       const result = await dispatch(generatePDF(fullHtml));
@@ -92,495 +722,58 @@ export const useDownload = ({ componentRef, formValues, resumeSettings, sections
         const fileUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = fileUrl;
-        a.download = `${formValues.first_name || "resume"}_${formValues.last_name || ""}.pdf`;
+        a.download = `${formValues.first_name || 'resume'}_${formValues.last_name || ''}.pdf`;
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(fileUrl);
       } else {
-        console.error("PDF download failed!");
+        console.error('PDF generation failed', result);
       }
     } catch (err) {
-      console.error(err);
-      console.error("PDF download failed!");
+      console.error('PDF download error:', err);
     }
   };
 
-  // ── DOCX ──
+  // ── DOCX: build clean semantic HTML → backend ──────────────────────────
   const handleDownloadDocx = async () => {
     try {
-      const primaryFont   = resumeSettings?.text?.primaryFont   || "Arial";
-      const secondaryFont = resumeSettings?.text?.secondaryFont || primaryFont;
-      const color         = themeColor || "#2c3e50";
-      const template      = resumeSettings?.theme?.template || "ats";
+      const template = resumeSettings?.theme?.template || 'ats';
+      const isTwoCol = TWO_COL_TEMPLATES.has(template);
 
-      const bodyPt = resumeSettings?.text?.body || 9;
-      const h1Pt   = resumeSettings?.text?.primaryHeading || 22;
-      const h1W    = resumeSettings?.text?.primaryHeadingWeight || 700;
-      const subPt  = resumeSettings?.text?.secondaryHeading || 13;
-      const subW   = resumeSettings?.text?.secondaryHeadingWeight || 600;
-      const secPt  = resumeSettings?.text?.sectionTitle || 11;
-      const secW   = resumeSettings?.text?.sectionTitleWeight || 700;
-      const bodyW  = resumeSettings?.text?.bodyWeight || 400;
-      const lh     = resumeSettings?.text?.lineHeight || 1.6;
-
-      const e = (s) => {
-        if (!s) return "";
-        return String(s)
-          .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-      };
-
-      const strip = (html) => {
-        if (!html) return "";
-        return html
-          .replace(/<br\s*\/?>/gi, " ").replace(/<\/p>/gi, " ")
-          .replace(/<li[^>]*>/gi, "").replace(/<\/li>/gi, "; ")
-          .replace(/<[^>]+>/g, "")
-          .replace(/&amp;/g, "&").replace(/&lt;/g, "<")
-          .replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-          .replace(/\s+/g, " ").trim();
-      };
-
-      const fmt = (d) => {
-        if (!d) return "";
-        if (String(d).toLowerCase() === "present") return "Present";
-        const dt = new Date(d);
-        if (isNaN(dt.getTime())) return String(d);
-        return dt.toLocaleString("en-US", { month: "short", year: "numeric" });
-      };
-      const dr = (s, end) => [fmt(s), fmt(end)].filter(Boolean).join(" - ");
-
-      // ── Shared section renderers (used by both templates) ──────────────
-      const renderSectionBody = (sec) => {
-        let out = "";
-
-        if (sec.type === "summary") {
-          out += `<p>${e(strip(sec.summary))}</p>`;
-        }
-        else if (sec.type === "skills") {
-          const skills = sec.skills || [];
-          out += `<table class="skills-table"><tbody>`;
-          for (let i = 0; i < skills.length; i += 2) {
-            const s1 = skills[i]; const s2 = skills[i + 1];
-            out += `<tr>
-              <td class="skill-cell">${e(s1?.name || "")}</td>
-              <td class="skill-cell">${s2 ? e(s2.name || "") : ""}</td>
-            </tr>`;
-          }
-          out += `</tbody></table>`;
-        }
-        else if (sec.type === "experience") {
-          (sec.experiences || []).forEach(exp => {
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(dr(exp.startDate, exp.endDate))}</span>
-              <span class="header-left"><strong>${e(exp.jobTitle)}${exp.company ? ` | ${e(exp.company)}` : ""}${exp.city ? `, ${e(exp.city)}` : ""}</strong></span>
-            </div></div>`;
-            if (exp.description) out += `<p class="desc">${e(strip(exp.description))}</p>`;
-          });
-        }
-        else if (sec.type === "education") {
-          (sec.educations || []).forEach(edu => {
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(dr(edu.startDate, edu.endDate))}</span>
-              <span class="header-left"><strong>${e(edu.degree)}${edu.institute ? `, ${e(edu.institute)}` : ""}${edu.city ? `, ${e(edu.city)}` : ""}</strong></span>
-            </div></div>`;
-            if (edu.description) out += `<p class="desc">${e(strip(edu.description))}</p>`;
-          });
-        }
-        else if (sec.type === "certifications") {
-          (sec.certifications || []).forEach(cert => {
-            const yr = cert.startYear && cert.endYear ? `${cert.startYear} - ${cert.endYear}` : cert.startYear || cert.endYear || "";
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(yr)}</span>
-              <span class="header-left"><strong>${e(cert.name)}${cert.organization ? ` - ${e(cert.organization)}` : ""}</strong></span>
-            </div></div>`;
-            if (cert.description) out += `<p class="desc">${e(cert.description)}</p>`;
-          });
-        }
-        else if (sec.type === "languages") {
-          const langs = sec.languages || [];
-          out += `<table class="skills-table"><tbody>`;
-          for (let i = 0; i < langs.length; i += 2) {
-            const l1 = langs[i]; const l2 = langs[i + 1];
-            const lb1 = l1 ? `${e(l1.language)}${!sec.hideProficiency && l1.level ? ` (${e(l1.level)})` : ""}` : "";
-            const lb2 = l2 ? `${e(l2.language)}${!sec.hideProficiency && l2.level ? ` (${e(l2.level)})` : ""}` : "";
-            out += `<tr><td class="skill-cell">${lb1}</td><td class="skill-cell">${lb2}</td></tr>`;
-          }
-          out += `</tbody></table>`;
-        }
-        else if (sec.type === "hobbies") {
-          out += `<p>${e(sec.hobbies)}</p>`;
-        }
-        else if (sec.type === "courses") {
-          (sec.courses || []).forEach(c => {
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(dr(c.startDate, c.endDate))}</span>
-              <span class="header-left"><strong>${e(c.course)}${c.institution ? `, ${e(c.institution)}` : ""}</strong></span>
-            </div></div>`;
-          });
-        }
-        else if (sec.type === "internships") {
-          (sec.internships || []).forEach(intern => {
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(dr(intern.startDate, intern.endDate))}</span>
-              <span class="header-left"><strong>${e(intern.jobTitle)}${intern.employer ? ` | ${e(intern.employer)}` : ""}${intern.city ? `, ${e(intern.city)}` : ""}</strong></span>
-            </div></div>`;
-            if (intern.description) out += `<p class="desc">${e(strip(intern.description))}</p>`;
-          });
-        }
-        else if (sec.type === "activities") {
-          (sec.activities || []).forEach(act => {
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(dr(act.startDate, act.endDate))}</span>
-              <span class="header-left"><strong>${e(act.functionTitle)}${act.employer ? ` | ${e(act.employer)}` : ""}${act.city ? `, ${e(act.city)}` : ""}</strong></span>
-            </div></div>`;
-            if (act.description) out += `<p class="desc">${e(strip(act.description))}</p>`;
-          });
-        }
-        else if (sec.type === "custom_simple") {
-          const items = sec.items || [];
-          out += `<table class="skills-table"><tbody>`;
-          for (let i = 0; i < items.length; i += 2) {
-            const n1 = typeof items[i] === "object" ? (items[i]?.name || items[i]?.title || "") : (items[i] || "");
-            const n2 = items[i + 1] ? (typeof items[i + 1] === "object" ? (items[i + 1]?.name || items[i + 1]?.title || "") : (items[i + 1] || "")) : "";
-            out += `<tr><td class="skill-cell">${e(n1)}</td><td class="skill-cell">${e(n2)}</td></tr>`;
-          }
-          out += `</tbody></table>`;
-        }
-        else if (sec.type === "custom") {
-          (sec.items || []).forEach(item => {
-            out += `<div class="item"><div class="item-header">
-              <span class="header-right">${e(dr(item.startDate, item.endDate))}</span>
-              <span class="header-left"><strong>${e(item.title)}${item.city ? `, ${e(item.city)}` : ""}</strong></span>
-            </div></div>`;
-            if (item.description) out += `<p class="desc">${e(strip(item.description))}</p>`;
-          });
-        }
-
-        return out;
-      };
-
-      // ════════════════════════════════════════════════════════════════════
-      //  PROFESSIONAL TEMPLATE — two-column table DOCX
-      // ════════════════════════════════════════════════════════════════════
-      const isProfessional = template === "professional";
-
-      let fullHtml = "";
-
-      if (isProfessional) {
-        const SIDEBAR_TYPES = new Set(['skills', 'hobbies', 'languages']);
-        const sidebarSections = (sections || []).filter(s => SIDEBAR_TYPES.has(s.type));
-        const mainSections    = (sections || []).filter(s => !SIDEBAR_TYPES.has(s.type));
-
-        // Sidebar HTML
-        let sidebarHtml = "";
-
-        // Contact
-        const contactItems = [
-          formValues.address     ? `<div>${e(formValues.address)}</div>` : "",
-          formValues.city_state  ? `<div>${e(formValues.city_state)}${formValues.country ? `, ${e(formValues.country)}` : ""}</div>` : "",
-          formValues.postal_code ? `<div>${e(formValues.postal_code)}</div>` : "",
-          formValues.email       ? `<div><a href="mailto:${e(formValues.email)}" style="color:#d1d5db">${e(formValues.email)}</a></div>` : "",
-          formValues.phone       ? `<div>${e(formValues.phone)}</div>` : "",
-          formValues.linkedin    ? `<div><a href="${e(formValues.linkedin)}" style="color:#d1d5db">LinkedIn</a></div>` : "",
-          formValues.github      ? `<div><a href="${e(formValues.github)}" style="color:#d1d5db">GitHub</a></div>` : "",
-          formValues.stackoverflow ? `<div><a href="${e(formValues.stackoverflow)}" style="color:#d1d5db">Stack Overflow</a></div>` : "",
-          formValues.leetcode    ? `<div><a href="${e(formValues.leetcode)}" style="color:#d1d5db">LeetCode</a></div>` : "",
-          formValues.driving_licence ? `<div><span class="side-label">Driving License</span><div>${e(formValues.driving_licence)}</div></div>` : "",
-          formValues.nationality ? `<div><span class="side-label">Nationality</span><div>${e(formValues.nationality)}</div></div>` : "",
-          formValues.birth_place ? `<div><span class="side-label">Place of Birth</span><div>${e(formValues.birth_place)}</div></div>` : "",
-          formValues.dob         ? `<div><span class="side-label">Date of Birth</span><div>${e(formValues.dob)}</div></div>` : "",
-        ].filter(Boolean).join("");
-
-        if (contactItems) {
-          sidebarHtml += `<div class="side-section"><div class="side-heading">Details</div><div class="side-body">${contactItems}</div></div>`;
-        }
-
-        sidebarSections.forEach(sec => {
-          let secHtml = "";
-          if (sec.type === "skills") {
-            (sec.skills || []).forEach(sk => { secHtml += `<div class="side-item">${e(sk.name)}</div>`; });
-          } else if (sec.type === "languages") {
-            (sec.languages || []).forEach(l => {
-              secHtml += `<div class="side-item">${e(l.language)}${!sec.hideProficiency && l.level ? ` (${e(l.level)})` : ""}</div>`;
-            });
-          } else if (sec.type === "hobbies") {
-            secHtml += `<div class="side-body">${e(sec.hobbies)}</div>`;
-          }
-          sidebarHtml += `<div class="side-section"><div class="side-heading">${e(sec.title)}</div>${secHtml}</div>`;
-        });
-
-        // Main HTML
-        let mainHtml = "";
-        mainSections.forEach(sec => {
-          mainHtml += `<div class="main-section"><div class="main-heading">${e(sec.title)}</div>${renderSectionBody(sec)}</div>`;
-        });
-
-        fullHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <title>Resume</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: '${primaryFont}', Arial, sans-serif;
-      font-size: ${bodyPt}pt;
-      font-weight: ${bodyW};
-      line-height: ${lh};
-      margin: 0; padding: 0;
-      color: #333;
-    }
-    .layout-table { width: 100%; border-collapse: collapse; }
-    .sidebar-td {
-      width: 35%;
-      background-color: ${color};
-      vertical-align: top;
-      padding: 24pt 14pt;
-    }
-    .main-td {
-      width: 65%;
-      background-color: #ffffff;
-      vertical-align: top;
-      padding: 20pt 22pt;
-    }
-
-    /* ── Name / title ── */
-    .name {
-      font-family: '${secondaryFont}', Arial, sans-serif;
-      font-size: ${h1Pt}pt;
-      font-weight: ${h1W};
-      color: #ffffff;
-      text-align: center;
-      line-height: 1.2;
-      margin-bottom: 4pt;
-    }
-    .job-target {
-      font-size: ${subPt}pt;
-      font-weight: ${subW};
-      color: rgba(255,255,255,0.8);
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10pt;
-    }
-    .divider {
-      width: 24pt;
-      border-top: 1px solid rgba(255,255,255,0.4);
-      margin: 6pt auto;
-    }
-
-    /* ── Sidebar ── */
-    .side-section { margin-bottom: 14pt; }
-    .side-heading {
-      font-family: '${secondaryFont}', Arial, sans-serif;
-      font-size: ${secPt}pt;
-      font-weight: ${secW};
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid rgba(255,255,255,0.3);
-      padding-bottom: 3pt;
-      margin-bottom: 6pt;
-    }
-    .side-body {
-      font-size: ${bodyPt}pt;
-      color: #d1d5db;
-      line-height: ${lh};
-    }
-    .side-item {
-      font-size: ${bodyPt}pt;
-      color: #d1d5db;
-      margin-bottom: 4pt;
-    }
-    .side-label {
-      font-size: ${bodyPt - 1}pt;
-      color: #9ca3af;
-      text-transform: uppercase;
-      display: block;
-      margin-top: 4pt;
-    }
-
-    /* ── Main ── */
-    .main-section { margin-bottom: 10pt; }
-    .main-heading {
-      font-family: '${secondaryFont}', Arial, sans-serif;
-      font-size: ${secPt}pt;
-      font-weight: ${secW};
-      color: #111827;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 3pt;
-      margin-bottom: 6pt;
-      margin-top: 10pt;
-    }
-
-    .item { margin-bottom: 8pt; }
-    .item-header { overflow: hidden; margin-bottom: 2pt; }
-    .header-left { display: block; overflow: hidden; font-size: ${bodyPt}pt; font-weight: ${bodyW}; }
-    .header-right { float: right; font-size: ${bodyPt}pt; font-weight: bold; color: #555; margin-left: 8pt; }
-
-    .desc {
-      font-size: ${bodyPt}pt;
-      font-weight: ${bodyW};
-      color: #374151;
-      line-height: ${lh};
-      margin: 2pt 0 6pt 0;
-    }
-    p { font-size: ${bodyPt}pt; font-weight: ${bodyW}; color: #374151; line-height: ${lh}; margin: 2pt 0; }
-
-    .skills-table { width: 100%; border-collapse: collapse; margin-top: 4pt; }
-    .skill-cell {
-      width: 50%;
-      padding: 2pt 8pt 2pt 0;
-      font-size: ${bodyPt}pt;
-      font-weight: ${bodyW};
-      color: #1f2937;
-      border-bottom: 1px solid #e5e7eb;
-      vertical-align: middle;
-    }
-    a { color: #2b6cb0; }
-  </style>
-</head>
-<body>
-<table class="layout-table">
-  <tbody>
-    <tr>
-      <td class="sidebar-td">
-        ${formValues.profileImage ? `<div style="text-align:center;margin-bottom:10pt"><img src="${formValues.profileImage}" alt="Profile" style="width:70pt;height:70pt;object-fit:cover;border-radius:50%;border:2pt solid rgba(255,255,255,0.5)"/></div>` : ""}
-        <div class="name">${e(formValues.first_name)} ${e(formValues.last_name)}</div>
-        <div class="divider"></div>
-        ${formValues.job_target ? `<div class="job-target">${e(formValues.job_target)}</div>` : ""}
-        ${sidebarHtml}
-      </td>
-      <td class="main-td">
-        ${mainHtml}
-      </td>
-    </tr>
-  </tbody>
-</table>
-</body>
-</html>`;
-
-      } else {
-        // ════════════════════════════════════════════════════════════════
-        //  ALL OTHER TEMPLATES — original flat layout
-        // ════════════════════════════════════════════════════════════════
-
-        const contactParts = [
-          [formValues?.address, formValues?.city_state && formValues?.postal_code
-            ? `${formValues.city_state}, ${formValues.postal_code}`
-            : formValues?.city_state || formValues?.postal_code, formValues?.country]
-            .filter(Boolean).map(e).join(", "),
-          formValues?.email       ? `Email: ${e(formValues.email)}` : "",
-          formValues?.phone       ? `Phone: ${e(formValues.phone)}` : "",
-          formValues?.linkedin    ? `LinkedIn: ${e(formValues.linkedin)}` : "",
-          formValues?.github      ? `GitHub: ${e(formValues.github)}` : "",
-          formValues?.stackoverflow ? `Stack Overflow: ${e(formValues.stackoverflow)}` : "",
-          formValues?.leetcode    ? `LeetCode: ${e(formValues.leetcode)}` : "",
-        ].filter(Boolean).join(" | ");
-
-        let body = `
-<header>
-  <h1>${e(formValues?.first_name)} ${e(formValues?.last_name)}</h1>
-  <div class="subtitle">${e(formValues?.job_target)}</div>
-  <div class="contact-info">${contactParts}</div>
-</header>`;
-
-        (sections || []).forEach(sec => {
-          body += `<section><h2>${e(sec.title)}</h2>${renderSectionBody(sec)}</section>`;
-        });
-
-        fullHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <title>Resume</title>
-  <style>
-    body {
-      font-family: '${primaryFont}', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: ${lh};
-      color: #333;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      font-size: ${bodyPt}pt;
-      font-weight: ${bodyW};
-    }
-    header {
-      text-align: center;
-      border-bottom: 2px solid ${color};
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      margin: 0 0 6px 0;
-      color: ${color};
-      font-size: ${h1Pt}pt;
-      font-weight: ${h1W};
-      font-family: '${secondaryFont}', Arial, sans-serif;
-      text-transform: uppercase;
-    }
-    .subtitle { font-size: ${subPt}pt; font-weight: ${subW}; color: #444; margin-bottom: 6px; }
-    .contact-info { font-size: ${bodyPt}pt; color: #555; }
-    h2 {
-      color: ${color};
-      border-top: 1px solid ${color};
-      border-bottom: 1px solid ${color};
-      padding: 3px 0;
-      margin-top: 20px;
-      margin-bottom: 8px;
-      font-size: ${secPt}pt;
-      font-weight: ${secW};
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-family: '${secondaryFont}', Arial, sans-serif;
-    }
-    .item { margin-bottom: 10px; }
-    .item-header { overflow: hidden; margin-bottom: 4px; }
-    .header-left { display: block; overflow: hidden; font-size: ${bodyPt}pt; }
-    .header-right { float: right; font-size: ${bodyPt}pt; font-weight: bold; color: #555; margin-left: 10px; }
-    .desc { font-size: ${bodyPt}pt; font-weight: ${bodyW}; color: #374151; line-height: ${lh}; margin: 4px 0 8px 0; }
-    p { font-size: ${bodyPt}pt; font-weight: ${bodyW}; color: #374151; line-height: ${lh}; margin: 4px 0; }
-    .skills-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-    .skill-cell { width: 50%; padding: 3px 8px 3px 0; font-size: ${bodyPt}pt; font-weight: ${bodyW}; color: #1f2937; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
-    a { color: #2b6cb0; }
-  </style>
-</head>
-<body><div class="cv-container">${body}</div></body>
-</html>`;
-      }
+      const fullHtml = isTwoCol
+        ? buildTwoColDocxHtml({ formValues, sections, resumeSettings, themeColor, template })
+        : buildSingleColDocxHtml({ formValues, sections, resumeSettings, themeColor, template });
 
       const result = await dispatch(generateDocx(fullHtml));
 
       if (generateDocx.fulfilled.match(result)) {
         const blob = result.payload;
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        const a = document.createElement('a');
         a.href = url;
-        a.download = `${formValues?.first_name || "resume"}_${formValues?.last_name || ""}.docx`;
+        a.download = `${formValues?.first_name || 'resume'}_${formValues?.last_name || ''}.docx`;
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
       } else {
-        console.error("DOCX download failed!");
+        console.error('DOCX generation failed', result);
       }
     } catch (err) {
-      console.error(err);
+      console.error('DOCX download error:', err);
     }
   };
 
+  // ── External event listeners (for trigger buttons outside React tree) ──
   useEffect(() => {
-    window.addEventListener("download-pdf", handleDownloadPDF);
-    return () => window.removeEventListener("download-pdf", handleDownloadPDF);
+    window.addEventListener('download-pdf', handleDownloadPDF);
+    return () => window.removeEventListener('download-pdf', handleDownloadPDF);
   }, [formValues, resumeSettings, sections, themeColor]);
 
   useEffect(() => {
-    window.addEventListener("download-docx", handleDownloadDocx);
-    return () => window.removeEventListener("download-docx", handleDownloadDocx);
+    window.addEventListener('download-docx', handleDownloadDocx);
+    return () => window.removeEventListener('download-docx', handleDownloadDocx);
   }, [formValues, resumeSettings, sections, themeColor]);
 
   return { handleDownloadPDF, handleDownloadDocx };

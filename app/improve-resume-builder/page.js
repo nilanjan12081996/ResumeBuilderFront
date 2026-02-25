@@ -49,14 +49,24 @@ import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ImpSimpleCustomSection from './components/Impsimplecustomsection';
 import { useDownload } from '../hooks/useDownload';
 import ResumeCompareModal from '../modal/ResumeCompareModal';
+import { resetAiCount } from '../reducers/PlanSlice';
 
 const Page = () => {
   const componentRef = useRef();
   const templateTextSettings = useRef({});
+  const hasInitialAtsCalled = useRef(false);
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
-    const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+  const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+  const { aiCountReset } = useSelector((state) => state.planst);
+
+  // AI Count
+  const [aiCounts, setAiCounts] = useState({
+    summary_count: defaultResumeSettings.ai.summary_count,
+    experience_count: defaultResumeSettings.ai.experience_count,
+  });
+  const aiCountsInitialized = useRef(false);
 
   const resumeSource =
     singleResumeInfo?.data?.data ||
@@ -75,33 +85,37 @@ const Page = () => {
   const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
   useEffect(() => {
-    if (!resumeSource) return;
+    if (resumeSource && !hasInitialAtsCalled.current) {
+      const atsPayload = {
+        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+        resume_data: JSON.stringify(resumeSource),
+        Ats_score: 0
+      };
 
-    const atsPayload = {
-      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-      resume_data: JSON.stringify(resumeSource),
-      Ats_score: 0
-    };
+      dispatch(checkATS(atsPayload));
 
-    dispatch(checkATS(atsPayload));
+      hasInitialAtsCalled.current = true;
+    }
   }, [resumeSource, dispatch]);
 
+
+
   useEffect(() => {
-      if (resumeSource && !originalResumeData) {
-          const clonedSource = JSON.parse(JSON.stringify(resumeSource));
-          const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
-          const initialSections = mapextracteResumeDataToSections(clonedSource);
-  
-          setOriginalResumeData({
-              ...clonedSource,
-              sections: initialSections,
-              oldResumeSettings: initialSettings 
-          });
-      }
-      if (!atsLoading && checkATSData?.ATS_Score > 0 && originalAtsScore === null) {
-          setOriginalAtsScore(checkATSData.ATS_Score);
-      }
-  
+    if (resumeSource && !originalResumeData) {
+      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+      const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
+      const initialSections = mapextracteResumeDataToSections(clonedSource);
+
+      setOriginalResumeData({
+        ...clonedSource,
+        sections: initialSections,
+        oldResumeSettings: initialSettings
+      });
+    }
+    if (!atsLoading && checkATSData?.ATS_Score > 0 && originalAtsScore === null) {
+      setOriginalAtsScore(checkATSData.ATS_Score);
+    }
+
   }, [resumeSource, checkATSData, atsLoading, originalAtsScore, originalResumeData]);
 
 
@@ -649,7 +663,18 @@ const Page = () => {
         defaultResumeSettings.theme.defaultColor;
 
       setThemeColor(color);
+
+      // Ai Count 
+      if (!aiCountsInitialized.current && settings.ai) {
+        setAiCounts({
+          summary_count: settings.ai.summary_count ?? defaultResumeSettings.ai.summary_count,
+          experience_count: settings.ai.experience_count ?? defaultResumeSettings.ai.experience_count,
+        });
+        aiCountsInitialized.current = true;
+      }
     }
+
+
 
     if (resumeSource.sections?.length) {
       setSections(resumeSource.sections);
@@ -660,6 +685,44 @@ const Page = () => {
     setSections(mappedSections);
 
   }, [resumeSource]);
+
+  // AI Count
+  const handleUseAiCount = (type) => {
+    if (type === "summary") {
+      setAiCounts(prev => ({
+        ...prev,
+        summary_count: Math.max(0, prev.summary_count - 1),
+      }));
+    } else if (type === "experience") {
+      setAiCounts(prev => ({
+        ...prev,
+        experience_count: Math.max(0, prev.experience_count - 1),
+      }));
+    }
+  };
+
+  // AI Count
+  useEffect(() => {
+    setResumeSettings(prev => ({
+      ...prev,
+      ai: {
+        summary_count: aiCounts.summary_count,
+        experience_count: aiCounts.experience_count,
+      },
+    }));
+  }, [aiCounts]);
+
+  // AI Count
+  useEffect(() => {
+  if (!aiCountReset) return;
+  
+  setAiCounts({
+    summary_count: defaultResumeSettings.ai.summary_count, 
+    experience_count: defaultResumeSettings.ai.experience_count, 
+  });
+
+  dispatch(resetAiCount()); 
+}, [aiCountReset]);
 
   // ----------------- SYNC SKILLS -----------------
   useEffect(() => {
@@ -1491,6 +1554,9 @@ const Page = () => {
                                       setSections={setSections}
                                       sectionIndex={index}
                                       onAtsRefresh={handleAtsRefresh}
+                                      // Ai Count 
+                                      aiSummaryCount={aiCounts.summary_count}
+                                      onUseAiCount={() => handleUseAiCount("summary")}
                                     />
                                   )}
 
@@ -1531,6 +1597,9 @@ const Page = () => {
                                       draggedExpIndex={draggedExpIndex}
                                       handleDragEnd={handleDragEnd}
                                       onAtsRefresh={handleAtsRefresh}
+                                      // Ai Count 
+                                      aiExpCount={aiCounts.experience_count}              
+                                      onUseAiCount={() => handleUseAiCount("experience")} 
                                     />
                                   )}
 

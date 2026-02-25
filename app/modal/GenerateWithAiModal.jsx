@@ -18,8 +18,8 @@ import {
     generateJdNewExperience,
     summeryGapJd,
     jobDescriptionGapJd,
-    improvementJdSummary,      // ✅ নতুন import
-    improvementJdExperience,   // ✅ নতুন import
+    improvementJdSummary,      
+    improvementJdExperience,   
 } from "../reducers/DashboardSlice";
 
 const TONES = [
@@ -35,6 +35,7 @@ const GenerateWithAiModal = ({
     initialText = "",
     fullResumeData,
     onApply,
+    onUseAiCount
 }) => {
     const dispatch = useDispatch();
     const [tone, setTone] = useState("Professional");
@@ -63,10 +64,10 @@ const GenerateWithAiModal = ({
         summeryGapJdData,
         jobDescriptionGapJdLoading,
         jobDescriptionGapJdData,
-        improvementJdSummaryLoading,      // ✅ নতুন
-        improvementJdSummaryData,         // ✅ নতুন
-        improvementJdExperienceLoading,   // ✅ নতুন
-        improvementJdExperienceData,      // ✅ নতুন
+        improvementJdSummaryLoading,      
+        improvementJdSummaryData,       
+        improvementJdExperienceLoading,   
+        improvementJdExperienceData,     
     } = useSelector((state) => state.dash);
 
     const isSummaryType = aiType === "imp_summary" || aiType === "linkdin_summary";
@@ -76,7 +77,7 @@ const GenerateWithAiModal = ({
     const isLoading =
         (isSummaryType && (improvementSummaryLoading || generateImpNewSummaryLoading)) ||
         (isExperienceType && (improvementExperienceLoading || generateImpNewExperienceLoading)) ||
-        // ✅ JD generate + improve উভয়ের loading
+       
         (aiType === "jd_summary" && (generateJdNewSummaryLoading || improvementJdSummaryLoading)) ||
         (aiType === "jd_experience" && (generateJdNewExperienceLoading || improvementJdExperienceLoading));
 
@@ -123,10 +124,10 @@ const GenerateWithAiModal = ({
         } else if (isExperienceType) {
             raw = improvementExperienceData?.summary || generateImpNewExperienceData?.summary;
         } else if (aiType === "jd_summary") {
-            // ✅ generate এবং improve উভয়ের data দেখবে
+
             raw = generateJdNewSummaryData?.summary || improvementJdSummaryData?.summary;
         } else if (aiType === "jd_experience") {
-            // ✅ generate এবং improve উভয়ের data দেখবে
+
             raw = generateJdNewExperienceData?.summary || improvementJdExperienceData?.summary;
         }
 
@@ -200,6 +201,8 @@ const GenerateWithAiModal = ({
     const sourceText = initialText;
     if (!sourceText?.trim()) return;
 
+    onUseAiCount && onUseAiCount();
+
     lastAnimatedTextRef.current = "";
     setAnimatedText("");
     setTypingDone(false);
@@ -242,6 +245,8 @@ const GenerateWithAiModal = ({
     const handleNewGenarate = () => {
         if (!fullResumeData) return;
 
+        onUseAiCount && onUseAiCount();
+        
         lastAnimatedTextRef.current = "";
         setAnimatedText("");
         setTypingDone(false);

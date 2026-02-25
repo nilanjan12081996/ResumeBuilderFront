@@ -940,6 +940,9 @@ const DashboardSlice = createSlice(
             setJobDescription: (state, action) => {
                 state.jobDescription = action.payload;
             },
+            resetDashboard: (state) => {
+                return initialState;
+            },
         },
         extraReducers: (builder) => {
             builder.addCase(extracteResume.pending, (state, { payload }) => {
@@ -1536,5 +1539,5 @@ const DashboardSlice = createSlice(
         }
     }
 )
-export const { resetImpSummary, resetImpExperience, setJobDescription } = DashboardSlice.actions;
+export const { resetImpSummary, resetImpExperience, setJobDescription, resetDashboard} = DashboardSlice.actions;
 export default DashboardSlice.reducer;

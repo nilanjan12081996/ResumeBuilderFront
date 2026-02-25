@@ -3,17 +3,19 @@
 import { Modal } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { HiSparkles } from "react-icons/hi2";
 import { FiFileText, FiUploadCloud, FiArrowRight } from "react-icons/fi";
-import { extracteResume } from "../reducers/DashboardSlice";
+import { extracteResume, resetDashboard } from "../reducers/DashboardSlice";
+import { addCountResume, addCountResumeOrg } from '../reducers/ResumeSlice';
 
 const ImproveExistingModal = ({ open, onClose }) => {
   const [resumeFileName, setResumeFileName] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { profileData } = useSelector((state) => state?.profile);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -33,6 +35,32 @@ const ImproveExistingModal = ({ open, onClose }) => {
     }
   }, [open, reset]);
 
+  // const onSubmit = async (data) => {
+  //   if (!data.resume_file?.[0]) {
+  //     toast.error("Please upload your resume");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   try {
+  //     dispatch(resetDashboard());
+  //     const formData = new FormData();
+  //     formData.append("resume_pdf", data.resume_file[0]);
+
+  //     const result = await dispatch(extracteResume(formData));
+  //     if (!result?.payload || result.payload.status !== "success") {
+  //       toast.error("Resume extraction failed. Please try again.");
+  //       return;
+  //     }
+
+  //     router.push("/improve-resume-builder");
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const onSubmit = async (data) => {
     if (!data.resume_file?.[0]) {
       toast.error("Please upload your resume");
@@ -41,18 +69,28 @@ const ImproveExistingModal = ({ open, onClose }) => {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("resume_pdf", data.resume_file[0]);
+      const isIndividual = profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
+      const countAction = isIndividual ? addCountResume : addCountResumeOrg;
 
-      const result = await dispatch(extracteResume(formData));
-      if (!result?.payload || result.payload.status !== "success") {
-        toast.error("Resume extraction failed. Please try again.");
-        return;
+      const countRes = await dispatch(countAction({ ref_type: "improve_resume" })).unwrap();
+
+      if (countRes?.status_code === 200) {
+        dispatch(resetDashboard());
+        const formData = new FormData();
+        formData.append("resume_pdf", data.resume_file[0]);
+
+        const result = await dispatch(extracteResume(formData));
+        if (!result?.payload || result.payload.status !== "success") {
+          toast.error("Resume extraction failed. Please try again.");
+          return;
+        }
+        router.push("/improve-resume-builder");
+      } else {
+        toast.error(countRes?.message || "Your limit is expired. Please upgrade your plan.");
       }
-
-      router.push("/improve-resume-builder");
     } catch (err) {
       console.error(err);
+      toast.error(err?.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }

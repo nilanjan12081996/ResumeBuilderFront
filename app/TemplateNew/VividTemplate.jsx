@@ -1,18 +1,33 @@
 "use client";
 import React from "react";
 
-const SIDEBAR_TYPES = new Set(["skills", "languages", "hobbies"]);
 const skillLevels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
 
-const SectionHeader = ({ title }) => (
-  <div className="bg-black text-white inline-block px-3 py-1 text-[11px] font-bold tracking-widest uppercase mb-5">
-    {title}
-  </div>
-);
+const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, themeColor }) => {
+  const text    = resumeSettings?.text   || {};
+  const layout  = resumeSettings?.layout || {};
 
-const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => {
+  // ── themeColor শুধু header bg তে ──
+  const headerBg = themeColor || "#ffeb3b";
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+  const topBottom            = layout.topBottom            ?? 28;
+  const leftRight            = layout.leftRight            ?? 28;
+  const betweenSections      = layout.betweenSections      ?? 16;
+  const betweenTitlesContent = layout.betweenTitlesContent ?? 8;
+
+  const primaryFont            = text.primaryFont            || "Arial, Helvetica, sans-serif";
+  const secondaryFont          = text.secondaryFont          || "Arial, Helvetica, sans-serif";
+  const bodySize               = text.body                   || 9;
+  const bodyWeight             = text.bodyWeight             || "normal";
+  const lineHeight             = text.lineHeight             || 1.5;
+  const sectionTitleSize       = text.sectionTitle           || 10;
+  const sectionTitleWeight     = text.sectionTitleWeight     || "800";
+  const primaryHeadingSize     = text.primaryHeading         || 36;
+  const primaryHeadingWeight   = text.primaryHeadingWeight   || "900";
+  const secondaryHeadingSize   = text.secondaryHeading       || 9;
+  const secondaryHeadingWeight = text.secondaryHeadingWeight || "700";
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
   const formatDate = (dateValue) => {
     if (!dateValue) return null;
     if (typeof dateValue === "string" && dateValue.toLowerCase() === "present") return "Present";
@@ -28,166 +43,319 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
     return start || end || "";
   };
 
-  // ── Scratch checks ────────────────────────────────────────────────────────
-  const hasEmployment  = formData.employmentHistory?.some(j => j.job_title || j.employer);
-  const hasEducation   = formData.educationHistory?.some(e => e.school || e.degree);
-  const hasSkills      = formData.newSkillHistory?.some(s => s.skill);
-  const hasLanguages   = formData.languageHistory?.some(l => l.language);
-  const hasActivities  = formData.activityHistory?.some(a => a.functionTitle || a.employer);
-  const hasInternships = formData.internshipHistory?.some(i => i.jobTitle || i.employer);
-  const hasCourses     = formData.coursesHistory?.some(c => c.course || c.institution);
+  // ── Shared styles ─────────────────────────────────────────────────────────
+  const bodyStyle = {
+    fontFamily: primaryFont,
+    fontSize: `${bodySize}pt`,
+    fontWeight: bodyWeight,
+    lineHeight: lineHeight,
+    color: "#374151",
+  };
+
+  const sectionGap = { marginBottom: `${betweenSections}pt` };
+
+  // ── Section heading — black badge label ──────────────────────────────────
+  const SectionHeading = ({ title }) => (
+    <div style={{
+      display: "inline-block",
+      backgroundColor: "#111",
+      color: "#fff",
+      fontFamily: secondaryFont,
+      fontSize: `${sectionTitleSize}pt`,
+      fontWeight: sectionTitleWeight,
+      letterSpacing: "0.12em",
+      textTransform: "uppercase",
+      padding: "2pt 8pt",
+      marginBottom: `${betweenTitlesContent}pt`,
+    }}>
+      {title}
+    </div>
+  );
+
+  // ── Entry title row ───────────────────────────────────────────────────────
+  const EntryTitle = ({ title, sub }) => (
+    <div style={{ marginBottom: "2pt" }}>
+      <span style={{
+        fontFamily: secondaryFont,
+        fontSize: `${bodySize + 1}pt`,
+        fontWeight: "700",
+        color: "#111",
+      }}>
+        {title}
+      </span>
+      {sub && (
+        <span style={{
+          fontFamily: primaryFont,
+          fontSize: `${bodySize}pt`,
+          fontWeight: "400",
+          color: "#555",
+        }}>
+          {sub}
+        </span>
+      )}
+    </div>
+  );
+
+  const DateLine = ({ range }) =>
+    range ? (
+      <div style={{
+        fontFamily: primaryFont,
+        fontSize: `${bodySize - 1}pt`,
+        fontWeight: "600",
+        color: "#9ca3af",
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+        marginBottom: "4pt",
+      }}>
+        {range}
+      </div>
+    ) : null;
+
+  // ── Skill bar — table-based, PDF-safe ────────────────────────────────────
+  const SkillBar = ({ level, total = 5 }) => {
+    const filled = Math.max(1, Math.min(total, Math.round(level ?? 0) + 1));
+    const SEG_H  = "4pt";
+    const cells  = Array.from({ length: total }).map((_, i) => i < filled ? "#111" : "#e5e7eb");
+    return (
+      <table style={{
+        width: "100%",
+        borderCollapse: "separate",
+        borderSpacing: "2pt 0",
+        marginTop: "2pt",
+        marginBottom: "6pt",
+        tableLayout: "fixed",
+      }}>
+        <tbody>
+          <tr>
+            {cells.map((bg, i) => (
+              <td key={i} style={{
+                backgroundColor: bg,
+                height: SEG_H,
+                padding: 0,
+                lineHeight: 0,
+                fontSize: 0,
+                border: "none",
+              }}>&nbsp;</td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const getLangLevel = (langLevel) => {
+    if (typeof langLevel === "number") return langLevel;
+    const map = {
+      "native speaker": 5, "native": 5,
+      "highly proficient": 4, "fluent": 4, "advanced": 4,
+      "very good command": 3, "upper intermediate": 3,
+      "good working knowledge": 2, "intermediate": 2,
+      "working knowledge": 1, "elementary": 1, "beginner": 1, "basic": 1,
+      "a1": 0, "a2": 1, "b1": 2, "b2": 3, "c1": 4, "c2": 5,
+    };
+    if (typeof langLevel === "string") return map[langLevel.toLowerCase()] ?? 2;
+    return 2;
+  };
 
   // ════════════════════════════════════════════════════════════════════════
-  //  MAIN — SCRATCH
+  //  SCRATCH SECTIONS
   // ════════════════════════════════════════════════════════════════════════
 
-  const renderSummaryScratch = () =>
-    formData.summary ? (
-      <section key="summary">
-        <SectionHeader title={formData.summarySectionTitle || "Profile"} />
+  const renderSummaryScratch = () => {
+    if (!formData.summary) return null;
+    return (
+      <div key="summary" style={sectionGap}>
+        <SectionHeading title={formData.summarySectionTitle || "Profile"} />
         <div
-          className="text-xs leading-relaxed text-gray-700 text-justify [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
+          className="resume-content"
+          style={{ ...bodyStyle, textAlign: "justify" }}
           dangerouslySetInnerHTML={{ __html: formData.summary }}
         />
-      </section>
-    ) : null;
+      </div>
+    );
+  };
 
-  const renderEmploymentScratch = () =>
-    hasEmployment ? (
-      <section key="employment">
-        <SectionHeader title={formData.employmentSectionTitle || "Experience"} />
-        <div className="flex flex-col gap-6">
-          {formData.employmentHistory.map((job, i) => (
-            <div key={i}>
-              <h3 className="text-[12px] font-bold text-gray-900">
-                {job.job_title}
-                <span className="font-normal text-gray-600">
-                  {job.employer ? `, ${job.employer}` : ""}
-                  {job.city_state ? `, ${job.city_state}` : ""}
-                </span>
-              </h3>
-              {dateRange(job.startDate, job.endDate) && (
-                <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                  {dateRange(job.startDate, job.endDate)}
-                </div>
-              )}
-              {job.description && (
-                <div
-                  className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
-                  dangerouslySetInnerHTML={{ __html: job.description }}
-                />
-              )}
+  const renderEmploymentScratch = () => {
+    if (!formData.employmentHistory?.some(j => j.job_title || j.employer)) return null;
+    return (
+      <div key="employment" style={sectionGap}>
+        <SectionHeading title={formData.employmentSectionTitle || "Experience"} />
+        {formData.employmentHistory.map((job, i) => (
+          <div key={i} style={{ marginBottom: "10pt" }}>
+            <EntryTitle
+              title={job.job_title}
+              sub={`${job.employer ? `, ${job.employer}` : ""}${job.city_state ? `, ${job.city_state}` : ""}`}
+            />
+            <DateLine range={dateRange(job.startDate, job.endDate)} />
+            {job.description && (
+              <div className="resume-content" style={bodyStyle}
+                dangerouslySetInnerHTML={{ __html: job.description }} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderEducationScratch = () => {
+    if (!formData.educationHistory?.some(e => e.school || e.degree)) return null;
+    return (
+      <div key="education" style={sectionGap}>
+        <SectionHeading title={formData.educationSectionTitle || "Education"} />
+        {formData.educationHistory.map((edu, i) => (
+          <div key={i} style={{ marginBottom: "8pt" }}>
+            <EntryTitle
+              title={edu.degree}
+              sub={`${edu.school ? `, ${edu.school}` : ""}${edu.city_state ? `, ${edu.city_state}` : ""}`}
+            />
+            <DateLine range={dateRange(edu.startDate, edu.endDate)} />
+            {edu.description && (
+              <div className="resume-content" style={bodyStyle}
+                dangerouslySetInnerHTML={{ __html: edu.description }} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderInternshipsScratch = () => {
+    if (!formData.internshipHistory?.some(i => i.jobTitle || i.employer)) return null;
+    return (
+      <div key="internships" style={sectionGap}>
+        <SectionHeading title={formData.internshipsSectionTitle || "Internships"} />
+        {formData.internshipHistory.map((job, i) => (
+          <div key={i} style={{ marginBottom: "8pt" }}>
+            <EntryTitle
+              title={job.jobTitle}
+              sub={`${job.employer ? `, ${job.employer}` : ""}${job.city ? `, ${job.city}` : ""}`}
+            />
+            <DateLine range={dateRange(job.startDate, job.endDate)} />
+            {job.description && (
+              <div className="resume-content" style={bodyStyle}
+                dangerouslySetInnerHTML={{ __html: job.description }} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderActivitiesScratch = () => {
+    if (!formData.activityHistory?.some(a => a.functionTitle || a.employer)) return null;
+    return (
+      <div key="activities" style={sectionGap}>
+        <SectionHeading title={formData.activitiesSectionTitle || "Activities"} />
+        {formData.activityHistory.map((act, i) => (
+          <div key={i} style={{ marginBottom: "8pt" }}>
+            <EntryTitle
+              title={act.functionTitle}
+              sub={`${act.employer ? ` - ${act.employer}` : ""}${act.city ? `, ${act.city}` : ""}`}
+            />
+            <DateLine range={dateRange(act.startDate, act.endDate)} />
+            {act.description && (
+              <div className="resume-content" style={bodyStyle}
+                dangerouslySetInnerHTML={{ __html: act.description }} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderCoursesScratch = () => {
+    if (!formData.coursesHistory?.some(c => c.course || c.institution)) return null;
+    return (
+      <div key="courses" style={sectionGap}>
+        <SectionHeading title={formData.coursesSectionTitle || "Courses"} />
+        {formData.coursesHistory.map((c, i) => (
+          <div key={i} style={{ marginBottom: "6pt" }}>
+            <EntryTitle
+              title={c.course}
+              sub={c.institution ? ` - ${c.institution}` : ""}
+            />
+            <DateLine range={dateRange(c.startDate, c.endDate)} />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderSkillsScratch = () => {
+    if (!formData.newSkillHistory?.some(s => s.skill)) return null;
+    return (
+      <div key="skills" style={sectionGap}>
+        <SectionHeading title={formData.skillSectionTitle || "Skills"} />
+        {formData.newSkillHistory.map((item, i) => (
+          <div key={i} style={{ marginBottom: "4pt" }}>
+            <div style={{
+              fontFamily: secondaryFont,
+              fontSize: `${bodySize}pt`,
+              fontWeight: "700",
+              color: "#111",
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              marginBottom: "1pt",
+            }}>
+              {item.skill}
             </div>
+            {!formData.hideExperienceLevel && (
+              <SkillBar level={item.level ?? 3} total={5} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderLanguagesScratch = () => {
+    if (!formData.languageHistory?.some(l => l.language)) return null;
+    return (
+      <div key="languages" style={sectionGap}>
+        <SectionHeading title={formData.languagesSectionTitle || "Languages"} />
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+          <colgroup>
+            <col style={{ width: "50%" }} />
+            <col style={{ width: "50%" }} />
+          </colgroup>
+          <tbody>
+            {Array.from({ length: Math.ceil(formData.languageHistory.length / 2) }).map((_, rowIdx) => (
+              <tr key={rowIdx}>
+                {[0, 1].map(colIdx => {
+                  const lang = formData.languageHistory[rowIdx * 2 + colIdx];
+                  if (!lang) return <td key={colIdx} />;
+                  return (
+                    <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
+                      <div style={{ ...bodyStyle, fontWeight: "500", color: "#111", marginBottom: "1pt" }}>
+                        {lang.language}
+                      </div>
+                      {!formData.hideLanguageProficiency && (
+                        <SkillBar level={getLangLevel(lang.level)} total={6} />
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const renderHobbiesScratch = () => {
+    if (!formData.hobbies) return null;
+    return (
+      <div key="hobbies" style={sectionGap}>
+        <SectionHeading title={formData.hobbiesSectionTitle || "Hobbies"} />
+        <div style={{ ...bodyStyle, fontWeight: "500" }}>
+          {formData.hobbies.split("\n").map((h, i) => (
+            <div key={i}>{h}</div>
           ))}
         </div>
-      </section>
-    ) : null;
-
-  const renderEducationScratch = () =>
-    hasEducation ? (
-      <section key="education">
-        <SectionHeader title={formData.educationSectionTitle || "Education"} />
-        <div className="flex flex-col gap-5">
-          {formData.educationHistory.map((edu, i) => (
-            <div key={i}>
-              <h3 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide">
-                {edu.degree}{edu.school ? `, ${edu.school}` : ""}
-              </h3>
-              {dateRange(edu.startDate, edu.endDate) && (
-                <div className="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">
-                  {dateRange(edu.startDate, edu.endDate)}
-                </div>
-              )}
-              {edu.description && (
-                <div
-                  className="text-[11px] text-gray-600 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                  dangerouslySetInnerHTML={{ __html: edu.description }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    ) : null;
-
-  const renderInternshipsScratch = () =>
-    hasInternships ? (
-      <section key="internships">
-        <SectionHeader title={formData.internshipsSectionTitle || "Internships"} />
-        <div className="flex flex-col gap-6">
-          {formData.internshipHistory.map((job, i) => (
-            <div key={i}>
-              <h3 className="text-[12px] font-bold text-gray-900">
-                {job.jobTitle}
-                <span className="font-normal text-gray-600">
-                  {job.employer ? `, ${job.employer}` : ""}
-                  {job.city ? `, ${job.city}` : ""}
-                </span>
-              </h3>
-              {dateRange(job.startDate, job.endDate) && (
-                <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                  {dateRange(job.startDate, job.endDate)}
-                </div>
-              )}
-              {job.description && (
-                <div
-                  className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                  dangerouslySetInnerHTML={{ __html: job.description }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    ) : null;
-
-  const renderActivitiesScratch = () =>
-    hasActivities ? (
-      <section key="activities">
-        <SectionHeader title={formData.activitiesSectionTitle || "Activities"} />
-        <div className="flex flex-col gap-5">
-          {formData.activityHistory.map((act, i) => (
-            <div key={i}>
-              <h3 className="text-[12px] font-bold text-gray-900">
-                {act.functionTitle}{act.employer ? ` - ${act.employer}` : ""}
-              </h3>
-              {dateRange(act.startDate, act.endDate) && (
-                <div className="text-[10px] text-gray-400 font-semibold uppercase mb-1 tracking-wider">
-                  {dateRange(act.startDate, act.endDate)}
-                </div>
-              )}
-              {act.description && (
-                <div
-                  className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                  dangerouslySetInnerHTML={{ __html: act.description }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    ) : null;
-
-  const renderCoursesScratch = () =>
-    hasCourses ? (
-      <section key="courses">
-        <SectionHeader title={formData.coursesSectionTitle || "Courses"} />
-        <div className="flex flex-col gap-5">
-          {formData.coursesHistory.map((course, i) => (
-            <div key={i}>
-              <h3 className="text-[12px] font-bold text-gray-900">
-                {course.course}{course.institution ? ` - ${course.institution}` : ""}
-              </h3>
-              {dateRange(course.startDate, course.endDate) && (
-                <div className="text-[10px] text-gray-400 font-semibold uppercase mb-1 tracking-wider">
-                  {dateRange(course.startDate, course.endDate)}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    ) : null;
+      </div>
+    );
+  };
 
   const renderScratchSimpleCustom = () =>
     Object.keys(formData)
@@ -195,25 +363,32 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       .map(key => {
         const sectionId = key.replace("customSimpleHistory_", "");
         const history   = formData[key];
-        const title     = formData[`customSimpleTitle_${sectionId}`] || "Custom Section";
+        const title     = formData[`customSimpleTitle_${sectionId}`]     || "Custom Section";
         const hideLevel = formData[`customSimpleHideLevel_${sectionId}`] ?? true;
         if (!history?.some(i => i.name)) return null;
         return (
-          <section key={sectionId}>
-            <SectionHeader title={title} />
-            <div className="flex flex-col gap-2">
-              {history.map((item, i) => (
-                <div key={i} className="text-[11px] font-bold text-gray-900 uppercase tracking-wide">
+          <div key={sectionId} style={sectionGap}>
+            <SectionHeading title={title} />
+            {history.map((item, i) => (
+              <div key={i} style={{ marginBottom: "4pt" }}>
+                <div style={{
+                  fontFamily: secondaryFont,
+                  fontSize: `${bodySize}pt`,
+                  fontWeight: "700",
+                  color: "#111",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}>
                   {item.name}
                   {!hideLevel && item.level !== undefined && (
-                    <span className="font-normal text-gray-500 ml-2 text-[10px]">
+                    <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt`, textTransform: "none" }}>
                       {skillLevels[item.level ?? 2]}
                     </span>
                   )}
                 </div>
-              ))}
-            </div>
-          </section>
+              </div>
+            ))}
+          </div>
         );
       });
 
@@ -226,359 +401,269 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
         const title     = formData[`customAdvancedTitle_${sectionId}`] || "Custom Section";
         if (!history?.some(i => i.title || i.city)) return null;
         return (
-          <section key={sectionId}>
-            <SectionHeader title={title} />
-            <div className="flex flex-col gap-6">
-              {history.map((item, i) => (
-                <div key={i}>
-                  <h3 className="text-[12px] font-bold text-gray-900">
-                    {item.title}{item.city ? `, ${item.city}` : ""}
-                  </h3>
-                  {dateRange(item.startDate, item.endDate) && (
-                    <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                      {dateRange(item.startDate, item.endDate)}
-                    </div>
-                  )}
-                  {item.description && (
-                    <div
-                      className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                      dangerouslySetInnerHTML={{ __html: item.description }}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
+          <div key={sectionId} style={sectionGap}>
+            <SectionHeading title={title} />
+            {history.map((item, i) => (
+              <div key={i} style={{ marginBottom: "8pt" }}>
+                <EntryTitle
+                  title={item.title}
+                  sub={item.city ? `, ${item.city}` : ""}
+                />
+                <DateLine range={dateRange(item.startDate, item.endDate)} />
+                {item.description && (
+                  <div className="resume-content" style={bodyStyle}
+                    dangerouslySetInnerHTML={{ __html: item.description }} />
+                )}
+              </div>
+            ))}
+          </div>
         );
       });
 
-  // ── Sidebar: Scratch ─────────────────────────────────────────────────────
-
-  const renderSkillsScratch = () =>
-    hasSkills ? (
-      <section key="skills">
-        <SectionHeader title={formData.skillSectionTitle || "Skills"} />
-        <div className="flex flex-col gap-5 mt-2">
-          {formData.newSkillHistory.map((item, i) => {
-            const pct = ((item.level ?? 3) + 1) * 20;
-            return (
-              <div key={i} className="w-full">
-                <div className="text-[11px] font-bold text-gray-900 mb-1.5 uppercase tracking-wide">{item.skill}</div>
-                {!formData.hideExperienceLevel && (
-                  <div className="w-full bg-gray-100 h-1.5">
-                    <div className="bg-black h-full" style={{ width: `${pct}%` }} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-    ) : null;
-
-  const renderLanguagesScratch = () =>
-    hasLanguages ? (
-      <section key="languages">
-        <SectionHeader title={formData.languagesSectionTitle || "Languages"} />
-        <div className="grid grid-cols-2 gap-x-16 gap-y-6 max-w-2xl">
-          {formData.languageHistory.map((lang, i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <span className="text-[11px] font-medium text-gray-800">{lang.language}</span>
-              {!formData.hideLanguageProficiency && (
-                <div className="w-full h-1.5 bg-gray-100">
-                  <div className="h-full bg-black" style={{
-                    width: { "Native speaker": "100%", "Highly proficient": "85%",
-                      "Very good command": "60%", "Good working knowledge": "40%",
-                      "Working knowledge": "20%" }[lang.level] ?? "20%"
-                  }} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    ) : null;
-
-  const renderHobbiesScratch = () =>
-    formData.hobbies ? (
-      <section key="hobbies">
-        <SectionHeader title={formData.hobbiesSectionTitle || "Hobbies"} />
-        <div className="text-[11px] text-gray-800 leading-relaxed font-medium">
-          {formData.hobbies.split("\n").map((h, i) => <span key={i} className="block">{h}</span>)}
-        </div>
-      </section>
-    ) : null;
-
   // ════════════════════════════════════════════════════════════════════════
-  //  MAIN — SECTIONS (improve / jd / linkedin)
+  //  SECTIONS PROP
   // ════════════════════════════════════════════════════════════════════════
 
   const renderSummaryFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div
-        className="text-xs leading-relaxed text-gray-700 text-justify [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:mb-1"
-        dangerouslySetInnerHTML={{ __html: section.summary }}
-      />
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      <div className="resume-content" style={{ ...bodyStyle, textAlign: "justify" }}
+        dangerouslySetInnerHTML={{ __html: section.summary }} />
+    </div>
   );
 
   const renderExperienceFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-6">
-        {section.experiences?.map((exp, i) => (
-          <div key={exp.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900">
-              {exp.jobTitle}
-              <span className="font-normal text-gray-600">
-                {exp.company ? `, ${exp.company}` : ""}{exp.city ? `, ${exp.city}` : ""}
-              </span>
-            </h3>
-            {dateRange(exp.startDate, exp.endDate) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                {dateRange(exp.startDate, exp.endDate)}
-              </div>
-            )}
-            {exp.description && (
-              <div
-                className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                dangerouslySetInnerHTML={{ __html: exp.description }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.experiences?.map((exp, i) => (
+        <div key={exp.id || i} style={{ marginBottom: "10pt" }}>
+          <EntryTitle
+            title={exp.jobTitle}
+            sub={`${exp.company ? `, ${exp.company}` : ""}${exp.city ? `, ${exp.city}` : ""}`}
+          />
+          <DateLine range={dateRange(exp.startDate, exp.endDate)} />
+          {exp.description && (
+            <div className="resume-content" style={bodyStyle}
+              dangerouslySetInnerHTML={{ __html: exp.description }} />
+          )}
+        </div>
+      ))}
+    </div>
   );
 
   const renderEducationFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-5">
-        {section.educations?.map((edu, i) => (
-          <div key={edu.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide">
-              {edu.degree}{edu.institute ? `, ${edu.institute}` : ""}{edu.city ? `, ${edu.city}` : ""}
-            </h3>
-            {dateRange(edu.startDate, edu.endDate) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">
-                {dateRange(edu.startDate, edu.endDate)}
-              </div>
-            )}
-            {edu.description && (
-              <div
-                className="text-[11px] text-gray-600 mt-1 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                dangerouslySetInnerHTML={{ __html: edu.description }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.educations?.map((edu, i) => (
+        <div key={edu.id || i} style={{ marginBottom: "8pt" }}>
+          <EntryTitle
+            title={edu.degree}
+            sub={`${edu.institute ? `, ${edu.institute}` : ""}${edu.city ? `, ${edu.city}` : ""}`}
+          />
+          <DateLine range={dateRange(edu.startDate, edu.endDate)} />
+          {edu.description && (
+            <div className="resume-content" style={bodyStyle}
+              dangerouslySetInnerHTML={{ __html: edu.description }} />
+          )}
+        </div>
+      ))}
+    </div>
   );
 
   const renderCertificationsFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-5">
-        {section.certifications?.map((cert, i) => (
-          <div key={cert.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide">
-              {cert.name}{cert.organization ? `, ${cert.organization}` : ""}
-            </h3>
-            {(cert.startYear || cert.endYear) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">
-                {cert.startYear}{cert.endYear ? ` — ${cert.endYear}` : ""}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.certifications?.map((cert, i) => (
+        <div key={cert.id || i} style={{ marginBottom: "8pt" }}>
+          <EntryTitle
+            title={cert.name}
+            sub={cert.organization ? `, ${cert.organization}` : ""}
+          />
+          <DateLine range={dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)} />
+          {cert.description && (
+            <div className="resume-content" style={bodyStyle}
+              dangerouslySetInnerHTML={{ __html: cert.description }} />
+          )}
+        </div>
+      ))}
+    </div>
   );
 
   const renderCoursesFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-5">
-        {section.courses?.map((c, i) => (
-          <div key={c.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900">
-              {c.course}{c.institution ? ` - ${c.institution}` : ""}
-            </h3>
-            {dateRange(c.startDate, c.endDate) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mb-1 tracking-wider">
-                {dateRange(c.startDate, c.endDate)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.courses?.map((c, i) => (
+        <div key={c.id || i} style={{ marginBottom: "6pt" }}>
+          <EntryTitle
+            title={c.course}
+            sub={c.institution ? ` - ${c.institution}` : ""}
+          />
+          <DateLine range={dateRange(c.startDate, c.endDate)} />
+        </div>
+      ))}
+    </div>
   );
 
   const renderInternshipsFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-6">
-        {section.internships?.map((intern, i) => (
-          <div key={intern.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900">
-              {intern.jobTitle}
-              <span className="font-normal text-gray-600">
-                {intern.employer ? `, ${intern.employer}` : ""}{intern.city ? `, ${intern.city}` : ""}
-              </span>
-            </h3>
-            {dateRange(intern.startDate, intern.endDate) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                {dateRange(intern.startDate, intern.endDate)}
-              </div>
-            )}
-            {intern.description && (
-              <div
-                className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                dangerouslySetInnerHTML={{ __html: intern.description }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.internships?.map((intern, i) => (
+        <div key={intern.id || i} style={{ marginBottom: "8pt" }}>
+          <EntryTitle
+            title={intern.jobTitle}
+            sub={`${intern.employer ? `, ${intern.employer}` : ""}${intern.city ? `, ${intern.city}` : ""}`}
+          />
+          <DateLine range={dateRange(intern.startDate, intern.endDate)} />
+          {intern.description && (
+            <div className="resume-content" style={bodyStyle}
+              dangerouslySetInnerHTML={{ __html: intern.description }} />
+          )}
+        </div>
+      ))}
+    </div>
   );
 
   const renderActivitiesFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-5">
-        {section.activities?.map((a, i) => (
-          <div key={a.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900">
-              {a.functionTitle}{a.employer ? ` - ${a.employer}` : ""}
-            </h3>
-            {dateRange(a.startDate, a.endDate) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mb-1 tracking-wider">
-                {dateRange(a.startDate, a.endDate)}
-              </div>
-            )}
-            {a.description && (
-              <div
-                className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                dangerouslySetInnerHTML={{ __html: a.description }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-
-  const renderCustomSimpleFromSection = (section) => {
-    const showLevel = section.hideExperienceLevel === false;
-    return (
-      <section key={section.id}>
-        <SectionHeader title={section.title} />
-        <div className="flex flex-col gap-2">
-          {section.items?.map((item, i) => {
-            const name  = typeof item === "object" ? (item.name || item.title) : item;
-            const level = typeof item === "object" ? (item.level ?? 2) : 2;
-            return (
-              <div key={i} className="text-[11px] font-bold text-gray-900 uppercase tracking-wide">
-                {name}{showLevel && <span className="font-normal text-gray-500 ml-2 text-[10px]">{skillLevels[level]}</span>}
-              </div>
-            );
-          })}
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.activities?.map((a, i) => (
+        <div key={a.id || i} style={{ marginBottom: "8pt" }}>
+          <EntryTitle
+            title={a.functionTitle}
+            sub={`${a.employer ? ` - ${a.employer}` : ""}${a.city ? `, ${a.city}` : ""}`}
+          />
+          <DateLine range={dateRange(a.startDate, a.endDate)} />
+          {a.description && (
+            <div className="resume-content" style={bodyStyle}
+              dangerouslySetInnerHTML={{ __html: a.description }} />
+          )}
         </div>
-      </section>
-    );
-  };
-
-  const renderCustomAdvancedFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="flex flex-col gap-6">
-        {section.items?.map((item, i) => (
-          <div key={item.id || i}>
-            <h3 className="text-[12px] font-bold text-gray-900">
-              {item.title}{item.city ? `, ${item.city}` : ""}
-            </h3>
-            {dateRange(item.startDate, item.endDate) && (
-              <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                {dateRange(item.startDate, item.endDate)}
-              </div>
-            )}
-            {item.description && (
-              <div
-                className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                dangerouslySetInnerHTML={{ __html: item.description }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+      ))}
+    </div>
   );
-
-  // ── Sidebar: Sections ─────────────────────────────────────────────────────
 
   const renderSkillsFromSection = (section) => {
     const showLevel = section.hideExperienceLevel === false;
     return (
-      <section key={section.id}>
-        <SectionHeader title={section.title} />
-        <div className="flex flex-col gap-5 mt-2">
-          {section.skills?.map((skill, i) => {
-            const pct = ((skill.level ?? 3) + 1) * 20;
-            return (
-              <div key={skill.id || i} className="w-full">
-                <div className="text-[11px] font-bold text-gray-900 mb-1.5 uppercase tracking-wide">{skill.name}</div>
-                {showLevel && (
-                  <div className="w-full bg-gray-100 h-1.5">
-                    <div className="bg-black h-full" style={{ width: `${pct}%` }} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <div key={section.id} style={sectionGap}>
+        <SectionHeading title={section.title} />
+        {section.skills?.map((skill, i) => (
+          <div key={skill.id || i} style={{ marginBottom: "4pt" }}>
+            <div style={{
+              fontFamily: secondaryFont,
+              fontSize: `${bodySize}pt`,
+              fontWeight: "700",
+              color: "#111",
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              marginBottom: "1pt",
+            }}>
+              {skill.name}
+            </div>
+            {showLevel && <SkillBar level={skill.level ?? 3} total={5} />}
+          </div>
+        ))}
+      </div>
     );
   };
 
   const renderLanguagesFromSection = (section) => (
-    <section key={section.id}>
-      <SectionHeader title={section.title} />
-      <div className="grid grid-cols-2 gap-x-16 gap-y-6 max-w-2xl">
-        {section.languages?.map((l, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            <span className="text-[11px] font-medium text-gray-800">{l.language}</span>
-            {!section.hideProficiency && (
-              <div className="w-full h-1.5 bg-gray-100">
-                <div className="h-full bg-black" style={{
-                  width: { "Native speaker": "100%", "Highly proficient": "85%",
-                    "Very good command": "60%", "Good working knowledge": "40%",
-                    "Working knowledge": "20%" }[l.level] ?? "20%"
-                }} />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+        <colgroup>
+          <col style={{ width: "50%" }} />
+          <col style={{ width: "50%" }} />
+        </colgroup>
+        <tbody>
+          {Array.from({ length: Math.ceil((section.languages?.length || 0) / 2) }).map((_, rowIdx) => (
+            <tr key={rowIdx}>
+              {[0, 1].map(colIdx => {
+                const l = section.languages?.[rowIdx * 2 + colIdx];
+                if (!l) return <td key={colIdx} />;
+                return (
+                  <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
+                    <div style={{ ...bodyStyle, fontWeight: "500", color: "#111", marginBottom: "1pt" }}>
+                      {l.language}
+                    </div>
+                    {!section.hideProficiency && (
+                      <SkillBar level={getLangLevel(l.level)} total={6} />
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
-  const renderHobbiesFromSection = (section) =>
-    section.hobbies ? (
-      <section key={section.id}>
-        <SectionHeader title={section.title} />
-        <div className="text-[11px] text-gray-800 leading-relaxed font-medium">
-          {section.hobbies.split("\n").map((h, i) => <span key={i} className="block">{h}</span>)}
+  const renderHobbiesFromSection = (section) => {
+    if (!section.hobbies) return null;
+    return (
+      <div key={section.id} style={sectionGap}>
+        <SectionHeading title={section.title} />
+        <div style={{ ...bodyStyle, fontWeight: "500" }}>
+          {section.hobbies.split("\n").map((h, i) => <div key={i}>{h}</div>)}
         </div>
-      </section>
-    ) : null;
+      </div>
+    );
+  };
+
+  const renderCustomSimpleFromSection = (section) => {
+    const showLevel = section.hideExperienceLevel === false;
+    return (
+      <div key={section.id} style={sectionGap}>
+        <SectionHeading title={section.title} />
+        {section.items?.map((item, i) => {
+          const name  = typeof item === "object" ? (item.name || item.title) : item;
+          const level = typeof item === "object" ? (item.level ?? 2) : 2;
+          return (
+            <div key={i} style={{ marginBottom: "4pt" }}>
+              <div style={{
+                fontFamily: secondaryFont,
+                fontSize: `${bodySize}pt`,
+                fontWeight: "700",
+                color: "#111",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}>
+                {name}
+                {showLevel && (
+                  <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt`, textTransform: "none" }}>
+                    {skillLevels[level]}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderCustomAdvancedFromSection = (section) => (
+    <div key={section.id} style={sectionGap}>
+      <SectionHeading title={section.title} />
+      {section.items?.map((item, i) => (
+        <div key={item.id || i} style={{ marginBottom: "8pt" }}>
+          <EntryTitle
+            title={item.title}
+            sub={item.city ? `, ${item.city}` : ""}
+          />
+          <DateLine range={dateRange(item.startDate, item.endDate)} />
+          {item.description && (
+            <div className="resume-content" style={bodyStyle}
+              dangerouslySetInnerHTML={{ __html: item.description }} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
 
   // ════════════════════════════════════════════════════════════════════════
-  //  RENDER LOGIC
+  //  ORCHESTRATE
   // ════════════════════════════════════════════════════════════════════════
 
   const renderAllSections = () => {
@@ -603,19 +688,19 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
     }
 
     const order = sectionOrder || [
-      "summary","employment","education","activities","skills","languages",
-      "hobbies","internships","courses","custom",
+      "summary", "employment", "education", "activities",
+      "skills", "languages", "hobbies", "internships", "courses",
     ];
     const map = {
-      summary:    renderSummaryScratch,
-      employment: renderEmploymentScratch,
-      education:  renderEducationScratch,
-      skills:     renderSkillsScratch,
-      languages:  renderLanguagesScratch,
-      hobbies:    renderHobbiesScratch,
-      activities: renderActivitiesScratch,
-      internships:renderInternshipsScratch,
-      courses:    renderCoursesScratch,
+      summary:     renderSummaryScratch,
+      employment:  renderEmploymentScratch,
+      education:   renderEducationScratch,
+      skills:      renderSkillsScratch,
+      languages:   renderLanguagesScratch,
+      hobbies:     renderHobbiesScratch,
+      activities:  renderActivitiesScratch,
+      internships: renderInternshipsScratch,
+      courses:     renderCoursesScratch,
     };
     return [
       ...order.map(id => {
@@ -625,18 +710,28 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
           const hide  = formData[`customSimpleHideLevel_${id}`] ?? true;
           if (!h?.some(i => i.name)) return null;
           return (
-            <section key={id}>
-              <SectionHeader title={title} />
-              <div className="flex flex-col gap-2">
-                {h.map((item, i) => (
-                  <div key={i} className="text-[11px] font-bold text-gray-900 uppercase tracking-wide">
-                    {item.name}{!hide && item.level !== undefined && (
-                      <span className="font-normal text-gray-500 ml-2 text-[10px]">{skillLevels[item.level ?? 2]}</span>
+            <div key={id} style={sectionGap}>
+              <SectionHeading title={title} />
+              {h.map((item, i) => (
+                <div key={i} style={{ marginBottom: "4pt" }}>
+                  <div style={{
+                    fontFamily: secondaryFont,
+                    fontSize: `${bodySize}pt`,
+                    fontWeight: "700",
+                    color: "#111",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                  }}>
+                    {item.name}
+                    {!hide && item.level !== undefined && (
+                      <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt`, textTransform: "none" }}>
+                        {skillLevels[item.level ?? 2]}
+                      </span>
                     )}
                   </div>
-                ))}
-              </div>
-            </section>
+                </div>
+              ))}
+            </div>
           );
         }
         if (id.startsWith("custom_advanced_")) {
@@ -644,25 +739,19 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
           const title = formData[`customAdvancedTitle_${id}`] || "Custom Section";
           if (!h?.some(i => i.title || i.city)) return null;
           return (
-            <section key={id}>
-              <SectionHeader title={title} />
-              <div className="flex flex-col gap-6">
-                {h.map((item, i) => (
-                  <div key={i}>
-                    <h3 className="text-[12px] font-bold text-gray-900">{item.title}{item.city ? `, ${item.city}` : ""}</h3>
-                    {dateRange(item.startDate, item.endDate) && (
-                      <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-                        {dateRange(item.startDate, item.endDate)}
-                      </div>
-                    )}
-                    {item.description && (
-                      <div className="text-[11px] text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-1"
-                        dangerouslySetInnerHTML={{ __html: item.description }} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
+            <div key={id} style={sectionGap}>
+              <SectionHeading title={title} />
+              {h.map((item, i) => (
+                <div key={i} style={{ marginBottom: "8pt" }}>
+                  <EntryTitle title={item.title} sub={item.city ? `, ${item.city}` : ""} />
+                  <DateLine range={dateRange(item.startDate, item.endDate)} />
+                  {item.description && (
+                    <div className="resume-content" style={bodyStyle}
+                      dangerouslySetInnerHTML={{ __html: item.description }} />
+                  )}
+                </div>
+              ))}
+            </div>
           );
         }
         return map[id]?.() ?? null;
@@ -672,582 +761,311 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
     ];
   };
 
+  // ── Links ─────────────────────────────────────────────────────────────────
+  const links = [];
+  if (formData.linkedin)      links.push({ label: "LinkedIn",       url: formData.linkedin });
+  if (formData.github)        links.push({ label: "GitHub",         url: formData.github });
+  if (formData.stackoverflow) links.push({ label: "Stack Overflow", url: formData.stackoverflow });
+  if (formData.leetcode)      links.push({ label: "LeetCode",       url: formData.leetcode });
+  if (formData.website)       links.push({ label: "Portfolio",      url: formData.website });
+
+  // ── Details section logic ─────────────────────────────────────────────────
+  const hasPhoto = !!formData.profileImage;
+
+  // photo না থাকলে contact header এ দেখায়, থাকলে details section এ নামে
+  const hasPersonalDetails = formData.driving_licence || formData.nationality || formData.dob || formData.birth_place;
+  const hasContactInDetails = hasPhoto && (
+    formData.address || formData.city_state || formData.country ||
+    formData.email || formData.phone || formData.postal_code
+  );
+  const hasDetails = hasPersonalDetails || hasContactInDetails;
+  const showDetailsSection = hasDetails || links.length > 0;
+
+  const detailLabelStyle = {
+    fontFamily: secondaryFont,
+    fontSize: `${bodySize - 0.5}pt`,
+    fontWeight: "700",
+    color: "#111",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+  };
+
   // ════════════════════════════════════════════════════════════════════════
   //  JSX
   // ════════════════════════════════════════════════════════════════════════
+
   return (
-    <div className="min-h-[297mm] bg-white text-gray-800 font-sans shadow-2xl flex flex-col">
-      {/* Yellow Header */}
-      <div className="bg-[#ffeb3b] p-12 pb-14 flex justify-between items-start">
-        <div className="w-[55%]">
-          <h1 className="text-[42px] font-bold text-gray-900 leading-none mb-2 tracking-tight">
-            {formData.first_name}<br />{formData.last_name}
-          </h1>
-        </div>
-        <div className="w-[45%] text-left flex flex-col gap-1 text-[11px] text-gray-900 leading-snug">
-          <p className="font-bold uppercase tracking-wide text-xs mb-1">{formData.job_target}</p>
-          {(formData.address || formData.city_state || formData.country) && (
-            <p>
-              {formData.address}{formData.address && (formData.city_state || formData.country) ? ", " : ""}
-              {formData.city_state}{formData.city_state && formData.country ? ", " : ""}
-              {formData.country}{formData.postal_code ? ` ${formData.postal_code}` : ""}
-            </p>
+    <div style={{ overflowY: "auto" }}>
+      <style>{`
+        .resume-content ul  { list-style-type: disc;    padding-left: 14pt; margin: 2pt 0; }
+        .resume-content ol  { list-style-type: decimal; padding-left: 14pt; margin: 2pt 0; }
+        .resume-content li  { margin-bottom: 2pt; }
+        .resume-content strong { font-weight: bold; }
+        .resume-content em     { font-style: italic; }
+        .resume-content p      { margin-bottom: 2pt; }
+      `}</style>
+
+      <div style={{
+        minHeight: "297mm",
+        width: "100%",
+        backgroundColor: "#fff",
+        fontFamily: primaryFont,
+        fontSize: `${bodySize}pt`,
+        lineHeight: lineHeight,
+        color: "#374151",
+        boxSizing: "border-box",
+        paddingBottom: `${topBottom}pt`,
+      }}>
+
+        {/* ══ HEADER — themeColor bg, flush to top ══ */}
+        {/* Photo mode uses a wrapper div with position:relative so the img stretches to full height */}
+        {hasPhoto ? (
+          <div style={{ position: "relative", width: "100%", backgroundColor: headerBg, display: "table" }}>
+            {/* Photo — position absolute, stretches full height of the row */}
+            <div style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "110pt",
+              bottom: 0,
+              overflow: "hidden",
+            }}>
+              <img
+                src={formData.profileImage}
+                alt="Profile"
+                style={{
+                  width: "110pt",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                }}
+              />
+            </div>
+            {/* Content — paddingLeft pushes content past photo */}
+            <div style={{
+              paddingLeft: `${110 + 16 + leftRight}pt`,
+              paddingRight: `${16 + leftRight}pt`,
+              paddingTop: "18pt",
+              paddingBottom: "16pt",
+            }}>
+              <div style={{
+                fontFamily: secondaryFont,
+                fontSize: `${primaryHeadingSize}pt`,
+                fontWeight: primaryHeadingWeight,
+                color: "#111",
+                lineHeight: "1.05",
+                letterSpacing: "-0.01em",
+                marginBottom: formData.job_target ? "8pt" : "0",
+              }}>
+                {formData.first_name && <div>{formData.first_name}</div>}
+                {formData.last_name  && <div>{formData.last_name}</div>}
+              </div>
+              {formData.job_target && (
+                <div style={{
+                  fontFamily: secondaryFont,
+                  fontSize: `${secondaryHeadingSize}pt`,
+                  fontWeight: secondaryHeadingWeight,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "#333",
+                }}>
+                  {formData.job_target}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+        <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: headerBg }}>
+          <tbody>
+            <tr>
+              {(
+                /* ── No photo mode: name left | job_title + contact right (original layout) ── */
+                <td style={{
+                  verticalAlign: "top",
+                  paddingTop: "18pt",
+                  paddingBottom: "16pt",
+                  paddingLeft: `${16 + leftRight}pt`,
+                  paddingRight: `${16 + leftRight}pt`,
+                }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <tbody>
+                      <tr>
+                        {/* Left: Name */}
+                        <td style={{ verticalAlign: "middle", width: "55%" }}>
+                          <div style={{
+                            fontFamily: secondaryFont,
+                            fontSize: `${primaryHeadingSize}pt`,
+                            fontWeight: primaryHeadingWeight,
+                            color: "#111",
+                            lineHeight: "1.0",
+                            letterSpacing: "-0.01em",
+                          }}>
+                            {formData.first_name && <div>{formData.first_name}</div>}
+                            {formData.last_name  && <div>{formData.last_name}</div>}
+                          </div>
+                        </td>
+                        {/* Right: Job title + contact */}
+                        <td style={{ verticalAlign: "top", width: "45%", paddingLeft: "12pt" }}>
+                          {formData.job_target && (
+                            <div style={{
+                              fontFamily: secondaryFont,
+                              fontSize: `${secondaryHeadingSize}pt`,
+                              fontWeight: secondaryHeadingWeight,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.08em",
+                              color: "#333",
+                              marginBottom: "6pt",
+                            }}>
+                              {formData.job_target}
+                            </div>
+                          )}
+                          {(formData.address || formData.city_state || formData.country) && (
+                            <div style={{ ...bodyStyle, color: "#333", marginBottom: "1pt" }}>
+                              {formData.address && <>{formData.address}, </>}
+                              {formData.city_state}
+                              {formData.city_state && formData.country ? ", " : ""}
+                              {formData.country}
+                              {formData.postal_code ? ` ${formData.postal_code}` : ""}
+                            </div>
+                          )}
+                          {formData.email && (
+                            <div style={{ marginBottom: "1pt" }}>
+                              <a href={`mailto:${formData.email}`} style={{ ...bodyStyle, color: "#333", textDecoration: "none", fontWeight: "500" }}>
+                                {formData.email}
+                              </a>
+                            </div>
+                          )}
+                          {formData.phone && (
+                            <div style={{ ...bodyStyle, color: "#333", fontWeight: "500" }}>
+                              {formData.phone}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              )}
+
+            </tr>
+          </tbody>
+        </table>
+        )}
+
+        {/* ══ BODY ══ */}
+        <div style={{
+          paddingTop: `${topBottom}pt`,
+          paddingLeft: `${leftRight}pt`,
+          paddingRight: `${leftRight}pt`,
+        }}>
+
+          {/* Details + Links section
+              - photo নেই: শুধু personal details (dob, nationality, licence) + links
+              - photo আছে: contact info + personal details + links সবই এখানে */}
+          {showDetailsSection && (
+            <div style={{ marginBottom: `${betweenSections}pt` }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+                <colgroup>
+                  <col style={{ width: "50%" }} />
+                  <col style={{ width: "50%" }} />
+                </colgroup>
+                <tbody>
+                  <tr>
+                    {/* Left col: Details */}
+                    <td style={{ verticalAlign: "top", paddingRight: "20pt" }}>
+                      {hasDetails && (
+                        <>
+                          <SectionHeading title="Details" />
+                          <table style={{ borderCollapse: "collapse", width: "100%" }}>
+                            <tbody>
+
+                              {/* Contact — only when photo exists */}
+                              {hasPhoto && (formData.address || formData.city_state || formData.country) && (
+                                <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
+                                  <div style={detailLabelStyle}>Address</div>
+                                  <div style={bodyStyle}>
+                                    {formData.address && <>{formData.address}, </>}
+                                    {formData.city_state}
+                                    {formData.city_state && formData.country ? ", " : ""}
+                                    {formData.country}
+                                    {formData.postal_code ? ` ${formData.postal_code}` : ""}
+                                  </div>
+                                </td></tr>
+                              )}
+                              {hasPhoto && formData.phone && (
+                                <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
+                                  <div style={detailLabelStyle}>Phone</div>
+                                  <div style={bodyStyle}>{formData.phone}</div>
+                                </td></tr>
+                              )}
+                              {hasPhoto && formData.email && (
+                                <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
+                                  <div style={detailLabelStyle}>Email</div>
+                                  <div style={bodyStyle}>
+                                    <a href={`mailto:${formData.email}`} style={{ color: "#374151", textDecoration: "none" }}>
+                                      {formData.email}
+                                    </a>
+                                  </div>
+                                </td></tr>
+                              )}
+
+                              {/* Personal details — always shown if present */}
+                              {(formData.dob || formData.birth_place) && (
+                                <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
+                                  <div style={detailLabelStyle}>Date / Place of Birth</div>
+                                  <div style={bodyStyle}>
+                                    {formData.dob}{formData.dob && formData.birth_place ? ", " : ""}{formData.birth_place}
+                                  </div>
+                                </td></tr>
+                              )}
+                              {formData.nationality && (
+                                <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
+                                  <div style={detailLabelStyle}>Nationality</div>
+                                  <div style={bodyStyle}>{formData.nationality}</div>
+                                </td></tr>
+                              )}
+                              {formData.driving_licence && (
+                                <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
+                                  <div style={detailLabelStyle}>Driving License</div>
+                                  <div style={bodyStyle}>{formData.driving_licence}</div>
+                                </td></tr>
+                              )}
+
+                            </tbody>
+                          </table>
+                        </>
+                      )}
+                    </td>
+
+                    {/* Right col: Links */}
+                    <td style={{ verticalAlign: "top" }}>
+                      {links.length > 0 && (
+                        <>
+                          <SectionHeading title="Links" />
+                          {links.map((link, i) => (
+                            <div key={i} style={{ marginBottom: "2pt" }}>
+                              <a href={link.url} style={{ ...bodyStyle, color: "#374151", textDecoration: "underline", textDecorationColor: "#9ca3af" }}>
+                                {link.label}
+                              </a>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           )}
-          {formData.email && <a href={`mailto:${formData.email}`} className="hover:underline font-medium">{formData.email}</a>}
-          {formData.phone && <p className="font-medium">{formData.phone}</p>}
+
+          {/* All sections */}
+          {renderAllSections()}
+
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="px-12 py-10 flex flex-col gap-8">
-        {/* Extra details */}
-        {(formData.driving_licence || formData.nationality || formData.dob || formData.birth_place) && (
-          <section>
-            <SectionHeader title="Details" />
-            <div className="grid grid-cols-2 gap-y-4 gap-x-10 max-w-lg">
-              {formData.driving_licence && (
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-900 uppercase">Driving License</h4>
-                  <p className="text-[11px] text-gray-600">{formData.driving_licence}</p>
-                </div>
-              )}
-              {formData.nationality && (
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-900 uppercase">Nationality</h4>
-                  <p className="text-[11px] text-gray-600">{formData.nationality}</p>
-                </div>
-              )}
-              {(formData.dob || formData.birth_place) && (
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-900 uppercase">Date / Place of Birth</h4>
-                  <p className="text-[11px] text-gray-600">{formData.dob}{formData.dob && formData.birth_place ? ", " : ""}{formData.birth_place}</p>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {renderAllSections()}
-
-        {/* Links */}
-        {(formData.linkedin || formData.github) && (
-          <section>
-            <SectionHeader title="Links" />
-            <div className="flex flex-col gap-1 text-[11px]">
-              {formData.linkedin && <a href={formData.linkedin} className="text-gray-700 underline decoration-gray-400 underline-offset-2 hover:text-black">LinkedIn</a>}
-              {formData.github   && <a href={formData.github}   className="text-gray-700 underline decoration-gray-400 underline-offset-2 hover:text-black">GitHub</a>}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );
 };
 
 export default VividTemplate;
-
-// "use client";
-// import React from "react";
-
-// const VividTemplate = ({ formData, sectionOrder }) => {
-//   // --- Helpers ---
-//   const formatDate = (dateValue) => {
-//     if (!dateValue) return "";
-//     const d = new Date(dateValue);
-//     return d
-//       .toLocaleString("en-US", { month: "short", year: "numeric" })
-//       .toUpperCase();
-//   };
-
-//   const getYear = (dateValue) => {
-//     if (!dateValue) return "";
-//     const d = new Date(dateValue);
-//     return d.getFullYear();
-//   };
-
-//   // --- Data Existence Checks ---
-//   // We calculate these once to keep the JSX clean
-//   const hasDetails =
-//     formData.driving_licence ||
-//     formData.nationality ||
-//     formData.dob ||
-//     formData.birth_place;
-//   const hasEducation = formData.educationHistory?.some(
-//     (edu) => edu.school || edu.degree,
-//   );
-//   const hasEmployment = formData.employmentHistory?.some(
-//     (job) => job.job_title || job.employer,
-//   );
-//   const hasActivities = formData.activityHistory?.some(
-//     (act) => act.functionTitle || act.employer,
-//   );
-//   const hasSkills = formData.newSkillHistory?.some((s) => s.skill);
-//   const hasLanguages = formData.languageHistory?.some((l) => l.language);
-//   const hasLinks = formData.linkedin || formData.github;
-//   const hasInternships = formData.internshipHistory?.some(
-//     (i) => i.jobTitle || i.employer,
-//   );
-//   const hasCourses = formData.coursesHistory?.some(
-//     (c) => c.course || c.institution,
-//   );
-
-//   const hideLevel = formData.hideExperienceLevel;
-
-//   // --- Sub-components ---
-//   const SectionHeader = ({ title }) => (
-//     <div className="bg-black text-white inline-block px-3 py-1 text-[11px] font-bold tracking-widest uppercase mb-5">
-//       {title}
-//     </div>
-//   );
-
-//   // --- RENDER FUNCTIONS ---
-//   const renderSummary = () =>
-//     formData.summary && (
-//       <section key="summary">
-//         <SectionHeader title="Profile" />
-//         {/* <p className="text-[11px] leading-relaxed text-gray-700 text-justify whitespace-pre-wrap">
-//             {formData.summary}
-//           </p> */}
-//         <div
-//           className="
-//           text-xs leading-relaxed text-gray-700 text-justify
-//           [&_ul]:list-disc
-//           [&_ul]:pl-4
-//           [&_ol]:list-decimal
-//           [&_ol]:pl-4
-//           [&_li]:mb-1
-//         "
-//           dangerouslySetInnerHTML={{ __html: formData.summary }}
-//         />
-//       </section>
-//     );
-
-//   const renderEducation = () =>
-//     hasEducation && (
-//       <section key="education">
-//         <SectionHeader title="Education" />
-//         <div className="flex flex-col gap-5">
-//           {formData.educationHistory.map((edu, idx) => (
-//             <div key={idx}>
-//               <h3 className="text-[12px] font-bold text-gray-900 uppercase tracking-wide">
-//                 {edu.degree}
-//                 {edu.school ? `, ${edu.school}` : ""}
-//               </h3>
-//               {edu.description && (
-//                 <p className="text-[11px] text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">
-//                   {edu.description}
-//                 </p>
-//               )}
-//               <div className="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">
-//                 {formatDate(edu.startDate)} — {formatDate(edu.endDate)}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     );
-
-//   const renderEmployment = () =>
-//     hasEmployment && (
-//       <section key="employment">
-//         <SectionHeader title="Experience" />
-//         <div className="flex flex-col gap-6">
-//           {formData.employmentHistory.map((job, idx) => (
-//             <div key={idx}>
-//               <h3 className="text-[12px] font-bold text-gray-900">
-//                 {job.job_title}
-//                 <span className="font-normal text-gray-600">
-//                   {job.employer ? `, ${job.employer}` : ""}
-//                   {job.city_state ? `, ${job.city_state}` : ""}
-//                 </span>
-//               </h3>
-
-//               <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-//                 {formatDate(job.startDate)} — {formatDate(job.endDate)}
-//               </div>
-
-//               {job.description && (
-//                 <p className="text-[11px] text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                   {job.description}
-//                 </p>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     );
-
-//   const renderInternships = () =>
-//     hasInternships && (
-//       <section key="internships">
-//         <SectionHeader title="Internships" />
-//         <div className="flex flex-col gap-6">
-//           {formData.internshipHistory.map((job, idx) => (
-//             <div key={idx}>
-//               <h3 className="text-[12px] font-bold text-gray-900">
-//                 {job.jobTitle}
-//                 <span className="font-normal text-gray-600">
-//                   {job.employer ? `, ${job.employer}` : ""}
-//                   {job.city ? `, ${job.city}` : ""}
-//                 </span>
-//               </h3>
-
-//               <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-//                 {formatDate(job.startDate)} — {formatDate(job.endDate)}
-//               </div>
-
-//               {job.description && (
-//                 <p className="text-[11px] text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                   {job.description}
-//                 </p>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     );
-
-//   const renderActivities = () =>
-//     hasActivities && (
-//       <section key="activities">
-//         <SectionHeader title="Activities" />
-//         <div className="flex flex-col gap-5">
-//           {formData.activityHistory.map((act, idx) => (
-//             <div key={idx}>
-//               <div className="flex justify-between items-baseline mb-1">
-//                 <h3 className="text-[12px] font-bold text-gray-900">
-//                   {act.functionTitle} {act.employer ? `- ${act.employer}` : ""}
-//                 </h3>
-//               </div>
-//               <div className="text-[10px] text-gray-400 font-semibold uppercase mb-1 tracking-wider">
-//                 {getYear(act.startDate)} — {getYear(act.endDate)}
-//               </div>
-//               {act.description && (
-//                 <p className="text-[11px] text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                   {act.description}
-//                 </p>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     );
-
-//   const renderCourses = () =>
-//     hasCourses && (
-//       <section key="courses">
-//         <SectionHeader title="Courses" />
-//         <div className="flex flex-col gap-5">
-//           {formData.coursesHistory.map((course, idx) => (
-//             <div key={idx}>
-//               <h3 className="text-[12px] font-bold text-gray-900">
-//                 {course.course}{" "}
-//                 {course.institution ? `- ${course.institution}` : ""}
-//               </h3>
-//               <div className="text-[10px] text-gray-400 font-semibold uppercase mb-1 tracking-wider">
-//                 {formatDate(course.startDate)} — {formatDate(course.endDate)}
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     );
-
-//   const renderSkills = () =>
-//     hasSkills && (
-//       <section key="skills">
-//         <SectionHeader title="Skills" />
-//         <div className="flex flex-col gap-5 mt-2">
-//           {formData.newSkillHistory.map((item, index) => {
-//             const percentage = ((item.level ?? 3) + 1) * 120;
-
-//             return (
-//               <div key={index} className="w-full">
-//                 <div className="text-[11px] font-bold text-gray-900 mb-1.5 uppercase tracking-wide">
-//                   {item.skill || ""}
-//                 </div>
-//                 {!formData.hideExperienceLevel && (
-//                   <div className="w-full bg-gray-100 h-1.5">
-//                     <div
-//                       className="bg-black h-full transition-all duration-500"
-//                       style={{ width: percentage }}
-//                     />
-//                   </div>
-//                 )}
-//               </div>
-//             );
-//           })}
-//         </div>
-//       </section>
-//     );
-
-//   const renderLanguages = () =>
-//     hasLanguages && (
-//       <section key="languages">
-//         <SectionHeader title="Languages" />
-//         <div className="grid grid-cols-2 gap-x-16 gap-y-6 max-w-2xl">
-//           {formData.languageHistory.map((lang, idx) => (
-//             <div key={idx} className="flex flex-col gap-1">
-//               <div className="flex justify-between items-end">
-//                 <span className="text-[11px] font-medium text-gray-800">
-//                   {lang.language}
-//                 </span>
-//               </div>
-//               <div className="w-full h-1.5 bg-gray-100">
-//                 <div
-//                   className="h-full bg-black"
-//                   style={{
-//                     width:
-//                       lang.level === "Native"
-//                         ? "100%"
-//                         : lang.level === "Fluent"
-//                           ? "85%"
-//                           : lang.level === "Intermediate"
-//                             ? "50%"
-//                             : "25%",
-//                   }}
-//                 />
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-//     );
-
-//   const renderHobbies = () =>
-//     formData.hobbies && (
-//       <section key="hobbies">
-//         <SectionHeader title="Hobbies" />
-//         <div className="text-[11px] text-gray-800 leading-relaxed font-medium">
-//           <div className="flex flex-col gap-2">
-//             {formData.hobbies.split("\n").map((hobby, i) => (
-//               <span key={i} className="block">
-//                 {hobby}
-//               </span>
-//             ))}
-//           </div>
-//         </div>
-//       </section>
-//     );
-
-//   const renderCustom = () => (
-//     <>
-//       {Object.keys(formData)
-//         .filter((key) => key.startsWith("customSectionHistory_"))
-//         .map((key) => {
-//           const sectionId = key.replace("customSectionHistory_", "");
-//           const history = formData[key];
-//           const title =
-//             formData[`customSectionTitle_${sectionId}`] || "Custom Section";
-
-//           if (!history?.some((item) => item.activity || item.city)) return null;
-
-//           return (
-//             <section key={sectionId}>
-//               <SectionHeader title={title} />
-//               <div className="flex flex-col gap-6">
-//                 {history.map((item, idx) => (
-//                   <div key={idx}>
-//                     <h3 className="text-[12px] font-bold text-gray-900">
-//                       {item.activity}
-//                       <span className="font-normal text-gray-600">
-//                         {item.city ? `, ${item.city}` : ""}
-//                       </span>
-//                     </h3>
-
-//                     <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-//                       {formatDate(item.startDate)} — {formatDate(item.endDate)}
-//                     </div>
-
-//                     {item.description && (
-//                       <p className="text-[11px] text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                         {item.description}
-//                       </p>
-//                     )}
-//                   </div>
-//                 ))}
-//               </div>
-//             </section>
-//           );
-//         })}
-//       {formData.customSectionHistory?.some(
-//         (item) => item.activity || item.city,
-//       ) && (
-//         <section key="custom-default">
-//           <SectionHeader
-//             title={formData.customSectionTitle || "Custom Section"}
-//           />
-//           <div className="flex flex-col gap-6">
-//             {formData.customSectionHistory.map((item, idx) => (
-//               <div key={idx}>
-//                 <h3 className="text-[12px] font-bold text-gray-900">
-//                   {item.activity}
-//                   <span className="font-normal text-gray-600">
-//                     {item.city ? `, ${item.city}` : ""}
-//                   </span>
-//                 </h3>
-
-//                 <div className="text-[10px] text-gray-400 font-semibold uppercase mb-2 tracking-wider mt-0.5">
-//                   {formatDate(item.startDate)} — {formatDate(item.endDate)}
-//                 </div>
-
-//                 {item.description && (
-//                   <p className="text-[11px] text-gray-700 leading-relaxed whitespace-pre-wrap">
-//                     {item.description}
-//                   </p>
-//                 )}
-//               </div>
-//             ))}
-//           </div>
-//         </section>
-//       )}
-//     </>
-//   );
-
-//   const sectionRenderers = {
-//     summary: renderSummary,
-//     employment: renderEmployment,
-//     education: renderEducation,
-//     skills: renderSkills,
-//     courses: renderCourses,
-//     hobbies: renderHobbies,
-//     activities: renderActivities,
-//     languages: renderLanguages,
-//     internships: renderInternships,
-//     custom: renderCustom,
-//   };
-
-//   const order = sectionOrder || [
-//     "summary",
-//     "employment",
-//     "education",
-//     "activities",
-//     "skills",
-//     "languages",
-//     "hobbies",
-//     "internships",
-//     "courses",
-//     "custom",
-//   ];
-
-//   return (
-//     <div className="min-h-[297mm] bg-white text-gray-800 font-sans shadow-2xl flex flex-col">
-//       {/* ----------------- YELLOW HEADER ----------------- */}
-//       <div className="bg-[#ffeb3b] p-12 pb-14 flex justify-between items-start">
-//         <div className="w-[55%]">
-//           <h1 className="text-[42px] font-bold text-gray-900 leading-none mb-2 tracking-tight">
-//             {formData.first_name}
-//             <br />
-//             {formData.last_name}
-//           </h1>
-//         </div>
-
-//         <div className="w-[45%] text-left flex flex-col gap-1 text-[11px] text-gray-900 leading-snug">
-//           <p className="font-bold uppercase tracking-wide text-xs mb-1">
-//             {formData.job_target}
-//           </p>
-//           {(formData.address || formData.city_state || formData.country) && (
-//             <p>
-//               {formData.address}
-//               {formData.address && (formData.city_state || formData.country)
-//                 ? ", "
-//                 : ""}
-//               {formData.city_state}
-//               {formData.city_state && formData.country ? ", " : ""}
-//               {formData.country}
-//               {formData.postal_code ? ` ${formData.postal_code}` : ""}
-//             </p>
-//           )}
-//           {formData.email && (
-//             <a
-//               href={`mailto:${formData.email}`}
-//               className="hover:underline font-medium"
-//             >
-//               {formData.email}
-//             </a>
-//           )}
-//           {formData.phone && <p className="font-medium">{formData.phone}</p>}
-//         </div>
-//       </div>
-
-//       {/* ----------------- MAIN CONTENT ----------------- */}
-//       <div className="px-12 py-10 flex flex-col gap-8">
-//         {/* --- DETAILS SECTION --- */}
-//         {hasDetails && (
-//           <section>
-//             <SectionHeader title="Details" />
-//             <div className="grid grid-cols-2 gap-y-4 gap-x-10 max-w-lg">
-//               {formData.driving_licence && (
-//                 <div>
-//                   <h4 className="text-[10px] font-bold text-gray-900 uppercase">
-//                     Driving License
-//                   </h4>
-//                   <p className="text-[11px] text-gray-600">
-//                     {formData.driving_licence}
-//                   </p>
-//                 </div>
-//               )}
-//               {formData.nationality && (
-//                 <div>
-//                   <h4 className="text-[10px] font-bold text-gray-900 uppercase">
-//                     Nationality
-//                   </h4>
-//                   <p className="text-[11px] text-gray-600">
-//                     {formData.nationality}
-//                   </p>
-//                 </div>
-//               )}
-//               {(formData.dob || formData.birth_place) && (
-//                 <div>
-//                   <h4 className="text-[10px] font-bold text-gray-900 uppercase">
-//                     Date / Place of Birth
-//                   </h4>
-//                   <p className="text-[11px] text-gray-600">
-//                     {formData.dob}
-//                     {formData.dob && formData.birth_place ? ", " : ""}
-//                     {formData.birth_place}
-//                   </p>
-//                 </div>
-//               )}
-//             </div>
-//           </section>
-//         )}
-
-//         {/* DYNAMIC SECTIONS */}
-//         {order.map((sectionId) => {
-//           if (sectionRenderers[sectionId]) {
-//             return sectionRenderers[sectionId]();
-//           }
-//           return null;
-//         })}
-
-//         {/* --- LINKS SECTION --- */}
-//         {hasLinks && (
-//           <section>
-//             <SectionHeader title="Links" />
-//             <div className="flex flex-col gap-1 text-[11px]">
-//               {formData.linkedin && (
-//                 <a
-//                   href={formData.linkedin}
-//                   className="text-gray-700 underline decoration-gray-400 underline-offset-2 hover:text-black"
-//                 >
-//                   LinkedIn
-//                 </a>
-//               )}
-//               {formData.github && (
-//                 <a
-//                   href={formData.github}
-//                   className="text-gray-700 underline decoration-gray-400 underline-offset-2 hover:text-black"
-//                 >
-//                   GitHub
-//                 </a>
-//               )}
-//             </div>
-//           </section>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default VividTemplate;

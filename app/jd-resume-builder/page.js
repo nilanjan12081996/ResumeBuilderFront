@@ -48,6 +48,7 @@ import { useTabs } from '../context/TabsContext.js';
 import { checkJdAts } from '../reducers/DashboardSlice';
 import { getSingleResume, saveResumeJd } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
+import { useDownload } from '../hooks/useDownload';
 
 const Page = () => {
   const componentRef = useRef();
@@ -56,6 +57,13 @@ const Page = () => {
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
   const { checkJdAtsData, atsLoading } = useSelector((state) => state.dash);
+
+  // AI Count
+  const [aiCounts, setAiCounts] = useState({
+    summary_count: defaultResumeSettings.ai.summary_count,
+    experience_count: defaultResumeSettings.ai.experience_count,
+  });
+  const aiCountsInitialized = useRef(false);
 
   const resumeSource =
     singleResumeInfo?.data?.data ||
@@ -73,38 +81,43 @@ const Page = () => {
   const [originalResumeData, setOriginalResumeData] = useState(null);
   const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
+  const hasInitialAtsCalled = useRef(false);
+
   useEffect(() => {
-    if (!resumeSource) return;
+    if (resumeSource && !hasInitialAtsCalled.current) {
 
-    const targetJD = sessionStorage.getItem("target_jd");
-    const atsPayload = {
-      security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-      resume_data: JSON.stringify(resumeSource),
-      Ats_score: 0,
-      JD: targetJD || ""
-    };
+      const targetJD = sessionStorage.getItem("target_jd");
 
-    dispatch(checkJdAts(atsPayload));
+      const atsPayload = {
+        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+        resume_data: JSON.stringify(resumeSource),
+        Ats_score: 0,
+        JD: targetJD || ""
+      };
+      dispatch(checkJdAts(atsPayload));
+
+      hasInitialAtsCalled.current = true;
+    }
   }, [resumeSource, dispatch]);
 
 
-useEffect(() => {
+  useEffect(() => {
     if (resumeSource && !originalResumeData) {
-        const clonedSource = JSON.parse(JSON.stringify(resumeSource));
-        const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
-        const initialSections = mapextracteResumeDataToSections(clonedSource);
+      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+      const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
+      const initialSections = mapextracteResumeDataToSections(clonedSource);
 
-        setOriginalResumeData({
-            ...clonedSource,
-            sections: initialSections,
-            oldResumeSettings: initialSettings 
-        });
+      setOriginalResumeData({
+        ...clonedSource,
+        sections: initialSections,
+        oldResumeSettings: initialSettings
+      });
     }
     if (!atsLoading && checkJdAtsData?.ATS_Score > 0 && originalAtsScore === null) {
-        setOriginalAtsScore(checkJdAtsData.ATS_Score);
+      setOriginalAtsScore(checkJdAtsData.ATS_Score);
     }
 
-}, [resumeSource, checkJdAtsData, atsLoading, originalAtsScore, originalResumeData]);
+  }, [resumeSource, checkJdAtsData, atsLoading, originalAtsScore, originalResumeData]);
 
 
   // ATS REFRESH
@@ -645,6 +658,14 @@ useEffect(() => {
         defaultResumeSettings.theme.defaultColor;
 
       setThemeColor(color);
+      // Ai Count 
+      if (!aiCountsInitialized.current && settings.ai) {
+        setAiCounts({
+          summary_count: settings.ai.summary_count ?? defaultResumeSettings.ai.summary_count,
+          experience_count: settings.ai.experience_count ?? defaultResumeSettings.ai.experience_count,
+        });
+        aiCountsInitialized.current = true;
+      }
     }
 
     if (resumeSource.sections?.length) {
@@ -655,6 +676,32 @@ useEffect(() => {
     const mappedSections = mapextracteResumeDataToSections(resumeSource);
     setSections(mappedSections);
   }, [resumeSource]);
+
+  // AI Count
+  const handleUseAiCount = (type) => {
+    if (type === "summary") {
+      setAiCounts(prev => ({
+        ...prev,
+        summary_count: Math.max(0, prev.summary_count - 1),
+      }));
+    } else if (type === "experience") {
+      setAiCounts(prev => ({
+        ...prev,
+        experience_count: Math.max(0, prev.experience_count - 1),
+      }));
+    }
+  };
+
+  // AI Count
+  useEffect(() => {
+    setResumeSettings(prev => ({
+      ...prev,
+      ai: {
+        summary_count: aiCounts.summary_count,
+        experience_count: aiCounts.experience_count,
+      },
+    }));
+  }, [aiCounts]);
 
   // ----------------- SYNC SKILLS -----------------
   useEffect(() => {
@@ -1420,6 +1467,8 @@ useEffect(() => {
   // Dummy handler for child components
   const handleDragEnd = () => { };
 
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
+
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
@@ -1541,6 +1590,9 @@ useEffect(() => {
                                       setSections={setSections}
                                       sectionIndex={index}
                                       onAtsRefresh={handleAtsRefresh}
+                                      // Ai Count 
+                                      aiSummaryCount={aiCounts.summary_count}
+                                      onUseAiCount={() => handleUseAiCount("summary")}
                                     />
                                   )}
 
@@ -1581,6 +1633,9 @@ useEffect(() => {
                                       draggedExpIndex={draggedExpIndex}
                                       handleDragEnd={handleDragEnd}
                                       onAtsRefresh={handleAtsRefresh}
+                                       // Ai Count 
+                                      aiExpCount={aiCounts.experience_count}              
+                                      onUseAiCount={() => handleUseAiCount("experience")} 
                                     />
                                   )}
 
