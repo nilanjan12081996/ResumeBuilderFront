@@ -61,6 +61,7 @@ import ImageCropModal from '../ui/ImageCropModal';
 import { useTabs } from '../context/TabsContext';
 import { defaultResumeSettings } from '../config/defaultResumeSettings';
 import { FaLock } from 'react-icons/fa';
+import { useDownload } from '../hooks/useDownload';
 
 
 // ── Editable Section Title (hover করলে pen দেখাবে, click করলে edit হবে) ──
@@ -484,6 +485,8 @@ const page = () => {
   }, [savingStatus]);
 
   const { activeTab } = useTabs();
+
+  useDownload({ componentRef, formValues, resumeSettings, themeColor });
 
   return (
     <div>

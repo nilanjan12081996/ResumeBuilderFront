@@ -47,6 +47,7 @@ import { getSingleResume, saveResumeLinkedIn } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ResumeCompareModal from '../modal/ResumeCompareModal';
 import { useDownload } from '../hooks/useDownload';
+import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 
 
 const LinkedInResumeBuilder = () => {
@@ -56,6 +57,13 @@ const LinkedInResumeBuilder = () => {
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
   const { checkATSData, atsLoading } = useSelector((state) => state.dash);
+
+  // AI Count
+  const [aiCounts, setAiCounts] = useState({
+    summary_count: defaultResumeSettings.ai.summary_count,
+    experience_count: defaultResumeSettings.ai.experience_count,
+  });
+  const aiCountsInitialized = useRef(false);
 
   const resumeSource =
     singleResumeInfo?.data?.data ||
@@ -482,6 +490,14 @@ const LinkedInResumeBuilder = () => {
         defaultResumeSettings.theme.defaultColor;
 
       setThemeColor(color);
+      // Ai Count 
+      if (!aiCountsInitialized.current && settings.ai) {
+        setAiCounts({
+          summary_count: settings.ai.summary_count ?? defaultResumeSettings.ai.summary_count,
+          experience_count: settings.ai.experience_count ?? defaultResumeSettings.ai.experience_count,
+        });
+        aiCountsInitialized.current = true;
+      }
     }
 
     if (resumeSource.sections?.length) {
@@ -491,6 +507,32 @@ const LinkedInResumeBuilder = () => {
 
     setSections(mapLinkedInDataToSections(resumeSource));
   }, [resumeSource]);
+
+  // AI Count
+  const handleUseAiCount = (type) => {
+    if (type === "summary") {
+      setAiCounts(prev => ({
+        ...prev,
+        summary_count: Math.max(0, prev.summary_count - 1),
+      }));
+    } else if (type === "experience") {
+      setAiCounts(prev => ({
+        ...prev,
+        experience_count: Math.max(0, prev.experience_count - 1),
+      }));
+    }
+  };
+
+  // AI Count
+  useEffect(() => {
+    setResumeSettings(prev => ({
+      ...prev,
+      ai: {
+        summary_count: aiCounts.summary_count,
+        experience_count: aiCounts.experience_count,
+      },
+    }));
+  }, [aiCounts]);
 
   // -------------------- SYNC SKILLS --------------------
   useEffect(() => {
@@ -1009,9 +1051,9 @@ const LinkedInResumeBuilder = () => {
 
   useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
 
-  // ═══════════════════════════════════════════════════════════════
-  //  RENDER
-  // ═══════════════════════════════════════════════════════════════
+  if (!resumeSource) {
+    return <CVSkeletonLoader />;
+  }
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
@@ -1112,6 +1154,9 @@ const LinkedInResumeBuilder = () => {
                                       sections={sections} setSections={setSections}
                                       sectionIndex={index}
                                       onAtsRefresh={handleAtsRefresh}
+                                      // Ai Count 
+                                      aiSummaryCount={aiCounts.summary_count}
+                                      onUseAiCount={() => handleUseAiCount("summary")}
                                     />
                                   )}
 
@@ -1137,6 +1182,9 @@ const LinkedInResumeBuilder = () => {
                                       draggedExpIndex={draggedExpIndex}
                                       handleDragEnd={handleDragEnd}
                                       onAtsRefresh={handleAtsRefresh}
+                                      // Ai Count 
+                                      aiExpCount={aiCounts.experience_count}
+                                      onUseAiCount={() => handleUseAiCount("experience")}
                                     />
                                   )}
 

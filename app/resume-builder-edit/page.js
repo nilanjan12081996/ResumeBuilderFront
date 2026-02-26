@@ -85,6 +85,7 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 import { getSingleResume, saveResumeNew } from '../reducers/ResumeSlice';
 import isEqual from 'lodash.isequal';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
+import { useDownload } from '../hooks/useDownload';
 
 
 
@@ -801,6 +802,8 @@ const page = () => {
       });
     }, 300);
   };
+
+  useDownload({ componentRef, formValues, resumeSettings, themeColor });
 
   return (
     <div>

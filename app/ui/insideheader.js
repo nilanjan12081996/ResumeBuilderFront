@@ -18,6 +18,7 @@ import userFace from "../assets/imagesource/user_face.png";
 import logoAdmin from "../assets/imagesource/logo_admin.png";
 import { toast } from 'react-toastify';
 import { useTabs } from '../context/TabsContext';
+import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 
 const Insideheader = () => {
   const pathname = usePathname();
@@ -119,9 +120,17 @@ const Insideheader = () => {
     <div className='bg-[#ffffff] rounded-[0px] py-2 px-6 border-l border-[#f3f4f6]'>
       <div className='flex justify-between items-center'>
         {/* Logo */}
-        <div className=''>
-          <Link className='block lg:hidden' href="/dashboard">
-            <Image src={logoAdmin} alt="logoAdmin" className='w-full' />
+        {/* Logo Area */}
+        <div className='pl-6'>
+          <Link className='block' href="/dashboard">
+            <Image
+              src={headerLogo}
+              alt="headerLogo"
+              width={140}
+              height={40}
+              className='object-contain'
+              priority
+            />
           </Link>
         </div>
 
@@ -135,7 +144,7 @@ const Insideheader = () => {
                     ? "bg-white shadow text-black"
                     : "text-gray-500 hover:text-black"}`}
               >
-                Edit
+                Enhance
               </button>
 
               <button

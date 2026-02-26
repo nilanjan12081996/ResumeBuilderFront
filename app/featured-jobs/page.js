@@ -47,7 +47,7 @@ const page = () => {
   
   return (
      <div className={`${inter.className} antialiased`}>
-      <div className='mb-5 lg:mb-10 pt-6'>
+      <div className='!m-5'>
         <h2 className='text-xl lg:text-[30px] leading-[30px] text-[#151515] font-semibold mb-1 lg:mb-4'>Featured Jobs</h2>
         <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Discover roles that match your skills and goals.</p>
       </div>

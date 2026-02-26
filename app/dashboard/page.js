@@ -22,6 +22,7 @@ import { getRecentResume } from "../reducers/ResumeHistorySlice";
 import JdbasedModal from "./JdbasedModal";
 import ImproveExistingModal from "./ImproveExistingModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
+import { MdOutlineWatchLater } from "react-icons/md";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -154,80 +155,132 @@ const Page = () => {
           </div>
 
           {/* Recent Resumes */}
-          <div className="mb-14">
-            <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
-              Recent Resumes
-            </h3>
-            <div className="lg:flex gap-4 pb-8 lg:pb-0">
-              <div className="lg:w-8/12">
-                {recentResume?.length === 0 ? (
-                  <div className="bg-white text-[#7D7D7D]">No recent resumes found.</div>
-                ) : (
-                  recentResume?.map((resume) => (
-                    <div
-                      key={resume.id}
-                      className="flex justify-between items-center bg-white border-[#d9d9d9] rounded-[10px] px-5 py-4 mb-4"
-                    >
-                      <div className="flex gap-3 items-center">
-                        <div className="bg-[#9C9C9C] rounded-[10px] w-[55px] h-[55px] flex justify-center items-center">
-                          <CgFileDocument className="text-white text-2xl" />
-                        </div>
-                        <div>
-                          <h3 className="text-[#151515] text-sm lg:text-base font-medium mb-1">
-                            {resume.resume_name}
-                          </h3>
-                          {/* <p className="text-[#7D7D7D] text-xs lg:text-sm">
-                            Created on {formatDate(resume.created_at)}
-                          </p> */}
-                        </div>
-                      </div>
-                      <div>
-                        <Link
-                          href={
-                            resume.resume_type === "scratch_resume"
-                              ? `/resume-builder-edit?id=${resume.id}&template=${resume?.template_detail?.[0]?.templete_id}`
-                              : resume.resume_type === "linkedin_resume"
-                                ? `/linkedIn-rewrite?id=${btoa(resume.id.toString())}`
-                                : resume.resume_type === "jd_based_resume"
-                                  ? `/jd-resume-builder?id=${btoa(resume.id.toString())}&template=${resume?.template_detail?.[0]?.templete_id}`
-                                  : resume.resume_type === "improve_resume"
-                                    ? `/improve-resume-builder?id=${btoa(resume.id.toString())}&template=${resume?.template_detail?.[0]?.templete_id}`
-                                    : ""
-                          }
-                          className="text-xl text-[#797979] hover:text-[#A635A2] cursor-pointer"
-                        >
-                          <BiEdit />
-                        </Link>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+<div className="mb-14">
+  <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
+    Recent Resumes
+  </h3>
+  <div className="lg:flex gap-4 pb-8 lg:pb-0">
+    <div className="lg:w-8/12">
 
-              <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
-                <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                  Resume Writing Tips
-                </h3>
-                <ul className="pl-4.5">
-                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                    Keep your resume to 1-2 pages maximum
-                  </li>
-                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                    Use action verbs to describe your achievements
-                  </li>
-                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                    Tailor your resume for each job application
-                  </li>
-                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                    Include relevant keywords from the job posting
-                  </li>
-                  <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
-                    Preview carefully before submitting
-                  </li>
-                </ul>
-              </div>
+      {/* Total Count Bar */}
+      {recentResume?.length > 0 && (
+        <div className="flex items-center justify-between bg-white border border-[#EBEBEB] rounded-[10px] px-5 py-3 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-[#F3E6F3] w-[32px] h-[32px] rounded-[8px] flex items-center justify-center">
+              <CgFileDocument className="text-[#800080] text-[17px]" />
             </div>
+            <span className="text-[#575757] text-[14px] font-medium">Total Resumes</span>
           </div>
+          <span className="bg-gradient-to-r from-[#800080] to-[#C44BC4] text-white text-[13px] font-bold px-4 py-1 rounded-full">
+            {recentResume.length}
+          </span>
+        </div>
+      )}
+
+      <div className="overflow-y-auto pr-1" style={{ maxHeight: "460px", minHeight: "200px" }}>
+        {recentResume?.length === 0 ? (
+          <div className="bg-white text-[#7D7D7D]">No recent resumes found.</div>
+        ) : (
+          recentResume?.map((resume) => {
+
+            const typeConfig = {
+              scratch_resume:  { label: "Scratch",  bg: "#DBFCE7", color: "#00A63E" },
+              linkedin_resume: { label: "LinkedIn", bg: "#EAD9FF", color: "#9747FF" },
+              jd_based_resume: { label: "JD Based", bg: "#FFEDD4", color: "#FF7043" },
+              improve_resume:  { label: "Improved", bg: "#DBEAFE", color: "#2B7FFF" },
+            };
+            const cfg = typeConfig[resume.resume_type] || { label: resume.resume_type, bg: "#F0F0F0", color: "#777" };
+
+            const formatDate = (dateStr) => {
+              if (!dateStr) return "";
+              const d = new Date(dateStr);
+              const now = new Date();
+              const diffDays = Math.floor((now - d) / 86400000);
+              if (diffDays === 0) return "Today";
+              if (diffDays === 1) return "Yesterday";
+              if (diffDays < 7)  return `${diffDays} days ago`;
+              return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+            };
+
+            const href =
+              resume.resume_type === "scratch_resume"
+                ? `/resume-builder-edit?id=${resume.id}&fetch=scratch_resume`
+                : resume.resume_type === "linkedin_resume"
+                ? `/linkedIn-rewrite?id=${resume.id}&fetch=linkdin_resume`
+                : resume.resume_type === "jd_based_resume"
+                ? `/jd-resume-builder?id=${resume.id}&fetch=jd_resume`
+                : resume.resume_type === "improve_resume"
+                ? `/improve-resume-builder?id=${resume.id}&fetch=improve_resume`
+                : "";
+
+            return (
+              <div
+                key={resume.id}
+                className="flex justify-between items-center bg-white border border-[#EBEBEB] hover:border-[#800080] hover:shadow-sm rounded-[12px] px-5 py-4 mb-3 transition-all duration-200 group"
+              >
+                <div className="flex gap-4 items-center">
+                  <div
+                    className="rounded-[10px] w-[46px] h-[46px] flex-shrink-0 flex items-center justify-center"
+                    style={{ backgroundColor: cfg.bg }}
+                  >
+                    <CgFileDocument className="text-[20px]" style={{ color: cfg.color }} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <h3 className="text-[#151515] text-[14px] font-semibold capitalize">
+                        {resume.resume_name?.replace(/_/g, " ")}
+                      </h3>
+                      <span
+                        className="text-[10px] font-bold px-2 py-[2px] rounded-full"
+                        style={{ backgroundColor: cfg.bg, color: cfg.color }}
+                      >
+                        {cfg.label}
+                      </span>
+                    </div>
+                    <p className="text-[#AAAAAA] text-[12px]">
+                      <span className="flex items-center"><MdOutlineWatchLater className="text-xl mr-1"/> {formatDate(resume.created_at)}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href={href}
+                  className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center border border-transparent group-hover:border-[#800080] group-hover:bg-[#FDF0FD] text-[#AAAAAA] group-hover:text-[#800080] transition-all duration-200"
+                >
+                  <BiEdit className="text-[17px]" />
+                </Link>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+
+    {/* Tips Card - same as before */}
+    <div className="lg:w-4/12 border bg-white border-[#D5D5D5] rounded-[10px] px-6 py-7">
+      <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+        Resume Writing Tips
+      </h3>
+      <ul className="pl-4.5">
+        <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+          Keep your resume to 1-2 pages maximum
+        </li>
+        <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+          Use action verbs to describe your achievements
+        </li>
+        <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+          Tailor your resume for each job application
+        </li>
+        <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+          Include relevant keywords from the job posting
+        </li>
+        <li className="text-[#575757] text-[14px] leading-[23px] font-normal mb-2 list-disc">
+          Preview carefully before submitting
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
 
         </div>
       </div>   

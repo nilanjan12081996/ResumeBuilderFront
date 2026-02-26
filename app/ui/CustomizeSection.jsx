@@ -11,13 +11,13 @@ const CustomizeSection = ({
   resumeSettings,
   setResumeSettings,
 }) => {
-  const [activeTab, setActiveTab] = useState("Template & Colors");
+  const [activeTab, setActiveTab] = useState("Template & Design");
   return (
     <div className="w-full bg-slate-50 min-h-screen font-sans text-gray-700">
 
       {/* TOP TABS – SAME DESIGN */}
       <div className="flex justify-center border-b bg-white">
-        {["Template & Colors", "Text", "Layout"].map((tab) => (
+        {["Template & Design", "Font Style", "Page Layout"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -32,7 +32,7 @@ const CustomizeSection = ({
       </div>
 
       <div className="max-w-6xl mx-auto py-8 px-4">
-        {activeTab === "Template & Colors" && (
+        {activeTab === "Template & Design" && (
           <TemplateAndColors
             selectedTemplate={selectedTemplate}
             onSelectTemplate={onSelectTemplate}
@@ -41,7 +41,7 @@ const CustomizeSection = ({
           />
         )}
 
-        {activeTab === "Text" && (
+        {activeTab === "Font Style" && (
           <TemplateText
             textSettings={resumeSettings.text}
             selectedTemplate={selectedTemplate}
@@ -54,7 +54,7 @@ const CustomizeSection = ({
           />
         )}
 
-        {activeTab === "Layout" && (
+        {activeTab === "Page Layout" && (
           <TemplateLayout
             selectedTemplate={selectedTemplate}
             layoutSettings={resumeSettings.layout}

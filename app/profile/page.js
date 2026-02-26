@@ -72,7 +72,7 @@ const password = watch("new_pass");
             <div>
         <div>
           <ToastContainer /> 
-          <div className='pt-6 lg:pt-0 mb-6'>
+          <div className='!m-4'>
               <h3 className='text-[22px] leading-[22px] text-black font-medium pb-4'>My Account</h3>
               <p className='text-[13px] leading-[22px] text-[#747577] font-normal pb-0'>Manage and update your account details in one place.</p>
           </div>

@@ -416,13 +416,13 @@ const Sidebar = () => {
         {/* Sidebar Header */}
         <div className="px-6 py-5">
           <Link href="/dashboard" className="flex justify-center items-center">
-            <Image src={headerLogo} alt="logo" className="w-6/12" />
+            <Image src={headerLogo} alt="logo"  />
           </Link>
         </div>
 
         {/* Sidebar Menu */}
         <div className={`${poppins.className} flex flex-col overflow-y-auto`}>
-          <nav className="mt-5 py-4 px-4">
+          <nav className=" py-4 px-4">
             <ul className="flex flex-col gap-1.5">
               {/* Dashboard */}
               <li onClick={closeSidebar}>

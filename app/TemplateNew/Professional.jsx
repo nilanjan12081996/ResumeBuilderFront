@@ -33,6 +33,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     width: '35%',
     verticalAlign: 'top',
     padding: '30pt 14pt',
+    minHeight: '297mm',
   };
 
   const mainStyle = {
@@ -445,29 +446,29 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     </section>
   );
 
- const renderCertificationsFromSection = (section) => (
-  <section key={section.id}>
-    <span style={mainHeadingStyle}>{section.title}</span>
-    {section.certifications?.map((cert, i) => (
-      <div key={cert.id || i} style={{ marginBottom: '8pt' }}>
-        <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-          {cert.name}{cert.organization ? `, ${cert.organization}` : ''}
-        </div>
-        {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear) && (
-          <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
-            {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}
+  const renderCertificationsFromSection = (section) => (
+    <section key={section.id}>
+      <span style={mainHeadingStyle}>{section.title}</span>
+      {section.certifications?.map((cert, i) => (
+        <div key={cert.id || i} style={{ marginBottom: '8pt' }}>
+          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
+            {cert.name}{cert.organization ? `, ${cert.organization}` : ''}
           </div>
-        )}
-        {cert.description && (
-          <div
-            style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight }}
-            dangerouslySetInnerHTML={{ __html: cert.description }}
-          />
-        )}
-      </div>
-    ))}
-  </section>
-);
+          {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear) && (
+            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
+              {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}
+            </div>
+          )}
+          {cert.description && (
+            <div
+              style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight }}
+              dangerouslySetInnerHTML={{ __html: cert.description }}
+            />
+          )}
+        </div>
+      ))}
+    </section>
+  );
 
   const renderCoursesFromSection = (section) => (
     <section key={section.id}>
@@ -709,9 +710,28 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           fontFamily: text.primaryFont,
           lineHeight: text.lineHeight,
           fontSize: `${text.body}pt`,
+          position: 'relative',
         }}
       >
-        <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+        {/* ── Purple bg extender — always full height ── */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '35%',
+          height: '100%',
+          minHeight: '297mm',
+          backgroundColor: themeColor,
+          zIndex: 0,
+        }} />
+
+        <table style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          tableLayout: 'fixed',
+          position: 'relative',
+          zIndex: 1,
+        }}>
           <colgroup>
             <col style={{ width: '35%' }} />
             <col style={{ width: '65%' }} />
@@ -719,7 +739,12 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           <tbody>
             <tr>
               {/* ── LEFT SIDEBAR ── */}
-              <td style={sidebarStyle}>
+              <td style={{
+                width: '35%',
+                verticalAlign: 'top',
+                padding: '30pt 14pt',
+                backgroundColor: 'transparent', // ← important: transparent, bg div handles color
+              }}>
                 {/* Profile Image */}
                 {formData.profileImage && (
                   <div style={{ textAlign: 'center', marginBottom: '12pt' }}>
@@ -732,10 +757,9 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
                         objectFit: 'cover',
                         borderRadius: '50%',
                         border: '2pt solid rgba(255,255,255,0.6)',
-                        // Nicher property gulo add koro:
                         display: 'block',
                         marginLeft: 'auto',
-                        marginRight: 'auto'
+                        marginRight: 'auto',
                       }}
                     />
                   </div>

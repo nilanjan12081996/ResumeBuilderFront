@@ -49,6 +49,7 @@ import { checkJdAts } from '../reducers/DashboardSlice';
 import { getSingleResume, saveResumeJd } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import { useDownload } from '../hooks/useDownload';
+import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 
 const Page = () => {
   const componentRef = useRef();
@@ -1468,7 +1469,9 @@ const Page = () => {
   const handleDragEnd = () => { };
 
   useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
-
+  if (!resumeSource) {
+    return <CVSkeletonLoader />;
+  }
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
@@ -1633,9 +1636,9 @@ const Page = () => {
                                       draggedExpIndex={draggedExpIndex}
                                       handleDragEnd={handleDragEnd}
                                       onAtsRefresh={handleAtsRefresh}
-                                       // Ai Count 
-                                      aiExpCount={aiCounts.experience_count}              
-                                      onUseAiCount={() => handleUseAiCount("experience")} 
+                                      // Ai Count 
+                                      aiExpCount={aiCounts.experience_count}
+                                      onUseAiCount={() => handleUseAiCount("experience")}
                                     />
                                   )}
 

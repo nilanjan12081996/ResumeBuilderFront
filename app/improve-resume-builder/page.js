@@ -50,6 +50,7 @@ import ImpSimpleCustomSection from './components/Impsimplecustomsection';
 import { useDownload } from '../hooks/useDownload';
 import ResumeCompareModal from '../modal/ResumeCompareModal';
 import { resetAiCount } from '../reducers/PlanSlice';
+import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 
 const Page = () => {
   const componentRef = useRef();
@@ -1439,6 +1440,9 @@ const Page = () => {
 
   useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
 
+  if (!resumeSource) {
+  return <CVSkeletonLoader/>;
+}
   return (
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
