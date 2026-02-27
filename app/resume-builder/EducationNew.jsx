@@ -83,7 +83,7 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move, 
           )}
         </div>
         <p className='text-sm text-[#808897] font-medium pt-1'>
-          A varied education on your resume sums up the value that your learnings and background will bring to job.
+         Mention all the Educational details below.
         </p>
       </div>
 
@@ -115,14 +115,14 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move, 
                                 <AccordionTitle className="p-4 font-semibold text-sm">
                                   {watchedSchool || watchedDegree
                                     ? `${watchedDegree || ''}${watchedSchool ? ' at ' + watchedSchool : ''}`
-                                    : "(Not specified)"}
+                                    : "(Awaiting Input)"}
                                 </AccordionTitle>
 
                                 <AccordionContent className="pt-0">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* School */}
                                     <div>
-                                      <label className="block text-xs font-semibold text-gray-500">School</label>
+                                      <label className="block text-xs font-semibold text-gray-500">School/College</label>
                                       <input
                                         type="text"
                                         placeholder="e.g. University of Dhaka"

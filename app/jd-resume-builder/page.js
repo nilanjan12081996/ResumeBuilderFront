@@ -54,6 +54,7 @@ import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 const Page = () => {
   const componentRef = useRef();
   const templateTextSettings = useRef({});
+  const originalFormValuesRef = useRef(null);
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
@@ -103,22 +104,10 @@ const Page = () => {
 
 
   useEffect(() => {
-    if (resumeSource && !originalResumeData) {
-      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
-      const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
-      const initialSections = mapextracteResumeDataToSections(clonedSource);
-
-      setOriginalResumeData({
-        ...clonedSource,
-        sections: initialSections,
-        oldResumeSettings: initialSettings
-      });
-    }
-    if (!atsLoading && checkJdAtsData?.ATS_Score > 0 && originalAtsScore === null) {
-      setOriginalAtsScore(checkJdAtsData.ATS_Score);
-    }
-
-  }, [resumeSource, checkJdAtsData, atsLoading, originalAtsScore, originalResumeData]);
+  if (!atsLoading && checkJdAtsData?.ATS_Score > 0 && originalAtsScore === null) {
+    setOriginalAtsScore(checkJdAtsData.ATS_Score);
+  }
+}, [checkJdAtsData, atsLoading, originalAtsScore]);
 
 
   // ATS REFRESH
@@ -532,7 +521,7 @@ const Page = () => {
       if (isSimpleList) {
         additionalSectionsList.push({
           id: id++,
-          title: key,          // ✅ CV এর আসল key name
+          title: key,          
           type: "custom_simple",
           items: value.content.map((item, i) => ({
             id: `simple_${i}_${Date.now()}`,
@@ -630,6 +619,48 @@ const Page = () => {
     setValue("birth_place", resumeSource.birth_place || "");
     setValue("dob", resumeSource.dob || "");
     setValue("driving_licence", resumeSource.driving_licence || "");
+
+    if (!originalFormValuesRef.current) {
+      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+      const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
+
+      const initialSections = clonedSource.sections?.length
+        ? clonedSource.sections
+        : mapextracteResumeDataToSections(clonedSource);
+
+      const personal = (extracteResumeData?.resume_data || resumeSource)?.personal_information || {};
+      const meta = (extracteResumeData?.resume_data || resumeSource)?.metadata || {};
+      const fullName = personal.full_name || "";
+      const nameParts = fullName.split(" ");
+
+      const originalFormData = {
+        job_target: meta.current_role || clonedSource.job_target || "",
+        first_name: nameParts[0] || clonedSource.first_name || "",
+        last_name: nameParts.slice(1).join(" ") || clonedSource.last_name || "",
+        email: personal.email || clonedSource.email || "",
+        phone: personal.phone || clonedSource.phone || "",
+        city_state: [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || clonedSource.city_state || "",
+        country: personal.location?.country || clonedSource.country || "",
+        address: personal.location?.full_address || clonedSource.address || "",
+        profileImage: clonedSource.profileImage || "",
+        linkedin: clonedSource.linkedin || "",
+        github: clonedSource.github || "",
+        stackoverflow: clonedSource.stackoverflow || "",
+        leetcode: clonedSource.leetcode || "",
+        postal_code: clonedSource.postal_code || "",
+      };
+
+      originalFormValuesRef.current = originalFormData;
+
+      setOriginalResumeData({
+        ...originalFormData,
+        sections: initialSections,
+        oldResumeSettings: {
+          ...initialSettings,
+          theme: { ...initialSettings.theme, template: "ats" } 
+        }
+      });
+    }
 
   }, [extracteResumeData, resumeSource, setValue]);
 
@@ -1802,6 +1833,7 @@ const Page = () => {
         themeColor={themeColor}
         oldResumeSettings={originalResumeData?.oldResumeSettings}
         resumeSettings={resumeSettings}
+        defaultOldTemplate="ats"
       />
     </div>
   );

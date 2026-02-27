@@ -65,7 +65,7 @@ const SkillsNewEdit = ({
         <h2 className="text-xl font-bold text-black">Skills</h2>
       )}
       <p className="text-sm text-[#808897] font-medium mb-2">
-        Choose 5 important skills that show you fit the position.
+        Mention the key skills you have experience of
       </p>
 
       <div className="flex items-center gap-2 my-3">

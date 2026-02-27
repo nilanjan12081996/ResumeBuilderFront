@@ -64,7 +64,7 @@ const ImpSkills = ({ section, sectionIndex, handleSkillUpdate }) => {
     <>
       <div>
         <p className="!text-sm !font-medium !text-gray-500">
-          Choose 5 important skills that show you fit the position. Make sure they match the key skills mentioned in the job listing.
+          Mention the key skills you have experience of
         </p>
 
         {/* Toggle Button - Initially OFF */}

@@ -41,7 +41,7 @@ const ImpAchievements = ({
             <Accordion collapseAll className="w-full border rounded-lg">
               <AccordionPanel>
                 <AccordionTitle className="text-sm font-semibold">
-                  {item.title || "(Not specified)"}
+                  {item.title || "(Awaiting Input)"}
                 </AccordionTitle>
 
                 <AccordionContent>

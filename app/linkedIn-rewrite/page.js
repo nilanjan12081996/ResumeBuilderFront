@@ -53,6 +53,7 @@ import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 const LinkedInResumeBuilder = () => {
   const componentRef = useRef();
   const templateTextSettings = useRef({});
+  const originalFormValuesRef = useRef(null);
   const dispatch = useDispatch();
   const { extracteResumeData } = useSelector((state) => state?.dash);
   const { loading, singleResumeInfo } = useSelector((state) => state?.resume);
@@ -98,21 +99,10 @@ const LinkedInResumeBuilder = () => {
 
 
   useEffect(() => {
-    if (resumeSource && !originalResumeData) {
-      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
-      const initialSettings = clonedSource.resumeSettings || linkedInDefaultSettings;
-      const initialSections = mapLinkedInDataToSections(clonedSource);
-
-      setOriginalResumeData({
-        ...clonedSource,
-        sections: initialSections,
-        oldResumeSettings: initialSettings
-      });
-    }
     if (!atsLoading && checkATSData?.ATS_Score > 0 && originalAtsScore === null) {
       setOriginalAtsScore(checkATSData.ATS_Score);
     }
-  }, [resumeSource, checkATSData, atsLoading, originalAtsScore, originalResumeData]);
+  }, [checkATSData, atsLoading, originalAtsScore]);
 
   // ── ATS REFRESH ──
   const handleAtsRefresh = () => {
@@ -465,6 +455,51 @@ const LinkedInResumeBuilder = () => {
     setValue("city_state", formattedCityState || resumeSource.city_state || "");
     setValue("linkedin", personal.linkedin || resumeSource.linkedin || "");
     setValue("website", resumeSource.website || "");
+    if (!originalFormValuesRef.current) {
+      const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+      const initialSettings = clonedSource.resumeSettings || linkedInDefaultSettings;
+
+      const initialSections = clonedSource.sections?.length
+        ? clonedSource.sections
+        : mapLinkedInDataToSections(clonedSource);
+
+      const resumeData = extracteResumeData?.resume_data || resumeSource;
+      const personal = resumeData?.personal_information || {};
+      const additionalSections = resumeData?.additional_sections || {};
+      const fullName = personal.full_name || "";
+      const nameParts = fullName.split(" ");
+      const headlineText =
+        additionalSections?.Headline?.content ||
+        resumeData?.metadata?.current_role ||
+        clonedSource.job_target || "";
+      const city = personal?.location?.city || "";
+      const state = personal?.location?.state || "";
+
+      const originalFormData = {
+        job_target: headlineText,
+        first_name: nameParts[0] || clonedSource.first_name || "",
+        last_name: nameParts.slice(1).join(" ") || clonedSource.last_name || "",
+        email: personal.email || clonedSource.email || "",
+        phone: personal.phone || clonedSource.phone || "",
+        address: personal?.location?.full_address || clonedSource.address || "",
+        city_state: [city, state].filter(Boolean).join(", ") || clonedSource.city_state || "",
+        linkedin: personal.linkedin || clonedSource.linkedin || "",
+        website: clonedSource.website || "",
+        profileImage: clonedSource.profileImage || "",
+        coverImage: clonedSource.coverImage || "",
+      };
+
+      originalFormValuesRef.current = originalFormData;
+
+      setOriginalResumeData({
+        ...originalFormData,
+        sections: initialSections,
+        oldResumeSettings: {
+          ...initialSettings,
+          theme: { ...initialSettings.theme, template: "linkedin" }
+        }
+      });
+    }
   }, [extracteResumeData, resumeSource, setValue]);
 
   // -------------------- SYNC SUMMARY --------------------

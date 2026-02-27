@@ -78,7 +78,7 @@ const ImpCertifications = ({
                     <AccordionPanel>
 
                       <AccordionTitle className="font-semibold text-sm">
-                        {cert.name?.trim() ? cert.name : "(Not specified)"}
+                        {cert.name?.trim() ? cert.name : "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">

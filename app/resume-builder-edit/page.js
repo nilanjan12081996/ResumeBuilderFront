@@ -82,7 +82,7 @@ import VividTemplate from '../TemplateNew/VividTemplate';
 import Professional from '../TemplateNew/Professional';
 import PrimeATS from '../TemplateNew/PrimeATS';
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
-import { getSingleResume, saveResumeNew } from '../reducers/ResumeSlice';
+import { getSingleResume, saveResumeNew, uploadImageScratch } from '../reducers/ResumeSlice';
 import isEqual from 'lodash.isequal';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import { useDownload } from '../hooks/useDownload';
@@ -91,7 +91,7 @@ import { useDownload } from '../hooks/useDownload';
 
 const page = () => {
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
-  const { loading, singleResumeInfo } = useSelector((state) => state?.resume)
+  const { loading, singleResumeInfo, uploadImageScratchLoading } = useSelector((state) => state?.resume)
   const { profileData } = useSelector((state) => state?.profile)
   const searchParams = useSearchParams();
   console.log("searchParams", searchParams);
@@ -320,7 +320,7 @@ const page = () => {
 
   const formValues = watch();
 
-  // ── UPDATED: Profile image handlers with crop + 1MB validation ──
+  // ── Profile image handlers with crop + 1MB validation ──
   const handleImageChange = (e) => {
     setProfileError("");
     const file = e.target.files[0];
@@ -343,6 +343,46 @@ const page = () => {
     reader.readAsDataURL(file);
     e.target.value = "";
   };
+
+  const handleCropSave = async (base64) => {
+    setProfileCropSrc(null);
+    setProfileError("");
+
+    try {
+      // base64 → atob → Uint8Array → Blob → File
+      const [meta, data] = base64.split(",");
+      const mimeType = meta.match(/:(.*?);/)[1];
+      const byteCharacters = atob(data);
+      const byteArray = new Uint8Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+      }
+      const blob = new Blob([byteArray], { type: mimeType });
+      const file = new File([blob], "profile.jpg", { type: mimeType });
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const result = await dispatch(uploadImageScratch(formData));
+
+      if (uploadImageScratch.fulfilled.match(result)) {
+        const destinationUrl = result?.payload?.destinationUrl;
+        if (destinationUrl) {
+          const baseUrl = process.env.NEXT_PUBLIC_API_RESUME_URL?.replace(/\/$/, ""); // trailing slash remove
+          const fullUrl = `${baseUrl}${destinationUrl}`;
+          setValue("profileImage", fullUrl);
+        } else {
+          setProfileError("Upload succeeded but no URL returned.");
+        }
+      } else {
+        setProfileError("Image upload failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("handleCropSave error:", err);
+      setProfileError("Something went wrong during upload.");
+    }
+  };
+
 
   const handleDeleteImage = () => {
     setValue("profileImage", "");
@@ -808,15 +848,12 @@ const page = () => {
   return (
     <div>
 
-      {/* ── NEW: Profile Crop Modal ── */}
+      {/* Profile Crop Modal */}
       {profileCropSrc && (
         <ImageCropModal
           imageSrc={profileCropSrc}
           aspectRatio={1}
-          onSave={(base64) => {
-            setValue("profileImage", base64);
-            setProfileCropSrc(null);
-          }}
+          onSave={handleCropSave}
           onCancel={() => setProfileCropSrc(null)}
         />
       )}
@@ -858,37 +895,73 @@ const page = () => {
 
                             {/* ── UPDATED: Profile Photo with Crop Modal ── */}
                             <div className="flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg bg-gray-50 p-2">
-                              <label htmlFor="profile-upload" className="cursor-pointer flex flex-col items-center gap-2 relative group">
-                                <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden relative">
-                                  {profileImage ? (
-                                    <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
-                                  ) : (
-                                    <FaUser className="text-[30px] text-[#800080]" />
-                                  )}
-                                  <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
-                                    <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
+                                {/* Profile Photo with Crop */}
+                                <label
+                                  htmlFor="profile-upload"
+                                  className="cursor-pointer flex flex-col items-center gap-2 relative group"
+                                >
+                                  <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden relative">
+                                    {/*  Uploading spinner */}
+                                    {uploadImageScratchLoading ? (
+                                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                        <svg className="animate-spin h-6 w-6 text-[#800080]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
+                                      </div>
+                                    ) : profileImage ? (
+                                      <img
+                                        src={profileImage}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <FaUser className="text-[30px] text-[#800080]" />
+                                    )}
+                                    {/* Hover overlay */}
+                                    {!uploadImageScratchLoading && (
+                                      <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
+                                        <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
+                                      </div>
+                                    )}
                                   </div>
-                                </div>
-                                <span className="text-sm font-medium text-[#800080] hover:underline">Upload photo</span>
-                              </label>
-                              {profileImage && (
-                                <button type="button" onClick={handleDeleteImage} className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 !bg-transparent">
-                                  <MdDelete size={12} /> Remove
-                                </button>
-                              )}
-                              <span className="text-[10px] text-gray-400 text-center leading-tight">
-                                JPG, JPEG, PNG<br />Up to 1MB
-                              </span>
-                              {profileError && (
-                                <p className="text-[10px] text-red-500 text-center leading-tight max-w-[110px]">
-                                  {profileError}
-                                </p>
-                              )}
-                              <input type="file" id="profile-upload" accept=".jpg,.jpeg,.png" className="hidden" onChange={handleImageChange} />
+                                  <span className="text-sm font-medium text-[#800080] hover:underline">
+                                    {uploadImageScratchLoading ? "Uploading..." : "Upload photo"}
+                                  </span>
+                                </label>
+
+                                {profileImage && !uploadImageScratchLoading && (
+                                  <button
+                                    type="button"
+                                    onClick={handleDeleteImage}
+                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 !bg-transparent"
+                                  >
+                                    <MdDelete size={12} /> Remove
+                                  </button>
+                                )}
+
+                                <span className="text-[10px] text-gray-400 text-center leading-tight">
+                                  JPG, JPEG, PNG<br />Up to 1MB
+                                </span>
+
+                                {profileError && (
+                                  <p className="text-[10px] text-red-500 text-center leading-tight max-w-[110px]">
+                                    {profileError}
+                                  </p>
+                                )}
+
+                                <input
+                                  type="file"
+                                  id="profile-upload"
+                                  accept=".jpg,.jpeg,.png"
+                                  className="hidden"
+                                  onChange={handleImageChange}
+                                  disabled={uploadImageScratchLoading}
+                                />
                             </div>
 
                             <div className="flex-1">
-                              <label className="block text-sm font-medium text-gray-700">Job Target</label>
+                              <label className="block text-sm font-medium text-gray-700">Job Role</label>
                               <input type="text" placeholder="SENIOR SOFTWARE ENGINEER" className="mt-1 w-full rounded-lg" {...register("job_target")} />
                             </div>
                           </div>
@@ -904,12 +977,12 @@ const page = () => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <label className="block text-sm font-medium text-gray-700">Email ID</label>
                             <input type="email" placeholder="Email" className="mt-1 w-full rounded-lg border border-gray-300 p-2" {...register("email")} />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Phone</label>
+                            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
                             <input type="text" placeholder="Phone" className="mt-1 w-full rounded-lg border border-gray-300 p-2" {...register("phone")} />
                           </div>
 
@@ -962,7 +1035,7 @@ const page = () => {
 
 
                           <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700">Address</label>
+                            <label className="block text-sm font-medium text-gray-700">Complete Address</label>
                             <input type="text" placeholder="Enter your address" className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("address")} />
                           </div>
 
@@ -1310,10 +1383,10 @@ const page = () => {
 
         <div className='lg:w-6/12 bg-[#ffffff] px-0'>
           <div className='h-screen overflow-y-scroll hide-scrollbar'>
-          
-          <div ref={componentRef}>
-            <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} resumeSettings={resumeSettings} />
-          </div>
+
+            <div ref={componentRef}>
+              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} resumeSettings={resumeSettings} />
+            </div>
           </div>
         </div>
       </div>

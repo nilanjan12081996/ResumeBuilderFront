@@ -699,7 +699,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
   };
 
   // ════════════════════════════════════════════════════════════════════════
-  //  RENDER — table-based two-column layout (PDF safe)
+  //  RENDER — table-based two-column layout (PDF + DOCX safe)
   // ════════════════════════════════════════════════════════════════════════
   return (
     <div style={{ overflowY: 'auto' }}>
@@ -713,7 +713,11 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           position: 'relative',
         }}
       >
-        {/* ── Purple bg extender — always full height ── */}
+        {/*
+         * ── Background extender div (browser/PDF preview only) ──
+         * This absolutely-positioned div gives the sidebar full-height color
+         * in browser preview. For PDF, the <td> backgroundColor below handles it.
+         */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -723,6 +727,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           minHeight: '297mm',
           backgroundColor: themeColor,
           zIndex: 0,
+          pointerEvents: 'none',
         }} />
 
         <table style={{
@@ -739,11 +744,20 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           <tbody>
             <tr>
               {/* ── LEFT SIDEBAR ── */}
+              {/*
+               * ▼▼▼ KEY FIX ▼▼▼
+               * backgroundColor set to themeColor (NOT transparent).
+               * The absolutely-positioned div above handles the full-height
+               * background for browser/PDF preview (where td height = content height).
+               * For DOCX/Word, this inline backgroundColor on the <td> is what works.
+               * Both can coexist: the div visually extends the color, the td carries
+               * the color attribute into the exported HTML.
+               */}
               <td style={{
                 width: '35%',
                 verticalAlign: 'top',
                 padding: '30pt 14pt',
-                backgroundColor: 'transparent', // ← important: transparent, bg div handles color
+                backgroundColor: themeColor,  // ← FIXED: was 'transparent'
               }}>
                 {/* Profile Image */}
                 {formData.profileImage && (
@@ -877,7 +891,6 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
 };
 
 export default Professional;
-
 
 // 'use client';
 // import React from 'react';

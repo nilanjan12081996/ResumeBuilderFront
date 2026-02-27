@@ -84,7 +84,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move, se
           )}
         </div>
         <p className='text-sm text-[#808897] font-medium pt-1'>
-          Show your relevant experience (last 10 years). Use bullet points to note your achievements.
+          Please add metrics, problems solved or features worked on, and key features or products that were built and scaled. (Overall write about Impact).
         </p>
       </div>
 
@@ -114,14 +114,14 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move, se
                             <AccordionTitle className="p-4 font-semibold text-sm">
                               {watchedJob || watchedEmployer
                                 ? `${watchedJob || ''}${watchedEmployer ? ' at ' + watchedEmployer : ''}`
-                                : "(Not specified)"}
+                                : "(Awaiting Input)"}
                             </AccordionTitle>
 
                             <AccordionContent className="pt-0">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Job Title */}
                                 <div>
-                                  <label className="block text-xs font-semibold text-gray-500">Job Title</label>
+                                  <label className="block text-xs font-semibold text-gray-500">Job Role Title</label>
                                   <input
                                     type="text"
                                     placeholder="e.g. Software Engineer"
@@ -132,7 +132,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move, se
 
                                 {/* Employer */}
                                 <div>
-                                  <label className="block text-xs font-semibold text-gray-500">Employer</label>
+                                  <label className="block text-xs font-semibold text-gray-500">Employer Name</label>
                                   <input
                                     type="text"
                                     placeholder="e.g. Google"
@@ -200,7 +200,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move, se
 
                                 {/* Description */}
                                 <div className="md:col-span-2">
-                                  <label className="block text-xs font-semibold text-gray-500">Description</label>
+                                  <label className="block text-xs font-semibold text-gray-500">Job Responsibilities</label>
                                   <Controller
                                     name={`employmentHistory.${index}.description`}
                                     control={control}

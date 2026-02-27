@@ -85,7 +85,7 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
                           <AccordionTitle className="font-semibold text-sm">
                             {functionTitle?.trim()
                               ? `${functionTitle}${employer ? " at " + employer : ""}`
-                              : "(Not specified)"}
+                              : "(Awaiting Input)"}
                           </AccordionTitle>
 
                           <AccordionContent>

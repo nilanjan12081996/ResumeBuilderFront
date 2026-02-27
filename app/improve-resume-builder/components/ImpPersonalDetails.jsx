@@ -4,6 +4,8 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { MdDelete } from 'react-icons/md';
 import { FaLock, FaUser, FaCamera } from 'react-icons/fa';
 import ImageCropModal from "../../ui/ImageCropModal";
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadImageImprove } from '../../reducers/ResumeSlice';
 
 const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => {
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
@@ -11,6 +13,9 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
   // Profile crop states
   const [profileCropSrc, setProfileCropSrc] = useState(null);
   const [profileError, setProfileError] = useState("");
+
+  const dispatch = useDispatch();
+  const { uploadImageImproveLoading } = useSelector((state) => state.resume);
 
   // Watch profileImage from form
   const profileImage = watch("profileImage");
@@ -38,6 +43,45 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
     e.target.value = "";
   };
 
+  const handleCropSave = async (base64) => {
+    setProfileCropSrc(null);
+    setProfileError("");
+
+    try {
+      // base64 → atob → Uint8Array → Blob → File
+      const [meta, data] = base64.split(",");
+      const mimeType = meta.match(/:(.*?);/)[1];
+      const byteCharacters = atob(data);
+      const byteArray = new Uint8Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+      }
+      const blob = new Blob([byteArray], { type: mimeType });
+      const file = new File([blob], "profile.jpg", { type: mimeType });
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const result = await dispatch(uploadImageImprove(formData));
+
+      if (uploadImageImprove.fulfilled.match(result)) {
+        const destinationUrl = result?.payload?.destinationUrl;
+        if (destinationUrl) {
+          const baseUrl = process.env.NEXT_PUBLIC_API_RESUME_URL?.replace(/\/$/, ""); // trailing slash remove
+          const fullUrl = `${baseUrl}${destinationUrl}`;
+          setValue("profileImage", fullUrl);
+        } else {
+          setProfileError("Upload succeeded but no URL returned.");
+        }
+      } else {
+        setProfileError("Image upload failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("handleCropSave error:", err);
+      setProfileError("Something went wrong during upload.");
+    }
+  };
+
   const handleDeleteImage = () => {
     setValue("profileImage", "");
     setProfileError("");
@@ -51,10 +95,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
         <ImageCropModal
           imageSrc={profileCropSrc}
           aspectRatio={1}
-          onSave={(base64) => {
-            setValue("profileImage", base64);
-            setProfileCropSrc(null);
-          }}
+          onSave={handleCropSave}
           onCancel={() => setProfileCropSrc(null)}
         />
       )}
@@ -91,7 +132,15 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
                         className="cursor-pointer flex flex-col items-center gap-2 relative group"
                       >
                         <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden relative">
-                          {profileImage ? (
+                          {/*  Uploading spinner */}
+                          {uploadImageImproveLoading ? (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                              <svg className="animate-spin h-6 w-6 text-[#800080]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                              </svg>
+                            </div>
+                          ) : profileImage ? (
                             <img
                               src={profileImage}
                               alt="Profile"
@@ -101,16 +150,18 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
                             <FaUser className="text-[30px] text-[#800080]" />
                           )}
                           {/* Hover overlay */}
-                          <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
-                            <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
-                          </div>
+                          {!uploadImageImproveLoading && (
+                            <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
+                              <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
+                            </div>
+                          )}
                         </div>
                         <span className="text-sm font-medium text-[#800080] hover:underline">
-                          Upload photo
+                          {uploadImageImproveLoading ? "Uploading..." : "Upload photo"}
                         </span>
                       </label>
 
-                      {profileImage && (
+                      {profileImage && !uploadImageImproveLoading && (
                         <button
                           type="button"
                           onClick={handleDeleteImage}
@@ -136,6 +187,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
                         accept=".jpg,.jpeg,.png"
                         className="hidden"
                         onChange={handleImageChange}
+                        disabled={uploadImageImproveLoading}
                       />
                     </>
                   )}
@@ -143,7 +195,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
 
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700">
-                    Job Target
+                    Job Role
                   </label>
                   <input
                     type="text"
@@ -178,7 +230,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
 
               {/* Email */}
               <div>
-                <label className="block !text-sm !font-medium !text-gray-500">Email</label>
+                <label className="block !text-sm !font-medium !text-gray-500">Email ID</label>
                 <input
                   type="text"
                   placeholder="Email"
@@ -189,7 +241,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
 
               {/* Phone */}
               <div>
-                <label className="block !text-sm !font-medium !text-gray-500">Phone</label>
+                <label className="block !text-sm !font-medium !text-gray-500">Phone Number</label>
                 <input
                   type="text"
                   placeholder="Phone No."
@@ -244,7 +296,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
 
               {/* Address */}
               <div className="md:col-span-2">
-                <label className="block !text-sm !font-medium !text-gray-500">Address</label>
+                <label className="block !text-sm !font-medium !text-gray-500">Complete Address</label>
                 <input
                   type="text"
                   placeholder="Enter your address"

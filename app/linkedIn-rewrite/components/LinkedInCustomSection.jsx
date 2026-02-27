@@ -73,7 +73,7 @@ const LinkedInCustomSection = ({
                   <Accordion className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
                     <AccordionPanel>
                       <AccordionTitle className="!text-sm !font-semibold">
-                        {item.title?.trim() || "(Not specified)"}
+                        {item.title?.trim() || "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent>

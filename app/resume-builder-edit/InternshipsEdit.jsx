@@ -68,7 +68,7 @@ const InternshipsEdit = ({
           <h2 className="text-xl font-bold text-black pb-1">Internships</h2>
         )}
         <p className="text-sm text-[#808897] font-medium">
-          Show your relevant experience (last 10 years). Use bullet points to note your achievements.
+          Demonstrate your skills, initiative, leadership, or continuous learning
         </p>
       </div>
 
@@ -97,13 +97,13 @@ const InternshipsEdit = ({
                           <AccordionTitle className="font-semibold text-sm">
                             {jobTitle?.trim()
                               ? `${jobTitle}${employer ? " at " + employer : ""}`
-                              : "(Not specified)"}
+                              : "(Awaiting Input)"}
                           </AccordionTitle>
 
                           <AccordionContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                               <div>
-                                <Label className="!text-sm !text-gray-500 font-semibold">Job Title</Label>
+                                <Label className="!text-sm !text-gray-500 font-semibold">Job Role Title</Label>
                                 <input
                                   {...register(`internshipHistory.${index}.jobTitle`)}
                                   className="w-full rounded-md border p-2 text-sm mt-1"
@@ -112,7 +112,7 @@ const InternshipsEdit = ({
                               </div>
 
                               <div>
-                                <Label className="!text-sm !text-gray-500 font-semibold">Employer</Label>
+                                <Label className="!text-sm !text-gray-500 font-semibold">Employer Name</Label>
                                 <input
                                   {...register(`internshipHistory.${index}.employer`)}
                                   className="w-full rounded-md border p-2 text-sm mt-1"

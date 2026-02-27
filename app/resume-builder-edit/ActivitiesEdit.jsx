@@ -97,7 +97,7 @@ const ActivitiesEdit = ({
                           <AccordionTitle className="font-semibold text-sm">
                             {functionTitle?.trim()
                               ? `${functionTitle}${employer ? " at " + employer : ""}`
-                              : "(Not specified)"}
+                              : "(Awaiting Input)"}
                           </AccordionTitle>
 
                           <AccordionContent>

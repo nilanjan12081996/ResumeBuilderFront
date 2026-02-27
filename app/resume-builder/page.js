@@ -25,7 +25,7 @@ import Certificates from './Certificates';
 import Achivments from './Achivments';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { addCountResume, addCountResumeOrg, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp, saveResumeNew } from '../reducers/ResumeSlice';
+import { addCountResume, addCountResumeOrg, saveAchivmentInfo, saveCertificatesInfo, saveEducationInfo, saveForDraft, saveLanguageInfo, savePersonalInfo, saveProjectInfo, saveSkillInfo, saveTemplate, saveWorkExp, saveResumeNew, uploadImageScratch } from '../reducers/ResumeSlice';
 import Template1 from '../temp/Template1';
 import { useReactToPrint } from 'react-to-print';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -64,11 +64,10 @@ import { FaLock } from 'react-icons/fa';
 import { useDownload } from '../hooks/useDownload';
 
 
-// ── Editable Section Title (hover করলে pen দেখাবে, click করলে edit হবে) ──
+
 const EditableSectionTitle = ({ titleKey, defaultTitle, subtitle, register, watch }) => {
   const [isEditing, setIsEditing] = useState(false);
   const currentTitle = watch(titleKey) || defaultTitle;
-
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2 pb-1 group">
@@ -162,7 +161,7 @@ const page = () => {
   const lastSavedData = useRef(null);
   const [selectedTemplate, setSelectedTemplate] = useState('ats');
   const [resumeSettings, setResumeSettings] = useState(defaultResumeSettings);
-
+const {uploadImageScratchLoading} = useSelector((state) => state.resume);
   // ── NEW: Profile crop states ──
   const [profileCropSrc, setProfileCropSrc] = useState(null);
   const [profileError, setProfileError] = useState("");
@@ -406,7 +405,6 @@ const page = () => {
   // Auto-Save Effect
   useEffect(() => {
     if (resumeIds.mongo_id && resumeIds.mysql_id) {
-      // resumeSettings সহ comparison করা হচ্ছে
       const currentDataNormalized = JSON.parse(JSON.stringify({
         ...formValues,
         resumeSettings,
@@ -418,7 +416,6 @@ const page = () => {
 
       setSavingStatus('saving');
       const timeoutId = setTimeout(() => {
-        // resumeSettings সহ currentData — comparison ও payload দুটোই consistent
         const currentData = JSON.parse(JSON.stringify({
           ...formValues,
           resumeSettings,
@@ -446,7 +443,7 @@ const page = () => {
 
 
   // ── Profile image handlers with crop + 1MB validation ──
-  const handleImageChange = (e) => {
+ const handleImageChange = (e) => {
     setProfileError("");
     const file = e.target.files[0];
     if (!file) return;
@@ -468,6 +465,45 @@ const page = () => {
     reader.readAsDataURL(file);
     e.target.value = "";
   };
+
+   const handleCropSave = async (base64) => {
+      setProfileCropSrc(null);
+      setProfileError("");
+  
+      try {
+        // base64 → atob → Uint8Array → Blob → File
+        const [meta, data] = base64.split(",");
+        const mimeType = meta.match(/:(.*?);/)[1];
+        const byteCharacters = atob(data);
+        const byteArray = new Uint8Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteArray[i] = byteCharacters.charCodeAt(i);
+        }
+        const blob = new Blob([byteArray], { type: mimeType });
+        const file = new File([blob], "profile.jpg", { type: mimeType });
+  
+        const formData = new FormData();
+        formData.append("file", file);
+  
+        const result = await dispatch(uploadImageScratch(formData));
+  
+        if (uploadImageScratch.fulfilled.match(result)) {
+          const destinationUrl = result?.payload?.destinationUrl;
+          if (destinationUrl) {
+            const baseUrl = process.env.NEXT_PUBLIC_API_RESUME_URL?.replace(/\/$/, ""); // trailing slash remove
+            const fullUrl = `${baseUrl}${destinationUrl}`;
+            setValue("profileImage", fullUrl);
+          } else {
+            setProfileError("Upload succeeded but no URL returned.");
+          }
+        } else {
+          setProfileError("Image upload failed. Please try again.");
+        }
+      } catch (err) {
+        console.error("handleCropSave error:", err);
+        setProfileError("Something went wrong during upload.");
+      }
+    };
 
   const handleDeleteImage = () => {
     setValue("profileImage", "");
@@ -491,15 +527,12 @@ const page = () => {
   return (
     <div>
 
-      {/* Profile Crop Modal */}
+       {/* Profile Crop Modal */}
       {profileCropSrc && (
         <ImageCropModal
           imageSrc={profileCropSrc}
           aspectRatio={1}
-          onSave={(base64) => {
-            setValue("profileImage", base64);
-            setProfileCropSrc(null);
-          }}
+          onSave={handleCropSave}
           onCancel={() => setProfileCropSrc(null)}
         />
       )}
@@ -545,13 +578,21 @@ const page = () => {
                                       </>
                                     ) : (
                                       <>
-                                        {/* Profile Photo with Crop Modal */}
+                                        {/* Profile Photo with Crop */}
                                         <label
                                           htmlFor="profile-upload"
                                           className="cursor-pointer flex flex-col items-center gap-2 relative group"
                                         >
                                           <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden relative">
-                                            {profileImage ? (
+                                            {/*  Uploading spinner */}
+                                            {uploadImageScratchLoading ? (
+                                              <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                                <svg className="animate-spin h-6 w-6 text-[#800080]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                                </svg>
+                                              </div>
+                                            ) : profileImage ? (
                                               <img
                                                 src={profileImage}
                                                 alt="Profile"
@@ -560,17 +601,19 @@ const page = () => {
                                             ) : (
                                               <FaUser className="text-[30px] text-[#800080]" />
                                             )}
-                                            <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
-                                              <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
-                                            </div>
+                                            {/* Hover overlay */}
+                                            {!uploadImageScratchLoading && (
+                                              <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
+                                                <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
+                                              </div>
+                                            )}
                                           </div>
-
                                           <span className="text-sm font-medium text-[#800080] hover:underline">
-                                            Upload photo
+                                            {uploadImageScratchLoading ? "Uploading..." : "Upload photo"}
                                           </span>
                                         </label>
-
-                                        {profileImage && (
+                  
+                                        {profileImage && !uploadImageScratchLoading && (
                                           <button
                                             type="button"
                                             onClick={handleDeleteImage}
@@ -579,23 +622,24 @@ const page = () => {
                                             <MdDelete size={12} /> Remove
                                           </button>
                                         )}
-
+                  
                                         <span className="text-[10px] text-gray-400 text-center leading-tight">
                                           JPG, JPEG, PNG<br />Up to 1MB
                                         </span>
-
+                  
                                         {profileError && (
                                           <p className="text-[10px] text-red-500 text-center leading-tight max-w-[110px]">
                                             {profileError}
                                           </p>
                                         )}
-
+                  
                                         <input
                                           type="file"
                                           id="profile-upload"
                                           accept=".jpg,.jpeg,.png"
                                           className="hidden"
                                           onChange={handleImageChange}
+                                          disabled={uploadImageScratchLoading}
                                         />
                                       </>
                                     )}
@@ -603,7 +647,7 @@ const page = () => {
 
                                   <div className="flex-1">
                                     <label className="block text-sm font-medium text-gray-700">
-                                      Job Target
+                                      Job Role
                                     </label>
                                     <input
                                       type="text"
@@ -643,7 +687,7 @@ const page = () => {
                                 {/* Email */}
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700">
-                                    Email
+                                    Email ID
                                   </label>
                                   <input
                                     type="email"
@@ -656,7 +700,7 @@ const page = () => {
                                 {/* Phone */}
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700">
-                                    Phone
+                                    Phone Number
                                   </label>
                                   <input
                                     type="text"
@@ -721,7 +765,7 @@ const page = () => {
                                 {/* Address */}
                                 <div className="md:col-span-2">
                                   <label className="block text-sm font-medium text-gray-700">
-                                    Address
+                                    Complete Address
                                   </label>
                                   <input
                                     type="text"

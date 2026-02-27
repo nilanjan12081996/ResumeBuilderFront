@@ -43,7 +43,7 @@ const LinkedInSkills = ({ section, sectionIndex, handleSkillUpdate }) => {
         <>
             <div>
                 <p className="!text-sm !font-medium !text-gray-500">
-                    Add skills that are relevant to your professional profile. LinkedIn emphasizes top skills for better visibility.
+                    Mention the key skills you have experience of
                 </p>
             </div>
 

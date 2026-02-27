@@ -163,7 +163,7 @@ const Page = () => {
     <div className="lg:w-8/12">
 
       {/* Total Count Bar */}
-      {recentResume?.length > 0 && (
+      {/* {recentResume?.length > 0 && (
         <div className="flex items-center justify-between bg-white border border-[#EBEBEB] rounded-[10px] px-5 py-3 mb-4">
           <div className="flex items-center gap-2">
             <div className="bg-[#F3E6F3] w-[32px] h-[32px] rounded-[8px] flex items-center justify-center">
@@ -175,7 +175,7 @@ const Page = () => {
             {recentResume.length}
           </span>
         </div>
-      )}
+      )} */}
 
       <div className="overflow-y-auto pr-1" style={{ maxHeight: "460px", minHeight: "200px" }}>
         {recentResume?.length === 0 ? (

@@ -38,8 +38,7 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex, onAt
   return (
     <>
       <p className="!text-sm !font-medium !text-gray-500 mb-4">
-        Write 2-4 short, energetic sentences about how great you are. Mention your
-        achievements and skills.
+        Add impact-focused details such as metrics, problems solved, features worked on, and key products or capabilities built and scaled.
       </p>
 
       <TipTapEditor value={summaryValue} onChange={handleSummaryChange} />

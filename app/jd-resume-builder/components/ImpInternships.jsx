@@ -55,7 +55,7 @@ const ImpInternships = ({
     return (
         <>
             <p className="!text-sm !font-medium !text-gray-500 mb-4">
-                Show your relevant internship experience. Use bullet points to highlight achievements.
+                Demonstrate your skills, initiative, leadership, or continuous learning
             </p>
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -78,13 +78,13 @@ const ImpInternships = ({
                                             <AccordionTitle className="font-semibold text-sm">
                                                 {item.jobTitle?.trim()
                                                     ? `${item.jobTitle}${item.employer ? ' at ' + item.employer : ''}`
-                                                    : '(Not specified)'}
+                                                    : '(Awaiting Input)'}
                                             </AccordionTitle>
 
                                             <AccordionContent className="pt-0">
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                                     <div>
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Job Title</Label>
+                                                        <Label className="!text-sm !font-medium !text-gray-500">Job Role Title</Label>
                                                         <input
                                                             value={item.jobTitle || ''}
                                                             onChange={(e) => handleUpdate(sectionIndex, item.id, 'jobTitle', e.target.value)}
@@ -94,7 +94,7 @@ const ImpInternships = ({
                                                     </div>
 
                                                     <div>
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Employer</Label>
+                                                        <Label className="!text-sm !font-medium !text-gray-500">Employer Name</Label>
                                                         <input
                                                             value={item.employer || ''}
                                                             onChange={(e) => handleUpdate(sectionIndex, item.id, 'employer', e.target.value)}

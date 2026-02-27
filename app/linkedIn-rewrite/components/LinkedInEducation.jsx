@@ -52,7 +52,7 @@ const LinkedInEducation = ({
   return (
     <>
       <p className="!text-sm !font-medium !text-gray-500 mb-4">
-        Add your educational background including school name, degree, and field of study.
+        Mention all the Educational details below.
       </p>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -71,15 +71,15 @@ const LinkedInEducation = ({
                     <AccordionPanel>
                       <AccordionTitle className="font-semibold text-sm">
                         {edu.institute?.trim()
-                          ? `${edu.institute} - ${edu.degree || "(Not specified)"}`
-                          : "(Not specified)"}
+                          ? `${edu.institute} - ${edu.degree || "(Awaiting Input)"}`
+                          : "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">
                         <div className="grid grid-cols-2 gap-4 mb-4">
 
                           <div className="col-span-2">
-                            <Label className="!text-sm !font-medium !text-gray-500">School</Label>
+                            <Label className="!text-sm !font-medium !text-gray-500">School/College</Label>
                             <input
                               value={edu.institute}
                               onChange={(e) => handleEducationUpdate(sectionIndex, edu.id, "institute", e.target.value)}

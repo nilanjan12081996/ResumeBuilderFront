@@ -67,7 +67,7 @@ const EducationNewEdit = ({
         <div className="mb-4">
           <h2 className="text-xl font-bold">Education</h2>
           <p className="text-sm text-gray-500">
-            Add your education background.
+            Mention all the Educational details below.
           </p>
         </div>
       )}
@@ -97,13 +97,13 @@ const EducationNewEdit = ({
                           <AccordionTitle className="font-semibold text-sm">
                             {degree?.trim()
                               ? `${degree}${school ? " at " + school : ""}`
-                              : "(Not specified)"}
+                              : "(Awaiting Input)"}
                           </AccordionTitle>
 
                           <AccordionContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                               <div>
-                                <Label className="!text-sm !text-gray-500">School</Label>
+                                <Label className="!text-sm !text-gray-500">School/College</Label>
                                 <input
                                   {...register(`educationHistory.${index}.school`)}
                                   className="w-full rounded-md border p-2 text-sm mt-1"

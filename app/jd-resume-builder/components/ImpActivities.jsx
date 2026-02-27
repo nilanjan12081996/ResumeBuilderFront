@@ -78,7 +78,7 @@ const ImpActivities = ({
                                             <AccordionTitle className="font-semibold text-sm">
                                                 {item.functionTitle?.trim()
                                                     ? `${item.functionTitle}${item.employer ? ' at ' + item.employer : ''}`
-                                                    : '(Not specified)'}
+                                                    : '(Awaiting Input)'}
                                             </AccordionTitle>
 
                                             <AccordionContent className="pt-0">

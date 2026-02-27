@@ -144,7 +144,7 @@ const CustomSectionEdit = ({
                             <AccordionTitle className="font-semibold text-sm">
                               {watchedActivity || watchedCity
                                 ? `${watchedActivity || ''}${watchedCity ? ', ' + watchedCity : ''}`
-                                : "(Not specified)"}
+                                : "(Awaiting Input)"}
                             </AccordionTitle>
 
                             <AccordionContent>

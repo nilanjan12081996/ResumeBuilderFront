@@ -56,7 +56,7 @@ const Internships = ({ register, watch, control, fields, append, remove, move })
       <div className="mb-4">
         <h2 className="text-xl font-bold text-black pb-1">Internships</h2>
         <p className="text-sm text-[#808897] font-medium">
-          Show your relevant experience (last 10 years). Use bullet points to note your achievements.
+          Demonstrate your skills, initiative, leadership, or continuous learning
         </p>
       </div>
 
@@ -85,13 +85,13 @@ const Internships = ({ register, watch, control, fields, append, remove, move })
                           <AccordionTitle className="font-semibold text-sm">
                             {jobTitle?.trim()
                               ? `${jobTitle}${employer ? " at " + employer : ""}`
-                              : "(Not specified)"}
+                              : "(Awaiting Input)"}
                           </AccordionTitle>
 
                           <AccordionContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                               <div>
-                                <label className="block text-xs font-semibold text-gray-500 ">Job Title</label>
+                                <label className="block text-xs font-semibold text-gray-500 ">Job Role Title</label>
                                 <input
                                   {...register(`internshipHistory.${index}.jobTitle`)}
                                   className="w-full rounded-md border border-gray-300 p-2 text-sm mt-1"
@@ -100,7 +100,7 @@ const Internships = ({ register, watch, control, fields, append, remove, move })
                               </div>
 
                               <div>
-                                <label className="block text-xs font-semibold text-gray-500 ">Employer</label>
+                                <label className="block text-xs font-semibold text-gray-500 ">Employer Name</label>
                                 <input
                                   {...register(`internshipHistory.${index}.employer`)}
                                   className="w-full rounded-md border border-gray-300 p-2 text-sm mt-1"

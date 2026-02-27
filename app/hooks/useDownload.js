@@ -279,6 +279,7 @@ const renderSectionBody = (sec, bodyPt, bodyW, lh) => {
 // ---------------------------------------------------------------------------
 const buildSharedCss = (primaryFont, secondaryFont, bodyPt, bodyW, lh) => {
   return [
+    'html, body { height: 100%; }',
     '* { box-sizing: border-box; margin: 0; padding: 0; }',
     'body {',
     '  font-family: ' + fontStack(primaryFont) + ';',
@@ -502,7 +503,7 @@ const buildTwoColDocxHtml = function(params) {
   let headerRowHtml = '';
   if (isClear) {
     headerRowHtml = '<tr>';
-    headerRowHtml += '<td colspan="2" style="background-color: ' + color + '; padding: 16pt ' + leftRight + 'pt 14pt ' + leftRight + 'pt;">';
+    headerRowHtml += '<td colspan="2" bgcolor="' + color + '" style="background-color: ' + color + '; padding: 16pt ' + leftRight + 'pt 14pt ' + leftRight + 'pt;">';
     headerRowHtml += '<div style="font-family: ' + fontStack(secondaryFont) + '; font-size: ' + h1Pt + 'pt; font-weight: ' + h1W + '; color: #111111; line-height: 1.1; margin-bottom: 4pt;">';
     headerRowHtml += esc(formValues.first_name || '') + ' ' + esc(formValues.last_name || '');
     headerRowHtml += '</div>';
@@ -525,10 +526,10 @@ const buildTwoColDocxHtml = function(params) {
 
   // ---- CSS ----
   const css = buildSharedCss(primaryFont, secondaryFont, bodyPt, bodyW, lh) + '\n' +
-    '.layout-table { width: 100%; border-collapse: collapse; }\n' +
+    // ▼ FIX: height: 100% ensures the table fills the full page so sidebar bg extends to bottom
+    '.layout-table { width: 100%; border-collapse: collapse; height: 100%; min-height: 297mm; }\n' +
     '.sidebar-td {\n' +
     '  width: 32%;\n' +
-    '  background-color: ' + sidebarBg + ';\n' +
     '  vertical-align: top;\n' +
     '  padding: ' + topBottom + 'pt 14pt ' + topBottom + 'pt 14pt;\n' +
     '  border-right: 1px solid ' + sideBorderColor + ';\n' +
@@ -572,11 +573,15 @@ const buildTwoColDocxHtml = function(params) {
   html += getFontLinks(primaryFont, secondaryFont) + '\n';
   html += '<style>\n' + css + '\n</style>\n';
   html += '</head>\n<body>\n';
+  // Convert hex color to a format safe for bgcolor attribute
+  // bgcolor attribute is required for Word/LibreOffice as they ignore CSS background-color on <td>
+  const sidebarBgHex = sidebarBg.startsWith('#') ? sidebarBg : color;
+
   html += '<table class="layout-table">\n<tbody>\n';
   html += headerRowHtml;
   html += '<tr>\n';
-  html += '<td class="sidebar-td">' + sidebarHtml + '</td>\n';
-  html += '<td class="main-td">' + mainHtml + '</td>\n';
+  html += '<td class="sidebar-td" bgcolor="' + sidebarBgHex + '" style="width:32%; background-color:' + sidebarBg + '; vertical-align:top; padding:' + topBottom + 'pt 14pt ' + topBottom + 'pt 14pt; border-right:1px solid ' + sideBorderColor + ';">' + sidebarHtml + '</td>\n';
+  html += '<td class="main-td" bgcolor="#ffffff" style="width:68%; background-color:#ffffff; vertical-align:top; padding:' + topBottom + 'pt ' + leftRight + 'pt ' + topBottom + 'pt 18pt;">' + mainHtml + '</td>\n';
   html += '</tr>\n';
   html += '</tbody>\n</table>\n';
   html += '</body>\n</html>';

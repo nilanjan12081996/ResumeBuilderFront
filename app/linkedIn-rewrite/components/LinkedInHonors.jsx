@@ -68,7 +68,7 @@ const LinkedInHonors = ({ section, sectionIndex, handleUpdate, handleAddItem }) 
                   <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
                     <AccordionPanel>
                       <AccordionTitle className="font-semibold text-sm">
-                        {item.title?.trim() || "(Not specified)"}
+                        {item.title?.trim() || "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">

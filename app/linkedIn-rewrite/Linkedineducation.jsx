@@ -56,8 +56,8 @@ const LinkedInEducation = ({
               <AccordionPanel>
                 <AccordionTitle className="font-semibold text-sm">
                   {edu.institute?.trim()
-                    ? `${edu.institute} - ${edu.degree || "(Not specified)"}`
-                    : "(Not specified)"}
+                    ? `${edu.institute} - ${edu.degree || "(Awaiting Input)"}`
+                    : "(Awaiting Input)"}
                 </AccordionTitle>
 
                 <AccordionContent className="pt-0">

@@ -55,8 +55,7 @@ const ImpEducation = ({
   return (
     <>
       <p className="!text-sm !font-medium !text-gray-500 pb-2">
-        A varied education on your resume sums up the value that your learnings
-        and background will bring to job.
+        Mention all the Educational details below.
       </p>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -78,13 +77,13 @@ const ImpEducation = ({
                   <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
                     <AccordionPanel>
                       <AccordionTitle className="font-semibold text-sm">
-                        {edu.institute?.trim() ? edu.institute : "(Not specified)"}
+                        {edu.institute?.trim() ? edu.institute : "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div>
-                            <Label className="!text-sm !font-medium !text-gray-500">School</Label>
+                            <Label className="!text-sm !font-medium !text-gray-500">School/College</Label>
                             <input
                               value={edu.institute}
                               onChange={(e) => handleEducationUpdate(sectionIndex, edu.id, "institute", e.target.value)}

@@ -82,13 +82,13 @@ const Courses = ({ register, watch, control, fields, append, remove, move }) => 
                               <AccordionTitle className="font-semibold text-sm">
                                 {course?.trim()
                                   ? `${course}${institution ? " at " + institution : ""}`
-                                  : "(Not specified)"}
+                                  : "(Awaiting Input)"}
                               </AccordionTitle>
 
                               <AccordionContent>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                   <div>
-                                    <label className="!text-sm !text-gray-500 font-semibold">Course</label>
+                                    <label className="!text-sm !text-gray-500 font-semibold">Course Name</label>
                                     <input
                                       {...register(`coursesHistory.${index}.course`)}
                                       className="w-full rounded-md border p-2 text-sm mt-1"

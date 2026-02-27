@@ -71,7 +71,7 @@ const ImpCustomSection = ({
                                     <Accordion className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
                                         <AccordionPanel>
                                             <AccordionTitle className="!text-sm !font-semibold">
-                                                {item.title || "(Not specified)"}
+                                                {item.title || "(Awaiting Input)"}
                                             </AccordionTitle>
 
                                             <AccordionContent>

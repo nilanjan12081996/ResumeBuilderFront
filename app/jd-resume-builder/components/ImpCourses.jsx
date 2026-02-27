@@ -78,13 +78,13 @@ const ImpCourses = ({
                                             <AccordionTitle className="font-semibold text-sm">
                                                 {course.course?.trim()
                                                     ? `${course.course}${course.institution ? ' at ' + course.institution : ''}`
-                                                    : '(Not specified)'}
+                                                    : '(Awaiting Input)'}
                                             </AccordionTitle>
 
                                             <AccordionContent className="pt-0">
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
                                                     <div>
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Course</Label>
+                                                        <Label className="!text-sm !font-medium !text-gray-500">Course Name</Label>
                                                         <input
                                                             value={course.course || ''}
                                                             onChange={(e) => handleUpdate(sectionIndex, course.id, 'course', e.target.value)}

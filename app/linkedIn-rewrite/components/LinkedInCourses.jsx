@@ -92,7 +92,7 @@ const ImpCourses = ({
                   <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg !overflow-hidden">
                     <AccordionPanel>
                       <AccordionTitle className="font-semibold text-sm">
-                        {course.course?.trim() || "(Not specified)"}
+                        {course.course?.trim() || "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">

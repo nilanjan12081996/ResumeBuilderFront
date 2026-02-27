@@ -71,7 +71,7 @@ const ImpExperience = ({
   return (
     <>
       <p className="!text-sm !font-medium !text-gray-500 mb-4">
-        Show your relevant experience (last 10 years). Use bullet points to highlight achievements.
+        Please add metrics, problems solved or features worked on, and key features or products that were built and scaled. (Overall write about Impact).
       </p>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -95,8 +95,8 @@ const ImpExperience = ({
 
                       <AccordionTitle className="font-semibold text-sm">
                         {exp.jobTitle?.trim()
-                          ? `${exp.jobTitle} at ${exp.company || "(Not specified)"}`
-                          : "(Not specified)"}
+                          ? `${exp.jobTitle} at ${exp.company || "(Awaiting Input)"}`
+                          : "(Awaiting Input)"}
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">
@@ -104,7 +104,7 @@ const ImpExperience = ({
                         <div className="grid grid-cols-2 gap-4 mb-4">
 
                           <div>
-                            <Label className="!text-sm !font-medium !text-gray-500">Job title</Label>
+                            <Label className="!text-sm !font-medium !text-gray-500">Job Role title</Label>
                             <input
                               value={exp.jobTitle}
                               onChange={(e) => handleExpUpdate(sectionIndex, exp.id, "jobTitle", e.target.value)}
@@ -113,7 +113,7 @@ const ImpExperience = ({
                           </div>
 
                           <div>
-                            <Label className="!text-sm !font-medium !text-gray-500">Employer</Label>
+                            <Label className="!text-sm !font-medium !text-gray-500">Employer Name</Label>
                             <input
                               value={exp.company}
                               onChange={(e) => handleExpUpdate(sectionIndex, exp.id, "company", e.target.value)}
@@ -168,7 +168,7 @@ const ImpExperience = ({
                         </div>
 
                         <div>
-                          <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                          <Label className="!text-sm !font-medium !text-gray-500">Job Responsibilities</Label>
                           <TipTapEditor
                             value={exp.description}
                             onChange={(html) => handleExpUpdate(sectionIndex, exp.id, "description", html)}

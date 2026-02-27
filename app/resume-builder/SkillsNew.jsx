@@ -89,7 +89,7 @@ const SkillsNew = ({ register, watch, setValue, fields, append, remove, move, se
                 </div>
                 <div className='flex justify-between items-center'>
                     <p className='text-sm text-[#808897] font-medium'>
-                        Choose 5 important skills that show you fit the position.
+                        Mention the key skills you have experience of
                     </p>
                 </div>
 

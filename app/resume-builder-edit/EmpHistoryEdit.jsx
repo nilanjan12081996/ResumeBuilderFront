@@ -67,7 +67,9 @@ const EmpHistoryEdit = ({
         <div className="mb-4">
           <h2 className="text-xl font-bold">Employment History</h2>
           <p className="text-sm text-gray-500">
-            Show your relevant experience (last 10 years).
+            <p className='text-sm text-[#808897] font-medium pt-1'>
+              Please add metrics, problems solved or features worked on, and key features or products that were built and scaled. (Overall write about Impact).
+            </p>
           </p>
         </div>
       )}
@@ -97,13 +99,13 @@ const EmpHistoryEdit = ({
                           <AccordionTitle className="font-semibold text-sm">
                             {job?.trim()
                               ? `${job}${company ? " at " + company : ""}`
-                              : "(Not specified)"}
+                              : "(Awaiting Input)"}
                           </AccordionTitle>
 
                           <AccordionContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                               <div>
-                                <Label className="!text-sm !text-gray-500">Job Title</Label>
+                                <Label className="!text-sm !text-gray-500">Job Role Title</Label>
                                 <input
                                   {...register(`employmentHistory.${index}.job_title`)}
                                   className="w-full rounded-md border p-2 text-sm mt-1"
@@ -112,7 +114,7 @@ const EmpHistoryEdit = ({
                               </div>
 
                               <div>
-                                <Label className="!text-sm !text-gray-500">Employer</Label>
+                                <Label className="!text-sm !text-gray-500">Employer Name</Label>
                                 <input
                                   {...register(`employmentHistory.${index}.employer`)}
                                   className="w-full rounded-md border p-2 text-sm mt-1"
@@ -189,7 +191,7 @@ const EmpHistoryEdit = ({
                               </div>
 
                               <div className="md:col-span-2">
-                                <Label className="!text-sm !text-gray-500">Description</Label>
+                                <Label className="!text-sm !text-gray-500">Job Responsibilities</Label>
                                 <Controller
                                   control={control}
                                   name={`employmentHistory.${index}.description`}

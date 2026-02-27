@@ -422,6 +422,85 @@ export const generateDocx = createAsyncThunk(
     }
 )
 
+// Scratch flow  →  tag=scratch
+export const uploadImageScratch = createAsyncThunk(
+    'uploadImageScratch',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_RESUME_URL}/api/image/upload?tag=scratch`,
+                { method: 'POST', body: formData }
+            );
+            const data = await response.json();
+            if (data?.statusCode === 201) return data; // { destinationUrl, message, url, status, statusCode }
+            return rejectWithValue(data?.errors || 'Something went wrong.');
+        } catch (err) { return rejectWithValue(err?.message || 'Upload failed'); }
+    }
+)
+
+// Upload image for JD (Job Description) flow
+export const uploadImageJd = createAsyncThunk(
+    'uploadImageJd',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_RESUME_URL}/api/image/upload?tag=jd`,
+                { method: 'POST', body: formData }
+            );
+            const data = await response.json();
+            if (data?.statusCode === 201) {
+                return data;
+            } else {
+                return rejectWithValue(data?.errors || 'Something went wrong.');
+            }
+        } catch (err) {
+            return rejectWithValue(err?.message || 'Upload failed');
+        }
+    }
+)
+
+// Upload image for Improve Resume flow
+export const uploadImageImprove = createAsyncThunk(
+    'uploadImageImprove',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_RESUME_URL}/api/image/upload?tag=improve`,
+                { method: 'POST', body: formData }
+            );
+            const data = await response.json();
+            if (data?.statusCode === 201) {
+                return data;
+            } else {
+                return rejectWithValue(data?.errors || 'Something went wrong.');
+            }
+        } catch (err) {
+            return rejectWithValue(err?.message || 'Upload failed');
+        }
+    }
+)
+
+// Upload image for LinkedIn flow
+export const uploadImageLinkedIn = createAsyncThunk(
+    'uploadImageLinkedIn',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_RESUME_URL}/api/image/upload?tag=linkdin`,
+                { method: 'POST', body: formData }
+            );
+            const data = await response.json();
+            if (data?.statusCode === 201) {
+                return data;
+            } else {
+                return rejectWithValue(data?.errors || 'Something went wrong.');
+            }
+        } catch (err) {
+            return rejectWithValue(err?.message || 'Upload failed');
+        }
+    }
+)
+
 const initialState = {
     loading: false,
     error: false,
@@ -441,6 +520,21 @@ const initialState = {
     pdfError: null,
     docxLoading: false,
     docxError: null,
+
+    // Image upload states
+    // Image upload — scratch
+    uploadImageScratchData: null,
+    uploadImageScratchLoading: false,
+    uploadImageScratchError: null,
+    uploadImageJdData: null,
+    uploadImageJdLoading: false,
+    uploadImageJdError: null,
+    uploadImageImproveData: null,
+    uploadImageImproveLoading: false,
+    uploadImageImproveError: null,
+    uploadImageLinkedInData: null,
+    uploadImageLinkedInLoading: false,
+    uploadImageLinkedInError: null,
 }
 const ResumeSlice = createSlice(
     {
@@ -655,6 +749,57 @@ const ResumeSlice = createSlice(
                 .addCase(generateDocx.rejected, (state, { payload }) => {
                     state.docxLoading = false;
                     state.docxError = payload;
+                })
+
+                // ── uploadImageScratch ───────────────────────────────────
+                .addCase(uploadImageScratch.pending, (state) => { state.uploadImageScratchLoading = true; state.uploadImageScratchError = null })
+                .addCase(uploadImageScratch.fulfilled, (state, { payload }) => { state.uploadImageScratchLoading = false; state.uploadImageScratchData = payload; state.uploadImageScratchError = null })
+                .addCase(uploadImageScratch.rejected, (state, { payload }) => { state.uploadImageScratchLoading = false; state.uploadImageScratchError = payload })
+
+
+                // ─── uploadImageJd ───────────────────────────────────────────
+                .addCase(uploadImageJd.pending, (state) => {
+                    state.uploadImageJdLoading = true;
+                    state.uploadImageJdError = null;
+                })
+                .addCase(uploadImageJd.fulfilled, (state, { payload }) => {
+                    state.uploadImageJdLoading = false;
+                    state.uploadImageJdData = payload;
+                    state.uploadImageJdError = null;
+                })
+                .addCase(uploadImageJd.rejected, (state, { payload }) => {
+                    state.uploadImageJdLoading = false;
+                    state.uploadImageJdError = payload;
+                })
+
+                // ─── uploadImageImprove ──────────────────────────────────────
+                .addCase(uploadImageImprove.pending, (state) => {
+                    state.uploadImageImproveLoading = true;
+                    state.uploadImageImproveError = null;
+                })
+                .addCase(uploadImageImprove.fulfilled, (state, { payload }) => {
+                    state.uploadImageImproveLoading = false;
+                    state.uploadImageImproveData = payload;
+                    state.uploadImageImproveError = null;
+                })
+                .addCase(uploadImageImprove.rejected, (state, { payload }) => {
+                    state.uploadImageImproveLoading = false;
+                    state.uploadImageImproveError = payload;
+                })
+
+                // ─── uploadImageLinkedIn ─────────────────────────────────────
+                .addCase(uploadImageLinkedIn.pending, (state) => {
+                    state.uploadImageLinkedInLoading = true;
+                    state.uploadImageLinkedInError = null;
+                })
+                .addCase(uploadImageLinkedIn.fulfilled, (state, { payload }) => {
+                    state.uploadImageLinkedInLoading = false;
+                    state.uploadImageLinkedInData = payload;
+                    state.uploadImageLinkedInError = null;
+                })
+                .addCase(uploadImageLinkedIn.rejected, (state, { payload }) => {
+                    state.uploadImageLinkedInLoading = false;
+                    state.uploadImageLinkedInError = payload;
                 })
         }
     }
