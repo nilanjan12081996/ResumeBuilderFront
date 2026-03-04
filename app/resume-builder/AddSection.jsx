@@ -21,7 +21,7 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
       label: 'Custom Section (Advanced)',
       icon: <BiCustomize />,
       isCustom: true,
-      description: 'Full details with dates and descriptions'
+      description: 'Full details with dates and descriptions — ideal for any custom section (e.g. References, Conferences, Awards, Certifications)'
     },
     { id: 'extra_curricular', label: 'Extra-curricular Activities', icon: <MdLocalFlorist />, isCustom: false },
     { id: 'courses', label: 'Courses', icon: <HiAcademicCap />, isCustom: false },
@@ -33,7 +33,7 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
     // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
     { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
     // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
-    { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
+    { id: 'licenses', label: 'Certifications', icon: <FaCertificate />, isLocked: true },
   ];
 
   const handleSelectSection = (sectionId, isAlreadyAdded) => {

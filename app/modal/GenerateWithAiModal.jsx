@@ -305,10 +305,10 @@ const GenerateWithAiModal = ({
                 <div className="flex justify-between items-start">
                     <div>
                         <h2 className="text-sm font-bold tracking-wide text-[#800080] flex items-center">
-                            <HiSparkles className="text-lg mr-2" /> AI WRITER
+                            <HiSparkles className="text-lg mr-2" /> Fix Grammar & Boost Impact
                         </h2>
                         <p className="text-sm text-gray-500 mt-1">
-                            Generate something new or improve what you've got!
+                            Use AI to write and refine this section with clear, impact-focused content
                         </p>
                     </div>
                     <button onClick={handleClose}>

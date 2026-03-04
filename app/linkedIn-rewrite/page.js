@@ -1084,7 +1084,7 @@ const LinkedInResumeBuilder = () => {
 
   const handleDragEnd = () => { };
 
-  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "l"});
 
   if (!resumeSource) {
     return <CVSkeletonLoader />;

@@ -501,6 +501,61 @@ export const uploadImageLinkedIn = createAsyncThunk(
     }
 )
 
+export const createSubscriptionCount = createAsyncThunk(
+    'createSubscriptionCount',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await resumeApi.post('/api/subscription/create-count');
+            if (response?.data?.statusCode === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const getRemainingCount = createAsyncThunk(
+    'getRemainingCount',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await resumeApi.get('/api/subscription/count-remaning');
+            if (response?.data?.statusCode === 200) {
+                return response.data;
+            } else {
+                if (response?.data?.errors) {
+                    return rejectWithValue(response.data.errors);
+                } else {
+                    return rejectWithValue('Something went wrong.');
+                }
+            }
+        } catch (err) {
+            return rejectWithValue(err);
+        }
+    }
+)
+
+export const decreaseSubscriptionCount = createAsyncThunk(
+    'decreaseSubscriptionCount',
+    async (type, { rejectWithValue }) => {
+        try {
+            const response = await resumeApi.get(`/api/subscription/count-decrease?type=${type}`);
+            if (response?.data?.statusCode === 200 || response?.data?.status_code === 200) {
+                return response.data;
+            }
+            return rejectWithValue(response?.data?.message || 'Failed to decrease count');
+        } catch (error) {
+            return rejectWithValue(error?.response?.data?.message || 'Something went wrong');
+        }
+    }
+);
+
 const initialState = {
     loading: false,
     error: false,
@@ -535,6 +590,18 @@ const initialState = {
     uploadImageLinkedInData: null,
     uploadImageLinkedInLoading: false,
     uploadImageLinkedInError: null,
+
+    createSubscriptionCountData: null,
+    createSubscriptionCountLoading: false,
+    createSubscriptionCountError: null,
+
+    getRemainingCountData: null,
+    getRemainingCountLoading: false,
+    getRemainingCountError: null,
+
+    decreaseSubscriptionCountLoading: false,
+    decreaseSubscriptionCountData: null,
+    decreaseSubscriptionCountError: null,
 }
 const ResumeSlice = createSlice(
     {
@@ -801,7 +868,56 @@ const ResumeSlice = createSlice(
                     state.uploadImageLinkedInLoading = false;
                     state.uploadImageLinkedInError = payload;
                 })
+
+                // Builder Cases
+                .addCase(createSubscriptionCount.pending, (state) => {
+                    state.createSubscriptionCountLoading = true;
+                    state.createSubscriptionCountError = null;
+                })
+                .addCase(createSubscriptionCount.fulfilled, (state, { payload }) => {
+                    state.createSubscriptionCountLoading = false;
+                    state.createSubscriptionCountData = payload;
+                    state.createSubscriptionCountError = null;
+                })
+                .addCase(createSubscriptionCount.rejected, (state, { payload }) => {
+                    state.createSubscriptionCountLoading = false;
+                    state.createSubscriptionCountError = payload;
+                })
+
+                .addCase(getRemainingCount.pending, (state) => {
+                    state.getRemainingCountLoading = true;
+                    state.getRemainingCountError = null;
+                })
+                .addCase(getRemainingCount.fulfilled, (state, { payload }) => {
+                    state.getRemainingCountLoading = false;
+                    state.getRemainingCountData = payload;
+                    state.getRemainingCountError = null;
+                })
+                .addCase(getRemainingCount.rejected, (state, { payload }) => {
+                    state.getRemainingCountLoading = false;
+                    state.getRemainingCountError = payload;
+                })
+
+                .addCase(decreaseSubscriptionCount.pending, (state) => {
+                    state.decreaseSubscriptionCountLoading = true;
+                    state.decreaseSubscriptionCountError = null;
+                })
+                .addCase(decreaseSubscriptionCount.fulfilled, (state, action) => {
+                    state.decreaseSubscriptionCountLoading = false;
+                    state.decreaseSubscriptionCountData = action.payload;
+                })
+                .addCase(decreaseSubscriptionCount.rejected, (state, action) => {
+                    state.decreaseSubscriptionCountLoading = false;
+                    state.decreaseSubscriptionCountError = action.payload;
+                })
         }
     }
 )
+
+export const RESUME_TYPES = {
+    SCRATCH:  "s",
+    IMPROVE:  "i",
+    JD:       "j",
+    LINKEDIN: "l",
+};
 export default ResumeSlice.reducer;

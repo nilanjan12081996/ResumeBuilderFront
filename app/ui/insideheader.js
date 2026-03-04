@@ -19,6 +19,7 @@ import logoAdmin from "../assets/imagesource/logo_admin.png";
 import { toast } from 'react-toastify';
 import { useTabs } from '../context/TabsContext';
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
+import { createSubscriptionCount } from '../reducers/ResumeSlice';
 
 const Insideheader = () => {
   const pathname = usePathname();
@@ -54,6 +55,7 @@ const Insideheader = () => {
       if (ipResult?.payload?.ip) {
         const ip_address = ipResult.payload.ip;
         dispatch(currentSubscription(ip_address));
+        createSubscriptionCount();
       }
     };
 
@@ -99,6 +101,7 @@ const Insideheader = () => {
 
       setShowCancelModal(false);
       dispatch(currentSubscription(ipData.ip));
+      createSubscriptionCount();
       router.push("/dashboard");
 
     } else {

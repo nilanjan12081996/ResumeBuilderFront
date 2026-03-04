@@ -843,7 +843,7 @@ const page = () => {
     }, 300);
   };
 
-  useDownload({ componentRef, formValues, resumeSettings, themeColor });
+  useDownload({ componentRef, formValues, resumeSettings, themeColor, resumeType: "s"});
 
   return (
     <div>

@@ -165,7 +165,7 @@ const LinkedInEducation = ({
                               className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080]"
                             >
                               <HiSparkles className="text-md" />
-                              Get help with writing
+                              Improve with AI
                             </button>
 
                             {activeEduId === edu.id && (

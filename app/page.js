@@ -130,7 +130,112 @@ export default function Home() {
    }, [])
    console.log("fetJobsOutSide", fetJobsOutSide);
 
+   // ─── Plan Type Badge ──────────────────────────────────────────────────────────
+   const getPlanMeta = (placeholder) => {
+      if (!placeholder) return null;
+      const p = placeholder.toLowerCase();
+      if (p.includes("watermark"))
+         return { label: "Scratch Resume", color: "#6B7280", bg: "#F3F4F6" };
+      if (p.includes("jd specific") && p.includes("optimized"))
+         return { label: "Improve + JD", color: "#7C3AED", bg: "#EDE9FE" };
+      if (p.includes("jd-specific") || p.includes("jd specific"))
+         return { label: "JD Based Resume", color: "#DC2626", bg: "#FEE2E2" };
+      if (p.includes("linkedin") && (p.includes("rewrite") || p.includes("optimized")))
+         return { label: "Improve + LinkedIn", color: "#0284C7", bg: "#E0F2FE" };
+      if (p.includes("linkedin"))
+         return { label: "LinkedIn Profile", color: "#0077B5", bg: "#E8F4FD" };
+      if (p.includes("optimized") || p.includes("ats score"))
+         return { label: "Improve Resume", color: "#059669", bg: "#D1FAE5" };
+      return null;
+   };
 
+   const PlanCard = ({ oneTime, popularId, onGetStarted }) => {
+      const isPopular = oneTime?.id === popularId;
+      const thisPrice = parseFloat(oneTime?.planPrice?.price || 0);
+      const isFree = thisPrice === 0;
+      const planMeta = getPlanMeta(oneTime?.placeholder);
+
+      return (
+         <div className="plan-card-wrapper" style={{ position: "relative", display: "flex", flexDirection: "column" }}>
+            {isPopular && (
+               <div style={{
+                  position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)",
+                  background: "linear-gradient(135deg, #800080, #b44db4)",
+                  color: "#fff", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em",
+                  padding: "5px 18px", borderRadius: "20px", zIndex: 10,
+                  boxShadow: "0 4px 14px rgba(128,0,128,0.35)", whiteSpace: "nowrap",
+                  textTransform: "uppercase",
+               }}> Most Popular</div>
+            )}
+            <div style={{
+               flex: 1, display: "flex", flexDirection: "column",
+               background: isPopular ? "linear-gradient(145deg, #fdf4ff, #fae8ff)" : "#fff",
+               border: isPopular ? "2px solid #800080" : "1.5px solid #e9edff",
+               borderRadius: "20px", overflow: "hidden",
+               boxShadow: isPopular ? "0 8px 32px rgba(128,0,128,0.12)" : "0 2px 12px rgba(0,0,0,0.06)",
+               transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            }}
+               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = isPopular ? "0 16px 40px rgba(128,0,128,0.18)" : "0 8px 28px rgba(0,0,0,0.12)"; }}
+               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = isPopular ? "0 8px 32px rgba(128,0,128,0.12)" : "0 2px 12px rgba(0,0,0,0.06)"; }}
+            >
+               {planMeta && (
+                  <div style={{ background: planMeta.bg, borderBottom: `1px solid ${planMeta.color}22`, padding: "8px 20px" }}>
+                     <span style={{ fontSize: "11px", fontWeight: 700, color: planMeta.color, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                        {planMeta.label}
+                     </span>
+                  </div>
+               )}
+               <div style={{ padding: "24px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
+                  <div style={{ marginBottom: "16px" }}>
+                     <h1>{oneTime?.id}</h1>
+                     <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1B223C", margin: "0 0 4px 0", lineHeight: 1.3 }}>{oneTime?.plan_name}</h3>
+                     <p style={{ fontSize: "12px", color: "#808897", margin: 0, lineHeight: 1.4 }}>{oneTime?.placeholder}</p>
+                  </div>
+                  <div style={{ marginBottom: "20px" }}>
+                     <div style={{ display: "flex", alignItems: "baseline", gap: "2px" }}>
+                        <span style={{ fontSize: "13px", fontWeight: 600, color: "#1B223C" }}>{oneTime?.planPrice?.currency}</span>
+                        <span style={{ fontSize: "32px", fontWeight: 800, color: isFree ? "#16a34a" : "#1B223C", lineHeight: 1 }}>{isFree ? "Free" : thisPrice.toFixed(0)}</span>
+                     </div>
+                     {!isFree && (
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
+                           <span style={{ fontSize: "12px", color: "#aaa", textDecoration: "line-through" }}>{oneTime?.planPrice?.currency} {(thisPrice * 1.3).toFixed(0)}</span>
+                           <span style={{ fontSize: "10px", fontWeight: 700, color: "#fff", background: "linear-gradient(90deg, #16a34a, #22c55e)", padding: "2px 7px", borderRadius: "10px" }}>30% OFF</span>
+                        </div>
+                     )}
+                  </div>
+                  <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, #e9edff, transparent)", margin: "0 0 18px 0" }} />
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+                     {oneTime?.PlanAccess?.map((planAccessName, idx) => (
+                        <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "9px" }}>
+                           <div style={{
+                              width: "16px", height: "16px", borderRadius: "50%", flexShrink: 0, marginTop: "1px",
+                              background: isPopular ? "linear-gradient(135deg, #800080, #b44db4)" : "#f0fdf4",
+                              border: isPopular ? "none" : "1.5px solid #16a34a",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                           }}>
+                              <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                                 <path d="M2 5l2.5 2.5L8 3" stroke={isPopular ? "#fff" : "#16a34a"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                           </div>
+                           <span style={{ fontSize: "12.5px", color: "#374151", lineHeight: 1.5 }}>{planAccessName?.plan_access_description}</span>
+                        </div>
+                     ))}
+                  </div>
+                  <button onClick={onGetStarted} style={{
+                     width: "100%", padding: "12px", borderRadius: "10px", fontSize: "13px",
+                     fontWeight: 700, letterSpacing: "0.03em", border: "none", cursor: "pointer",
+                     transition: "all 0.2s ease",
+                     background: isPopular ? "linear-gradient(135deg, #800080, #b44db4)" : "#1B223C",
+                     color: "#fff", boxShadow: isPopular ? "0 4px 16px rgba(128,0,128,0.3)" : "none",
+                  }}
+                     onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.filter = "brightness(1.08)"; }}
+                     onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.filter = "brightness(1)"; }}
+                  >Get Started</button>
+               </div>
+            </div>
+         </div>
+      );
+   };
    return (
       <div className={`${poppins.variable} antialiased home_wrapper_arera`}>
 
@@ -350,6 +455,36 @@ export default function Home() {
                      </TabList>
 
                      <TabPanel>
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
+                           <style>{`.plan-card-wrapper{position:relative;display:flex;flex-direction:column}.plan-card-wrapper:hover{z-index:2}`}</style>
+                           {plans?.data?.map((oneTime) => (
+                              oneTime?.plan_frequency === 1 && (
+                                 <PlanCard key={oneTime?.id} oneTime={oneTime} popularId={3} onGetStarted={() => setOpenLoginModal(true)} />
+                              )
+                           ))}
+                        </div>
+                     </TabPanel>
+
+                     <TabPanel>
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
+                           {plans?.data?.map((oneTime) => (
+                              oneTime?.plan_frequency === 3 && (
+                                 <PlanCard key={oneTime?.id} oneTime={oneTime} popularId={12} onGetStarted={() => setOpenLoginModal(true)} />
+                              )
+                           ))}
+                        </div>
+                     </TabPanel>
+
+                     <TabPanel>
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
+                           {plansHomeData?.data?.map((oneTime) => (
+                              oneTime?.plan_frequency === 12 && (
+                                 <PlanCard key={oneTime?.id} oneTime={oneTime} popularId={7} onGetStarted={() => setOpenLoginModal(true)} />
+                              )
+                           ))}
+                        </div>
+                     </TabPanel>
+                     {/* <TabPanel>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
                            {
                               plans?.data?.map((oneTime) => (
@@ -370,12 +505,6 @@ export default function Home() {
 
                                                 <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">{oneTime?.plan_name}</h3>
                                                 <p className="text-[#1B223C] pb-6">{oneTime?.placeholder}</p>
-                                                {/* <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[30px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                                   </div>
-                                                </div> */}
                                                 <div className="flex items-center gap-2 mb-8">
                                                    <p className="text-[#1D2127] text-[25px] leading-[45px] font-medium">
                                                       {oneTime?.planPrice?.currency}{" "}
@@ -452,12 +581,6 @@ export default function Home() {
 
                                                 <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">{oneTime?.plan_name}</h3>
                                                 <p className="text-[#1B223C] pb-6">{oneTime?.placeholder}</p>
-                                                {/* <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                                   </div>
-                                                </div> */}
                                                 <div className="flex items-center gap-2 mb-8">
                                                    <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
                                                       {oneTime?.planPrice?.currency}{" "}
@@ -530,12 +653,6 @@ export default function Home() {
                                                    </div>
                                                 </div>
                                                 <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                                                {/* <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[35px] leading-[45px] font-medium">{oneTime?.planPrice?.currency} {oneTime?.planPrice?.price}</p>
-                                                   <div className="pt-4">
-                                                      <p className="text-[#797878] text-[14px] leading-[20px] line-through">₹300</p>
-                                                   </div>
-                                                </div> */}
                                                 <div className="flex items-center gap-2 mb-8">
                                                    <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
                                                       {oneTime?.planPrice?.currency}{" "}
@@ -587,7 +704,7 @@ export default function Home() {
                            }
 
                         </div>
-                     </TabPanel>
+                     </TabPanel> */}
                   </Tabs>
                </div>
             </div>

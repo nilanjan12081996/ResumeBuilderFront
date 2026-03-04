@@ -211,7 +211,7 @@ const ImpExperience = ({
                                   }`}
                               >
                                 <HiSparkles className="text-md" />
-                                Get help with writing
+                                Improve with AI
                               </button>
 
                               {/* Tooltip */}

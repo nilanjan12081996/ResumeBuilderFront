@@ -1499,7 +1499,7 @@ const Page = () => {
   // Dummy handler for child components
   const handleDragEnd = () => { };
 
-  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor });
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "j"});
   if (!resumeSource) {
     return <CVSkeletonLoader />;
   }

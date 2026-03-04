@@ -319,6 +319,7 @@ import { CiLogout } from 'react-icons/ci';
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 import { currentSubscription, cancelSubscription, getIpData } from '../reducers/PlanSlice';
 import { toast } from 'react-toastify';
+import { createSubscriptionCount } from '../reducers/ResumeSlice';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -340,6 +341,7 @@ const Sidebar = () => {
       const ipResult = await dispatch(getIpData());
       if (ipResult?.payload?.ip) {
         dispatch(currentSubscription(ipResult.payload.ip));
+        createSubscriptionCount();
       }
     };
     fetchSubscription();
@@ -382,6 +384,7 @@ const Sidebar = () => {
       toast.success("Your subscription has been cancelled");
       setShowCancelModal(false);
       dispatch(currentSubscription(ipData.ip));
+      createSubscriptionCount();
       router.push("/dashboard");
     } else {
       toast.error(result?.message || "Failed to cancel subscription");

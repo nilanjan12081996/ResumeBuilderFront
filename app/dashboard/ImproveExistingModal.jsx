@@ -35,32 +35,6 @@ const ImproveExistingModal = ({ open, onClose }) => {
     }
   }, [open, reset]);
 
-  // const onSubmit = async (data) => {
-  //   if (!data.resume_file?.[0]) {
-  //     toast.error("Please upload your resume");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     dispatch(resetDashboard());
-  //     const formData = new FormData();
-  //     formData.append("resume_pdf", data.resume_file[0]);
-
-  //     const result = await dispatch(extracteResume(formData));
-  //     if (!result?.payload || result.payload.status !== "success") {
-  //       toast.error("Resume extraction failed. Please try again.");
-  //       return;
-  //     }
-
-  //     router.push("/improve-resume-builder");
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const onSubmit = async (data) => {
     if (!data.resume_file?.[0]) {
       toast.error("Please upload your resume");
@@ -69,32 +43,58 @@ const ImproveExistingModal = ({ open, onClose }) => {
 
     setLoading(true);
     try {
-      const isIndividual = profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
-      const countAction = isIndividual ? addCountResume : addCountResumeOrg;
+      dispatch(resetDashboard());
+      const formData = new FormData();
+      formData.append("resume_pdf", data.resume_file[0]);
 
-      const countRes = await dispatch(countAction({ ref_type: "improve_resume" })).unwrap();
-
-      if (countRes?.status_code === 200) {
-        dispatch(resetDashboard());
-        const formData = new FormData();
-        formData.append("resume_pdf", data.resume_file[0]);
-
-        const result = await dispatch(extracteResume(formData));
-        if (!result?.payload || result.payload.status !== "success") {
-          toast.error("Resume extraction failed. Please try again.");
-          return;
-        }
-        router.push("/improve-resume-builder");
-      } else {
-        toast.error(countRes?.message || "Your limit is expired. Please upgrade your plan.");
+      const result = await dispatch(extracteResume(formData));
+      if (!result?.payload || result.payload.status !== "success") {
+        toast.error("Resume extraction failed. Please try again.");
+        return;
       }
+
+      router.push("/improve-resume-builder");
     } catch (err) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }
   };
+
+  // const onSubmit = async (data) => {
+  //   if (!data.resume_file?.[0]) {
+  //     toast.error("Please upload your resume");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   try {
+  //     const isIndividual = profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
+  //     const countAction = isIndividual ? addCountResume : addCountResumeOrg;
+
+  //     const countRes = await dispatch(countAction({ ref_type: "improve_resume" })).unwrap();
+
+  //     if (countRes?.status_code === 200) {
+  //       dispatch(resetDashboard());
+  //       const formData = new FormData();
+  //       formData.append("resume_pdf", data.resume_file[0]);
+
+  //       const result = await dispatch(extracteResume(formData));
+  //       if (!result?.payload || result.payload.status !== "success") {
+  //         toast.error("Resume extraction failed. Please try again.");
+  //         return;
+  //       }
+  //       router.push("/improve-resume-builder");
+  //     } else {
+  //       toast.error(countRes?.message || "Your limit is expired. Please upgrade your plan.");
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(err?.response?.data?.message || "Something went wrong!");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <Modal

@@ -15,6 +15,7 @@ import { getSearchHistory } from "../reducers/SearchHistroySlice";
 
 import { RiGoogleFill } from "react-icons/ri";
 import { useGoogleLogin } from "@react-oauth/google";
+import { createSubscriptionCount } from "../reducers/ResumeSlice";
 
 
 const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, setOpenChoiceModal }) => {
@@ -96,11 +97,11 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
                     //     JSON.stringify({ token: accessToken })
                     // );c
 
-                     localStorage.setItem(
+                    localStorage.setItem(
                         "resumeToken",
                         JSON.stringify({ token: accessToken })
                     );
-
+                    dispatch(createSubscriptionCount())
                     setOpenLoginModal(false);
                     router.push("/dashboard");
                     dispatch(getProfile());
@@ -151,7 +152,8 @@ const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, s
 
                 if (accessToken) {
                     // sessionStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));c
-                     localStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));
+                    localStorage.setItem('resumeToken', JSON.stringify({ token: accessToken }));
+                    dispatch(createSubscriptionCount());
                     router.push("/dashboard");
                     dispatch(getProfile());
 

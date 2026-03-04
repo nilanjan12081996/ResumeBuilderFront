@@ -211,7 +211,7 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move, 
                                       <div className="relative flex justify-end mt-1">
                                         <button type="button" className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] hover:bg-[#ebdcfc] transition-colors">
                                           <HiSparkles className="text-md" />
-                                          Get help with writing
+                                          Improve with AI
                                         </button>
                                       </div>
                                     </div>

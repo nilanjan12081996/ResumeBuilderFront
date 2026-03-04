@@ -23,6 +23,7 @@ import JdbasedModal from "./JdbasedModal";
 import ImproveExistingModal from "./ImproveExistingModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
 import { MdOutlineWatchLater } from "react-icons/md";
+import RemainingCountWidget from "../ui/Remainingcountwidget";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -45,9 +46,32 @@ const inter = Inter({
 const Page = () => {
   const { recentResume } = useSelector((state) => state?.resHist);
   const { profData } = useSelector((state) => state?.auth);
+  
 
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const { getRemainingCountData } = useSelector((state) => state.resume || {});
+const credits = getRemainingCountData?.data;
+
+const canCreate = (type) => {
+  if (!credits) return true; 
+  switch (type) {
+    case "scratch":  return (credits.totalScratch ?? 0) > 0;
+    case "improve":  return (credits.totalImp ?? 0) > 0;
+    case "jd":       return (credits.totalJd ?? 0) > 0;
+    case "linkedin": return (credits.totalLink ?? 0) > 0;
+    default:         return false;
+  }
+};
+
+const handleCardClick = (type, action) => {
+  if (!canCreate(type)) {
+    toast.error("No credits remaining. Please purchase a plan to continue.");
+    return;
+  }
+  action();
+};
 
   // Modal states
   const [openModalImproveexistingResume, setOpenModalImproveexistingResume] = useState(false); // JD Based
@@ -77,83 +101,112 @@ const Page = () => {
               Choose from our collection of templates and get hired faster.
             </p>
           </div>
+        
 
           {/* Quick Actions */}
-          <div className="mb-10">
-            <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
-              Quick Actions
-            </h3>
-            <div className="flex gap-4">
-              <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
+<div className="mb-10">
+  <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
+    Quick Actions
+  </h3>
+  <div className="flex gap-4">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
 
-                {/* Create from Scratch */}
-                <div
-                  onClick={() => router.push("/resume-builder")}
-                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-                >
-                  <div className="bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                    <BiPlus className="text-[#00A63E] text-[30px]" />
-                  </div>
-                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                    Create Resume From Scratch
-                  </h3>
-                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                    Start fresh with a new resume using our professional templates
-                  </p>
-                </div>
+      {/* Create from Scratch */}
+      <div
+        onClick={() => handleCardClick("scratch", () => router.push("/resume-builder"))}
+        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+          ${canCreate("scratch")
+            ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
+            : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
+          }`}
+      >
+        <div className="bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+          <BiPlus className="text-[#00A63E] text-[30px]" />
+        </div>
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+          Create Resume From Scratch
+        </h3>
+        <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+          Start fresh with a new resume using our professional templates
+        </p>
+        {!canCreate("scratch") && (
+          <span className="inline-block mt-2 text-[11px] font-semibold text-red-400">No credits</span>
+        )}
+      </div>
 
-                {/* Improve Existing Resume */}
-                <div
-                  onClick={() => setOpenModalImproveExistingResumeTwo(true)}
-                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-                >
-                  <div className="bg-[#DBEAFE] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                    <RiExchange2Line className="text-[#2B7FFF] text-[30px]" />
-                  </div>
-                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                    Improve existing resume
-                  </h3>
-                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                    Upload and enhance your current resume with AI-powered suggestions
-                  </p>
-                </div>
+      {/* Improve Existing Resume */}
+      <div
+        onClick={() => handleCardClick("improve", () => setOpenModalImproveExistingResumeTwo(true))}
+        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+          ${canCreate("improve")
+            ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
+            : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
+          }`}
+      >
+        <div className="bg-[#DBEAFE] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+          <RiExchange2Line className="text-[#2B7FFF] text-[30px]" />
+        </div>
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+          Improve existing resume
+        </h3>
+        <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+          Upload and enhance your current resume with AI-powered suggestions
+        </p>
+        {!canCreate("improve") && (
+          <span className="inline-block mt-2 text-[11px] font-semibold text-red-400">No credits</span>
+        )}
+      </div>
 
-                {/* JD Based Resume */}
-                <div
-                  onClick={() => setOpenModalImproveexistingResume(true)}
-                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-                >
-                  <div className="bg-[#FFEDD4] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                    <BiBriefcaseAlt className="text-[#FF886D] text-[30px]" />
-                  </div>
-                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                    JD based resume
-                  </h3>
-                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                    Tailor your resume to any job description with AI assistance
-                  </p>
-                </div>
+      {/* JD Based Resume */}
+      <div
+        onClick={() => handleCardClick("jd", () => setOpenModalImproveexistingResume(true))}
+        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+          ${canCreate("jd")
+            ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
+            : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
+          }`}
+      >
+        <div className="bg-[#FFEDD4] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+          <BiBriefcaseAlt className="text-[#FF886D] text-[30px]" />
+        </div>
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+          JD based resume
+        </h3>
+        <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+          Tailor your resume to any job description with AI assistance
+        </p>
+        {!canCreate("jd") && (
+          <span className="inline-block mt-2 text-[11px] font-semibold text-red-400">No credits</span>
+        )}
+      </div>
 
-                {/* LinkedIn Rewrite */}
-                <div
-                  onClick={() => setOpenModalLinkedInRewrite(true)}
-                  className="border bg-white border-[#D5D5D5] hover:border-[#800080] rounded-[10px] px-5 py-7 cursor-pointer"
-                >
-                  <div className="bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
-                    <BiLogoLinkedin className="text-[#9747FF] text-[30px]" />
-                  </div>
-                  <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
-                    LinkedIn Rewrite
-                  </h3>
-                  <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
-                    Get AI-powered suggestions to enhance and optimize your LinkedIn profile.
-                  </p>
-                </div>
+      {/* LinkedIn Rewrite */}
+      <div
+        onClick={() => handleCardClick("linkedin", () => setOpenModalLinkedInRewrite(true))}
+        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+          ${canCreate("linkedin")
+            ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
+            : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
+          }`}
+      >
+        <div className="bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
+          <BiLogoLinkedin className="text-[#9747FF] text-[30px]" />
+        </div>
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+          LinkedIn Rewrite
+        </h3>
+        <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
+          Get AI-powered suggestions to enhance and optimize your LinkedIn profile.
+        </p>
+        {!canCreate("linkedin") && (
+          <span className="inline-block mt-2 text-[11px] font-semibold text-red-400">No credits</span>
+        )}
+      </div>
 
-              </div>
-            </div>
-          </div>
-
+    </div>
+  </div>
+</div>
+  {/* <RemainingCountWidget/> */}
           {/* Recent Resumes */}
 <div className="mb-14">
   <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">

@@ -22,7 +22,7 @@ const AddSectionEdit = ({ onAddNewSection, activeSections = [] }) => {
             label: 'Custom Section (Advanced)', 
             icon: <BiCustomize />, 
             isCustom: true,
-            description: 'Full details with dates and descriptions'
+            description: 'Full details with dates and descriptions — ideal for any custom section (e.g. References, Conferences, Awards, Certifications)'
         },
         { id: 'summary', label: 'Professional Summary', icon: <HiAcademicCap />, isCustom: false },
         { id: 'employment', label: 'Employment History', icon: <BiBriefcase />, isCustom: false },
@@ -78,7 +78,7 @@ const AddSectionEdit = ({ onAddNewSection, activeSections = [] }) => {
                         <div>
                             <h2 className="text-xl font-bold text-black pb-1">Add Additional Sections</h2>
                             <p className="text-sm text-[#808897] font-medium">
-                                Choose from predefined sections or create a custom one
+                               Use any of the below sections, if you would like to add any new content to the resume or modify any section.
                             </p>
                         </div>
                         <button

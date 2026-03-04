@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { generatePDF, generateDocx } from '../reducers/ResumeSlice';
+import { generatePDF, generateDocx, decreaseSubscriptionCount } from '../reducers/ResumeSlice';
 
 // ---------------------------------------------------------------------------
 //  GOOGLE FONT MAP
@@ -819,12 +819,13 @@ const buildSingleColDocxHtml = function(params) {
 // ---------------------------------------------------------------------------
 //  MAIN HOOK
 // ---------------------------------------------------------------------------
-export const useDownload = ({ componentRef, formValues, resumeSettings, sections, themeColor }) => {
+export const useDownload = ({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType }) => {
   const dispatch = useDispatch();
 
   // ---- PDF: clone DOM -> strip overflow -> backend ----
   const handleDownloadPDF = async () => {
     try {
+       await dispatch(decreaseSubscriptionCount(resumeType));
       const resumeEl = componentRef.current;
       if (!resumeEl) return;
 
@@ -896,6 +897,7 @@ export const useDownload = ({ componentRef, formValues, resumeSettings, sections
   // ---- DOCX: build clean semantic HTML -> backend ----
   const handleDownloadDocx = async () => {
     try {
+      await dispatch(decreaseSubscriptionCount(resumeType));
       const template = (resumeSettings && resumeSettings.theme && resumeSettings.theme.template)
         ? resumeSettings.theme.template
         : 'ats';

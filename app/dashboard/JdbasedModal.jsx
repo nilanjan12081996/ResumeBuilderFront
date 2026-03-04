@@ -39,38 +39,6 @@ const { profileData } = useSelector((state) => state?.profile);
     }
   }, [open, reset]);
 
-  // const onSubmit = async (data) => {
-  //   if (!data.resume_file?.[0]) {
-  //     toast.error("Please upload your resume");
-  //     return;
-  //   }
-  //   if (!jdContent || jdContent === "<p></p>" || !jdContent.trim()) {
-  //     toast.error("Job Description is required");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //      dispatch(resetDashboard());
-  //     sessionStorage.setItem("target_jd", jdContent);
-
-  //     const formData = new FormData();
-  //     formData.append("resume_pdf", data.resume_file[0]);
-
-  //     const result = await dispatch(extracteResume(formData));
-  //     if (!result?.payload || result.payload.status !== "success") {
-  //       toast.error("Resume extraction failed. Please try again.");
-  //       return;
-  //     }
-
-  //     router.push("/jd-resume-builder");
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const onSubmit = async (data) => {
     if (!data.resume_file?.[0]) {
       toast.error("Please upload your resume");
@@ -83,34 +51,66 @@ const { profileData } = useSelector((state) => state?.profile);
 
     setLoading(true);
     try {
-      const isIndividual = profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
-      const countAction = isIndividual ? addCountResume : addCountResumeOrg;
-      const countRes = await dispatch(countAction({ ref_type: "jd_based_resume" })).unwrap();
-      if (countRes?.status_code === 200) {
-        dispatch(resetDashboard());
-        sessionStorage.setItem("target_jd", jdContent);
+       dispatch(resetDashboard());
+      sessionStorage.setItem("target_jd", jdContent);
 
-        const formData = new FormData();
-        formData.append("resume_pdf", data.resume_file[0]);
+      const formData = new FormData();
+      formData.append("resume_pdf", data.resume_file[0]);
 
-        const result = await dispatch(extracteResume(formData));
-        if (!result?.payload || result.payload.status !== "success") {
-          toast.error("Resume extraction failed. Please try again.");
-          return;
-        }
-
-        router.push("/jd-resume-builder");
-      } else {
-        toast.error(countRes?.message || "Your plan limit is expired, please upgrade!");
+      const result = await dispatch(extracteResume(formData));
+      if (!result?.payload || result.payload.status !== "success") {
+        toast.error("Resume extraction failed. Please try again.");
+        return;
       }
-      
+
+      router.push("/jd-resume-builder");
     } catch (err) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // const onSubmit = async (data) => {
+  //   if (!data.resume_file?.[0]) {
+  //     toast.error("Please upload your resume");
+  //     return;
+  //   }
+  //   if (!jdContent || jdContent === "<p></p>" || !jdContent.trim()) {
+  //     toast.error("Job Description is required");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   try {
+  //     const isIndividual = profileData?.data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id === 1;
+  //     const countAction = isIndividual ? addCountResume : addCountResumeOrg;
+  //     const countRes = await dispatch(countAction({ ref_type: "jd_based_resume" })).unwrap();
+  //     if (countRes?.status_code === 200) {
+  //       dispatch(resetDashboard());
+  //       sessionStorage.setItem("target_jd", jdContent);
+
+  //       const formData = new FormData();
+  //       formData.append("resume_pdf", data.resume_file[0]);
+
+  //       const result = await dispatch(extracteResume(formData));
+  //       if (!result?.payload || result.payload.status !== "success") {
+  //         toast.error("Resume extraction failed. Please try again.");
+  //         return;
+  //       }
+
+  //       router.push("/jd-resume-builder");
+  //     } else {
+  //       toast.error(countRes?.message || "Your plan limit is expired, please upgrade!");
+  //     }
+      
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(err?.response?.data?.message || "Something went wrong. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <Modal

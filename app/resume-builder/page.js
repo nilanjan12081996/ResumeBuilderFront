@@ -522,7 +522,7 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
 
   const { activeTab } = useTabs();
 
-  useDownload({ componentRef, formValues, resumeSettings, themeColor });
+  useDownload({ componentRef, formValues, resumeSettings, themeColor, resumeType: "s"});
 
   return (
     <div>

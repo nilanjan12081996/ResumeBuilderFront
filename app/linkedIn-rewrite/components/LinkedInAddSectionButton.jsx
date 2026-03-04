@@ -21,7 +21,7 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
             label: 'Custom Section (Advanced)',
             icon: <BiCustomize />,
             isCustom: true,
-            description: 'Full details with dates and descriptions',
+            description: 'Full details with dates and descriptions — ideal for any custom section (e.g. References, Conferences, Awards, Certifications)',
         },
         { id: 'summary', label: 'Profile Summary', icon: <HiAcademicCap />, isCustom: false },
         { id: 'skills', label: 'Skills', icon: <FaList />, isCustom: false },
@@ -32,9 +32,9 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
         { id: 'awards', label: 'Honors & awards', icon: <BiAward />, isLocked: false },
         { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
         { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
-        { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
-        { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
-        { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
+        // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
+        // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
+        { id: 'licenses', label: 'Certifications', icon: <FaCertificate />, isLocked: true },
     ];
 
     const handleSelectSection = (sectionId, isAlreadyAdded) => {
@@ -225,7 +225,7 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
                         <div>
                             <h2 className="text-xl font-bold text-black pb-1">Add Additional Sections</h2>
                             <p className="text-sm text-[#808897] font-medium">
-                                Choose from predefined sections or create a custom one
+                                Use any of the below sections, if you would like to add any new content to the resume or modify any section.
                             </p>
                         </div>
                         <button

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { applyCoupon, clearCouponState } from "../reducers/CouponSlice";
 import { currentSubscription } from "../reducers/PlanSlice";
+import { createSubscriptionCount } from "../reducers/ResumeSlice";
 
 const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, currentPlanPrice, ip, onPayment }) => {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
 
   useEffect(() => {
     dispatch(currentSubscription(ip));
+    createSubscriptionCount()
   }, [dispatch, ip]);
 
   useEffect(() => {

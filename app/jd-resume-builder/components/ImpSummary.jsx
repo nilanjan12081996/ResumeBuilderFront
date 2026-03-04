@@ -79,7 +79,7 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex, onAt
               }`}
           >
             <HiSparkles className="text-md" />
-            Get help with writing
+            Improve with AI
           </button>
 
           {/* Tooltip on exhausted */}
