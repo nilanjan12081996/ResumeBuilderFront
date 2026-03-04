@@ -542,7 +542,7 @@ const Sidebar = () => {
                     }`}
                 >
                   <BiSolidCrown className="!text-white" />
-                  {hasActiveSubscription() ? "Subscription Plan" : "Upgrade Now"}
+                  {hasActiveSubscription() ? "Active Plans" : "Upgrade Now"}
                 </button>
 
                 {/* Cancel Subscription */}
@@ -551,7 +551,7 @@ const Sidebar = () => {
                     onClick={() => setShowCancelModal(true)}
                     className="flex items-center justify-center gap-1 py-1 cursor-pointer px-3 rounded-lg bg-red-500 hover:bg-red-600 text-sm font-semibold text-white transition-all duration-200 transform hover:scale-105"
                   >
-                    Cancel Subscription
+                    Cancel Plan
                   </button>
                 )}
               </div>
@@ -573,9 +573,9 @@ const Sidebar = () => {
       {showCancelModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white p-6 rounded-xl w-96 text-center">
-            <h2 className="text-lg font-semibold mb-4">Cancel Subscription</h2>
+            <h2 className="text-lg font-semibold mb-4">Cancel Plan</h2>
             <p className="mb-6 text-sm text-gray-600">
-              By cancelling your subscription, you will lose access to premium features. Are you sure you want to continue?
+              By cancelling your existing plan, you will lose your current credits if any unused, Are you sure you want to continue?
             </p>
             <div className="flex justify-between gap-4">
               <button

@@ -886,7 +886,7 @@ const page = () => {
                     <div className='bg-white p-5 rounded-lg'>
                       <div className='mb-4'>
                         <h2 className='text-xl font-bold text-black pb-1'>Personal details</h2>
-                        <p className='text-sm text-[#808897] font-medium'>Users who added phone number and email received 64% more positive feedback from recruiters.</p>
+                        <p className='text-sm text-[#808897] font-medium'>Please complete most of the details below for a better resume</p>
                       </div>
 
                       <div className='acco_section'>

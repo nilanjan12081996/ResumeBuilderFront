@@ -30,9 +30,9 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
     { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
     { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
     { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
-    { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
+    // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
     { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
-    { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
+    // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
     { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
   ];
 
@@ -48,9 +48,9 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
     <div className="">
       <div className="bg-white rounded-xl shadow-md">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-black pb-1">Add Additional Sections</h2>
+          <h2 className="text-xl font-bold text-black pb-1">Add New Sections(If any)</h2>
           <p className="text-sm text-[#808897] font-medium">
-            Choose from predefined sections or create a custom one
+            Use any of the below sections, if you would like to add any new content to the resume or modify any section.
           </p>
         </div>
 

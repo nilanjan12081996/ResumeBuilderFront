@@ -154,7 +154,7 @@ const Insideheader = () => {
                     ? "bg-white shadow text-black"
                     : "text-gray-500 hover:text-black"}`}
               >
-                Customize
+                Template
               </button>
             </div>
           </div>
@@ -378,9 +378,9 @@ const Insideheader = () => {
       {showCancelModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white p-6 rounded-xl w-96 text-center">
-            <h2 className="text-lg font-semibold mb-4">Cancel Subscription</h2>
+            <h2 className="text-lg font-semibold mb-4">Cancel Plan</h2>
             <p className="mb-6 text-sm text-gray-600">
-              By cancelling your subscription, you will lose access to premium features. Are you sure you want to continue?
+              By cancelling your existing plan, you will lose your current credits if any unused, Are you sure you want to continue?
             </p>
             <div className="flex justify-between gap-4">
               <button
