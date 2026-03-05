@@ -72,7 +72,7 @@ import { getRecentResume } from "../reducers/ResumeHistorySlice";
 
 
 import { useForm } from "react-hook-form";
-import { checkATS, improveResume } from "../reducers/DashboardSlice";
+import { checkATS } from "../reducers/DashboardSlice";
 
 
 const poppins = Poppins({
@@ -213,29 +213,29 @@ const Page = () => {
       console.log(key, value);
     }
     
-    dispatch(improveResume(formData))
-      .then((res) => {
-        console.log(" res ", res);
-        const userData = {
-          imp_resume_id: res?.payload?.data?.id,
-          raw_data: res?.payload?.raw_data,
-        };
-        dispatch(checkATS(userData))
-          .then((res) => {
-            // toast.success(res?.payload?.message || "ATS score");
-            setATSscore(res?.payload?.data?.ats_score);
-            setopenATSmodal(true);
-          })
-          .catch((err) => {
-            console.log("err", err);
-          });
-      })
-      .catch((err) => {
-        console.log("err", err);
-        toast.error(
-          err?.message || "An error occurred while improving the resume."
-        );
-      });
+    // dispatch(improveResume(formData))
+    //   .then((res) => {
+    //     console.log(" res ", res);
+    //     const userData = {
+    //       imp_resume_id: res?.payload?.data?.id,
+    //       raw_data: res?.payload?.raw_data,
+    //     };
+    //     dispatch(checkATS(userData))
+    //       .then((res) => {
+    //         // toast.success(res?.payload?.message || "ATS score");
+    //         setATSscore(res?.payload?.data?.ats_score);
+    //         setopenATSmodal(true);
+    //       })
+    //       .catch((err) => {
+    //         console.log("err", err);
+    //       });
+    //   })
+    //   .catch((err) => {
+    //     console.log("err", err);
+    //     toast.error(
+    //       err?.message || "An error occurred while improving the resume."
+    //     );
+    //   });
       clearFileInput();
   };
 
