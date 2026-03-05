@@ -556,6 +556,36 @@ export const decreaseSubscriptionCount = createAsyncThunk(
     }
 );
 
+export const scratchResumeCount = createAsyncThunk(
+    'scratchResumeCount',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await resumeApi.get(`/api/subscription/count-sc`);
+            if (response?.data?.statusCode === 200 || response?.data?.status_code === 200) {
+                return response.data;
+            }
+            return rejectWithValue(response?.data?.message || 'Failed to decrease count');
+        } catch (error) {
+            return rejectWithValue(error?.response?.data?.message || 'Something went wrong');
+        }
+    }
+);
+
+export const createScratchFreeSubscription = createAsyncThunk(
+    'createScratchFreeSubscription',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await resumeApi.post('/api/subscription/create-free');
+            if (response?.data?.statusCode === 200 || response?.data?.status_code === 200) {
+                return response.data;
+            }
+            return rejectWithValue(response?.data?.message || 'Failed to create free subscription');
+        } catch (error) {
+            return rejectWithValue(error?.response?.data?.message || 'Something went wrong');
+        }
+    }
+);
+
 const initialState = {
     loading: false,
     error: false,
@@ -602,6 +632,14 @@ const initialState = {
     decreaseSubscriptionCountLoading: false,
     decreaseSubscriptionCountData: null,
     decreaseSubscriptionCountError: null,
+
+    scratchResumeCountLoading: false,
+    scratchResumeCountData: null,
+    scratchResumeCountError: null,
+
+    createScratchFreeSubscriptionLoading: false,
+    createScratchFreeSubscriptionData: null,
+    createScratchFreeSubscriptionError: null,
 }
 const ResumeSlice = createSlice(
     {
@@ -910,14 +948,40 @@ const ResumeSlice = createSlice(
                     state.decreaseSubscriptionCountLoading = false;
                     state.decreaseSubscriptionCountError = action.payload;
                 })
+
+                .addCase(scratchResumeCount.pending, (state) => {
+                    state.scratchResumeCountLoading = true;
+                    state.scratchResumeCountError = null;
+                })
+                .addCase(scratchResumeCount.fulfilled, (state, action) => {
+                    state.scratchResumeCountLoading = false;
+                    state.scratchResumeCountData = action.payload;
+                })
+                .addCase(scratchResumeCount.rejected, (state, action) => {
+                    state.scratchResumeCountLoading = false;
+                    state.scratchResumeCountError = action.payload;
+                })
+
+                .addCase(createScratchFreeSubscription.pending, (state) => {
+                    state.createScratchFreeSubscriptionLoading = true;
+                    state.createScratchFreeSubscriptionError = null;
+                })
+                .addCase(createScratchFreeSubscription.fulfilled, (state, action) => {
+                    state.createScratchFreeSubscriptionLoading = false;
+                    state.createScratchFreeSubscriptionData = action.payload;
+                })
+                .addCase(createScratchFreeSubscription.rejected, (state, action) => {
+                    state.createScratchFreeSubscriptionLoading = false;
+                    state.createScratchFreeSubscriptionError = action.payload;
+                })
         }
     }
 )
 
 export const RESUME_TYPES = {
-    SCRATCH:  "s",
-    IMPROVE:  "i",
-    JD:       "j",
+    SCRATCH: "s",
+    IMPROVE: "i",
+    JD: "j",
     LINKEDIN: "l",
 };
 export default ResumeSlice.reducer;

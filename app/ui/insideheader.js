@@ -20,6 +20,7 @@ import { toast } from 'react-toastify';
 import { useTabs } from '../context/TabsContext';
 import headerLogo from '../assets/imagesource/ResumeMile_Logo.png';
 import { createSubscriptionCount } from '../reducers/ResumeSlice';
+import RemainingCountHeader from './Remainingcountheader';
 
 const Insideheader = () => {
   const pathname = usePathname();
@@ -55,7 +56,7 @@ const Insideheader = () => {
       if (ipResult?.payload?.ip) {
         const ip_address = ipResult.payload.ip;
         dispatch(currentSubscription(ip_address));
-        createSubscriptionCount();
+        // createSubscriptionCount();
       }
     };
 
@@ -101,7 +102,7 @@ const Insideheader = () => {
 
       setShowCancelModal(false);
       dispatch(currentSubscription(ipData.ip));
-      createSubscriptionCount();
+      // createSubscriptionCount();
       router.push("/dashboard");
 
     } else {
@@ -339,39 +340,74 @@ const Insideheader = () => {
               )}
             </div>
 
-            {open && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
-                {/* Header: Name & Email */}
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <p className="text-sm font-semibold text-gray-800">
-                    {profileData?.data?.fullname}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {profileData?.data?.email}
-                  </p>
-                </div>
+           {open && (
+  <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden">
 
-                {/* Menu Items */}
-                <ul className="flex flex-col py-2">
-                  <li className="px-0">
-                    <Link
-                      href="/profile"
-                      className="flex items-center gap-2 px-4 py-2 text-gray-600 text-sm cursor-pointer rounded-lg hover:bg-gray-100"
-                    >
-                      <FaUser className="text-base" />
-                      My Profile
-                    </Link>
-                  </li>
-                  <li
-                    className="flex items-center gap-2 px-4 py-2 text-gray-600 text-sm cursor-pointer rounded-lg hover:bg-gray-100"
-                    onClick={handleLogout}
-                  >
-                    <MdOutlineLogout className="text-base" />
-                    Log Out
-                  </li>
-                </ul>
-              </div>
-            )}
+    {/* Header: Avatar + Name & Email */}
+    <div className="px-4 py-3 border-b border-gray-100"
+      style={{ background: "linear-gradient(135deg, #faf5ff, #f5f3ff)" }}
+    >
+      <div className="flex items-center gap-3">
+        {/* Mini avatar */}
+        <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
+          {profileData?.data?.avatar ? (
+            <img src={profileData.data.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
+          ) : (
+            <FaUser className="text-purple-400 text-sm" />
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-gray-800 truncate leading-tight">
+            {profileData?.data?.fullname}
+          </p>
+          <p className="text-[11px] text-gray-400 truncate">
+            {profileData?.data?.email}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Credits Section */}
+    <div className="px-4 py-3 border-b border-gray-100">
+      <p style={{
+        fontSize: "9px",
+        fontWeight: 800,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        color: "#a855f7",
+        marginBottom: "8px",
+      }}>
+        Credits Remaining
+      </p>
+
+      <RemainingCountHeader />
+    </div>
+
+    {/* Menu Items */}
+    <ul className="flex flex-col py-1.5">
+      <li className="px-0">
+        <Link
+          href="/profile"
+          className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-gray-50 transition-colors"
+        >
+          <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <FaUser className="text-gray-500 text-xs" />
+          </div>
+          <span className="font-medium">My Profile</span>
+        </Link>
+      </li>
+      <li
+        className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-red-50 transition-colors group"
+        onClick={handleLogout}
+      >
+        <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0 group-hover:bg-red-100 transition-colors">
+          <MdOutlineLogout className="text-red-400 text-sm" />
+        </div>
+        <span className="font-medium group-hover:text-red-500 transition-colors">Log Out</span>
+      </li>
+    </ul>
+  </div>
+)}
           </div>
 
         </div>

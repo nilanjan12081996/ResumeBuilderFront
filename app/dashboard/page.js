@@ -24,6 +24,7 @@ import ImproveExistingModal from "./ImproveExistingModal";
 import LinkedInReWriteModal from "./LinkedInReWriteModal";
 import { MdOutlineWatchLater } from "react-icons/md";
 import RemainingCountWidget from "../ui/Remainingcountwidget";
+import { getRemainingCount } from "../reducers/ResumeSlice";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -51,18 +52,19 @@ const Page = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { getRemainingCountData } = useSelector((state) => state.resume || {});
+ const { getRemainingCountData, getRemainingCountLoading } = useSelector((state) => state.resume || {});
 const credits = getRemainingCountData?.data;
 
 const canCreate = (type) => {
-  if (!credits) return true; 
-  switch (type) {
-    case "scratch":  return (credits.totalScratch ?? 0) > 0;
-    case "improve":  return (credits.totalImp ?? 0) > 0;
-    case "jd":       return (credits.totalJd ?? 0) > 0;
-    case "linkedin": return (credits.totalLink ?? 0) > 0;
-    default:         return false;
-  }
+    if (getRemainingCountLoading) return false;
+    if (!credits) return false; 
+    switch (type) {
+        case "scratch":  return (credits.totalScratch ?? 0) > 0;
+        case "improve":  return (credits.totalImp ?? 0) > 0;
+        case "jd":       return (credits.totalJd ?? 0) > 0;
+        case "linkedin": return (credits.totalLink ?? 0) > 0;
+        default:         return false;
+    }
 };
 
 const handleCardClick = (type, action) => {
@@ -83,6 +85,7 @@ const handleCardClick = (type, action) => {
 
   useEffect(() => {
     dispatch(getRecentResume());
+    dispatch(getRemainingCount());
   }, []);
 
   return (

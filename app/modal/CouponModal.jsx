@@ -21,7 +21,7 @@ const CouponModal = ({ isOpen, onClose, amount, currency, plan_id, planPrice, cu
 
   useEffect(() => {
     dispatch(currentSubscription(ip));
-    createSubscriptionCount()
+    // createSubscriptionCount()
   }, [dispatch, ip]);
 
   useEffect(() => {

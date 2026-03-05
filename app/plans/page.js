@@ -20,10 +20,9 @@ import {
   currentSubscription,
   getIpData,
   getPlans,
-  cancelSubscription,
   resetAiCount,
 } from "../reducers/PlanSlice";
-import { createSubscriptionCount, getRemainingCount } from "../reducers/ResumeSlice";
+import { createSubscriptionCount, getRemainingCount, scratchResumeCount } from "../reducers/ResumeSlice";
 import RemainingCountWidget from "../ui/Remainingcountwidget";
 
 // ─── Plan Type Badge ─────────────────────────────────────────────────────────
@@ -47,11 +46,8 @@ const getPlanMeta = (placeholder) => {
 
 const Page = () => {
   const dispatch = useDispatch();
-  const { plans, ipData, currentSubscriptionData } = useSelector(
-    (state) => state.planst || {}
-  );
+  const { plans, ipData } = useSelector((state) => state.planst || {});
 
-  // const usertypeId = sessionStorage.getItem("signup_type_id");
   const usertypeId = localStorage.getItem("signup_type_id");
   const parsed = usertypeId ? JSON.parse(usertypeId) : null;
 
@@ -64,53 +60,9 @@ const Page = () => {
     currentPlanPrice: 0,
   });
 
-  const hasActiveSubscription = () => {
-    if (!currentSubscriptionData?.data?.length) return false;
-    const now = new Date();
-    return currentSubscriptionData.data.some((sub) => {
-      const end = new Date(sub.end_date);
-      return sub.status === 1 && end > now;
-    });
-  };
-
-  const getCurrentActiveSubscription = () => {
-    if (!currentSubscriptionData?.data?.length) return null;
-    const now = new Date();
-    return currentSubscriptionData.data.find((sub) => {
-      const end = new Date(sub.end_date);
-      return sub.status === 1 && end > now;
-    });
-  };
-
-  const computeButtonState = (pln) => {
-    const active = getCurrentActiveSubscription();
-    const activePrice = Number(active?.Plan?.planPrice?.price || 0);
-    const thisPrice = Number(pln?.planPrice?.price || 0);
-
-    if (active && active.Plan?.id === pln?.id) {
-      return { label: "Current Plan", disabled: true };
-    }
-
-    if (hasActiveSubscription()) {
-      if (thisPrice < activePrice) return { label: "Downgrade", disabled: false };
-      if (thisPrice > activePrice) return { label: "Upgrade", disabled: false };
-      return { label: "Same Tier", disabled: true };
-    }
-
-    return { label: "Get Started", disabled: false };
-  };
-
   const handlePlanClick = (e, pln) => {
     e.preventDefault();
-    const active = getCurrentActiveSubscription();
-    const activePrice = Number(active?.Plan?.planPrice?.price || 0);
     const thisPrice = Number(pln?.planPrice?.price || 0);
-
-    if (active && active.Plan?.id === pln?.id) {
-      toast.info("You are already on this plan.");
-      return;
-    }
-
     const payable = Number(thisPrice.toFixed(2));
 
     setCouponModalData({
@@ -118,7 +70,7 @@ const Page = () => {
       currency: pln?.planPrice?.currency || "INR",
       plan_id: pln?.id,
       planPrice: thisPrice,
-      currentPlanPrice: activePrice,
+      currentPlanPrice: 0,
     });
 
     setOpenCouponModal(true);
@@ -146,20 +98,11 @@ const Page = () => {
   const handlePaymentModal = async (e, data) => {
     e.preventDefault();
     const ip = ipData?.ip || "";
-    const active = getCurrentActiveSubscription();
-    const activePlanId = active?.Plan?.id || null;
-    const newPlanPrice = Number(data?.planPrice ?? data?.amount ?? 0);
     const payableAmount = Number(data.amount || 0);
 
     try {
       await loadRazorpayScript();
 
-      // If user confirmed cancel, call cancel-subscription first
-      if (data.cancelCurrentPlan && activePlanId) {
-        await dispatch(cancelSubscription({ ip_address: ipData.ip }));
-      }
-
-      // Then create new order
       const orderData = {
         amount: payableAmount,
         currency: data.currency,
@@ -200,6 +143,7 @@ const Page = () => {
             dispatch(resetAiCount());
             dispatch(createSubscriptionCount());
             dispatch(getRemainingCount());
+            dispatch(scratchResumeCount())
           } catch (err) {
             toast.error("Payment verification failed.");
           }
@@ -223,22 +167,21 @@ const Page = () => {
           })
         );
         dispatch(getRemainingCount());
+        dispatch(scratchResumeCount());
       }
     });
   }, []);
 
   useEffect(() => {
     if (ipData?.ip) dispatch(currentSubscription(ipData.ip));
-    dispatch(createSubscriptionCount());
+    // dispatch(createSubscriptionCount());
   }, [ipData]);
 
   const renderPlanCard = (pln) => {
-    const btnState = computeButtonState(pln);
     const thisPrice = Number(pln?.planPrice?.price || 0);
     const isFree = thisPrice === 0;
     const isPopular = pln?.id === 3 || pln?.id === 12;
     const planMeta = getPlanMeta(pln?.placeholder);
-    const isCurrentPlan = btnState.label === "Current Plan";
 
     return (
       <div
@@ -256,14 +199,14 @@ const Page = () => {
             boxShadow: "0 4px 14px rgba(128,0,128,0.35)", whiteSpace: "nowrap",
             textTransform: "uppercase",
           }}>
-             Most Popular
+            Most Popular
           </div>
         )}
 
         <div style={{
           flex: 1, display: "flex", flexDirection: "column",
-          background: isCurrentPlan ? "linear-gradient(145deg, #f0fdf4, #dcfce7)" : isPopular ? "linear-gradient(145deg, #fdf4ff, #fae8ff)" : "#fff",
-          border: isCurrentPlan ? "2px solid #16a34a" : isPopular ? "2px solid #800080" : "1.5px solid #e9edff",
+          background: isPopular ? "linear-gradient(145deg, #fdf4ff, #fae8ff)" : "#fff",
+          border: isPopular ? "2px solid #800080" : "1.5px solid #e9edff",
           borderRadius: "20px", overflow: "hidden",
           boxShadow: isPopular ? "0 8px 32px rgba(128,0,128,0.12)" : "0 2px 12px rgba(0,0,0,0.06)",
           transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -286,7 +229,7 @@ const Page = () => {
           <div style={{ padding: "24px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
             {/* Header */}
             <div style={{ marginBottom: "16px" }}>
-              <h1>{pln?.id}</h1>
+              {/* <h1>{pln?.id}</h1> */}
               <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1B223C", margin: "0 0 4px 0", lineHeight: 1.3 }}>
                 {pln?.plan_name}
               </h3>
@@ -345,35 +288,29 @@ const Page = () => {
               ))}
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Button — always "Buy Now" */}
             <button
               onClick={(e) => handlePlanClick(e, pln)}
-              disabled={btnState.disabled}
               style={{
                 width: "100%", padding: "12px", borderRadius: "10px", fontSize: "13px",
-                fontWeight: 700, letterSpacing: "0.03em", border: "none", cursor: btnState.disabled ? "not-allowed" : "pointer",
+                fontWeight: 700, letterSpacing: "0.03em", border: "none", cursor: "pointer",
                 transition: "all 0.2s ease",
-                background: isCurrentPlan
-                  ? "linear-gradient(135deg, #dcfce7, #bbf7d0)"
-                  : isPopular
-                    ? "linear-gradient(135deg, #800080, #b44db4)"
-                    : "#1B223C",
-                color: isCurrentPlan ? "#16a34a" : "#fff",
-                boxShadow: isPopular && !isCurrentPlan ? "0 4px 16px rgba(128,0,128,0.3)" : "none",
-                opacity: btnState.disabled && !isCurrentPlan ? 0.5 : 1,
+                background: isPopular
+                  ? "linear-gradient(135deg, #800080, #b44db4)"
+                  : "#1B223C",
+                color: "#fff",
+                boxShadow: isPopular ? "0 4px 16px rgba(128,0,128,0.3)" : "none",
               }}
               onMouseEnter={e => {
-                if (!btnState.disabled) {
-                  e.currentTarget.style.transform = "scale(1.02)";
-                  e.currentTarget.style.filter = "brightness(1.08)";
-                }
+                e.currentTarget.style.transform = "scale(1.02)";
+                e.currentTarget.style.filter = "brightness(1.08)";
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform = "scale(1)";
                 e.currentTarget.style.filter = "brightness(1)";
               }}
             >
-              {isCurrentPlan ? "✓ " : ""}{btnState.label}
+              Buy Now
             </button>
           </div>
         </div>
@@ -391,41 +328,8 @@ const Page = () => {
       <div className="key_benefits_section pt-[4px] pb-10">
         <div className="purchase_section py-8 lg:py-20">
           <div className="max-w-6xl mx-auto">
-            {/* ACTIVE SUBSCRIPTION NOTICE */}
-            {hasActiveSubscription() && getCurrentActiveSubscription() && (
-              <div className="mb-6 mx-4 lg:mx-0">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-green-800">
-                        You have an active subscription
-                      </h3>
-                      <div className="mt-2 text-sm text-green-700">
-                        <p>
-                          <strong>Plan:</strong> {getCurrentActiveSubscription().Plan?.plan_name}
-                        </p>
-                        <p>
-                          <strong>Valid until:</strong> {new Date(getCurrentActiveSubscription().end_date).toLocaleDateString()}
-                        </p>
-                        <p>
-                          <strong>Features:</strong> {getCurrentActiveSubscription().Plan?.PlanAccess?.map(access => access.plan_access_description).join(', ')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
             <RemainingCountWidget />
+
             {/* TABS SECTION */}
             <div className="subscription_tab_section inner_plan">
               <Tabs>

@@ -17,6 +17,7 @@ import { RiGoogleFill } from "react-icons/ri";
 import Link from 'next/link';
 import { useGoogleLogin } from "@react-oauth/google";
 import { getIpData } from "../reducers/PlanSlice";
+import { createScratchFreeSubscription, createSubscriptionCount } from "../reducers/ResumeSlice";
 
 
 
@@ -62,7 +63,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     }, [dispatch]);
     const onSubmit = (data) => {
         if (!chooseResumeType) {
-            return; 
+            return;
         }
         const payload1 = {
             app: 1,
@@ -135,7 +136,9 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
             if (res?.payload?.status_code === 200) {
                 setOtpError(""); // clear previous error
                 setOtpSuccess("OTP Verified Successfully!");
-
+                dispatch(createScratchFreeSubscription()).then(() => {
+                    dispatch(createSubscriptionCount());
+                });
                 // Wait 3 seconds before redirect
                 setTimeout(() => {
                     setOpenRegisterModal(false);

@@ -341,7 +341,7 @@ const Sidebar = () => {
       const ipResult = await dispatch(getIpData());
       if (ipResult?.payload?.ip) {
         dispatch(currentSubscription(ipResult.payload.ip));
-        createSubscriptionCount();
+        // createSubscriptionCount();
       }
     };
     fetchSubscription();
@@ -384,7 +384,7 @@ const Sidebar = () => {
       toast.success("Your subscription has been cancelled");
       setShowCancelModal(false);
       dispatch(currentSubscription(ipData.ip));
-      createSubscriptionCount();
+      // createSubscriptionCount();
       router.push("/dashboard");
     } else {
       toast.error(result?.message || "Failed to cancel subscription");
@@ -475,7 +475,7 @@ const Sidebar = () => {
                       ? 'bg-gray-200 text-[#800080]'
                       : 'text-gray-500 hover:bg-gray-200 hover:text-[#800080]'}`}
                 >
-                  <VscChecklist className="text-2xl" /> Billing
+                  <VscChecklist className="text-2xl" /> Plans
                 </Link>
               </li>
 
@@ -549,14 +549,14 @@ const Sidebar = () => {
                 </button>
 
                 {/* Cancel Subscription */}
-                {hasActiveSubscription() && (
+                {/* {hasActiveSubscription() && (
                   <button
                     onClick={() => setShowCancelModal(true)}
                     className="flex items-center justify-center gap-1 py-1 cursor-pointer px-3 rounded-lg bg-red-500 hover:bg-red-600 text-sm font-semibold text-white transition-all duration-200 transform hover:scale-105"
                   >
                     Cancel Plan
                   </button>
-                )}
+                )} */}
               </div>
 
               {/* Logout */}
