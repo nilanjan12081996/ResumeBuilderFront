@@ -187,7 +187,7 @@ export default function Home() {
                )}
                <div style={{ padding: "24px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
                   <div style={{ marginBottom: "16px" }}>
-                     <h1>{oneTime?.id}</h1>
+                     {/* <h1>{oneTime?.id}</h1> */}
                      <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1B223C", margin: "0 0 4px 0", lineHeight: 1.3 }}>{oneTime?.plan_name}</h3>
                      <p style={{ fontSize: "12px", color: "#808897", margin: 0, lineHeight: 1.4 }}>{oneTime?.placeholder}</p>
                   </div>
