@@ -25,24 +25,32 @@ import {
 import { createSubscriptionCount, getRemainingCount, scratchResumeCount } from "../reducers/ResumeSlice";
 import RemainingCountWidget from "../ui/Remainingcountwidget";
 
-// ─── Plan Type Badge ─────────────────────────────────────────────────────────
+// ─── Plan Type Badge ──────────────────────────────────────────────────────────
 const getPlanMeta = (placeholder) => {
   if (!placeholder) return null;
   const p = placeholder.toLowerCase();
+
   if (p.includes("watermark"))
     return { label: "Scratch Resume", color: "#6B7280", bg: "#F3F4F6" };
-  if (p.includes("jd specific") && p.includes("optimized"))
-    return { label: "Improve + JD", color: "#7C3AED", bg: "#EDE9FE" };
-  if (p.includes("jd-specific") || p.includes("jd specific"))
+
+  if (p.includes("jd based") && p.includes("improve"))
+    return { label: "Improve existing resume + JD based resume", color: "#7C3AED", bg: "#EDE9FE" };
+
+  if (p.includes("jd based"))
     return { label: "JD Based Resume", color: "#DC2626", bg: "#FEE2E2" };
-  if (p.includes("linkedin") && (p.includes("rewrite") || p.includes("optimized")))
-    return { label: "Improve + LinkedIn", color: "#0284C7", bg: "#E0F2FE" };
+
+  if (p.includes("linkedin") && p.includes("improve"))
+    return { label: "Improve existing resume + LinkedIn Rewrite", color: "#0284C7", bg: "#E0F2FE" };
+
   if (p.includes("linkedin"))
-    return { label: "LinkedIn Profile", color: "#0077B5", bg: "#E8F4FD" };
-  if (p.includes("optimized") || p.includes("ats score"))
-    return { label: "Improve Resume", color: "#059669", bg: "#D1FAE5" };
+    return { label: "LinkedIn Rewrite", color: "#0077B5", bg: "#E8F4FD" };
+
+  if (p.includes("improve"))
+    return { label: "Improve existing resume", color: "#059669", bg: "#D1FAE5" };
+
   return null;
 };
+
 
 const Page = () => {
   const dispatch = useDispatch();
