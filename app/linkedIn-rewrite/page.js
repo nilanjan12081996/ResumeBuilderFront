@@ -42,8 +42,8 @@ import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 import LinkedInPrime from '../TemplateNew/LinkedInPrime';
 
 import { useTabs } from '../context/TabsContext.js';
-import { checkATS } from '../reducers/DashboardSlice';
-import { getSingleResume, saveResumeLinkedIn } from '../reducers/ResumeSlice';
+import { checkATS, resetDashboard } from '../reducers/DashboardSlice';
+import { getSingleResume, resetSingleResume, saveResumeLinkedIn } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ResumeCompareModal from '../modal/ResumeCompareModal';
 import { useDownload } from '../hooks/useDownload';
@@ -1085,6 +1085,19 @@ const LinkedInResumeBuilder = () => {
   const handleDragEnd = () => { };
 
   useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "l"});
+
+   useEffect(() => {
+      return () => {
+        dispatch(resetDashboard());
+      };
+    }, []);
+  
+    useEffect(() => {
+      return () => {
+        dispatch(resetDashboard());
+        dispatch(resetSingleResume());
+      };
+    }, []);
 
   if (!resumeSource) {
     return <CVSkeletonLoader />;

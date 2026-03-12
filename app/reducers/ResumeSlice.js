@@ -645,7 +645,11 @@ const ResumeSlice = createSlice(
     {
         name: "resume",
         initialState,
-        reducers: {},
+        reducers: {
+            resetSingleResume: (state) => {
+                state.singleResumeInfo = null;
+            }
+        },
         extraReducers: (builder) => {
             builder.addCase(savePersonalInfo.pending, (state) => {
                 state.loading = true
@@ -984,4 +988,6 @@ export const RESUME_TYPES = {
     JD: "j",
     LINKEDIN: "l",
 };
+
+export const {resetSingleResume} = ResumeSlice.actions;
 export default ResumeSlice.reducer;

@@ -45,8 +45,8 @@ import VividTemplate from "../TemplateNew/VividTemplate";
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
-import { checkJdAts } from '../reducers/DashboardSlice';
-import { getSingleResume, saveResumeJd } from '../reducers/ResumeSlice';
+import { checkJdAts, resetDashboard } from '../reducers/DashboardSlice';
+import { getSingleResume, resetSingleResume, saveResumeJd } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import { useDownload } from '../hooks/useDownload';
 import CVSkeletonLoader from '../ui/CVSkeletonLoader';
@@ -1500,6 +1500,20 @@ const Page = () => {
   const handleDragEnd = () => { };
 
   useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "j"});
+
+   useEffect(() => {
+      return () => {
+        dispatch(resetDashboard());
+      };
+    }, []);
+  
+    useEffect(() => {
+      return () => {
+        dispatch(resetDashboard());
+        dispatch(resetSingleResume());
+      };
+    }, []);
+
   if (!resumeSource) {
     return <CVSkeletonLoader />;
   }

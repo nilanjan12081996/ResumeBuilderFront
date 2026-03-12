@@ -43,8 +43,8 @@ import VividTemplate from "../TemplateNew/VividTemplate";
 import CorporateTemplate from '../TemplateNew/CorporateTemplate';
 
 import { useTabs } from '../context/TabsContext.js';
-import { checkATS } from '../reducers/DashboardSlice';
-import { generatePDF, getSingleResume, saveResumeImprove } from '../reducers/ResumeSlice';
+import { checkATS, resetDashboard } from '../reducers/DashboardSlice';
+import { generatePDF, getSingleResume, resetSingleResume, saveResumeImprove } from '../reducers/ResumeSlice';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ImpSimpleCustomSection from './components/Impsimplecustomsection';
 import { useDownload } from '../hooks/useDownload';
@@ -627,7 +627,7 @@ const Page = () => {
     setValue("dob", resumeSource.dob || "");
     setValue("driving_licence", resumeSource.driving_licence || "");
 
-  
+
     if (!originalFormValuesRef.current) {
       const clonedSource = JSON.parse(JSON.stringify(resumeSource));
       const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
@@ -1471,7 +1471,21 @@ const Page = () => {
   // Dummy handler for child components
   const handleDragEnd = () => { };
 
-  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "i"});
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "i" });
+
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetDashboard());
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetDashboard());
+      dispatch(resetSingleResume());
+    };
+  }, []);
 
   if (!resumeSource) {
     return <CVSkeletonLoader />;

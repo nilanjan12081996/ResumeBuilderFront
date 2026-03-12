@@ -24,6 +24,12 @@ const ImproveExistingModal = ({ open, onClose }) => {
   const resumeFile = watch("resume_file");
 
   useEffect(() => {
+    if (open) {
+      dispatch(resetDashboard());
+    }
+  }, [open]);
+
+  useEffect(() => {
     if (resumeFile?.[0]) setResumeFileName(resumeFile[0].name);
   }, [resumeFile]);
 

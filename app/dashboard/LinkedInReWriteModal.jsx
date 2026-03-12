@@ -23,7 +23,12 @@ const LinkedInReWriteModal = ({ open, onClose }) => {
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
 
   const resumeFile = watch("resume_file");
-
+  useEffect(() => {
+    if (open) {
+      dispatch(resetDashboard()); 
+    }
+  }, [open]);
+  
   useEffect(() => {
     if (resumeFile?.[0]) setResumeFileName(resumeFile[0].name);
   }, [resumeFile]);
