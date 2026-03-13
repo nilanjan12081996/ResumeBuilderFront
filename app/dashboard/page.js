@@ -51,6 +51,9 @@ const Page = () => {
 
   const router = useRouter();
   const dispatch = useDispatch();
+  const handleGoPlan = ()=>{
+    router.push("/plans")
+  }
 
  const { getRemainingCountData, getRemainingCountLoading } = useSelector((state) => state.resume || {});
 const credits = getRemainingCountData?.data;
@@ -108,9 +111,12 @@ const handleCardClick = (type, action) => {
 
           {/* Quick Actions */}
 <div className="mb-10">
-  <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium mb-6">
-    Quick Actions
+  <div className="flex items-center mb-6 gap-2">
+ <h3 className="text-[20px] leading-[20px] text-[#151515] font-medium">
+    Quick Actions 
   </h3>
+  <button onClick={handleGoPlan} className="cursor-pointer bg-[#800080] !text-[#ffffff] px-2 py-1 rounded-md hover:bg-[#ac70ac]">View Plans & Pricing</button>
+    </div>
   <div className="flex gap-4">
     <div className="w-full grid grid-cols-1 lg:grid-cols-4 gap-4">
 

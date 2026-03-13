@@ -258,28 +258,28 @@ const RemainingCountWidget = ({ compact = false }) => {
 
     const cards = [
         {
-            label: "Scratch",
+            label: "Scratch Resume",
             count: data?.totalScratch ?? 0,
             color: "#7C3AED",
             bg: "linear-gradient(135deg, #faf5ff, #ede9fe)",
             breakdown: getPlanBreakdown(details, "scratchCount"),
         },
         {
-            label: "JD Based",
+            label: "JD based resume",
             count: data?.totalJd ?? 0,
             color: "#DC2626",
             bg: "linear-gradient(135deg, #fff5f5, #fee2e2)",
             breakdown: getPlanBreakdown(details, "jdCount"),
         },
         {
-            label: "LinkedIn",
+            label: "LinkedIn Rewrite",
             count: data?.totalLink ?? 0,
             color: "#0077B5",
             bg: "linear-gradient(135deg, #f0f9ff, #e0f2fe)",
             breakdown: getPlanBreakdown(details, "linkCount"),
         },
         {
-            label: "Improve",
+            label: "Improve existing resume",
             count: data?.totalImp ?? 0,
             color: "#059669",
             bg: "linear-gradient(135deg, #f0fdf4, #d1fae5)",

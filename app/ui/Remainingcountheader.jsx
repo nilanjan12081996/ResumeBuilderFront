@@ -55,7 +55,7 @@ const GlobalStyles = () => (
 const CARDS = [
     {
         key: "totalScratch",
-        label: "Scratch",
+        label: "Scratch Resume",
         color: "#7C3AED",
         bg: "rgba(124,58,237,0.09)",
         border: "rgba(124,58,237,0.22)",
@@ -63,7 +63,7 @@ const CARDS = [
     },
     {
         key: "totalJd",
-        label: "JD",
+        label: "JD based resume",
         color: "#DC2626",
         bg: "rgba(220,38,38,0.08)",
         border: "rgba(220,38,38,0.2)",
@@ -71,7 +71,7 @@ const CARDS = [
     },
     {
         key: "totalLink",
-        label: "LinkedIn",
+        label: "LinkedIn Rewrite",
         color: "#0077B5",
         bg: "rgba(0,119,181,0.08)",
         border: "rgba(0,119,181,0.2)",
@@ -79,7 +79,7 @@ const CARDS = [
     },
     {
         key: "totalImp",
-        label: "Improve",
+        label: "Improve existing resume",
         color: "#059669",
         bg: "rgba(5,150,105,0.08)",
         border: "rgba(5,150,105,0.2)",
