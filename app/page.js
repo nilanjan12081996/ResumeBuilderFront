@@ -130,31 +130,31 @@ export default function Home() {
    }, [])
    console.log("fetJobsOutSide", fetJobsOutSide);
 
-// ─── Plan Type Badge ──────────────────────────────────────────────────────────
-const getPlanMeta = (placeholder) => {
-  if (!placeholder) return null;
-  const p = placeholder.toLowerCase();
+   // ─── Plan Type Badge ──────────────────────────────────────────────────────────
+   const getPlanMeta = (placeholder) => {
+      if (!placeholder) return null;
+      const p = placeholder.toLowerCase();
 
-  if (p.includes("watermark"))
-    return { label: "Scratch Resume", color: "#6B7280", bg: "#F3F4F6" };
+      if (p.includes("watermark"))
+         return { label: "Scratch Resume", color: "#6B7280", bg: "#F3F4F6" };
 
-  if (p.includes("jd based") && p.includes("improve"))
-    return { label: "Improve existing resume + JD based resume", color: "#7C3AED", bg: "#EDE9FE" };
+      if (p.includes("jd based") && p.includes("improve"))
+         return { label: "Improve existing resume + JD based resume", color: "#7C3AED", bg: "#EDE9FE" };
 
-  if (p.includes("jd based"))
-    return { label: "JD Based Resume", color: "#DC2626", bg: "#FEE2E2" };
+      if (p.includes("jd based"))
+         return { label: "JD Based Resume", color: "#DC2626", bg: "#FEE2E2" };
 
-  if (p.includes("linkedin") && p.includes("improve"))
-    return { label: "Improve existing resume + LinkedIn Rewrite", color: "#0284C7", bg: "#E0F2FE" };
+      if (p.includes("linkedin") && p.includes("improve"))
+         return { label: "Improve existing resume + LinkedIn Rewrite", color: "#0284C7", bg: "#E0F2FE" };
 
-  if (p.includes("linkedin"))
-    return { label: "LinkedIn Rewrite", color: "#0077B5", bg: "#E8F4FD" };
+      if (p.includes("linkedin"))
+         return { label: "LinkedIn Rewrite", color: "#0077B5", bg: "#E8F4FD" };
 
-  if (p.includes("improve"))
-    return { label: "Improve existing resume", color: "#059669", bg: "#D1FAE5" };
+      if (p.includes("improve"))
+         return { label: "Improve existing resume", color: "#059669", bg: "#D1FAE5" };
 
-  return null;
-};
+      return null;
+   };
 
    const PlanCard = ({ oneTime, popularId, onGetStarted }) => {
       const isPopular = oneTime?.id === popularId;
@@ -186,8 +186,8 @@ const getPlanMeta = (placeholder) => {
                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = isPopular ? "0 8px 32px rgba(128,0,128,0.12)" : "0 2px 12px rgba(0,0,0,0.06)"; }}
             >
                {planMeta && (
-                  <div style={{ background: planMeta.bg, borderBottom: `1px solid ${planMeta.color}22`, padding: "8px 20px", textAlign:"center"}}>
-                     <span style={{ fontSize: "11px", fontWeight: 700, color: planMeta.color, letterSpacing: "0.06em", textTransform: "uppercase"}}>
+                  <div style={{ background: planMeta.bg, borderBottom: `1px solid ${planMeta.color}22`, padding: "8px 20px", textAlign: "center" }}>
+                     <span style={{ fontSize: "11px", fontWeight: 700, color: planMeta.color, letterSpacing: "0.06em", textTransform: "uppercase" }}>
                         {planMeta.label}
                      </span>
                   </div>
@@ -460,7 +460,9 @@ const getPlanMeta = (placeholder) => {
                         <Tab>Break Through </Tab>
                         <Tab>Institution </Tab>
                      </TabList>
-
+                     <p className="text-sm text-[#a536a2] font-bold my-2 text-center">
+                        Buy as many plans as you want. You can use each plan until its expiry date, and purchasing a new plan will not affect your existing plan.
+                     </p>
                      <TabPanel>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
                            <style>{`.plan-card-wrapper{position:relative;display:flex;flex-direction:column}.plan-card-wrapper:hover{z-index:2}`}</style>

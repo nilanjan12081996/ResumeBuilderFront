@@ -212,7 +212,7 @@ const EmpHistory = ({ register, watch, control, fields, append, remove, move, se
                                       <button
                                         type="button"
                                         disabled
-                                        className="flex items-center gap-2 px-4 py-1.5 rounded-[25px] text-sm !bg-gray-100 !text-gray-400 cursor-not-allowed opacity-70"
+                                        className="flex items-center gap-2 px-4 py-1.5 rounded-[25px] text-sm !bg-gray-100 !text-gray-400 cursor-not-allowed opacity-80 !border"
                                       >
                                         <HiSparkles className="text-md" />
                                         Improve with AI

@@ -297,7 +297,7 @@ const Page = () => {
             </div>
 
             {/* CTA Button — always "Buy Now" */}
-            <button
+            {/* <button
               onClick={(e) => handlePlanClick(e, pln)}
               style={{
                 width: "100%", padding: "12px", borderRadius: "10px", fontSize: "13px",
@@ -319,7 +319,32 @@ const Page = () => {
               }}
             >
               Buy Now
-            </button>
+            </button> */}
+            {!isFree && (
+              <button
+                onClick={(e) => handlePlanClick(e, pln)}
+                style={{
+                  width: "100%", padding: "12px", borderRadius: "10px", fontSize: "13px",
+                  fontWeight: 700, letterSpacing: "0.03em", border: "none", cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  background: isPopular
+                    ? "linear-gradient(135deg, #800080, #b44db4)"
+                    : "#1B223C",
+                  color: "#fff",
+                  boxShadow: isPopular ? "0 4px 16px rgba(128,0,128,0.3)" : "none",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "scale(1.02)";
+                  e.currentTarget.style.filter = "brightness(1.08)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.filter = "brightness(1)";
+                }}
+              >
+                Buy Now
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -350,6 +375,9 @@ const Page = () => {
                   )}
                   {parsed?.signup_type_id === 2 && <Tab>Institution</Tab>}
                 </TabList>
+                 <p className="text-sm text-[#a536a2] font-bold my-2 text-center">
+                  Buy as many plans as you want. You can use each plan until its expiry date, and purchasing a new plan will not affect your existing plan.
+                </p>
 
                 {/* SIGNUP TYPE 1 → TWO TABS */}
                 {parsed?.signup_type_id === 1 && (

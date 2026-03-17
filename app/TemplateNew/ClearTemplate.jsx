@@ -740,7 +740,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
             <div style={{
               paddingLeft: `${PHOTO_WIDTH + 16 + leftRight}pt`,
               paddingRight: `${18 + leftRight}pt`,
-              paddingTop: "16pt",
+              paddingTop: "40pt",
               paddingBottom: "13pt",
             }}>
               {/* Name */}
@@ -804,7 +804,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
               <tr>
                 <td style={{
                   verticalAlign: "top",
-                  padding: `16pt ${18 + leftRight}pt 13pt ${16 + leftRight}pt`,
+                  padding: `40pt ${18 + leftRight}pt 13pt ${16 + leftRight}pt`,
                 }}>
                   {/* Name */}
                   <div style={{
@@ -877,7 +877,6 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
                 <td style={{
                   verticalAlign: "top",
                   padding: `${topBottom}pt 14pt 14pt 0pt`,
-                  backgroundColor: "#f7f7f7",
                   borderRight: "1pt solid #e5e5e5",
                 }}>
 

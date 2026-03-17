@@ -30,11 +30,11 @@ const LinkedInAddSectionButton = ({ onAddNewSection, sections = [] }) => {
         { id: 'courses', label: 'Courses', icon: <HiAcademicCap />, isCustom: false },
         { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
         { id: 'awards', label: 'Honors & awards', icon: <BiAward />, isLocked: false },
-        { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
-        { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
+        // { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
+        // { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
         // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
         // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
-        { id: 'licenses', label: 'Certifications', icon: <FaCertificate />, isLocked: true },
+        // { id: 'licenses', label: 'Certifications', icon: <FaCertificate />, isLocked: true },
     ];
 
     const handleSelectSection = (sectionId, isAlreadyAdded) => {

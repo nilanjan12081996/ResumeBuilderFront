@@ -33,12 +33,12 @@ const AddSectionEdit = ({ onAddNewSection, activeSections = [] }) => {
         { id: 'hobbies', label: 'Hobbies', icon: <FaChessKnight />, isCustom: false },
         { id: 'activities', label: 'Extra-curricular Activities', icon: <MdLocalFlorist />, isCustom: false },
         { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
-        { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
-        { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
-        { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
-        { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
-        { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
-        { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
+        // { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
+        // { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
+        // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
+        // { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
+        // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
+        // { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
     ];
 
     const handleSelectSection = (sectionId, isAlreadyAdded) => {
@@ -65,7 +65,7 @@ const AddSectionEdit = ({ onAddNewSection, activeSections = [] }) => {
                     <button
                         type="button"
                         onClick={() => setShowSectionList(true)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 text-[#800080] border-2 border-dashed border-[#800080] rounded-lg hover:bg-[#f6efff] transition-all cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 text-[#800080] !border-2 !border-dashed !border-[#800080] rounded-lg hover:bg-[#f6efff] transition-all cursor-pointer"
                     >
                         <FaPlus className="text-lg" />
                         <span className="font-medium">Add New Section</span>
@@ -106,10 +106,10 @@ const AddSectionEdit = ({ onAddNewSection, activeSections = [] }) => {
                                     key={section.id}
                                     onClick={() => handleSelectSection(section.id, isAlreadyAdded)}
                                     disabled={isDisabled}
-                                    className={`flex items-start gap-3 p-4 rounded-lg border transition-all text-left group relative
+                                    className={`flex items-start gap-3 p-4 rounded-lg !border transition-all text-left group relative
                                         ${isDisabled
-                                            ? 'bg-gray-50 border-gray-100 cursor-not-allowed opacity-60'
-                                            : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
+                                            ? 'bg-gray-50 !border-gray-100 cursor-not-allowed opacity-60'
+                                            : 'bg-white !border-gray-200 hover:!border-[#800080] hover:shadow-md cursor-pointer'
                                         }`}
                                 >
                                     <div className={`text-2xl ${

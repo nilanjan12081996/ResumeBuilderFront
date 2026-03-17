@@ -33,10 +33,10 @@ const AddSectionButton = ({ onAddNewSection, sections = [] }) => {
         { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
         { id: 'internships', label: 'Internships', icon: <BiBriefcase />, isCustom: false },
         { id: 'extra_curricular', label: 'Extra-curricular Activities', icon: <MdLocalFlorist />, isCustom: false },
-        { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
-        { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
+        // { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
+        // { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
         // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
-        { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
+        // { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
         // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
         // { id: 'licenses', label: 'Licenses & Certifications', icon: <FaCertificate />, isLocked: true },
     ];

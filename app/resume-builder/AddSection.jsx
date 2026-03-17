@@ -28,12 +28,12 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
     { id: 'internships', label: 'Internships', icon: <BiBriefcase />, isCustom: false },
     { id: 'hobbies', label: 'Hobbies', icon: <FaChessKnight />, isCustom: false },
     { id: 'languages', label: 'Languages', icon: <FaLanguage />, isCustom: false },
-    { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
-    { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
+    // { id: 'references', label: 'References', icon: <HiSpeakerphone />, isLocked: true },
+    // { id: 'conferences', label: 'Conferences', icon: <HiSpeakerphone />, isLocked: true },
     // { id: 'volunteering', label: 'Volunteering', icon: <MdVolunteerActivism />, isLocked: true },
-    { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
+    // { id: 'awards', label: 'Awards', icon: <BiAward />, isLocked: true },
     // { id: 'affiliations', label: 'Affiliations', icon: <MdCardMembership />, isLocked: true },
-    { id: 'licenses', label: 'Certifications', icon: <FaCertificate />, isLocked: true },
+    // { id: 'licenses', label: 'Certifications', icon: <FaCertificate />, isLocked: true },
   ];
 
   const handleSelectSection = (sectionId, isAlreadyAdded) => {
@@ -70,10 +70,10 @@ const AddSection = ({ onSelectSection, activeSections = [] }) => {
                 key={section.id}
                 onClick={() => handleSelectSection(section.id, isAlreadyAdded)}
                 disabled={isDisabled}
-                className={`flex items-start gap-3 p-4 rounded-lg border transition-all text-left group relative
+                className={`flex items-start gap-3 p-4 rounded-lg !border transition-all text-left group relative
                   ${isDisabled
-                    ? 'bg-gray-50 border-gray-100 cursor-not-allowed opacity-60'
-                    : 'bg-white border-gray-200 hover:border-[#800080] hover:shadow-md cursor-pointer'
+                    ? 'bg-gray-50 !border-gray-100 cursor-not-allowed opacity-60'
+                    : 'bg-white !border-gray-200 hover:!border-[#800080] hover:shadow-md cursor-pointer'
                   }`}
               >
                 <div className={`text-2xl ${

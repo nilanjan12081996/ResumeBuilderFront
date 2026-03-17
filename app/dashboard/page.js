@@ -245,11 +245,11 @@ const handleCardClick = (type, action) => {
         ) : (
           recentResume?.map((resume) => {
 
-            const typeConfig = {
-              scratch_resume:  { label: "Scratch",  bg: "#DBFCE7", color: "#00A63E" },
-              linkedin_resume: { label: "LinkedIn", bg: "#EAD9FF", color: "#9747FF" },
-              jd_based_resume: { label: "JD Based", bg: "#FFEDD4", color: "#FF7043" },
-              improve_resume:  { label: "Improved", bg: "#DBEAFE", color: "#2B7FFF" },
+           const typeConfig = {
+              scratch_resume:  { label: "Scratch Resume",           bg: "#DBFCE7", color: "#00A63E" },
+              linkedin_resume: { label: "LinkedIn Rewrite",          bg: "#EAD9FF", color: "#9747FF" },
+              jd_based_resume: { label: "JD Based Resume",           bg: "#FFEDD4", color: "#FF7043" },
+              improve_resume:  { label: "Improve Existing Resume",   bg: "#DBEAFE", color: "#2B7FFF" },
             };
             const cfg = typeConfig[resume.resume_type] || { label: resume.resume_type, bg: "#F0F0F0", color: "#777" };
 
@@ -289,9 +289,9 @@ const handleCardClick = (type, action) => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <h3 className="text-[#151515] text-[14px] font-semibold capitalize">
-                        {resume.resume_name?.replace(/_/g, " ")}
-                      </h3>
+                     <h3 className="text-[#151515] text-[14px] font-semibold">
+                      {cfg.label}
+                    </h3>
                       <span
                         className="text-[10px] font-bold px-2 py-[2px] rounded-full"
                         style={{ backgroundColor: cfg.bg, color: cfg.color }}

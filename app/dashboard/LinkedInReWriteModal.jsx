@@ -123,7 +123,7 @@ const LinkedInReWriteModal = ({ open, onClose }) => {
             <button className="rm-close-btn" onClick={onClose} type="button">✕</button>
           </div>
           <p className="rm-subtitle">
-            Upload your resume and we'll craft a standout LinkedIn profile
+            Upload your resume or LinkedIn PDF and we'll craft a standout LinkedIn profile
           </p>
         </div>
 

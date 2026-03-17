@@ -846,7 +846,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             <div style={{
               paddingLeft: `${110 + 16 + leftRight}pt`,
               paddingRight: `${16 + leftRight}pt`,
-              paddingTop: "18pt",
+              paddingTop: "40pt",
               paddingBottom: "16pt",
             }}>
               <div style={{
@@ -883,7 +883,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
                 /* ── No photo mode: name left | job_title + contact right (original layout) ── */
                 <td style={{
                   verticalAlign: "top",
-                  paddingTop: "18pt",
+                  paddingTop: "40pt",
                   paddingBottom: "16pt",
                   paddingLeft: `${16 + leftRight}pt`,
                   paddingRight: `${16 + leftRight}pt`,

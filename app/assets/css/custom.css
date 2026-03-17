@@ -963,12 +963,12 @@ body {
 }
 
 .welcome_area {
-  background: #1d5cfb;
+  background: #800080;
   background: linear-gradient(
     90deg,
-    rgba(29, 92, 251, 1) 0%,
-    rgba(103, 69, 251, 1) 68%,
-    rgba(147, 26, 250, 1) 100%
+    #800080 0%,
+    #9932cc 50%,
+    #ba55d3 100%
   );
 }
 

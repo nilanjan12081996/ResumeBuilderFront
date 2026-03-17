@@ -18,8 +18,8 @@ import {
     generateJdNewExperience,
     summeryGapJd,
     jobDescriptionGapJd,
-    improvementJdSummary,      
-    improvementJdExperience,   
+    improvementJdSummary,
+    improvementJdExperience,
 } from "../reducers/DashboardSlice";
 
 const TONES = [
@@ -64,22 +64,30 @@ const GenerateWithAiModal = ({
         summeryGapJdData,
         jobDescriptionGapJdLoading,
         jobDescriptionGapJdData,
-        improvementJdSummaryLoading,      
-        improvementJdSummaryData,       
-        improvementJdExperienceLoading,   
-        improvementJdExperienceData,     
+        improvementJdSummaryLoading,
+        improvementJdSummaryData,
+        improvementJdExperienceLoading,
+        improvementJdExperienceData,
     } = useSelector((state) => state.dash);
 
     const isSummaryType = aiType === "imp_summary" || aiType === "linkdin_summary";
     const isExperienceType = aiType === "imp_experience" || aiType === "linkdin_experience";
     const isJdType = aiType === "jd_summary" || aiType === "jd_experience";
 
-    const isLoading =
-        (isSummaryType && (improvementSummaryLoading || generateImpNewSummaryLoading)) ||
-        (isExperienceType && (improvementExperienceLoading || generateImpNewExperienceLoading)) ||
-       
-        (aiType === "jd_summary" && (generateJdNewSummaryLoading || improvementJdSummaryLoading)) ||
-        (aiType === "jd_experience" && (generateJdNewExperienceLoading || improvementJdExperienceLoading));
+    // ✅ আলাদা করে improve ও generate loading track করা হচ্ছে
+    const isImproveLoading =
+        (isSummaryType && improvementSummaryLoading) ||
+        (isExperienceType && improvementExperienceLoading) ||
+        (aiType === "jd_summary" && improvementJdSummaryLoading) ||
+        (aiType === "jd_experience" && improvementJdExperienceLoading);
+
+    const isGenerateLoading =
+        (isSummaryType && generateImpNewSummaryLoading) ||
+        (isExperienceType && generateImpNewExperienceLoading) ||
+        (aiType === "jd_summary" && generateJdNewSummaryLoading) ||
+        (aiType === "jd_experience" && generateJdNewExperienceLoading);
+
+    const isLoading = isImproveLoading || isGenerateLoading;
 
     const isGapLoading =
         (aiType === "jd_summary" && summeryGapJdLoading) ||
@@ -124,10 +132,8 @@ const GenerateWithAiModal = ({
         } else if (isExperienceType) {
             raw = improvementExperienceData?.summary || generateImpNewExperienceData?.summary;
         } else if (aiType === "jd_summary") {
-
             raw = generateJdNewSummaryData?.summary || improvementJdSummaryData?.summary;
         } else if (aiType === "jd_experience") {
-
             raw = generateJdNewExperienceData?.summary || improvementJdExperienceData?.summary;
         }
 
@@ -182,8 +188,8 @@ const GenerateWithAiModal = ({
         generateImpNewExperienceData,
         generateJdNewSummaryData,
         generateJdNewExperienceData,
-        improvementJdSummaryData,    
-        improvementJdExperienceData, 
+        improvementJdSummaryData,
+        improvementJdExperienceData,
     ]);
 
     useEffect(() => {
@@ -198,55 +204,53 @@ const GenerateWithAiModal = ({
     }, [open]);
 
     const handleImprove = () => {
-    const sourceText = initialText;
-    if (!sourceText?.trim()) return;
+        const sourceText = initialText;
+        if (!sourceText?.trim()) return;
 
-    onUseAiCount && onUseAiCount();
+        onUseAiCount && onUseAiCount();
 
-    lastAnimatedTextRef.current = "";
-    setAnimatedText("");
-    setTypingDone(false);
+        lastAnimatedTextRef.current = "";
+        setAnimatedText("");
+        setTypingDone(false);
 
-    
-    if (aiType === "jd_summary" || aiType === "jd_experience") {
-        const targetJd = sessionStorage.getItem("target_jd");
-        
-        const jdNeedsText = getGapText();
+        if (aiType === "jd_summary" || aiType === "jd_experience") {
+            const targetJd = sessionStorage.getItem("target_jd");
+            const jdNeedsText = getGapText();
 
-        const payload = {
+            const payload = {
+                security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+                tone,
+                original_text: sourceText,
+                jd_needs: jdNeedsText || "",
+                ...(targetJd && { JD: targetJd }),
+            };
+
+            if (aiType === "jd_summary") {
+                dispatch(improvementJdSummary(payload));
+            } else {
+                dispatch(improvementJdExperience(payload));
+            }
+            return;
+        }
+
+        const impPayload = {
             security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
             tone,
             original_text: sourceText,
-            jd_needs: jdNeedsText || "",  
-            ...(targetJd && { JD: targetJd }),
         };
 
-        if (aiType === "jd_summary") {
-            dispatch(improvementJdSummary(payload));
-        } else {
-            dispatch(improvementJdExperience(payload));
+        if (isSummaryType) {
+            dispatch(improvementSummary(impPayload));
+        } else if (isExperienceType) {
+            dispatch(improvementExperience(impPayload));
         }
-        return;
-    }
-
-    const impPayload = {
-        security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-        tone,
-        original_text: sourceText,
     };
-
-    if (isSummaryType) {
-        dispatch(improvementSummary(impPayload));
-    } else if (isExperienceType) {
-        dispatch(improvementExperience(impPayload));
-    }
-};
 
     const handleNewGenarate = () => {
         if (!fullResumeData) return;
 
         onUseAiCount && onUseAiCount();
-        
+
         lastAnimatedTextRef.current = "";
         setAnimatedText("");
         setTypingDone(false);
@@ -357,7 +361,7 @@ const GenerateWithAiModal = ({
                     </div>
                 )}
 
-                {/* Loading */}
+                {/* Loading — full screen spinner (Generate/Improve এর বাইরে যদি অন্য কোনো loading হয়) */}
                 {isLoading && (
                     <div className="flex flex-col items-center justify-center py-16">
                         <ImSpinner2 className="animate-spin text-2xl text-purple-600 mb-3" />
@@ -394,14 +398,24 @@ const GenerateWithAiModal = ({
                     </div>
                 )}
 
-                {/* Initial Buttons */}
-                {!animatedText && !isLoading && (
+                {/* ✅ Initial Buttons — loading এর সময়ও দেখাবে, বাটনের ভেতরে spinner */}
+                {!animatedText && (
                     <div className="flex mt-5 border border-[#e5d6e5] rounded-sm overflow-hidden relative">
                         <button
                             onClick={handleNewGenarate}
-                            className={`py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition ${hasInitialText ? "w-1/2" : "w-full"}`}
+                            disabled={isLoading}
+                            className={`py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition flex items-center justify-center gap-2
+                            ${isLoading ? "opacity-60 cursor-not-allowed" : ""}
+                            ${hasInitialText ? "w-1/2" : "w-full"}`}
                         >
-                            Generate
+                            {isGenerateLoading ? (
+                                <>
+                                    <ImSpinner2 className="animate-spin text-sm" />
+                                    Generating...
+                                </>
+                            ) : (
+                                "Generate"
+                            )}
                         </button>
 
                         {hasInitialText && (
@@ -409,14 +423,24 @@ const GenerateWithAiModal = ({
                                 <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-[2px] bg-[#d1b3d1]" />
                                 <button
                                     onClick={handleImprove}
-                                    className="w-1/2 py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition"
+                                    disabled={isLoading}
+                                    className={`w-1/2 py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition flex items-center justify-center gap-2
+                                    ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
                                 >
-                                    Improve
+                                    {isImproveLoading ? (
+                                        <>
+                                            <ImSpinner2 className="animate-spin text-sm" />
+                                            Improving...
+                                        </>
+                                    ) : (
+                                        "Improve"
+                                    )}
                                 </button>
                             </>
                         )}
                     </div>
                 )}
+
             </div>
         </div>,
         document.body
@@ -424,7 +448,6 @@ const GenerateWithAiModal = ({
 };
 
 export default GenerateWithAiModal;
-
 
 // 'use client';
 
@@ -446,6 +469,8 @@ export default GenerateWithAiModal;
 //     generateJdNewExperience,
 //     summeryGapJd,
 //     jobDescriptionGapJd,
+//     improvementJdSummary,      
+//     improvementJdExperience,   
 // } from "../reducers/DashboardSlice";
 
 // const TONES = [
@@ -461,6 +486,7 @@ export default GenerateWithAiModal;
 //     initialText = "",
 //     fullResumeData,
 //     onApply,
+//     onUseAiCount
 // }) => {
 //     const dispatch = useDispatch();
 //     const [tone, setTone] = useState("Professional");
@@ -489,8 +515,11 @@ export default GenerateWithAiModal;
 //         summeryGapJdData,
 //         jobDescriptionGapJdLoading,
 //         jobDescriptionGapJdData,
+//         improvementJdSummaryLoading,      
+//         improvementJdSummaryData,       
+//         improvementJdExperienceLoading,   
+//         improvementJdExperienceData,     
 //     } = useSelector((state) => state.dash);
-
 
 //     const isSummaryType = aiType === "imp_summary" || aiType === "linkdin_summary";
 //     const isExperienceType = aiType === "imp_experience" || aiType === "linkdin_experience";
@@ -499,8 +528,9 @@ export default GenerateWithAiModal;
 //     const isLoading =
 //         (isSummaryType && (improvementSummaryLoading || generateImpNewSummaryLoading)) ||
 //         (isExperienceType && (improvementExperienceLoading || generateImpNewExperienceLoading)) ||
-//         (aiType === "jd_summary" && generateJdNewSummaryLoading) ||
-//         (aiType === "jd_experience" && generateJdNewExperienceLoading);
+       
+//         (aiType === "jd_summary" && (generateJdNewSummaryLoading || improvementJdSummaryLoading)) ||
+//         (aiType === "jd_experience" && (generateJdNewExperienceLoading || improvementJdExperienceLoading));
 
 //     const isGapLoading =
 //         (aiType === "jd_summary" && summeryGapJdLoading) ||
@@ -508,7 +538,6 @@ export default GenerateWithAiModal;
 
 //     const hasInitialText = !!initialText?.replace(/<[^>]*>/g, "").trim();
 
-//     // ✅ Call gap API when modal opens for JD types
 //     useEffect(() => {
 //         if (!open || !isJdType) return;
 
@@ -541,14 +570,16 @@ export default GenerateWithAiModal;
 //     useEffect(() => {
 //         let raw;
 
-//        if (isSummaryType) {
+//         if (isSummaryType) {
 //             raw = improvementSummaryData?.summary || generateImpNewSummaryData?.summary;
 //         } else if (isExperienceType) {
 //             raw = improvementExperienceData?.summary || generateImpNewExperienceData?.summary;
 //         } else if (aiType === "jd_summary") {
-//             raw = generateJdNewSummaryData?.summary;
+
+//             raw = generateJdNewSummaryData?.summary || improvementJdSummaryData?.summary;
 //         } else if (aiType === "jd_experience") {
-//             raw = generateJdNewExperienceData?.summary;
+
+//             raw = generateJdNewExperienceData?.summary || improvementJdExperienceData?.summary;
 //         }
 
 //         if (!raw || raw === lastAnimatedTextRef.current) return;
@@ -602,6 +633,8 @@ export default GenerateWithAiModal;
 //         generateImpNewExperienceData,
 //         generateJdNewSummaryData,
 //         generateJdNewExperienceData,
+//         improvementJdSummaryData,    
+//         improvementJdExperienceData, 
 //     ]);
 
 //     useEffect(() => {
@@ -616,47 +649,55 @@ export default GenerateWithAiModal;
 //     }, [open]);
 
 //     const handleImprove = () => {
-//         const sourceText = initialText;
-//         if (!sourceText?.trim()) return;
+//     const sourceText = initialText;
+//     if (!sourceText?.trim()) return;
 
-//         lastAnimatedTextRef.current = "";
-//         setAnimatedText("");
-//         setTypingDone(false);
+//     onUseAiCount && onUseAiCount();
+
+//     lastAnimatedTextRef.current = "";
+//     setAnimatedText("");
+//     setTypingDone(false);
+
+    
+//     if (aiType === "jd_summary" || aiType === "jd_experience") {
+//         const targetJd = sessionStorage.getItem("target_jd");
+        
+//         const jdNeedsText = getGapText();
 
 //         const payload = {
 //             security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
 //             tone,
-//             original_text: JSON.stringify(fullResumeData),
-//         };
-
-//         if (aiType === "jd_summary" || aiType === "jd_experience") {
-//             const targetJd = sessionStorage.getItem("target_jd");
-//             if (targetJd) payload.JD = targetJd;
-
-//             if (aiType === "jd_summary") {
-//                 dispatch(generateJdNewSummary(payload));
-//             } else {
-//                 dispatch(generateJdNewExperience(payload));
-//             }
-//             return;
-//         }
-
-//         const impPayload = {
-//             security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-//             tone,
 //             original_text: sourceText,
+//             jd_needs: jdNeedsText || "",  
+//             ...(targetJd && { JD: targetJd }),
 //         };
 
-//         if (isSummaryType) {
-//             dispatch(improvementSummary(impPayload));
-//         } else if (isExperienceType) {
-//             dispatch(improvementExperience(impPayload));
+//         if (aiType === "jd_summary") {
+//             dispatch(improvementJdSummary(payload));
+//         } else {
+//             dispatch(improvementJdExperience(payload));
 //         }
+//         return;
+//     }
+
+//     const impPayload = {
+//         security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+//         tone,
+//         original_text: sourceText,
 //     };
+
+//     if (isSummaryType) {
+//         dispatch(improvementSummary(impPayload));
+//     } else if (isExperienceType) {
+//         dispatch(improvementExperience(impPayload));
+//     }
+// };
 
 //     const handleNewGenarate = () => {
 //         if (!fullResumeData) return;
 
+//         onUseAiCount && onUseAiCount();
+        
 //         lastAnimatedTextRef.current = "";
 //         setAnimatedText("");
 //         setTypingDone(false);
@@ -672,7 +713,6 @@ export default GenerateWithAiModal;
 //             if (targetJd) payload.JD = targetJd;
 //         }
 
-//         // ✅ Updated Generation Logic
 //         if (isSummaryType) {
 //             dispatch(generateImpNewSummary(payload));
 //         } else if (isExperienceType) {
@@ -690,7 +730,6 @@ export default GenerateWithAiModal;
 //         handleClose();
 //     };
 
-//     // Parse gap API response
 //     const getGapText = () => {
 //         const data = aiType === "jd_summary" ? summeryGapJdData : jobDescriptionGapJdData;
 //         if (!data) return null;
@@ -709,9 +748,7 @@ export default GenerateWithAiModal;
 
 //     if (!open) return null;
 
-    
-
-//     return createPortal (
+//     return createPortal(
 //         <div className="fixed left-140 inset-0 z-[9999] flex items-center justify-center">
 //             <div className="bg-white min-w-[550px] max-w-md rounded-2xl p-4 shadow-[0_12px_32px_rgba(0,0,0,0.18)]">
 
@@ -719,10 +756,10 @@ export default GenerateWithAiModal;
 //                 <div className="flex justify-between items-start">
 //                     <div>
 //                         <h2 className="text-sm font-bold tracking-wide text-[#800080] flex items-center">
-//                             <HiSparkles className="text-lg mr-2" /> AI WRITER
+//                             <HiSparkles className="text-lg mr-2" /> Fix Grammar & Boost Impact
 //                         </h2>
 //                         <p className="text-sm text-gray-500 mt-1">
-//                             Generate something new or improve what you've got!
+//                             Use AI to write and refine this section with clear, impact-focused content
 //                         </p>
 //                     </div>
 //                     <button onClick={handleClose}>
@@ -730,7 +767,7 @@ export default GenerateWithAiModal;
 //                     </button>
 //                 </div>
 
-//                 {/* ✅ This job needs — JD types only, right after subtitle */}
+//                 {/* Gap Analysis — JD types only */}
 //                 {isJdType && (
 //                     <div className="mt-3 rounded-xl border border-purple-100 bg-[#fdf6ff] px-4 py-3 min-h-[52px]">
 //                         {isGapLoading ? (
@@ -739,14 +776,9 @@ export default GenerateWithAiModal;
 //                                 Analyzing job requirements...
 //                             </div>
 //                         ) : gapText ? (
-//                             <>
-//                                 {/* <p className="text-[10px] font-bold text-[#800080] uppercase tracking-widest mb-1">
-//                                     This job needs:
-//                                 </p> */}
-//                                 <p className="text-[12px] font-bold text-[#800080] leading-relaxed whitespace-pre-wrap">
-//                                     {gapText}
-//                                 </p>
-//                             </>
+//                             <p className="text-[12px] font-bold text-[#800080] leading-relaxed whitespace-pre-wrap">
+//                                 {gapText}
+//                             </p>
 //                         ) : null}
 //                     </div>
 //                 )}

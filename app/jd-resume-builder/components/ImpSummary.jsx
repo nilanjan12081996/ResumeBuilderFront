@@ -45,16 +45,19 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex, onAt
 
       <div className="relative flex justify-end items-center mt-2 gap-3">
 
-        {/* Count Badge — left of button */}
+        <span className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full cursor-pointer">
+          Add metrics and impact for a better ATS score
+        </span>
         {typeof aiSummaryCount === 'number' && (
-          <div className="flex items-center gap-1.5">
+          <div className="relative group flex items-center gap-1.5">
+
             {isExhausted ? (
-              <span className="flex items-center gap-1 text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full cursor-pointer">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
                 AI limit reached
               </span>
             ) : (
-              <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border
+              <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border cursor-pointer
                 ${aiSummaryCount <= 2
                   ? 'text-orange-600 bg-orange-50 border-orange-200'
                   : 'text-purple-600 bg-[#f6efff] border-purple-200'
@@ -63,8 +66,15 @@ const ImpSummary = ({ watch, setValue, sections, setSections, sectionIndex, onAt
                 {aiSummaryCount}/{totalCount} left
               </span>
             )}
+
+            {/* Tooltip on hover */}
+            <div className="absolute bottom-full left-0 mb-2 w-56 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
+              You can use this feature up to 5 times to improve your resume with AI.
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+            </div>
           </div>
         )}
+
 
         {/* Button */}
         <div className="relative group">
