@@ -48,6 +48,7 @@ import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import ResumeCompareModal from '../modal/ResumeCompareModal';
 import { useDownload } from '../hooks/useDownload';
 import CVSkeletonLoader from '../ui/CVSkeletonLoader';
+import ResumePageViewer from '../ui/ResumePageViewer';
 
 
 const LinkedInResumeBuilder = () => {
@@ -1084,20 +1085,20 @@ const LinkedInResumeBuilder = () => {
 
   const handleDragEnd = () => { };
 
-  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "l"});
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "l" });
 
-   useEffect(() => {
-      return () => {
-        dispatch(resetDashboard());
-      };
-    }, []);
-  
-    useEffect(() => {
-      return () => {
-        dispatch(resetDashboard());
-        dispatch(resetSingleResume());
-      };
-    }, []);
+  useEffect(() => {
+    return () => {
+      dispatch(resetDashboard());
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetDashboard());
+      dispatch(resetSingleResume());
+    };
+  }, []);
 
   if (!resumeSource) {
     return <CVSkeletonLoader />;
@@ -1337,7 +1338,7 @@ const LinkedInResumeBuilder = () => {
 
       {/* ── Template preview ── */}
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
-        <div className='h-screen overflow-y-scroll hide-scrollbar'>
+        {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
           <div ref={componentRef}>
             <ActiveResume
               formData={formValues}
@@ -1347,7 +1348,24 @@ const LinkedInResumeBuilder = () => {
               resumeSettings={resumeSettings}
             />
           </div>
-        </div>
+        </div> */}
+        <ResumePageViewer
+          contentRef={componentRef}
+          sections={sections}
+          formValues={formValues}
+          resumeSettings={resumeSettings}
+        >
+          <div ref={componentRef}>
+            <ActiveResume
+              formData={formValues}
+              sections={sections}
+              themeColor={themeColor}
+              setValue={setValue}
+              resumeSettings={resumeSettings}
+            />
+          </div>
+        </ResumePageViewer>
+
       </div>
       <ResumeCompareModal
         isOpen={showCompare}

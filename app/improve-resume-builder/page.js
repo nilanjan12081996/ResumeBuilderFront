@@ -52,6 +52,7 @@ import ResumeCompareModal from '../modal/ResumeCompareModal';
 import { resetAiCount } from '../reducers/PlanSlice';
 import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 import LinkedInPrime from '../TemplateNew/LinkedInPrime';
+import ResumePageViewer from '../ui/ResumePageViewer';
 
 const Page = () => {
   const componentRef = useRef();
@@ -1788,7 +1789,12 @@ const Page = () => {
       </div>
 
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
-        <div className='h-screen overflow-y-scroll hide-scrollbar'>
+        <ResumePageViewer
+          contentRef={componentRef}
+          sections={sections}
+          formValues={formValues}
+          resumeSettings={resumeSettings}
+        >
           <div ref={componentRef}>
             <ActiveResume
               formData={formValues}
@@ -1798,7 +1804,8 @@ const Page = () => {
               resumeSettings={resumeSettings}
             />
           </div>
-        </div>
+        </ResumePageViewer>
+
       </div>
       <ResumeCompareModal
         isOpen={showCompare}

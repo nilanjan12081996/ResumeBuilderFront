@@ -58,6 +58,7 @@ export default function TransactionsPage() {
                 <th className="p-3 border border-[#92278F]">Discount Price</th>
                 <th className="p-3 border border-[#92278F]">GST</th>
                 <th className="p-3 border border-[#92278F]">Total Payment</th>
+                <th className="p-3 border border-[#92278F]">Transaction ID</th>
                 <th className="p-3 border border-[#92278F]">Start Date</th>
                 <th className="p-3 border border-[#92278F]">Expiry Date</th>
                 <th className="p-3 border border-[#92278F]">Status</th>
@@ -67,7 +68,7 @@ export default function TransactionsPage() {
               {items.map((txn) => {
                 const isIndian = txn.currency === "INR";
 
-              const priceExclGst = parseFloat(txn.original_amount ?? txn.amount ?? 0);
+                const priceExclGst = parseFloat(txn.original_amount ?? txn.amount ?? 0);
                 const totalPayment = parseFloat(txn.total_amount || 0);
 
                 const currencySymbol = isIndian ? "₹" : "$";
@@ -100,7 +101,9 @@ export default function TransactionsPage() {
                     <td className="border border-[#92278F] p-3 font-semibold">
                       {currencySymbol} {totalPayment.toFixed(2)}
                     </td>
-
+                    <td className="border border-[#92278F] p-3">
+                      {txn.razorpay_payment_id || "-"}
+                    </td>
                     <td className="border border-[#92278F] p-3">
                       {new Date(txn.created_at).toLocaleDateString()}
                     </td>

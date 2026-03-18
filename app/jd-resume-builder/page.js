@@ -50,6 +50,7 @@ import { getSingleResume, resetSingleResume, saveResumeJd } from '../reducers/Re
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import { useDownload } from '../hooks/useDownload';
 import CVSkeletonLoader from '../ui/CVSkeletonLoader';
+import ResumePageViewer from '../ui/ResumePageViewer';
 
 const Page = () => {
   const componentRef = useRef();
@@ -104,10 +105,10 @@ const Page = () => {
 
 
   useEffect(() => {
-  if (!atsLoading && checkJdAtsData?.ATS_Score > 0 && originalAtsScore === null) {
-    setOriginalAtsScore(checkJdAtsData.ATS_Score);
-  }
-}, [checkJdAtsData, atsLoading, originalAtsScore]);
+    if (!atsLoading && checkJdAtsData?.ATS_Score > 0 && originalAtsScore === null) {
+      setOriginalAtsScore(checkJdAtsData.ATS_Score);
+    }
+  }, [checkJdAtsData, atsLoading, originalAtsScore]);
 
 
   // ATS REFRESH
@@ -521,7 +522,7 @@ const Page = () => {
       if (isSimpleList) {
         additionalSectionsList.push({
           id: id++,
-          title: key,          
+          title: key,
           type: "custom_simple",
           items: value.content.map((item, i) => ({
             id: `simple_${i}_${Date.now()}`,
@@ -657,7 +658,7 @@ const Page = () => {
         sections: initialSections,
         oldResumeSettings: {
           ...initialSettings,
-          theme: { ...initialSettings.theme, template: "ats" } 
+          theme: { ...initialSettings.theme, template: "ats" }
         }
       });
     }
@@ -1499,20 +1500,20 @@ const Page = () => {
   // Dummy handler for child components
   const handleDragEnd = () => { };
 
-  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "j"});
+  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "j" });
 
-   useEffect(() => {
-      return () => {
-        dispatch(resetDashboard());
-      };
-    }, []);
-  
-    useEffect(() => {
-      return () => {
-        dispatch(resetDashboard());
-        dispatch(resetSingleResume());
-      };
-    }, []);
+  useEffect(() => {
+    return () => {
+      dispatch(resetDashboard());
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetDashboard());
+      dispatch(resetSingleResume());
+    };
+  }, []);
 
   if (!resumeSource) {
     return <CVSkeletonLoader />;
@@ -1823,7 +1824,7 @@ const Page = () => {
 
       {/* Right Panel - Resume Preview */}
       <div className='lg:w-6/12 bg-[#ffffff] px-0'>
-        <div className='h-screen overflow-y-scroll hide-scrollbar'>
+        {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
           <div ref={componentRef}>
             <ActiveResume
               formData={formValues}
@@ -1833,7 +1834,24 @@ const Page = () => {
               resumeSettings={resumeSettings}
             />
           </div>
-        </div>
+        </div> */}
+        <ResumePageViewer
+          contentRef={componentRef}
+          sections={sections}
+          formValues={formValues}
+          resumeSettings={resumeSettings}
+        >
+          <div ref={componentRef}>
+            <ActiveResume
+              formData={formValues}
+              sections={sections}
+              themeColor={themeColor}
+              setValue={setValue}
+              resumeSettings={resumeSettings}
+            />
+          </div>
+        </ResumePageViewer>
+
       </div>
       <ResumeCompareModal
         isOpen={showCompare}

@@ -62,6 +62,7 @@ import { useTabs } from '../context/TabsContext';
 import { defaultResumeSettings } from '../config/defaultResumeSettings';
 import { FaLock } from 'react-icons/fa';
 import { useDownload } from '../hooks/useDownload';
+import ResumePageViewer from '../ui/ResumePageViewer';
 
 
 
@@ -1205,24 +1206,46 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
             </div>
           </div>
 
-             <div className='lg:w-6/12 bg-[#ffffff] px-0 '>
-          <div className='h-screen overflow-y-scroll hide-scrollbar'>
-            <div ref={componentRef} className=''>
-              <ActiveResume 
-                formData={formValues} 
-                empHistory={empHistory} 
-                themeColor={themeColor} 
-                resumeSettings={resumeSettings}
-                sectionOrder={[
-                  "summary",
-                  "employment", 
-                  "education",
-                  "skills",  
-                  ...activeSections.map(id => id === "extra_curricular" ? "activities" : id),
-                ]}
-              />
-            </div>
-            </div>
+          <div className='lg:w-6/12 bg-[#ffffff] px-0 '>
+            {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
+              <div ref={componentRef} className=''>
+                <ActiveResume 
+                  formData={formValues} 
+                  empHistory={empHistory} 
+                  themeColor={themeColor} 
+                  resumeSettings={resumeSettings}
+                  sectionOrder={[
+                    "summary",
+                    "employment", 
+                    "education",
+                    "skills",  
+                    ...activeSections.map(id => id === "extra_curricular" ? "activities" : id),
+                  ]}
+                />
+              </div>
+            </div> */}
+            <ResumePageViewer
+              contentRef={componentRef}
+              sections={[]}
+              formValues={formValues}
+              resumeSettings={resumeSettings}
+            >
+              <div ref={componentRef}>
+                <ActiveResume 
+                  formData={formValues} 
+                  empHistory={empHistory} 
+                  themeColor={themeColor} 
+                  resumeSettings={resumeSettings}
+                  sectionOrder={[
+                    "summary",
+                    "employment", 
+                    "education",
+                    "skills",  
+                    ...activeSections.map(id => id === "extra_curricular" ? "activities" : id),
+                  ]}
+                />
+              </div>
+            </ResumePageViewer>
           </div>
         </div>
       </Tabs>

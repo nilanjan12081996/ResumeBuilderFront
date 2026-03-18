@@ -86,6 +86,7 @@ import { getSingleResume, saveResumeNew, uploadImageScratch } from '../reducers/
 import isEqual from 'lodash.isequal';
 import { defaultResumeSettings } from "../config/defaultResumeSettings";
 import { useDownload } from '../hooks/useDownload';
+import ResumePageViewer from '../ui/ResumePageViewer';
 
 
 
@@ -843,7 +844,7 @@ const page = () => {
     }, 300);
   };
 
-  useDownload({ componentRef, formValues, resumeSettings, themeColor, resumeType: "s"});
+  useDownload({ componentRef, formValues, resumeSettings, themeColor, resumeType: "s" });
 
   return (
     <div>
@@ -895,69 +896,69 @@ const page = () => {
 
                             {/* ── UPDATED: Profile Photo with Crop Modal ── */}
                             <div className="flex flex-col items-center justify-center w-full md:w-48 border border-gray-200 rounded-lg bg-gray-50 p-2">
-                                {/* Profile Photo with Crop */}
-                                <label
-                                  htmlFor="profile-upload"
-                                  className="cursor-pointer flex flex-col items-center gap-2 relative group"
-                                >
-                                  <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden relative">
-                                    {/*  Uploading spinner */}
-                                    {uploadImageScratchLoading ? (
-                                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                                        <svg className="animate-spin h-6 w-6 text-[#800080]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                                        </svg>
-                                      </div>
-                                    ) : profileImage ? (
-                                      <img
-                                        src={profileImage}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : (
-                                      <FaUser className="text-[30px] text-[#800080]" />
-                                    )}
-                                    {/* Hover overlay */}
-                                    {!uploadImageScratchLoading && (
-                                      <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
-                                        <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <span className="text-sm font-medium text-[#800080] hover:underline">
-                                    {uploadImageScratchLoading ? "Uploading..." : "Upload photo"}
-                                  </span>
-                                </label>
-
-                                {profileImage && !uploadImageScratchLoading && (
-                                  <button
-                                    type="button"
-                                    onClick={handleDeleteImage}
-                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 !bg-transparent"
-                                  >
-                                    <MdDelete size={12} /> Remove
-                                  </button>
-                                )}
-
-                                <span className="text-[10px] text-gray-400 text-center leading-tight">
-                                  JPG, JPEG, PNG<br />Up to 1MB
+                              {/* Profile Photo with Crop */}
+                              <label
+                                htmlFor="profile-upload"
+                                className="cursor-pointer flex flex-col items-center gap-2 relative group"
+                              >
+                                <div className="w-20 h-20 rounded-full bg-white border border-gray-300 flex items-center justify-center overflow-hidden relative">
+                                  {/*  Uploading spinner */}
+                                  {uploadImageScratchLoading ? (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                      <svg className="animate-spin h-6 w-6 text-[#800080]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                      </svg>
+                                    </div>
+                                  ) : profileImage ? (
+                                    <img
+                                      src={profileImage}
+                                      alt="Profile"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <FaUser className="text-[30px] text-[#800080]" />
+                                  )}
+                                  {/* Hover overlay */}
+                                  {!uploadImageScratchLoading && (
+                                    <div className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/25 transition flex items-center justify-center">
+                                      <FaCamera className="text-white text-sm opacity-0 group-hover:opacity-100 transition" />
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="text-sm font-medium text-[#800080] hover:underline">
+                                  {uploadImageScratchLoading ? "Uploading..." : "Upload photo"}
                                 </span>
+                              </label>
 
-                                {profileError && (
-                                  <p className="text-[10px] text-red-500 text-center leading-tight max-w-[110px]">
-                                    {profileError}
-                                  </p>
-                                )}
+                              {profileImage && !uploadImageScratchLoading && (
+                                <button
+                                  type="button"
+                                  onClick={handleDeleteImage}
+                                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 !bg-transparent"
+                                >
+                                  <MdDelete size={12} /> Remove
+                                </button>
+                              )}
 
-                                <input
-                                  type="file"
-                                  id="profile-upload"
-                                  accept=".jpg,.jpeg,.png"
-                                  className="hidden"
-                                  onChange={handleImageChange}
-                                  disabled={uploadImageScratchLoading}
-                                />
+                              <span className="text-[10px] text-gray-400 text-center leading-tight">
+                                JPG, JPEG, PNG<br />Up to 1MB
+                              </span>
+
+                              {profileError && (
+                                <p className="text-[10px] text-red-500 text-center leading-tight max-w-[110px]">
+                                  {profileError}
+                                </p>
+                              )}
+
+                              <input
+                                type="file"
+                                id="profile-upload"
+                                accept=".jpg,.jpeg,.png"
+                                className="hidden"
+                                onChange={handleImageChange}
+                                disabled={uploadImageScratchLoading}
+                              />
                             </div>
 
                             <div className="flex-1">
@@ -1382,12 +1383,23 @@ const page = () => {
         </div>
 
         <div className='lg:w-6/12 bg-[#ffffff] px-0'>
-          <div className='h-screen overflow-y-scroll hide-scrollbar'>
+          {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
 
             <div ref={componentRef}>
               <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} resumeSettings={resumeSettings} />
             </div>
-          </div>
+          </div> */}
+
+          <ResumePageViewer
+            contentRef={componentRef}
+            sections={[]}
+            formValues={formValues}
+            resumeSettings={resumeSettings}
+          >
+            <div ref={componentRef}>
+              <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} resumeSettings={resumeSettings} />
+            </div>
+          </ResumePageViewer>
         </div>
       </div>
     </div>

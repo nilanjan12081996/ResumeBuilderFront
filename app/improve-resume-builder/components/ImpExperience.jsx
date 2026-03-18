@@ -65,7 +65,7 @@ const ImpExperience = ({
   };
 
   const isExhausted = aiExpCount === 0;
-  const totalCount = 5;
+  const totalCount = 12;
   const experienceIds = (section.experiences || []).map((e) => e.id);
 
   return (
@@ -200,7 +200,7 @@ const ImpExperience = ({
                                 )}
                                 {/* Tooltip on hover */}
                                 <div className="absolute bottom-full left-0 mb-2 w-56 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
-                                  You can use this feature up to 5 times to improve your resume with AI.
+                                  You can use this feature up to 12 times to improve your resume with AI.
                                   <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
                                 </div>
                               </div>
@@ -225,7 +225,7 @@ const ImpExperience = ({
                               {/* Tooltip */}
                               {isExhausted && (
                                 <div className="absolute bottom-full right-0 mb-2 w-52 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
-                                  You've used all 5 AI generations for this resume.{" "}
+                                  You've used all 12 AI generations for this resume.{" "}
                                   <span className="text-purple-300 font-semibold">Buy a new plan</span>{" "}
                                   to use it again.
                                   <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />

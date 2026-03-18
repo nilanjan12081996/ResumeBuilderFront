@@ -59,6 +59,6 @@ export const defaultResumeSettings = {
   },
   ai: {
     summary_count: 5,
-    experience_count: 5,
+    experience_count: 12,
   },
 };
