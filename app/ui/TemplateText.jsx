@@ -146,7 +146,7 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
       </div>
 
       {/* FONT SIZE */}
-      <div className="space-y-6">
+      <div className="space-y-2 md:space-y-6">
         <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
           Font Size
         </p>
@@ -156,12 +156,18 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
           const percent = ((value - item.min) / (item.max - item.min)) * 100;
 
           return (
-            <div key={item.key} className="flex items-center gap-4">
-              <label className="w-36 text-sm font-medium text-gray-600">
-                {item.label}
-              </label>
+            <div key={item.key} className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 pb-4 md:pb-0 border-b md:border-none border-gray-100 last:border-none">
 
-              <div className="relative flex-1">
+              <div className="flex justify-between items-center md:w-36">
+                <label className="text-sm font-medium text-gray-600">
+                  {item.label}
+                </label>
+                <span className="md:hidden rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                  {value} {item.unit}
+                </span>
+              </div>
+
+              <div className="relative flex-1 flex items-center gap-3">
                 <input
                   type="range"
                   min={item.min}
@@ -177,18 +183,17 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
                   style={{ "--fill": `${percent}%` }}
                   className="step-slider w-full"
                 />
+
+                <span className="hidden md:inline-block rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 whitespace-nowrap">
+                  {value} {item.unit}
+                </span>
               </div>
-
-              <span className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                {value} {item.unit}
-              </span>
-
               <button
                 type="button"
-                className={`px-2 py-1 text-xs font-semibold rounded transition-colors
-                  ${value === defaultSettings[item.key]
-                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "bg-green-500 text-white hover:bg-green-600"
+                className={`w-full md:w-auto px-4 md:px-2 py-2 md:py-1 text-xs font-semibold rounded transition-colors
+            ${value === defaultSettings[item.key]
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-green-500 text-white hover:bg-green-600 shadow-sm"
                   }`}
                 onClick={() =>
                   setTextSettings({

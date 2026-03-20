@@ -84,22 +84,22 @@ const TemplateAndColors = ({
     return (
         <>
             {/* MAIN COLOR PICKER */}
-            <div className="flex items-center justify-center gap-6 mb-10">
-                <span className="text-lg font-medium">Main color</span>
+            <div className="flex items-center justify-center gap-6 mb-4 md:mb-10">
+                <span className="text-sm md:text-lg font-medium">Main color</span>
 
-                <div className="flex gap-3 items-center">
+                <div className="flex gap-2 md:gap-3 items-center">
                     {colorOptions.map((color) => (
                         <button
                             key={color.value}
                             onClick={() => setThemeColor(color.value)}
-                            className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center ${
+                            className={`relative w-7 h-7 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center ${
                                 themeColor === color.value
                                     ? "border-blue-500"
                                     : "border-gray-300"
                             }`}
                         >
                             <div
-                                className="w-7 h-7 rounded-full"
+                                className="w-5 h-5 md:w-7 md:h-7 rounded-full"
                                 style={{ backgroundColor: color.value }}
                             />
                             {themeColor === color.value && (
@@ -108,7 +108,7 @@ const TemplateAndColors = ({
                         </button>
                     ))}
 
-                    <label className="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer flex items-center justify-center relative">
+                    <label className="w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-gray-300 cursor-pointer flex items-center justify-center relative">
                         <div className="absolute">
                             <CiPickerEmpty className="text-white text-[18px]" />
                         </div>
@@ -119,7 +119,7 @@ const TemplateAndColors = ({
                             className="opacity-0 absolute w-0 h-0"
                         />
                         <div
-                            className="w-7 h-7 rounded-full"
+                            className="w-5 h-5 md:w-7 md:h-7 rounded-full"
                             style={{ backgroundColor: themeColor }}
                         />
                     </label>
@@ -138,7 +138,7 @@ const TemplateAndColors = ({
                         >
                             <div
                                 onClick={() => handleTemplateClick(template.id)}
-                                className={`relative bg-white p-2 border shadow-sm transition-all
+                                className={`relative bg-white p-2 border shadow-sm transition-all flex flex-col items-center
                                     ${isDisabled
                                         ? "opacity-50 cursor-not-allowed"
                                         : "cursor-pointer hover:shadow-xl hover:-translate-y-1"
@@ -146,17 +146,17 @@ const TemplateAndColors = ({
                                     ${selectedTemplate === template.id ? "ring-2 ring-blue-500 border-blue-500" : "border-gray-200"}
                                 `}
                             >
-                                <h3 className="text-[18px] font-medium mb-2 text-slate-800">
+                                <h3 className="text-[18px] font-medium mb-2 text-slate-800 text-center w-full">
                                     {template.name}
                                 </h3>
 
-                                <div className="relative">
+                                <div className="relative w-full flex justify-center">
                                     <Image
                                         src={template.image}
                                         alt={template.name}
                                         width={200}
                                         height={200}
-                                        className="h-auto aspect-[1/1.41] object-cover"
+                                        className="h-auto aspect-[1/1.41] object-cover mx-auto"
                                     />
 
                                     {selectedTemplate === template.id && (

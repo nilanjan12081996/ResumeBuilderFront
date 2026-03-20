@@ -4,27 +4,27 @@ import React from "react";
 const skillLevels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
 
 const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, themeColor }) => {
-  const text    = resumeSettings?.text   || {};
-  const layout  = resumeSettings?.layout || {};
+  const text = resumeSettings?.text || {};
+  const layout = resumeSettings?.layout || {};
 
   // ── themeColor শুধু header bg তে ──
   const headerBg = themeColor || "#ffeb3b";
 
-  const topBottom            = layout.topBottom            ?? 28;
-  const leftRight            = layout.leftRight            ?? 28;
-  const betweenSections      = layout.betweenSections      ?? 16;
+  const topBottom = layout.topBottom ?? 28;
+  const leftRight = layout.leftRight ?? 28;
+  const betweenSections = layout.betweenSections ?? 16;
   const betweenTitlesContent = layout.betweenTitlesContent ?? 8;
 
-  const primaryFont            = text.primaryFont            || "Arial, Helvetica, sans-serif";
-  const secondaryFont          = text.secondaryFont          || "Arial, Helvetica, sans-serif";
-  const bodySize               = text.body                   || 9;
-  const bodyWeight             = text.bodyWeight             || "normal";
-  const lineHeight             = text.lineHeight             || 1.5;
-  const sectionTitleSize       = text.sectionTitle           || 10;
-  const sectionTitleWeight     = text.sectionTitleWeight     || "800";
-  const primaryHeadingSize     = text.primaryHeading         || 36;
-  const primaryHeadingWeight   = text.primaryHeadingWeight   || "900";
-  const secondaryHeadingSize   = text.secondaryHeading       || 9;
+  const primaryFont = text.primaryFont || "Arial, Helvetica, sans-serif";
+  const secondaryFont = text.secondaryFont || "Arial, Helvetica, sans-serif";
+  const bodySize = text.body || 9;
+  const bodyWeight = text.bodyWeight || "normal";
+  const lineHeight = text.lineHeight || 1.5;
+  const sectionTitleSize = text.sectionTitle || 10;
+  const sectionTitleWeight = text.sectionTitleWeight || "800";
+  const primaryHeadingSize = text.primaryHeading || 36;
+  const primaryHeadingWeight = text.primaryHeadingWeight || "900";
+  const secondaryHeadingSize = text.secondaryHeading || 9;
   const secondaryHeadingWeight = text.secondaryHeadingWeight || "700";
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
 
   const dateRange = (startDate, endDate) => {
     const start = formatDate(startDate);
-    const end   = formatDate(endDate);
+    const end = formatDate(endDate);
     if (start && end) return `${start} — ${end}`;
     return start || end || "";
   };
@@ -114,8 +114,8 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
   // ── Skill bar — table-based, PDF-safe ────────────────────────────────────
   const SkillBar = ({ level, total = 5 }) => {
     const filled = Math.max(1, Math.min(total, Math.round(level ?? 0) + 1));
-    const SEG_H  = "4pt";
-    const cells  = Array.from({ length: total }).map((_, i) => i < filled ? "#111" : "#e5e7eb");
+    const SEG_H = "4pt";
+    const cells = Array.from({ length: total }).map((_, i) => i < filled ? "#111" : "#e5e7eb");
     return (
       <table style={{
         width: "100%",
@@ -362,8 +362,8 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       .filter(k => k.startsWith("customSimpleHistory_custom_simple_"))
       .map(key => {
         const sectionId = key.replace("customSimpleHistory_", "");
-        const history   = formData[key];
-        const title     = formData[`customSimpleTitle_${sectionId}`]     || "Custom Section";
+        const history = formData[key];
+        const title = formData[`customSimpleTitle_${sectionId}`] || "Custom Section";
         const hideLevel = formData[`customSimpleHideLevel_${sectionId}`] ?? true;
         if (!history?.some(i => i.name)) return null;
         return (
@@ -397,8 +397,8 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       .filter(k => k.startsWith("customAdvancedHistory_custom_advanced_"))
       .map(key => {
         const sectionId = key.replace("customAdvancedHistory_", "");
-        const history   = formData[key];
-        const title     = formData[`customAdvancedTitle_${sectionId}`] || "Custom Section";
+        const history = formData[key];
+        const title = formData[`customAdvancedTitle_${sectionId}`] || "Custom Section";
         if (!history?.some(i => i.title || i.city)) return null;
         return (
           <div key={sectionId} style={sectionGap}>
@@ -617,7 +617,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <div key={section.id} style={sectionGap}>
         <SectionHeading title={section.title} />
         {section.items?.map((item, i) => {
-          const name  = typeof item === "object" ? (item.name || item.title) : item;
+          const name = typeof item === "object" ? (item.name || item.title) : item;
           const level = typeof item === "object" ? (item.level ?? 2) : 2;
           return (
             <div key={i} style={{ marginBottom: "4pt" }}>
@@ -670,19 +670,19 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
     if (sections && sections.length > 0) {
       return sections.map(section => {
         switch (section.type) {
-          case "summary":        return renderSummaryFromSection(section);
-          case "experience":     return renderExperienceFromSection(section);
-          case "education":      return renderEducationFromSection(section);
+          case "summary": return renderSummaryFromSection(section);
+          case "experience": return renderExperienceFromSection(section);
+          case "education": return renderEducationFromSection(section);
           case "certifications": return renderCertificationsFromSection(section);
-          case "courses":        return renderCoursesFromSection(section);
-          case "internships":    return renderInternshipsFromSection(section);
-          case "activities":     return renderActivitiesFromSection(section);
-          case "skills":         return renderSkillsFromSection(section);
-          case "languages":      return renderLanguagesFromSection(section);
-          case "hobbies":        return renderHobbiesFromSection(section);
-          case "custom_simple":  return renderCustomSimpleFromSection(section);
-          case "custom":         return renderCustomAdvancedFromSection(section);
-          default:               return null;
+          case "courses": return renderCoursesFromSection(section);
+          case "internships": return renderInternshipsFromSection(section);
+          case "activities": return renderActivitiesFromSection(section);
+          case "skills": return renderSkillsFromSection(section);
+          case "languages": return renderLanguagesFromSection(section);
+          case "hobbies": return renderHobbiesFromSection(section);
+          case "custom_simple": return renderCustomSimpleFromSection(section);
+          case "custom": return renderCustomAdvancedFromSection(section);
+          default: return null;
         }
       });
     }
@@ -692,22 +692,22 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       "skills", "languages", "hobbies", "internships", "courses",
     ];
     const map = {
-      summary:     renderSummaryScratch,
-      employment:  renderEmploymentScratch,
-      education:   renderEducationScratch,
-      skills:      renderSkillsScratch,
-      languages:   renderLanguagesScratch,
-      hobbies:     renderHobbiesScratch,
-      activities:  renderActivitiesScratch,
+      summary: renderSummaryScratch,
+      employment: renderEmploymentScratch,
+      education: renderEducationScratch,
+      skills: renderSkillsScratch,
+      languages: renderLanguagesScratch,
+      hobbies: renderHobbiesScratch,
+      activities: renderActivitiesScratch,
       internships: renderInternshipsScratch,
-      courses:     renderCoursesScratch,
+      courses: renderCoursesScratch,
     };
     return [
       ...order.map(id => {
         if (id.startsWith("custom_simple_")) {
-          const h     = formData[`customSimpleHistory_${id}`];
+          const h = formData[`customSimpleHistory_${id}`];
           const title = formData[`customSimpleTitle_${id}`] || "Custom Section";
-          const hide  = formData[`customSimpleHideLevel_${id}`] ?? true;
+          const hide = formData[`customSimpleHideLevel_${id}`] ?? true;
           if (!h?.some(i => i.name)) return null;
           return (
             <div key={id} style={sectionGap}>
@@ -735,7 +735,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
           );
         }
         if (id.startsWith("custom_advanced_")) {
-          const h     = formData[`customAdvancedHistory_${id}`];
+          const h = formData[`customAdvancedHistory_${id}`];
           const title = formData[`customAdvancedTitle_${id}`] || "Custom Section";
           if (!h?.some(i => i.title || i.city)) return null;
           return (
@@ -763,11 +763,11 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
 
   // ── Links ─────────────────────────────────────────────────────────────────
   const links = [];
-  if (formData.linkedin)      links.push({ label: "LinkedIn",       url: formData.linkedin });
-  if (formData.github)        links.push({ label: "GitHub",         url: formData.github });
+  if (formData.linkedin) links.push({ label: "LinkedIn", url: formData.linkedin });
+  if (formData.github) links.push({ label: "GitHub", url: formData.github });
   if (formData.stackoverflow) links.push({ label: "Stack Overflow", url: formData.stackoverflow });
-  if (formData.leetcode)      links.push({ label: "LeetCode",       url: formData.leetcode });
-  if (formData.website)       links.push({ label: "Portfolio",      url: formData.website });
+  if (formData.leetcode) links.push({ label: "LeetCode", url: formData.leetcode });
+  if (formData.website) links.push({ label: "Portfolio", url: formData.website });
 
   // ── Details section logic ─────────────────────────────────────────────────
   const hasPhoto = !!formData.profileImage;
@@ -820,137 +820,142 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         {/* ══ HEADER — themeColor bg, flush to top ══ */}
         {/* Photo mode uses a wrapper div with position:relative so the img stretches to full height */}
         {hasPhoto ? (
-          <div style={{ position: "relative", width: "100%", backgroundColor: headerBg, display: "table" }}>
-            {/* Photo — position absolute, stretches full height of the row */}
-            <div style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "110pt",
-              bottom: 0,
-              overflow: "hidden",
-            }}>
-              <img
-                src={formData.profileImage}
-                alt="Profile"
-                style={{
+          <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: headerBg }}>
+            <tbody>
+              <tr>
+                {/* Photo cell — no padding, image fills the cell */}
+                <td style={{
                   width: "110pt",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center top",
-                  display: "block",
-                }}
-              />
-            </div>
-            {/* Content — paddingLeft pushes content past photo */}
-            <div style={{
-              paddingLeft: `${110 + 16 + leftRight}pt`,
-              paddingRight: `${16 + leftRight}pt`,
-              paddingTop: "40pt",
-              paddingBottom: "16pt",
-            }}>
-              <div style={{
-                fontFamily: secondaryFont,
-                fontSize: `${primaryHeadingSize}pt`,
-                fontWeight: primaryHeadingWeight,
-                color: "#111",
-                lineHeight: "1.05",
-                letterSpacing: "-0.01em",
-                marginBottom: formData.job_target ? "8pt" : "0",
-              }}>
-                {formData.first_name && <div>{formData.first_name}</div>}
-                {formData.last_name  && <div>{formData.last_name}</div>}
-              </div>
-              {formData.job_target && (
-                <div style={{
-                  fontFamily: secondaryFont,
-                  fontSize: `${secondaryHeadingSize}pt`,
-                  fontWeight: secondaryHeadingWeight,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  color: "#333",
+                  padding: 0,
+                  verticalAlign: "top",
+                  lineHeight: 0,
+                  fontSize: 0,
                 }}>
-                  {formData.job_target}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: headerBg }}>
-          <tbody>
-            <tr>
-              {(
-                /* ── No photo mode: name left | job_title + contact right (original layout) ── */
+                  <img
+                    src={formData.profileImage}
+                    alt="Profile"
+                    style={{
+                      width: "110pt",
+                      height: "100%",
+                      minHeight: "130pt",
+                      objectFit: "cover",
+                      objectPosition: "center top",
+                      display: "block",
+                    }}
+                  />
+                </td>
+                {/* Content cell */}
                 <td style={{
                   verticalAlign: "top",
-                  paddingTop: "40pt",
-                  paddingBottom: "16pt",
                   paddingLeft: `${16 + leftRight}pt`,
                   paddingRight: `${16 + leftRight}pt`,
+                  paddingTop: "40pt",
+                  paddingBottom: "16pt",
                 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                    <tbody>
-                      <tr>
-                        {/* Left: Name */}
-                        <td style={{ verticalAlign: "middle", width: "55%" }}>
-                          <div style={{
-                            fontFamily: secondaryFont,
-                            fontSize: `${primaryHeadingSize}pt`,
-                            fontWeight: primaryHeadingWeight,
-                            color: "#111",
-                            lineHeight: "1.0",
-                            letterSpacing: "-0.01em",
-                          }}>
-                            {formData.first_name && <div>{formData.first_name}</div>}
-                            {formData.last_name  && <div>{formData.last_name}</div>}
-                          </div>
-                        </td>
-                        {/* Right: Job title + contact */}
-                        <td style={{ verticalAlign: "top", width: "45%", paddingLeft: "12pt" }}>
-                          {formData.job_target && (
+                  <div style={{
+                    fontFamily: secondaryFont,
+                    fontSize: `${primaryHeadingSize}pt`,
+                    fontWeight: primaryHeadingWeight,
+                    color: "#111",
+                    lineHeight: "1.05",
+                    letterSpacing: "-0.01em",
+                    marginBottom: formData.job_target ? "8pt" : "0",
+                  }}>
+                    {formData.first_name && <div>{formData.first_name}</div>}
+                    {formData.last_name && <div>{formData.last_name}</div>}
+                  </div>
+                  {formData.job_target && (
+                    <div style={{
+                      fontFamily: secondaryFont,
+                      fontSize: `${secondaryHeadingSize}pt`,
+                      fontWeight: secondaryHeadingWeight,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      color: "#333",
+                    }}>
+                      {formData.job_target}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: headerBg }}>
+            <tbody>
+              <tr>
+                {(
+                  /* ── No photo mode: name left | job_title + contact right (original layout) ── */
+                  <td style={{
+                    verticalAlign: "top",
+                    paddingTop: "40pt",
+                    paddingBottom: "16pt",
+                    paddingLeft: `${16 + leftRight}pt`,
+                    paddingRight: `${16 + leftRight}pt`,
+                  }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <tbody>
+                        <tr>
+                          {/* Left: Name */}
+                          <td style={{ verticalAlign: "middle", width: "55%" }}>
                             <div style={{
                               fontFamily: secondaryFont,
-                              fontSize: `${secondaryHeadingSize}pt`,
-                              fontWeight: secondaryHeadingWeight,
-                              textTransform: "uppercase",
-                              letterSpacing: "0.08em",
-                              color: "#333",
-                              marginBottom: "6pt",
+                              fontSize: `${primaryHeadingSize}pt`,
+                              fontWeight: primaryHeadingWeight,
+                              color: "#111",
+                              lineHeight: "1.0",
+                              letterSpacing: "-0.01em",
                             }}>
-                              {formData.job_target}
+                              {formData.first_name && <div>{formData.first_name}</div>}
+                              {formData.last_name && <div>{formData.last_name}</div>}
                             </div>
-                          )}
-                          {(formData.address || formData.city_state || formData.country) && (
-                            <div style={{ ...bodyStyle, color: "#333", marginBottom: "1pt" }}>
-                              {formData.address && <>{formData.address}, </>}
-                              {formData.city_state}
-                              {formData.city_state && formData.country ? ", " : ""}
-                              {formData.country}
-                              {formData.postal_code ? ` ${formData.postal_code}` : ""}
-                            </div>
-                          )}
-                          {formData.email && (
-                            <div style={{ marginBottom: "1pt" }}>
-                              <a href={`mailto:${formData.email}`} style={{ ...bodyStyle, color: "#333", textDecoration: "none", fontWeight: "500" }}>
-                                {formData.email}
-                              </a>
-                            </div>
-                          )}
-                          {formData.phone && (
-                            <div style={{ ...bodyStyle, color: "#333", fontWeight: "500" }}>
-                              {formData.phone}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-              )}
+                          </td>
+                          {/* Right: Job title + contact */}
+                          <td style={{ verticalAlign: "top", width: "45%", paddingLeft: "12pt" }}>
+                            {formData.job_target && (
+                              <div style={{
+                                fontFamily: secondaryFont,
+                                fontSize: `${secondaryHeadingSize}pt`,
+                                fontWeight: secondaryHeadingWeight,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.08em",
+                                color: "#333",
+                                marginBottom: "6pt",
+                              }}>
+                                {formData.job_target}
+                              </div>
+                            )}
+                            {(formData.address || formData.city_state || formData.country) && (
+                              <div style={{ ...bodyStyle, color: "#333", marginBottom: "1pt" }}>
+                                {formData.address && <>{formData.address}, </>}
+                                {formData.city_state}
+                                {formData.city_state && formData.country ? ", " : ""}
+                                {formData.country}
+                                {formData.postal_code ? ` ${formData.postal_code}` : ""}
+                              </div>
+                            )}
+                            {formData.email && (
+                              <div style={{ marginBottom: "1pt" }}>
+                                <a href={`mailto:${formData.email}`} style={{ ...bodyStyle, color: "#333", textDecoration: "none", fontWeight: "500" }}>
+                                  {formData.email}
+                                </a>
+                              </div>
+                            )}
+                            {formData.phone && (
+                              <div style={{ ...bodyStyle, color: "#333", fontWeight: "500" }}>
+                                {formData.phone}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                )}
 
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+            </tbody>
+          </table>
         )}
 
         {/* ══ BODY ══ */}

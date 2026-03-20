@@ -213,7 +213,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
 
             <Modal size="lg" show={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                 <ModalHeader className='border-none pb-0 absolute right-3 top-3 bg-transparent z-10'>&nbsp;</ModalHeader>
-                <ModalBody className='bg-white p-0 rounded-2xl overflow-hidden'>
+               <ModalBody className='rm-modal-body bg-white p-0 rounded-2xl overflow-y-auto' style={{ maxHeight: '90dvh' }}>
                     <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
 
                         {/* Top accent bar */}

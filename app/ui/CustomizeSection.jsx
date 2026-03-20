@@ -21,7 +21,7 @@ const CustomizeSection = ({
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-12 py-4 text-lg font-medium transition-all border-b-4 ${activeTab === tab
+            className={`px-5 py-2 md:px-12 md:py-4 text-[12px] md:text-lg font-medium transition-all border-b-4 ${activeTab === tab
               ? "border-blue-500 text-slate-900"
               : "border-transparent text-slate-400"
               }`}
@@ -31,7 +31,7 @@ const CustomizeSection = ({
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto py-8 px-4">
+      <div className="max-w-6xl mx-auto py-4 md:py-8 px-4">
         {activeTab === "Template & Design" && (
           <TemplateAndColors
             selectedTemplate={selectedTemplate}
