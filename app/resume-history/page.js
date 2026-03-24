@@ -70,6 +70,7 @@ const page = () => {
       const type = hist?.data?.resume_type;
       const firstName = hist?.data?.first_name || "";
       const lastName = hist?.data?.last_name || "";
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
       const jobTarget = hist?.data?.job_target || "";
       const cfg = TYPE_CONFIG[type] || {};
 
@@ -80,6 +81,7 @@ const page = () => {
         cfg.label?.toLowerCase().includes(searchLower) ||
         firstName.toLowerCase().includes(searchLower) ||
         lastName.toLowerCase().includes(searchLower) ||
+         fullName.toLowerCase().includes(searchLower) ||
         jobTarget.toLowerCase().includes(searchLower);
 
       return matchesType && matchesSearch;
