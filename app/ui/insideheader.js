@@ -252,7 +252,7 @@ const Insideheader = () => {
                             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none"><path d="M9 12H15M9 16H15M9 8H11" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" /><path fillRule="evenodd" clipRule="evenodd" d="M6 2C4.34315 2 3 3.34315 3 5V19C3 20.6569 4.34315 22 6 22H18C19.6569 22 21 20.6569 21 19V9L15 2H6ZM6 4H14V10H20V19C20 19.5523 19.5523 20 19 20H6C5.44772 20 5 19.5523 5 19V5C5 4.44772 5.44772 4 6 4Z" fill="#3b82f6" /></svg>
                           }
                         </div>
-                        <div className="flex-1 min-w-0"><p className="text-sm font-semibold text-gray-800">Word Document</p><p className="text-[11px] text-gray-400 mt-0.5">Editable .docx format <span style={{ color: "#000" , fontWeight:"700"}}>(Profile picture not supported in DOCX if any.)</span></p></div>
+                        <div className="flex-1 min-w-0"><p className="text-sm font-semibold text-gray-800">Word Document</p><p className="text-[11px] text-gray-400 mt-0.5">Editable .docx format</p></div>
                       </button>
                     </>
                   )}

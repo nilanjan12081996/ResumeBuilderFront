@@ -495,8 +495,10 @@ import { FaArrowUpWideShort } from "react-icons/fa6";
 import { AiOutlineEdit } from "react-icons/ai";
 import { MdOutlineDelete } from "react-icons/md";
 import { BiFilter } from "react-icons/bi";
-import { Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker,
-     Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
+import {
+  Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker,
+  Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow
+} from "flowbite-react";
 import serverApi from '../reducers/serverApi';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -542,9 +544,9 @@ const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1,
 
   const colorMap = {
     purple: { bg: 'bg-purple-50', border: 'border-purple-200', btn: 'bg-purple-100 hover:bg-purple-200 text-purple-700', text: 'text-purple-700', badge: 'bg-purple-100' },
-    blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   btn: 'bg-blue-100 hover:bg-blue-200 text-blue-700',     text: 'text-blue-700',   badge: 'bg-blue-100'   },
+    blue: { bg: 'bg-blue-50', border: 'border-blue-200', btn: 'bg-blue-100 hover:bg-blue-200 text-blue-700', text: 'text-blue-700', badge: 'bg-blue-100' },
     orange: { bg: 'bg-orange-50', border: 'border-orange-200', btn: 'bg-orange-100 hover:bg-orange-200 text-orange-700', text: 'text-orange-700', badge: 'bg-orange-100' },
-    green:  { bg: 'bg-green-50',  border: 'border-green-200',  btn: 'bg-green-100 hover:bg-green-200 text-green-700',  text: 'text-green-700',  badge: 'bg-green-100'  },
+    green: { bg: 'bg-green-50', border: 'border-green-200', btn: 'bg-green-100 hover:bg-green-200 text-green-700', text: 'text-green-700', badge: 'bg-green-100' },
   }
   const c = colorMap[color] || colorMap.purple
 
@@ -646,6 +648,7 @@ const page = () => {
   const { loading_for_csv, loading_for_manual, loading } = useSelector((state) => state?.inviteStd)
   const { currentSubscriptionData } = useSelector((state) => state?.planst)
   const dispatch = useDispatch()
+  const studentListRef = React.useRef(null)
 
   // Determine which resume types are active in current subscription
   const activeTypes = React.useMemo(() => {
@@ -658,9 +661,9 @@ const page = () => {
     const totals = { imp_count: 0, link_count: 0, jd_count: 0, scratch_count: 0 }
     currentSubscriptionData.data.forEach((sub) => {
       if (sub.status === 1) {
-        totals.imp_count    += sub.imp_count    || 0
-        totals.link_count   += sub.link_count   || 0
-        totals.jd_count     += sub.jd_count     || 0
+        totals.imp_count += sub.imp_count || 0
+        totals.link_count += sub.link_count || 0
+        totals.jd_count += sub.jd_count || 0
         totals.scratch_count += sub.scratch_count || 0
       }
     })
@@ -691,7 +694,7 @@ const page = () => {
     }
   }
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm()
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm()
 
   const {
     register: register1,
@@ -721,6 +724,10 @@ const page = () => {
       } else if (res?.payload?.status_code === 200) {
         dispatch(invitedStudentsList({ page: 1, limit: 10 }))
         toast.success(res?.payload?.message)
+        reset()
+        setTimeout(() => {
+          studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 300)
       }
     })
   }
@@ -728,9 +735,9 @@ const page = () => {
   const onSubmitManual = (data) => {
     for (const student of data.students) {
       const payload = {
-        name:    student.name,
-        email:   student.email,
-        phone:   student.phone,
+        name: student.name,
+        email: student.email,
+        phone: student.phone,
         improve: Number(student.improve) || 0,
         linkdin: Number(student.linkdin) || 0,
       }
@@ -742,13 +749,16 @@ const page = () => {
           toast.success(res?.payload?.message)
           dispatch(invitedStudentsList({ page: 1, limit: 10 }))
         }
+        setTimeout(() => {
+          studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 300)
       })
     }
     // Reset only the quota fields (improve, linkdin) to 0, keep name/email/phone
     const currentVals = data.students.map((s) => ({
-      name:    s.name,
-      email:   s.email,
-      phone:   s.phone,
+      name: s.name,
+      email: s.email,
+      phone: s.phone,
       improve: 0,
       linkdin: 0,
     }))
@@ -761,9 +771,9 @@ const page = () => {
       const selectedStudents = e.detail || []
       if (selectedStudents.length === 0) return
       const newStudents = selectedStudents.map((s) => ({
-        name:    s?.user?.fullname || '',
-        email:   s?.user?.email   || '',
-        phone:   s?.user?.phone   || '',
+        name: s?.user?.fullname || '',
+        email: s?.user?.email || '',
+        phone: s?.user?.phone || '',
         improve: 0,
         linkdin: 0,
       }))
@@ -952,7 +962,9 @@ const page = () => {
         </div>
       </div>
 
-      <StudentList />
+      <div ref={studentListRef}>
+        <StudentList />
+      </div>
     </div>
   )
 }

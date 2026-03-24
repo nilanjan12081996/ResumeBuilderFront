@@ -279,9 +279,9 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
 
                                         {chooseResumeType == 2 && (
                                             <div className="rm-reg-field">
-                                                <label className="rm-reg-label">Organization Name</label>
+                                                <label className="rm-reg-label">Institution Name</label>
                                                 <input className="rm-reg-input" type="text" placeholder="Acme Corp"
-                                                    {...register("organization_name", { required: "Organization name is required" })} />
+                                                    {...register("organization_name", { required: "Institution name is required" })} />
                                                 {errors?.organization_name && <p className="rm-reg-error">{errors.organization_name.message}</p>}
                                             </div>
                                         )}
