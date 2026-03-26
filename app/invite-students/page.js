@@ -808,48 +808,139 @@ const page = () => {
         {/* ── CSV Upload ── */}
         <div className='lg:w-6/12 mb-4 lg:mb-0'>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='mb-0'>
-              <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
-              <div className="flex w-full items-center justify-center">
-                <Label
-                  htmlFor="dropzone-file"
-                  className="resume_upload_box_small2 flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100"
-                >
-                  <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                    <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
-                    <p className="my-2 text-xl text-[#000000]">
-                      {csvFile && csvFile[0] ? csvFile[0].name : "Select a CSV file to import"}
-                    </p>
-                    <p className='text-[#A4A4A4] text-base'>or drag and drop it here</p>
-                  </div>
-                  <FileInput
-                    {...register("file", { required: true })}
-                    accept='.csv'
-                    id="dropzone-file"
-                    className="hidden"
-                    aria-invalid={errors.resume_file ? "true" : "false"}
-                  />
-                </Label>
+            <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
+
+            <div className="flex gap-4 items-start">
+
+              {/* Left: Upload box + buttons */}
+              <div className="w-1/2 flex-shrink-0">
+                <div className="flex w-full items-center justify-center">
+                  <Label
+                    htmlFor="dropzone-file"
+                    className="resume_upload_box_small2 flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100"
+                  >
+                    <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                      <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
+                      <p className="my-2 text-sm text-[#000000] text-center">
+                        {csvFile && csvFile[0] ? csvFile[0].name : "Select a CSV file to import"}
+                      </p>
+                      <p className='text-[#A4A4A4] text-xs text-center'>or drag and drop it here</p>
+                    </div>
+                    <FileInput
+                      {...register("file", { required: true })}
+                      accept='.csv'
+                      id="dropzone-file"
+                      className="hidden"
+                      aria-invalid={errors.resume_file ? "true" : "false"}
+                    />
+                  </Label>
+                </div>
+                {errors.file?.type === "required" && (
+                  <p className="text-red-700 text-sm mt-1" role="alert">Please upload csv</p>
+                )}
+                <div className="flex flex-col gap-2 mt-3">
+                  <button
+                    type='button'
+                    onClick={handleDownload}
+                    className="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer text-[13px] leading-[40px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center justify-center"
+                  >
+                    <BiImport className="text-[18px]" /> Download Sample CSV
+                  </button>
+                  <button className="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer text-[13px] leading-[40px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">
+                    {loading_for_csv || loading ? "Waiting..." : "Invite Students"}
+                  </button>
+                </div>
               </div>
-              {errors.file?.type === "required" && (
-                <p className="text-red-700 text-sm" role="alert">Please upload csv</p>
-              )}
-              <div className='lg:flex gap-4 mt-3'>
-                <button
-                  type='button'
-                  onClick={handleDownload}
-                  className="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"
-                >
-                  <BiImport className="text-[24px]" /> Download Sample CSV
-                </button>
-                <button className="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">
-                  {loading_for_csv || loading ? "Waiting..." : "Invite Students"}
-                </button>
+
+              {/* Right: Instructions */}
+              <div className="w-1/2 rounded-xl border border-purple-100 bg-gradient-to-br from-purple-50 to-white p-3">
+
+                {/* Header */}
+                <div className="flex items-center gap-1.5 mb-3">
+                  <div className="w-5 h-5 rounded-md bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <BiImport className="text-purple-600 text-xs" />
+                  </div>
+                  <p className="text-xs font-bold text-purple-800 tracking-tight leading-tight">
+                    How to upload via CSV
+                  </p>
+                </div>
+
+                {/* Steps */}
+                <ol className="space-y-2 mb-3">
+                  {[
+                    { step: "1", text: <>Download the <span className="font-semibold text-gray-800">Sample CSV</span> template.</> },
+                    { step: "2", text: <>Fill in student details — one row per student.</> },
+                    { step: "3", text: <>Save as <span className="font-semibold text-gray-800">.csv</span> and upload above.</> },
+                    { step: "4", text: <>Always use the <span className="font-semibold text-gray-800">downloaded sample sheet</span> — do not modify column headers, reorder columns, or substitute your own spreadsheet format.</> },
+                  ].map(({ step, text }) => (
+                    <li key={step} className="flex items-start gap-2">
+                      <span className="w-4 h-4 rounded-full bg-purple-600 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                        {step}
+                      </span>
+                      <p className="text-[11px] text-gray-600 leading-relaxed">{text}</p>
+                    </li>
+                  ))}
+                </ol>
+
+                {/* Column guide */}
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">CSV Column Guide</p>
+                <div className="flex flex-col gap-1">
+                  {[
+                    { col: "email", desc: "Email address", example: "john@example.com", required: true, color: "gray" },
+                    { col: "name", desc: "Full name", example: "John Doe", required: true, color: "gray" },
+                    { col: "phone", desc: "Phone (with code)", example: "+91-9876543210", required: true, color: "gray" },
+                    {
+                      col: "improve", desc: "Improve Resume credits",
+                      example: "2", required: false, color: "purple",
+                      badge: "Improve Existing Resume",
+                      badgeColor: "bg-purple-100 text-purple-700",
+                      icon: <HiDocumentText className="text-purple-500 text-[10px]" />,
+                    },
+                    {
+                      col: "linkedin", desc: "LinkedIn Rewrite credits",
+                      example: "1", required: false, color: "blue",
+                      badge: "LinkedIn Rewrite",
+                      badgeColor: "bg-blue-100 text-blue-700",
+                      icon: <BiLogoLinkedinSquare className="text-blue-500 text-[10px]" />,
+                    },
+                  ].map(({ col, desc, example, required, color, badge, badgeColor, icon }) => (
+                    <div
+                      key={col}
+                      className={`flex items-start gap-2 rounded-lg px-2 py-1.5 border ${color === "purple" ? "border-purple-100 bg-purple-50/60" :
+                        color === "blue" ? "border-blue-100 bg-blue-50/60" :
+                          "border-gray-100 bg-white"
+                        }`}
+                    >
+                      <code className={`text-[10px] font-bold px-1 py-0.5 rounded font-mono flex-shrink-0 mt-0.5 ${color === "purple" ? "bg-purple-100 text-purple-700" :
+                        color === "blue" ? "bg-blue-100 text-blue-700" :
+                          "bg-gray-100 text-gray-700"
+                        }`}>
+                        {col}
+                      </code>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-1">
+                          <p className="text-[11px] text-gray-700 leading-snug">{desc}</p>
+                          {badge && (
+                            <span className={`inline-flex items-center gap-0.5 text-[9px] font-semibold px-1 py-0.5 rounded ${badgeColor}`}>
+                              {icon}{badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          e.g. <span className="font-mono text-gray-500">{example}</span>
+                          {required
+                            ? <span className="ml-1.5 text-red-400 font-semibold">required</span>
+                            : <span className="ml-1.5 text-gray-400">optional · 0 if not needed</span>
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </form>
         </div>
-
         {/* ── Manual Invite ── */}
         <div className='lg:w-6/12' id="manual-invite-form">
           <form onSubmit={handleSubmit1(onSubmitManual)}>

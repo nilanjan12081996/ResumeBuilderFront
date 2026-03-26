@@ -20,12 +20,12 @@ const DATE_SORT_OPTIONS = [
   { value: "end_desc",   label: "End Date Z → A" },
 ]
 
+const ITEMS_PER_PAGE = 10
+
 const StudentList = () => {
   const { studentsData } = useSelector((state) => state?.inviteStd)
   const dispatch = useDispatch()
 
-  const [totalPage, setTotalPage]     = useState(1)
-  const [limit]                        = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
   const [resumeTypeFilter, setResumeTypeFilter] = useState("all")
@@ -35,12 +35,10 @@ const StudentList = () => {
 
   const onPageChange = (page) => { setCurrentPage(page); setSelectedRows([]) }
 
+  // ── সব data একবারে fetch করো ─────────────────────────────────────────────
   useEffect(() => {
-    dispatch(invitedStudentsList({ page: currentPage, limit })).then((res) => {
-      const total = res?.payload?.page
-      setTotalPage(Number.isInteger(total) && total > 0 ? total : 1)
-    })
-  }, [currentPage, limit])
+    dispatch(invitedStudentsList({ page: 1, limit: 9999 }))
+  }, [])
 
   const rawData = studentsData?.data || []
 
@@ -84,11 +82,25 @@ const StudentList = () => {
     return data
   }, [rawData, searchQuery, resumeTypeFilter, dateSort])
 
+  // ── filter/sort বদলালে page 1 এ ফিরে যাবে ────────────────────────────────
+  useEffect(() => {
+    setCurrentPage(1)
+    setSelectedRows([])
+  }, [searchQuery, resumeTypeFilter, dateSort])
+
+  // ── client-side pagination ────────────────────────────────────────────────
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE) || 1
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return filteredData.slice(start, start + ITEMS_PER_PAGE)
+  }, [filteredData, currentPage])
+
   // ── selection ─────────────────────────────────────────────────────────────
-  const toggleRow  = (id) => setSelectedRows((prev) =>
+  const toggleRow = (id) => setSelectedRows((prev) =>
     prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
   )
-  const toggleAll  = () =>
+  const toggleAll = () =>
     setSelectedRows(
       selectedRows.length === filteredData.length ? [] : filteredData.map((d) => d.id)
     )
@@ -268,8 +280,8 @@ const StudentList = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {filteredData.length > 0 ? (
-              filteredData.map((item) => {
+            {paginatedData.length > 0 ? (
+              paginatedData.map((item) => {
                 const isSelected = selectedRows.includes(item.id)
                 return (
                   <tr key={item.id} onClick={() => toggleRow(item.id)}
@@ -339,11 +351,18 @@ const StudentList = () => {
         </table>
       </div>
 
-      {/* Pagination */}
-      {studentsData?.page > 1 && (
+      {/* ── Pagination ── */}
+      {totalPages > 1 && (
         <div className="flex justify-center mt-5">
-          <Pagination layout="pagination" currentPage={currentPage} totalPages={totalPage}
-            onPageChange={onPageChange} previousLabel="" nextLabel="" showIcons />
+          <Pagination
+            layout="pagination"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            previousLabel=""
+            nextLabel=""
+            showIcons
+          />
         </div>
       )}
     </div>
@@ -351,7 +370,6 @@ const StudentList = () => {
 }
 
 export default StudentList
-
 
 // import { Checkbox, Pagination, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput } from "flowbite-react"
 // import { useEffect, useState } from "react"
