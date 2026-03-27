@@ -91,7 +91,7 @@ const Footer = () => {
         </div>
 
         <div className='border-t border-[#433c4e] pt-5 text-center mt-10'>
-          <p className='text-sm text-[#433c4e]'>© 2025 HiringEye Solutions Private Limited</p>
+          <p className='text-sm text-[#433c4e]'>© 2026 HiringEye Solutions Private Limited</p>
         </div>
 
       </div>
