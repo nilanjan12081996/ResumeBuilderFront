@@ -279,7 +279,7 @@ export const verifyOtpNew = createAsyncThunk(
     async (payload, { rejectWithValue }) => {
         // payload = { otp: 822312, id: 42 }
         try {
-            const response = await serverApi.post(`/api/auth/verify-otp`, payload);
+            const response = await serverApi.post(`/api/auth/verify-otp-registration`, payload);
             if (response?.data?.status_code === 200) {
                 return response.data;
             } else {
@@ -341,38 +341,8 @@ const authSlice = createSlice({
                 state.error = null;
             })
             .addCase(registerCustomer.fulfilled, (state, { payload }) => {
-                const { access_token, data, refresh_token } = payload;
-
                 state.loading = false;
-                state.isLoggedIn = true;
                 state.message = payload;
-                // sessionStorage.setItem(
-                //     'resumeToken',
-                //     JSON.stringify({ token: access_token })
-                // );
-
-                // sessionStorage.setItem(
-                //     'signup_type_id',
-                //     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
-                // );
-                // sessionStorage.setItem(
-                //     'user_id',
-                //     JSON.stringify({ user_id: data?.id })
-                // );c
-
-                localStorage.setItem(
-                    'resumeToken',
-                    JSON.stringify({ token: access_token })
-                );
-
-                localStorage.setItem(
-                    'signup_type_id',
-                    JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
-                );
-                localStorage.setItem(
-                    'user_id',
-                    JSON.stringify({ user_id: data?.id })
-                );
             })
             .addCase(registerCustomer.rejected, (state, { payload }) => {
 
@@ -449,7 +419,7 @@ const authSlice = createSlice({
                     'signup_type_id',
                     JSON.stringify({ signup_type_id: data?.signUpType[0]?.UserSignUpTypeMap?.sign_up_type_id })
                 );
-                
+
             })
             .addCase(loginCustomer.rejected, (state, { payload }) => {
                 state.loading = false;
@@ -547,7 +517,7 @@ const authSlice = createSlice({
                 //     'user_id',
                 //     JSON.stringify({ user_id: data?.id })
                 // );c
-                 localStorage.setItem(
+                localStorage.setItem(
                     'user_id',
                     JSON.stringify({ user_id: data?.id })
                 );
@@ -602,18 +572,23 @@ const authSlice = createSlice({
                 state.loading = true;
             })
             .addCase(verifyOtpNew.fulfilled, (state, { payload }) => {
-                const { access_token } = payload; // get token from payload
+                const { access_token, data, refresh_token } = payload;
 
                 state.loading = false;
                 state.message = payload;
                 state.error = null;
                 state.isLoggedIn = true;
 
-                // Save only the access token
                 if (access_token) {
-                    // sessionStorage.setItem('resumeToken', JSON.stringify({ token: access_token }));c
                     localStorage.setItem('resumeToken', JSON.stringify({ token: access_token }));
                 }
+                localStorage.setItem('projects', JSON.stringify({ projects: data?.project }));
+                localStorage.setItem('user_id', JSON.stringify({ user_id: data?.id }));
+                localStorage.setItem('fullname', JSON.stringify({ fullname: data?.fullname }));
+                localStorage.setItem(
+                    'signup_type_id',
+                    JSON.stringify({ signup_type_id: data?.signUpType?.[0]?.UserSignUpTypeMap?.sign_up_type_id })
+                );
             })
 
             .addCase(verifyOtpNew.rejected, (state, { payload }) => {

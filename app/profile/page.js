@@ -40,7 +40,7 @@ const page = () => {
   }, [profileData]);
 
   const onSubmit = (data) => {
-    const payload = { fullname: data?.fullname, phone: data?.phone };
+    const payload = { fullname: data?.fullname, phone: data?.phone, appId: 1,};
     dispatch(updateProfile(payload)).then((res) => {
       if (res?.payload?.status_code === 200) {
         toast.success(res?.payload?.message);
@@ -50,7 +50,11 @@ const page = () => {
   };
 
   const onSubmitPass = (data) => {
-    dispatch(changePassword(data)).then((res) => {
+       const payload = {
+            ...data,
+            appId: 1,
+        };
+    dispatch(changePassword(payload)).then((res) => {
       if (res?.payload?.status_code === 200) {
         toast.success(res?.payload?.message);
       } else if (res?.payload?.response?.data?.status_code === 422) {

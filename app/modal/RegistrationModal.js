@@ -54,7 +54,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
         };
         dispatch(registerCustomer(payload1)).then((res) => {
             if (res?.payload?.status_code === 201) {
-                setOtpId(res?.payload?.data?.id);
+                setOtpId(res?.payload?.id);
                 setShowOtpScreen(true);
             } else if (res?.payload?.response?.data?.status_code === 422) {
                 const validationErrors = res?.payload?.response?.data?.data || [];
@@ -72,7 +72,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
             return;
         }
         setIsVerifying(true);
-        dispatch(verifyOtpNew({ id: otpId, otp })).then((res) => {
+        dispatch(verifyOtpNew({ id: otpId, otp: parseInt(otp), appId: 1, sign_up_type: chooseResumeType,})).then((res) => {
             setIsVerifying(false);
             if (res?.payload?.status_code === 200) {
                 setOtpError("");
@@ -213,7 +213,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
 
             <Modal size="lg" show={openRegisterModal} onClose={() => setOpenRegisterModal(false)}>
                 <ModalHeader className='border-none pb-0 absolute right-3 top-3 bg-transparent z-10'>&nbsp;</ModalHeader>
-               <ModalBody className='rm-modal-body bg-white p-0 rounded-2xl overflow-y-auto' style={{ maxHeight: '90dvh' }}>
+                <ModalBody className='rm-modal-body bg-white p-0 rounded-2xl overflow-y-auto' style={{ maxHeight: '90dvh' }}>
                     <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
 
                         {/* Top accent bar */}
@@ -290,7 +290,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                             <label className="rm-reg-label">Password</label>
                                             <div style={{ position: "relative" }}>
                                                 <input className="rm-reg-input" type={showPassword ? "text" : "password"}
-                                                    placeholder="Min. 6 characters" style={{ paddingRight: "44px" }}
+                                                    placeholder="Min. 8 characters" style={{ paddingRight: "44px" }}
                                                     {...register("password", { required: "Password is required" })} />
                                                 <button type="button" className="rm-eye-btn" onClick={() => setShowPassword(!showPassword)}>
                                                     <EyeIcon show={showPassword} />
