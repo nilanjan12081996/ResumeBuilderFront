@@ -227,6 +227,7 @@ const LinkedInExperience = ({
 
                             {activeExpId === exp.id && !isExhausted && (
                               <GenerateWithAiModal
+                                key={exp.id}
                                 open={true}
                                 onClose={() => setActiveExpId(null)}
                                 aiType="linkdin_experience"

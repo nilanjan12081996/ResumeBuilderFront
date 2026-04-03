@@ -234,6 +234,7 @@ const ImpExperience = ({
 
                             {activeExpId === exp.id && !isExhausted && (
                               <GenerateWithAiModal
+                                key={exp.id}
                                 open={true}
                                 onClose={() => setActiveExpId(null)}
                                 aiType="jd_experience"

@@ -42,6 +42,7 @@ const GenerateWithAiModal = ({
     const [generatedHTML, setGeneratedHTML] = useState("");
     const [animatedText, setAnimatedText] = useState("");
     const [typingDone, setTypingDone] = useState(false);
+    const [localImproveLoading, setLocalImproveLoading] = useState(false);
 
     const scrollRef = useRef(null);
     const intervalRef = useRef(null);
@@ -112,14 +113,29 @@ const GenerateWithAiModal = ({
         }
     }, [open, aiType]);
 
+    // const handleClose = () => {
+    //     clearInterval(intervalRef.current);
+    //     if (aiType === "imp_summary") dispatch(resetImpSummary());
+    //     else dispatch(resetImpExperience());
+
+    //     setGeneratedHTML("");
+    //     setAnimatedText("");
+    //     setTypingDone(false);
+    //     lastAnimatedTextRef.current = "";
+    //     onClose();
+    // };
+
+
     const handleClose = () => {
         clearInterval(intervalRef.current);
-        if (aiType === "imp_summary") dispatch(resetImpSummary());
-        else dispatch(resetImpExperience());
+
+        dispatch(resetImpSummary());
+        dispatch(resetImpExperience());
 
         setGeneratedHTML("");
         setAnimatedText("");
         setTypingDone(false);
+        setLocalImproveLoading(false);
         lastAnimatedTextRef.current = "";
         onClose();
     };
@@ -160,7 +176,7 @@ const GenerateWithAiModal = ({
         setGeneratedHTML(html);
         setAnimatedText("");
         setTypingDone(false);
-
+        setLocalImproveLoading(false);
         const tokens = plainText.split(/(\n|\s+)/).filter(Boolean);
         let index = 0;
 
@@ -193,7 +209,15 @@ const GenerateWithAiModal = ({
     ]);
 
     useEffect(() => {
-        if (!open) {
+        if (open) {
+            clearInterval(intervalRef.current);
+            setGeneratedHTML("");
+            setAnimatedText("");
+            setTypingDone(false);
+            lastAnimatedTextRef.current = "";
+            dispatch(resetImpSummary());
+            dispatch(resetImpExperience());
+        } else {
             clearInterval(intervalRef.current);
             setGeneratedHTML("");
             setAnimatedText("");
@@ -206,7 +230,7 @@ const GenerateWithAiModal = ({
     const handleImprove = () => {
         const sourceText = initialText;
         if (!sourceText?.trim()) return;
-
+        setLocalImproveLoading(true);
         onUseAiCount && onUseAiCount();
 
         lastAnimatedTextRef.current = "";
@@ -427,7 +451,7 @@ const GenerateWithAiModal = ({
                                     className={`w-1/2 py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition flex items-center justify-center gap-2
                                     ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
                                 >
-                                    {isImproveLoading ? (
+                                    {isImproveLoading || localImproveLoading ? (
                                         <>
                                             <ImSpinner2 className="animate-spin text-sm" />
                                             Improving...
@@ -449,6 +473,8 @@ const GenerateWithAiModal = ({
 
 export default GenerateWithAiModal;
 
+
+
 // 'use client';
 
 // import React, { useEffect, useRef, useState } from "react";
@@ -469,8 +495,8 @@ export default GenerateWithAiModal;
 //     generateJdNewExperience,
 //     summeryGapJd,
 //     jobDescriptionGapJd,
-//     improvementJdSummary,      
-//     improvementJdExperience,   
+//     improvementJdSummary,
+//     improvementJdExperience,
 // } from "../reducers/DashboardSlice";
 
 // const TONES = [
@@ -515,22 +541,30 @@ export default GenerateWithAiModal;
 //         summeryGapJdData,
 //         jobDescriptionGapJdLoading,
 //         jobDescriptionGapJdData,
-//         improvementJdSummaryLoading,      
-//         improvementJdSummaryData,       
-//         improvementJdExperienceLoading,   
-//         improvementJdExperienceData,     
+//         improvementJdSummaryLoading,
+//         improvementJdSummaryData,
+//         improvementJdExperienceLoading,
+//         improvementJdExperienceData,
 //     } = useSelector((state) => state.dash);
 
 //     const isSummaryType = aiType === "imp_summary" || aiType === "linkdin_summary";
 //     const isExperienceType = aiType === "imp_experience" || aiType === "linkdin_experience";
 //     const isJdType = aiType === "jd_summary" || aiType === "jd_experience";
 
-//     const isLoading =
-//         (isSummaryType && (improvementSummaryLoading || generateImpNewSummaryLoading)) ||
-//         (isExperienceType && (improvementExperienceLoading || generateImpNewExperienceLoading)) ||
-       
-//         (aiType === "jd_summary" && (generateJdNewSummaryLoading || improvementJdSummaryLoading)) ||
-//         (aiType === "jd_experience" && (generateJdNewExperienceLoading || improvementJdExperienceLoading));
+//     // ✅ আলাদা করে improve ও generate loading track করা হচ্ছে
+//     const isImproveLoading =
+//         (isSummaryType && improvementSummaryLoading) ||
+//         (isExperienceType && improvementExperienceLoading) ||
+//         (aiType === "jd_summary" && improvementJdSummaryLoading) ||
+//         (aiType === "jd_experience" && improvementJdExperienceLoading);
+
+//     const isGenerateLoading =
+//         (isSummaryType && generateImpNewSummaryLoading) ||
+//         (isExperienceType && generateImpNewExperienceLoading) ||
+//         (aiType === "jd_summary" && generateJdNewSummaryLoading) ||
+//         (aiType === "jd_experience" && generateJdNewExperienceLoading);
+
+//     const isLoading = isImproveLoading || isGenerateLoading;
 
 //     const isGapLoading =
 //         (aiType === "jd_summary" && summeryGapJdLoading) ||
@@ -575,10 +609,8 @@ export default GenerateWithAiModal;
 //         } else if (isExperienceType) {
 //             raw = improvementExperienceData?.summary || generateImpNewExperienceData?.summary;
 //         } else if (aiType === "jd_summary") {
-
 //             raw = generateJdNewSummaryData?.summary || improvementJdSummaryData?.summary;
 //         } else if (aiType === "jd_experience") {
-
 //             raw = generateJdNewExperienceData?.summary || improvementJdExperienceData?.summary;
 //         }
 
@@ -633,8 +665,8 @@ export default GenerateWithAiModal;
 //         generateImpNewExperienceData,
 //         generateJdNewSummaryData,
 //         generateJdNewExperienceData,
-//         improvementJdSummaryData,    
-//         improvementJdExperienceData, 
+//         improvementJdSummaryData,
+//         improvementJdExperienceData,
 //     ]);
 
 //     useEffect(() => {
@@ -649,55 +681,53 @@ export default GenerateWithAiModal;
 //     }, [open]);
 
 //     const handleImprove = () => {
-//     const sourceText = initialText;
-//     if (!sourceText?.trim()) return;
+//         const sourceText = initialText;
+//         if (!sourceText?.trim()) return;
 
-//     onUseAiCount && onUseAiCount();
+//         onUseAiCount && onUseAiCount();
 
-//     lastAnimatedTextRef.current = "";
-//     setAnimatedText("");
-//     setTypingDone(false);
+//         lastAnimatedTextRef.current = "";
+//         setAnimatedText("");
+//         setTypingDone(false);
 
-    
-//     if (aiType === "jd_summary" || aiType === "jd_experience") {
-//         const targetJd = sessionStorage.getItem("target_jd");
-        
-//         const jdNeedsText = getGapText();
+//         if (aiType === "jd_summary" || aiType === "jd_experience") {
+//             const targetJd = sessionStorage.getItem("target_jd");
+//             const jdNeedsText = getGapText();
 
-//         const payload = {
+//             const payload = {
+//                 security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
+//                 tone,
+//                 original_text: sourceText,
+//                 jd_needs: jdNeedsText || "",
+//                 ...(targetJd && { JD: targetJd }),
+//             };
+
+//             if (aiType === "jd_summary") {
+//                 dispatch(improvementJdSummary(payload));
+//             } else {
+//                 dispatch(improvementJdExperience(payload));
+//             }
+//             return;
+//         }
+
+//         const impPayload = {
 //             security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
 //             tone,
 //             original_text: sourceText,
-//             jd_needs: jdNeedsText || "",  
-//             ...(targetJd && { JD: targetJd }),
 //         };
 
-//         if (aiType === "jd_summary") {
-//             dispatch(improvementJdSummary(payload));
-//         } else {
-//             dispatch(improvementJdExperience(payload));
+//         if (isSummaryType) {
+//             dispatch(improvementSummary(impPayload));
+//         } else if (isExperienceType) {
+//             dispatch(improvementExperience(impPayload));
 //         }
-//         return;
-//     }
-
-//     const impPayload = {
-//         security_id: process.env.NEXT_PUBLIC_AI_SECURITY_ID,
-//         tone,
-//         original_text: sourceText,
 //     };
-
-//     if (isSummaryType) {
-//         dispatch(improvementSummary(impPayload));
-//     } else if (isExperienceType) {
-//         dispatch(improvementExperience(impPayload));
-//     }
-// };
 
 //     const handleNewGenarate = () => {
 //         if (!fullResumeData) return;
 
 //         onUseAiCount && onUseAiCount();
-        
+
 //         lastAnimatedTextRef.current = "";
 //         setAnimatedText("");
 //         setTypingDone(false);
@@ -808,7 +838,7 @@ export default GenerateWithAiModal;
 //                     </div>
 //                 )}
 
-//                 {/* Loading */}
+//                 {/* Loading — full screen spinner (Generate/Improve এর বাইরে যদি অন্য কোনো loading হয়) */}
 //                 {isLoading && (
 //                     <div className="flex flex-col items-center justify-center py-16">
 //                         <ImSpinner2 className="animate-spin text-2xl text-purple-600 mb-3" />
@@ -845,14 +875,24 @@ export default GenerateWithAiModal;
 //                     </div>
 //                 )}
 
-//                 {/* Initial Buttons */}
-//                 {!animatedText && !isLoading && (
+//                 {/* ✅ Initial Buttons — loading এর সময়ও দেখাবে, বাটনের ভেতরে spinner */}
+//                 {!animatedText && (
 //                     <div className="flex mt-5 border border-[#e5d6e5] rounded-sm overflow-hidden relative">
 //                         <button
 //                             onClick={handleNewGenarate}
-//                             className={`py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition ${hasInitialText ? "w-1/2" : "w-full"}`}
+//                             disabled={isLoading}
+//                             className={`py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition flex items-center justify-center gap-2
+//                             ${isLoading ? "opacity-60 cursor-not-allowed" : ""}
+//                             ${hasInitialText ? "w-1/2" : "w-full"}`}
 //                         >
-//                             Generate
+//                             {isGenerateLoading ? (
+//                                 <>
+//                                     <ImSpinner2 className="animate-spin text-sm" />
+//                                     Generating...
+//                                 </>
+//                             ) : (
+//                                 "Generate"
+//                             )}
 //                         </button>
 
 //                         {hasInitialText && (
@@ -860,14 +900,24 @@ export default GenerateWithAiModal;
 //                                 <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-[2px] bg-[#d1b3d1]" />
 //                                 <button
 //                                     onClick={handleImprove}
-//                                     className="w-1/2 py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition"
+//                                     disabled={isLoading}
+//                                     className={`w-1/2 py-2 !bg-[#fff] !text-[#800080] text-sm hover:!bg-[#f3e6f3] transition flex items-center justify-center gap-2
+//                                     ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
 //                                 >
-//                                     Improve
+//                                     {isImproveLoading ? (
+//                                         <>
+//                                             <ImSpinner2 className="animate-spin text-sm" />
+//                                             Improving...
+//                                         </>
+//                                     ) : (
+//                                         "Improve"
+//                                     )}
 //                                 </button>
 //                             </>
 //                         )}
 //                     </div>
 //                 )}
+
 //             </div>
 //         </div>,
 //         document.body

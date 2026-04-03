@@ -931,11 +931,35 @@ const DashboardSlice = createSlice(
         name: "dashboard",
         initialState,
         reducers: {
+            // resetImpSummary(state) {
+            //     state.generateImpSummaryData = null;
+            // },
+            // resetImpExperience(state) {
+            //     state.generateImpExperienceData = null;
+            // },
             resetImpSummary(state) {
-                state.generateImpSummaryData = null;
+                state.improvementSummaryData = {};
+                state.improvementSummaryLoading = false;
+                state.generateImpNewSummaryData = {};
+                state.generateImpNewSummaryLoading = false;
+                state.generateJdNewSummaryData = {};
+                state.generateJdNewSummaryLoading = false;
+                state.improvementJdSummaryData = {};
+                state.improvementJdSummaryLoading = false;
+                state.summeryGapJdData = {};
+                state.summeryGapJdLoading = false;
             },
             resetImpExperience(state) {
-                state.generateImpExperienceData = null;
+                state.improvementExperienceData = {};
+                state.improvementExperienceLoading = false;
+                state.generateImpNewExperienceData = {};
+                state.generateImpNewExperienceLoading = false;
+                state.generateJdNewExperienceData = {};
+                state.generateJdNewExperienceLoading = false;
+                state.improvementJdExperienceData = {};
+                state.improvementJdExperienceLoading = false;
+                state.jobDescriptionGapJdData = {};
+                state.jobDescriptionGapJdLoading = false;
             },
             setJobDescription: (state, action) => {
                 state.jobDescription = action.payload;
@@ -1539,5 +1563,5 @@ const DashboardSlice = createSlice(
         }
     }
 )
-export const { resetImpSummary, resetImpExperience, setJobDescription, resetDashboard} = DashboardSlice.actions;
+export const { resetImpSummary, resetImpExperience, setJobDescription, resetDashboard } = DashboardSlice.actions;
 export default DashboardSlice.reducer;
