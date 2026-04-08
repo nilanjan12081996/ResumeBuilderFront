@@ -149,7 +149,7 @@ useEffect(() => {
                 <div className="rm-label">
                   <FiUploadCloud style={{ color: "#800080", fontSize: "1rem" }} />
                   Your Resume
-                  <span className="rm-pill">PDF / DOC</span>
+                  <span className="rm-pill">PDF</span>
                 </div>
 
                 <label
@@ -171,7 +171,7 @@ useEffect(() => {
                     </span>
                     {resumeFileName
                       ? <div className="rm-file-badge">✓ {resumeFileName}</div>
-                      : <span className="rm-upload-sub">or click to browse · PDF, DOC, DOCX</span>
+                      : <span className="rm-upload-sub">or click to browse</span>
                     }
                   </div>
                   <input

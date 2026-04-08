@@ -2,7 +2,10 @@ import withFlowbiteReact from "flowbite-react/plugin/nextjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-   output: 'standalone',
+  output: 'standalone',
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
   // eslint: {
   //   ignoreDuringBuilds: true,
   // },
@@ -14,7 +17,7 @@ const nextConfig = {
         port: '',
         pathname: '/uploads/images/**',
       },
-         {
+      {
         protocol: 'https',
         hostname: 'resumebuilderbackend.hiringeye.ai',
         port: '',
