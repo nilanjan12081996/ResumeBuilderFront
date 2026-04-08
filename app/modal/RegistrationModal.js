@@ -92,7 +92,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     };
 
     const handleResendOtp = () => {
-        dispatch(resendOtpNew(otpId));
+        dispatch(resendOtpNew({ id: otpId }));
     };
 
     const ResendOtpButton = ({ handleResendOtp, setOtp }) => {
