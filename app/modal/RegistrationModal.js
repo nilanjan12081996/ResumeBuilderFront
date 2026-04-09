@@ -25,6 +25,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
     const [isVerifying, setIsVerifying] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [resendSuccess, setResendSuccess] = useState("");
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const password = watch("password");
@@ -72,7 +73,7 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
             return;
         }
         setIsVerifying(true);
-        dispatch(verifyOtpNew({ id: otpId, otp: parseInt(otp), appId: 1, sign_up_type: chooseResumeType,})).then((res) => {
+        dispatch(verifyOtpNew({ id: otpId, otp: parseInt(otp), appId: 1, sign_up_type: chooseResumeType, })).then((res) => {
             setIsVerifying(false);
             if (res?.payload?.status_code === 200) {
                 setOtpError("");
@@ -93,6 +94,9 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
 
     const handleResendOtp = () => {
         dispatch(resendOtpNew({ id: otpId }));
+        setResendSuccess("OTP sent successfully! Please check your email.");
+        setOtp("");
+        setTimeout(() => setResendSuccess(""), 4000);
     };
 
     const ResendOtpButton = ({ handleResendOtp, setOtp }) => {
@@ -392,6 +396,23 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                                     <div style={{ marginTop: "16px" }}>
                                         <ResendOtpButton handleResendOtp={handleResendOtp} setOtp={setOtp} />
                                     </div>
+
+                                    {resendSuccess && (
+                                        <div style={{
+                                            display: "flex", alignItems: "center", gap: "8px",
+                                            background: "#f0fdf4", border: "1px solid #86efac",
+                                            borderRadius: "10px", padding: "10px 14px", marginTop: "12px"
+                                        }}>
+                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"
+                                                stroke="#16a34a" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                    strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                            <p style={{ color: "#15803d", fontSize: "13px", margin: 0, fontWeight: 600 }}>
+                                                {resendSuccess}
+                                            </p>
+                                        </div>
+                                    )}
                                     <p style={{ fontSize: "13px", color: "#9ca3af", marginTop: "12px" }}>Didn't receive the code? You can resend it once the timer ends.</p>
                                 </div>
                             )}
