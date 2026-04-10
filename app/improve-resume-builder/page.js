@@ -356,33 +356,258 @@ const Page = () => {
   }, [savingStatus]);
 
   // Helper function to map resume data to sections
+  // const mapextracteResumeDataToSections = (resumeData) => {
+  //   if (!resumeData) return [];
+
+  //   let id = 0;
+
+  //   // ----------------- SUMMARY (প্রথমে) -----------------
+  //   const profileSummaryKey = Object.keys(resumeData?.additional_sections || {}).find(
+  //     k => k.trim().toUpperCase() === "PROFILE SUMMARY"
+  //   );
+  //   const profileSummaryContent = profileSummaryKey
+  //     ? resumeData.additional_sections[profileSummaryKey]?.content
+  //     : null;
+  //   const hasProfileSummary =
+  //     Array.isArray(profileSummaryContent) &&
+  //     profileSummaryContent.length > 0 &&
+  //     profileSummaryContent.some(p => p?.trim());
+
+  //   const summaryText = hasProfileSummary
+  //     ? (profileSummaryContent.length > 1
+  //       ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
+  //       : profileSummaryContent[0])
+  //     : (resumeData?.professional_summary?.summary_text || "");
+
+  //   const summaryTitle = profileSummaryKey || "Professional Summary";
+
+  //   const summarySection = summaryText
+  //     ? { id: id++, title: summaryTitle, type: "summary", summary: summaryText }
+  //     : null;
+
+  //   // ----------------- TECHNICAL SKILLS -----------------
+  //   const techCategories = resumeData?.technical_skills?.categories || {};
+  //   const techSkills = Object.values(techCategories).flat();
+  //   const skillsSections = [];
+
+  //   if (techSkills.length > 0) {
+  //     skillsSections.push({
+  //       id: id++,
+  //       title: (resumeData?.soft_skills || []).length > 0 ? "Technical Skills" : "Skills",
+  //       type: "skills",
+  //       skills: techSkills.map((skill, i) => ({
+  //         id: `ts_${i}_${Date.now()}`,
+  //         name: skill,
+  //         level: 3,
+  //       })),
+  //     });
+  //   }
+
+  //   if ((resumeData?.soft_skills || []).length > 0) {
+  //     skillsSections.push({
+  //       id: id++,
+  //       title: "Soft Skills",
+  //       type: "skills",
+  //       skills: resumeData.soft_skills.map((skill, i) => ({
+  //         id: `ss_${i}_${Date.now()}`,
+  //         name: skill,
+  //         level: 3,
+  //       })),
+  //     });
+  //   }
+
+  //   // ----------------- EDUCATION -----------------
+  //   const educationKey = Object.keys(resumeData?.additional_sections || {}).find(
+  //     k => k.trim().toUpperCase() === "EDUCATION"
+  //   );
+  //   const educationTitle = educationKey || "Education";
+
+  //   const educationSection = (resumeData?.education || []).length > 0
+  //     ? {
+  //       id: id++,
+  //       title: educationTitle,
+  //       type: "education",
+  //       educations: resumeData.education.map((edu, i) => ({
+  //         id: `e_${i}_${Date.now()}`,
+  //         institute: edu.institution || "",
+  //         degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
+  //         startDate: edu.start_date || "",
+  //         endDate: edu.graduation_date || "",
+  //         city: edu.location || "",
+  //         description: edu.description || "",
+  //       })),
+  //     }
+  //     : null;
+
+  //   // ----------------- CERTIFICATIONS -----------------
+  //   const certKey = Object.keys(resumeData?.additional_sections || {}).find(
+  //     k => k.trim().toUpperCase() === "CERTIFICATIONS"
+  //   );
+  //   const certTitle = certKey || "Certifications";
+
+  //   const certSection = (resumeData?.certifications || []).length > 0
+  //     ? {
+  //       id: id++,
+  //       title: certTitle,
+  //       type: "certifications",
+  //       certifications: resumeData.certifications.map((c, i) => ({
+  //         id: `c_${i}_${Date.now()}`,
+  //         name: c.name || "",
+  //         organization: c.organization || "",
+  //         city: "",
+  //         startYear: "",
+  //         endYear: "",
+  //         description: "",
+  //       })),
+  //     }
+  //     : null;
+
+  //   // ----------------- EXPERIENCE -----------------
+  //   const experienceKey = Object.keys(resumeData?.additional_sections || {}).find(
+  //     k => ["WORK EXPERIENCE", "EXPERIENCE"].includes(k.trim().toUpperCase())
+  //   );
+  //   const experienceTitle = experienceKey || "Experience";
+
+  //   const experienceSection = (resumeData?.work_experience || []).length > 0
+  //     ? {
+  //       id: id++,
+  //       title: experienceTitle,
+  //       type: "experience",
+  //       experiences: resumeData.work_experience.map((exp, i) => ({
+  //         id: `x_${i}_${Date.now()}`,
+  //         jobTitle: exp.job_title || "",
+  //         company: exp.company_name || "",
+  //         city: exp.location || "",
+  //         startDate: exp.start_date || "",
+  //         endDate: exp.end_date || "",
+  //         description: (exp.responsibilities || []).join("<br/>"),
+  //       })),
+  //     }
+  //     : null;
+
+  //   // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
+  //   const SKIP_KEYS = new Set([
+  //     "PROFILE SUMMARY",
+  //     "EDUCATION",
+  //     "CERTIFICATIONS",
+  //     "WORK EXPERIENCE",
+  //     "EXPERIENCE",
+  //     "IT SKILLS",
+  //     "CONTACT DETAILS",
+  //   ]);
+
+  //   const additionalSectionsList = [];
+  //   const additionalSections = resumeData?.additional_sections || {};
+
+  //   Object.entries(additionalSections).forEach(([key, value]) => {
+  //     if (SKIP_KEYS.has(key.trim().toUpperCase())) return;
+  //     if (!value?.content) return;
+  //     if (Array.isArray(value.content) && value.content.length === 0) return;
+  //     if (typeof value.content === "string" && !value.content.trim()) return;
+
+  //     // Detect simple list
+  //     const isSimpleList = Array.isArray(value.content) && value.content.every(item => {
+  //       if (typeof item === 'string') return true;
+  //       if (typeof item === 'object') {
+  //         const keys = Object.keys(item);
+  //         return keys.length <= 2 && (
+  //           (keys.includes('name') || keys.includes('title')) &&
+  //           (!keys.includes('description') && !keys.includes('city') && !keys.includes('start_date'))
+  //         );
+  //       }
+  //       return false;
+  //     });
+
+  //     if (isSimpleList) {
+  //       additionalSectionsList.push({
+  //         id: id++,
+  //         title: key,
+  //         type: "custom_simple",
+  //         items: value.content.map((item, i) => ({
+  //           id: `simple_${i}_${Date.now()}`,
+  //           name: typeof item === "string" ? item : item.name || item.title || "",
+  //           level: typeof item === "object" && item.level ? item.level : 2
+  //         })),
+  //         hideExperienceLevel: true
+  //       });
+  //     } else {
+  //       additionalSectionsList.push({
+  //         id: id++,
+  //         title: key,
+  //         type: "custom",
+  //         items: Array.isArray(value.content)
+  //           ? value.content.map((item, i) => ({
+  //             id: `custom_${i}_${Date.now()}`,
+  //             title: typeof item === "string" ? item : item.title || item.name || "",
+  //             city: item.city || "",
+  //             startDate: item.start_date || "",
+  //             endDate: item.end_date || "",
+  //             description: item.description || "",
+  //           }))
+  //           : [
+  //             {
+  //               id: `custom_0_${Date.now()}`,
+  //               title: typeof value.content === "string" ? value.content : "",
+  //               city: "",
+  //               startDate: "",
+  //               endDate: "",
+  //               description: "",
+  //             },
+  //           ],
+  //       });
+  //     }
+  //   });
+
+
+  //   const sections = [
+  //     ...(summarySection ? [summarySection] : []),
+  //     ...skillsSections,
+  //     ...(educationSection ? [educationSection] : []),
+  //     ...(certSection ? [certSection] : []),
+  //     ...(experienceSection ? [experienceSection] : []),
+  //     ...additionalSectionsList,
+  //   ];
+
+  //   return sections;
+  // };
+
+  // Helper function to map resume data to sections
   const mapextracteResumeDataToSections = (resumeData) => {
     if (!resumeData) return [];
 
     let id = 0;
+    const SKIP_KEYS = new Set();
+    const normalizeStr = (str) => str.trim().replace(/\s+/g, ' ').toUpperCase();
 
-    // ----------------- SUMMARY (প্রথমে) -----------------
+    // ----------------- SUMMARY -----------------
+    const summaryKeywords = ["PROFILE SUMMARY", "ABOUT ME", "SUMMARY", "PROFESSIONAL SUMMARY", "OBJECTIVE", "CAREER OBJECTIVE", "ABOUT", "EXECUTIVE SUMMARY"];
     const profileSummaryKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => k.trim().toUpperCase() === "PROFILE SUMMARY"
+      k => summaryKeywords.includes(normalizeStr(k))
     );
+    if (profileSummaryKey) SKIP_KEYS.add(normalizeStr(profileSummaryKey));
+
     const profileSummaryContent = profileSummaryKey
       ? resumeData.additional_sections[profileSummaryKey]?.content
       : null;
-    const hasProfileSummary =
-      Array.isArray(profileSummaryContent) &&
-      profileSummaryContent.length > 0 &&
-      profileSummaryContent.some(p => p?.trim());
 
-    const summaryText = hasProfileSummary
-      ? (profileSummaryContent.length > 1
+    let summaryText = "";
+    if (Array.isArray(profileSummaryContent) && profileSummaryContent.length > 0) {
+      summaryText = profileSummaryContent.length > 1
         ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
-        : profileSummaryContent[0])
-      : (resumeData?.professional_summary?.summary_text || "");
-
-    const summaryTitle = profileSummaryKey || "Professional Summary";
+        : profileSummaryContent[0];
+    } else if (typeof profileSummaryContent === 'string' && profileSummaryContent.trim()) {
+      summaryText = profileSummaryContent;
+    } else if (resumeData?.professional_summary?.summary_text?.trim()) {
+      summaryText = resumeData.professional_summary.summary_text;
+    } else if (Array.isArray(resumeData?.professional_summary?.key_highlights) && resumeData.professional_summary.key_highlights.length > 0) {
+      // ✅ NEW FIX: Fetching from key_highlights if summary_text is empty
+      summaryText = resumeData.professional_summary.key_highlights.length > 1
+        ? `<ul>${resumeData.professional_summary.key_highlights.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : resumeData.professional_summary.key_highlights[0];
+    }
 
     const summarySection = summaryText
-      ? { id: id++, title: summaryTitle, type: "summary", summary: summaryText }
+      ? { id: id++, title: profileSummaryKey || "Professional Summary", type: "summary", summary: summaryText }
       : null;
 
     // ----------------- TECHNICAL SKILLS -----------------
@@ -417,15 +642,16 @@ const Page = () => {
     }
 
     // ----------------- EDUCATION -----------------
+    const eduKeywords = ["EDUCATION", "QUALIFICATIONS", "ACADEMICS", "ACADEMIC BACKGROUND"];
     const educationKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => k.trim().toUpperCase() === "EDUCATION"
+      k => eduKeywords.includes(normalizeStr(k))
     );
-    const educationTitle = educationKey || "Education";
+    if (educationKey) SKIP_KEYS.add(normalizeStr(educationKey));
 
     const educationSection = (resumeData?.education || []).length > 0
       ? {
         id: id++,
-        title: educationTitle,
+        title: educationKey || "Education",
         type: "education",
         educations: resumeData.education.map((edu, i) => ({
           id: `e_${i}_${Date.now()}`,
@@ -440,15 +666,16 @@ const Page = () => {
       : null;
 
     // ----------------- CERTIFICATIONS -----------------
+    const certKeywords = ["CERTIFICATIONS", "CERTIFICATES", "COURSES", "TRAINING"];
     const certKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => k.trim().toUpperCase() === "CERTIFICATIONS"
+      k => certKeywords.includes(normalizeStr(k))
     );
-    const certTitle = certKey || "Certifications";
+    if (certKey) SKIP_KEYS.add(normalizeStr(certKey));
 
     const certSection = (resumeData?.certifications || []).length > 0
       ? {
         id: id++,
-        title: certTitle,
+        title: certKey || "Certifications",
         type: "certifications",
         certifications: resumeData.certifications.map((c, i) => ({
           id: `c_${i}_${Date.now()}`,
@@ -463,15 +690,16 @@ const Page = () => {
       : null;
 
     // ----------------- EXPERIENCE -----------------
+    const expKeywords = ["WORK EXPERIENCE", "EXPERIENCE", "EMPLOYMENT EXPERIENCE", "PROFESSIONAL EXPERIENCE", "WORK HISTORY"];
     const experienceKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => ["WORK EXPERIENCE", "EXPERIENCE"].includes(k.trim().toUpperCase())
+      k => expKeywords.includes(normalizeStr(k))
     );
-    const experienceTitle = experienceKey || "Experience";
+    if (experienceKey) SKIP_KEYS.add(normalizeStr(experienceKey));
 
     const experienceSection = (resumeData?.work_experience || []).length > 0
       ? {
         id: id++,
-        title: experienceTitle,
+        title: experienceKey || "Experience",
         type: "experience",
         experiences: resumeData.work_experience.map((exp, i) => ({
           id: `x_${i}_${Date.now()}`,
@@ -485,27 +713,47 @@ const Page = () => {
       }
       : null;
 
+    // ----------------- PROJECTS (New addition to prevent data loss) -----------------
+    const projKeywords = ["PROJECTS", "PROJECT PROFILE", "PROJECTS PROFILE", "PERSONAL PROJECTS"];
+    const projKey = Object.keys(resumeData?.additional_sections || {}).find(
+      k => projKeywords.includes(normalizeStr(k))
+    );
+    if (projKey) SKIP_KEYS.add(normalizeStr(projKey));
+
+    const projectSection = (resumeData?.projects || []).length > 0
+      ? {
+        id: id++,
+        title: projKey || "Projects",
+        type: "custom",
+        items: resumeData.projects.map((proj, i) => ({
+          id: `proj_${i}_${Date.now()}`,
+          title: proj.project_name || "",
+          city: "",
+          startDate: "",
+          endDate: proj.duration || "",
+          description: proj.description || (proj.responsibilities || []).join("<br/>") || "",
+        }))
+      }
+      : null;
+
     // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
-    const SKIP_KEYS = new Set([
-      "PROFILE SUMMARY",
-      "EDUCATION",
-      "CERTIFICATIONS",
-      "WORK EXPERIENCE",
-      "EXPERIENCE",
-      "IT SKILLS",
-      "CONTACT DETAILS",
-    ]);
+    // Skip redundant headers/contact details extracted by AI
+    ["CONTACT DETAILS", "CONTACT INFORMATION", "HEADER", "IT SKILLS", "TECHNICAL SKILLS"].forEach(k => SKIP_KEYS.add(k));
+    Object.keys(resumeData?.additional_sections || {}).forEach(k => {
+      if (normalizeStr(k).includes("HEADER") || normalizeStr(k).includes("CONTACT")) {
+        SKIP_KEYS.add(normalizeStr(k));
+      }
+    });
 
     const additionalSectionsList = [];
     const additionalSections = resumeData?.additional_sections || {};
 
     Object.entries(additionalSections).forEach(([key, value]) => {
-      if (SKIP_KEYS.has(key.trim().toUpperCase())) return;
-      if (!value?.content) return;
-      if (Array.isArray(value.content) && value.content.length === 0) return;
-      if (typeof value.content === "string" && !value.content.trim()) return;
+      if (SKIP_KEYS.has(normalizeStr(key))) return;
+      if (!value?.content && !value?.details) return;
+      if (Array.isArray(value.content) && value.content.length === 0 && !value.details) return;
+      if (typeof value.content === "string" && !value.content.trim() && !value.details) return;
 
-      // Detect simple list
       const isSimpleList = Array.isArray(value.content) && value.content.every(item => {
         if (typeof item === 'string') return true;
         if (typeof item === 'object') {
@@ -531,75 +779,169 @@ const Page = () => {
           hideExperienceLevel: true
         });
       } else {
+        const contentArray = Array.isArray(value.content) ? value.content : [value.content];
         additionalSectionsList.push({
           id: id++,
           title: key,
           type: "custom",
-          items: Array.isArray(value.content)
-            ? value.content.map((item, i) => ({
-              id: `custom_${i}_${Date.now()}`,
-              title: typeof item === "string" ? item : item.title || item.name || "",
-              city: item.city || "",
-              startDate: item.start_date || "",
-              endDate: item.end_date || "",
-              description: item.description || "",
-            }))
-            : [
-              {
-                id: `custom_0_${Date.now()}`,
-                title: typeof value.content === "string" ? value.content : "",
-                city: "",
-                startDate: "",
-                endDate: "",
-                description: "",
-              },
-            ],
+          items: contentArray.filter(item => typeof item === "string" ? item.trim() : item).map((item, i) => ({
+            id: `custom_${i}_${Date.now()}`,
+            title: typeof item === "string" ? item : item.title || item.name || "",
+            city: item.city || "",
+            startDate: item.start_date || "",
+            endDate: item.end_date || "",
+            description: item.description || "",
+          }))
         });
       }
     });
 
-
-    const sections = [
+    return [
       ...(summarySection ? [summarySection] : []),
       ...skillsSections,
       ...(educationSection ? [educationSection] : []),
       ...(certSection ? [certSection] : []),
       ...(experienceSection ? [experienceSection] : []),
+      ...(projectSection ? [projectSection] : []),
       ...additionalSectionsList,
     ];
-
-    return sections;
   };
 
   // ----------------- SETTING FORM VALUES -----------------
+  // useEffect(() => {
+  //   if (!resumeSource) return;
+
+  //   const resumeData = extracteResumeData?.resume_data || resumeSource;
+  //   const personal = resumeData?.personal_information || {};
+  //   const meta = resumeData?.metadata || {};
+
+  //   const profileSummaryKey = Object.keys(resumeData?.additional_sections || {}).find(
+  //     k => k.trim().toUpperCase() === "PROFILE SUMMARY"
+  //   );
+  //   const profileSummaryContent = profileSummaryKey
+  //     ? resumeData.additional_sections[profileSummaryKey]?.content
+  //     : null;
+  //   const hasProfileSummary =
+  //     Array.isArray(profileSummaryContent) &&
+  //     profileSummaryContent.length > 0 &&
+  //     profileSummaryContent.some(p => p?.trim());
+
+  //   const summaryPoints = hasProfileSummary
+  //     ? profileSummaryContent
+  //     : (resumeData?.professional_summary?.summary_text
+  //       ? [resumeData.professional_summary.summary_text]
+  //       : []);
+
+  //   const formattedSummary =
+  //     summaryPoints.length > 1
+  //       ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
+  //       : summaryPoints[0] || "";
+
+  //   const fullName = personal.full_name || "";
+  //   const nameParts = fullName.split(" ");
+
+  //   setValue("job_target", meta.current_role || resumeSource.job_target || "");
+  //   setValue("first_name", nameParts[0] || resumeSource.first_name || "");
+  //   setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
+  //   setValue("email", personal.email || resumeSource.email || "");
+  //   setValue("phone", personal.phone || resumeSource.phone || "");
+  //   setValue(
+  //     "city_state",
+  //     [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || resumeSource.city_state || ""
+  //   );
+  //   setValue("country", personal.location?.country || resumeSource.country || "");
+  //   setValue("address", personal.location?.full_address || resumeSource.address || "");
+  //   setValue("summary", formattedSummary || resumeSource.summary || "");
+  //   setValue("profileImage", resumeSource.profileImage || "");
+
+  //   setValue("linkedin", resumeSource.linkedin || "");
+  //   setValue("github", resumeSource.github || "");
+  //   setValue("stackoverflow", resumeSource.stackoverflow || "");
+  //   setValue("leetcode", resumeSource.leetcode || "");
+  //   setValue("postal_code", resumeSource.postal_code || "");
+  //   setValue("nationality", resumeSource.nationality || "");
+  //   setValue("birth_place", resumeSource.birth_place || "");
+  //   setValue("dob", resumeSource.dob || "");
+  //   setValue("driving_licence", resumeSource.driving_licence || "");
+
+
+  //   if (!originalFormValuesRef.current) {
+  //     const clonedSource = JSON.parse(JSON.stringify(resumeSource));
+  //     const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
+  //     const initialSections = clonedSource.sections?.length
+  //       ? clonedSource.sections
+  //       : mapextracteResumeDataToSections(clonedSource);
+
+  //     const personal = (extracteResumeData?.resume_data || resumeSource)?.personal_information || {};
+  //     const meta = (extracteResumeData?.resume_data || resumeSource)?.metadata || {};
+  //     const fullName = personal.full_name || "";
+  //     const nameParts = fullName.split(" ");
+
+  //     const originalFormData = {
+  //       job_target: meta.current_role || clonedSource.job_target || "",
+  //       first_name: nameParts[0] || clonedSource.first_name || "",
+  //       last_name: nameParts.slice(1).join(" ") || clonedSource.last_name || "",
+  //       email: personal.email || clonedSource.email || "",
+  //       phone: personal.phone || clonedSource.phone || "",
+  //       city_state: [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || clonedSource.city_state || "",
+  //       country: personal.location?.country || clonedSource.country || "",
+  //       address: personal.location?.full_address || clonedSource.address || "",
+  //       profileImage: clonedSource.profileImage || "",
+  //       linkedin: clonedSource.linkedin || "",
+  //       github: clonedSource.github || "",
+  //       stackoverflow: clonedSource.stackoverflow || "",
+  //       leetcode: clonedSource.leetcode || "",
+  //       postal_code: clonedSource.postal_code || "",
+  //     };
+
+  //     originalFormValuesRef.current = originalFormData;
+
+  //     setOriginalResumeData({
+  //       ...originalFormData,
+  //       sections: initialSections,
+  //       oldResumeSettings: {
+  //         ...initialSettings,
+  //         theme: { ...initialSettings.theme, template: "ats" } // ✅ সবসময় ats
+  //       }
+  //     });
+  //   }
+
+  // }, [extracteResumeData, resumeSource, setValue]);
+
+// ----------------- SETTING FORM VALUES -----------------
   useEffect(() => {
     if (!resumeSource) return;
 
     const resumeData = extracteResumeData?.resume_data || resumeSource;
     const personal = resumeData?.personal_information || {};
     const meta = resumeData?.metadata || {};
+    const normalizeStr = (str) => str.trim().replace(/\s+/g, ' ').toUpperCase();
 
+    // Dynamically find summary based on common keywords
+    const summaryKeywords = ["PROFILE SUMMARY", "ABOUT ME", "SUMMARY", "PROFESSIONAL SUMMARY", "OBJECTIVE", "CAREER OBJECTIVE", "ABOUT", "EXECUTIVE SUMMARY"];
     const profileSummaryKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => k.trim().toUpperCase() === "PROFILE SUMMARY"
+      k => summaryKeywords.includes(normalizeStr(k))
     );
+
     const profileSummaryContent = profileSummaryKey
       ? resumeData.additional_sections[profileSummaryKey]?.content
       : null;
-    const hasProfileSummary =
-      Array.isArray(profileSummaryContent) &&
-      profileSummaryContent.length > 0 &&
-      profileSummaryContent.some(p => p?.trim());
 
-    const summaryPoints = hasProfileSummary
-      ? profileSummaryContent
-      : (resumeData?.professional_summary?.summary_text
-        ? [resumeData.professional_summary.summary_text]
-        : []);
-
-    const formattedSummary =
-      summaryPoints.length > 1
-        ? `<ul>${summaryPoints.map(p => `<li>${p}</li>`).join("")}</ul>`
-        : summaryPoints[0] || "";
+    let formattedSummary = "";
+    if (Array.isArray(profileSummaryContent) && profileSummaryContent.length > 0) {
+      formattedSummary = profileSummaryContent.length > 1
+        ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : profileSummaryContent[0];
+    } else if (typeof profileSummaryContent === 'string' && profileSummaryContent.trim()) {
+      formattedSummary = profileSummaryContent;
+    } else if (resumeData?.professional_summary?.summary_text?.trim()) {
+      formattedSummary = resumeData.professional_summary.summary_text;
+    } else if (Array.isArray(resumeData?.professional_summary?.key_highlights) && resumeData.professional_summary.key_highlights.length > 0) {
+      // ✅ NEW FIX: Fetching from key_highlights
+      formattedSummary = resumeData.professional_summary.key_highlights.length > 1
+        ? `<ul>${resumeData.professional_summary.key_highlights.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : resumeData.professional_summary.key_highlights[0];
+    }
 
     const fullName = personal.full_name || "";
     const nameParts = fullName.split(" ");
@@ -628,18 +970,12 @@ const Page = () => {
     setValue("dob", resumeSource.dob || "");
     setValue("driving_licence", resumeSource.driving_licence || "");
 
-
     if (!originalFormValuesRef.current) {
       const clonedSource = JSON.parse(JSON.stringify(resumeSource));
       const initialSettings = clonedSource.resumeSettings || defaultResumeSettings;
       const initialSections = clonedSource.sections?.length
         ? clonedSource.sections
         : mapextracteResumeDataToSections(clonedSource);
-
-      const personal = (extracteResumeData?.resume_data || resumeSource)?.personal_information || {};
-      const meta = (extracteResumeData?.resume_data || resumeSource)?.metadata || {};
-      const fullName = personal.full_name || "";
-      const nameParts = fullName.split(" ");
 
       const originalFormData = {
         job_target: meta.current_role || clonedSource.job_target || "",
@@ -665,7 +1001,7 @@ const Page = () => {
         sections: initialSections,
         oldResumeSettings: {
           ...initialSettings,
-          theme: { ...initialSettings.theme, template: "ats" } // ✅ সবসময় ats
+          theme: { ...initialSettings.theme, template: "ats" }
         }
       });
     }
