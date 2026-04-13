@@ -87,7 +87,13 @@ const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVer
                     router.push("/plans");
                 }, 5000);
             } else {
-                setOtpError("Invalid OTP. Please try again.");
+                const backendMsg = res?.payload?.response?.data?.message || res?.payload?.message;
+
+                if (backendMsg) {
+                    setOtpError(backendMsg);
+                } else {
+                    setOtpError("Invalid OTP. Please try again.");
+                }
             }
         });
     };
