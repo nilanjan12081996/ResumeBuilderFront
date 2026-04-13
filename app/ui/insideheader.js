@@ -343,6 +343,19 @@ const Insideheader = () => {
                       <span className="font-medium">My Profile</span>
                     </Link>
                   </li>
+                  <li className="px-0">
+                    <Link
+                      href="/support"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-blue-50 transition-colors group"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
+                        <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <span className="font-medium group-hover:text-blue-500 transition-colors">Help & Support</span>
+                    </Link>
+                  </li>
                   <li
                     className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-red-50 transition-colors group"
                     onClick={handleLogout}
