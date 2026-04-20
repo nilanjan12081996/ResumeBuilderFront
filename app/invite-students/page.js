@@ -2,18 +2,14 @@
 
 // import React, { useEffect, useState } from 'react';
 // import Image from 'next/image';
-
 // import { Inter } from 'next/font/google';
-
 // import resume01 from "../assets/imagesource/resume01.png";
-
 // import { HiClipboardList } from "react-icons/hi";
 // import { MdPreview } from "react-icons/md";
 // import { IoStatsChart } from "react-icons/io5";
 // import { IoMdDownload } from "react-icons/io";
 // import { AiOutlineArrowRight } from "react-icons/ai";
 // import { AiFillSave } from "react-icons/ai";
-
 // import { BiImport, BiSolidUser } from "react-icons/bi";
 // import { BiSolidBriefcase } from "react-icons/bi";
 // import { FaGlobe } from "react-icons/fa";
@@ -22,50 +18,32 @@
 // import { MdEmail } from "react-icons/md";
 // import { FaLocationDot } from "react-icons/fa6";
 // import { BiSolidPhone } from "react-icons/bi";
-
 // import { HiAcademicCap } from "react-icons/hi2";
-
 // import { FaLanguage } from "react-icons/fa6";
 // import { MdSettingsSuggest } from "react-icons/md";
 // import { FaDiagramProject } from "react-icons/fa6";
 // import { FaCertificate } from "react-icons/fa";
 // import { FaTrophy } from "react-icons/fa6";
-
 // import { BiSolidBank } from "react-icons/bi";
-
 // import { BsFillPlusCircleFill } from "react-icons/bs";
 // import { MdDelete } from "react-icons/md";
-
 // import { FaTags } from "react-icons/fa";
 // import { BiSolidBuilding } from "react-icons/bi";
-
 // import { BiWorld } from "react-icons/bi";
-
 // import { BsFillPersonVcardFill } from "react-icons/bs";
 // import { BiCodeAlt } from "react-icons/bi";
-
 // import { BiLink } from "react-icons/bi";
-
 // import { HiDocumentText } from "react-icons/hi2";
-
 // import { BsFiletypeCsv } from "react-icons/bs";
-
 // import { RiSearchLine } from "react-icons/ri";
-
 // import { FaArrowUpWideShort } from "react-icons/fa6";
-
 // import { AiOutlineEdit } from "react-icons/ai";
-
 // import { MdOutlineDelete } from "react-icons/md";
-
 // import { BiFilter } from "react-icons/bi";
-
-
 // import {
 //   Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker,
 //   Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow
 // } from "flowbite-react";
-
 // import serverApi from '../reducers/serverApi';
 // import { useFieldArray, useForm } from 'react-hook-form';
 // import { useDispatch, useSelector } from 'react-redux';
@@ -73,379 +51,556 @@
 // import { toast, ToastContainer } from 'react-toastify';
 // import StudentList from './StudentList';
 
-
-
 // const inter = Inter({
-//   subsets: ['latin'], // or ['latin-ext'] etc.
-//   weight: ['400', '500', '600', '700'], // specify desired weights
-//   variable: '--font-inter', // optional, for Tailwind usage
+//   subsets: ['latin'],
+//   weight: ['400', '500', '600', '700'],
+//   variable: '--font-inter',
 // })
 
+// // ─── Resume type config ───────────────────────────────────────────────────────
+// const RESUME_TYPE_CONFIG = [
+//   {
+//     key: 'improve',
+//     label: 'Improve Existing Resume',
+//     icon: <HiDocumentText className="text-purple-500 text-lg" />,
+//     color: 'purple',
+//     subscriptionKey: 'imp_count',
+//   },
+//   {
+//     key: 'linkdin',
+//     label: 'LinkedIn Rewrite',
+//     icon: <BiLogoLinkedinSquare className="text-blue-500 text-lg" />,
+//     color: 'blue',
+//     subscriptionKey: 'link_count',
+//   },
+// ]
+
+// // ─── Counter field component ──────────────────────────────────────────────────
+// const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1, watch1, setValue1 }) => {
+//   const fieldName = `students.${index}.${fieldKey}`
+//   const currentVal = Number(watch1(fieldName)) || 0
+
+//   const increment = () => {
+//     if (currentVal < 100) setValue1(fieldName, currentVal + 1)
+//   }
+//   const decrement = () => {
+//     if (currentVal > 0) setValue1(fieldName, currentVal - 1)
+//   }
+
+//   const colorMap = {
+//     purple: { bg: 'bg-purple-50', border: 'border-purple-200', btn: 'bg-purple-100 hover:bg-purple-200 text-purple-700', text: 'text-purple-700', badge: 'bg-purple-100' },
+//     blue: { bg: 'bg-blue-50', border: 'border-blue-200', btn: 'bg-blue-100 hover:bg-blue-200 text-blue-700', text: 'text-blue-700', badge: 'bg-blue-100' },
+//     orange: { bg: 'bg-orange-50', border: 'border-orange-200', btn: 'bg-orange-100 hover:bg-orange-200 text-orange-700', text: 'text-orange-700', badge: 'bg-orange-100' },
+//     green: { bg: 'bg-green-50', border: 'border-green-200', btn: 'bg-green-100 hover:bg-green-200 text-green-700', text: 'text-green-700', badge: 'bg-green-100' },
+//   }
+//   const c = colorMap[color] || colorMap.purple
+
+//   return (
+//     <div className={`rounded-xl border ${c.border} ${c.bg} p-3`}>
+//       {/* Label row */}
+//       <div className="flex items-center gap-2 mb-3">
+//         <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shadow-sm flex-shrink-0">
+//           {icon}
+//         </div>
+//         <span className={`text-xs font-semibold ${c.text} leading-tight`}>{label}</span>
+//       </div>
+
+//       {/* Counter row */}
+//       <div className="flex items-center gap-2">
+//         {/* Decrement */}
+//         <button
+//           type="button"
+//           onClick={decrement}
+//           disabled={currentVal === 0}
+//           className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold transition ${c.btn} disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0`}
+//         >
+//           −
+//         </button>
+
+//         {/* Manual input */}
+//         <input
+//           type="number"
+//           min={0}
+//           max={100}
+//           {...register1(fieldName, {
+//             valueAsNumber: true,
+//             min: { value: 0, message: 'Min 0' },
+//             max: { value: 100, message: 'Max 100' },
+//           })}
+//           className={`w-full text-center text-sm font-bold border ${c.border} rounded-lg py-1.5 focus:outline-none focus:ring-2 focus:ring-offset-0 bg-white ${c.text}`}
+//           style={{ MozAppearance: 'textfield' }}
+//         />
+
+//         {/* Increment */}
+//         <button
+//           type="button"
+//           onClick={increment}
+//           disabled={currentVal >= 100}
+//           className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold transition ${c.btn} disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0`}
+//         >
+//           +
+//         </button>
+//       </div>
+
+//       {/* Max label */}
+//       <p className="text-[10px] text-gray-400 text-center mt-1.5">Max 100</p>
+
+//       {errors1?.students?.[index]?.[fieldKey] && (
+//         <p className="text-red-500 text-xs mt-1">{errors1.students[index][fieldKey].message}</p>
+//       )}
+//     </div>
+//   )
+// }
+
+// // ─── Dynamic quota section ────────────────────────────────────────────────────
+// const ResumeQuotaFields = ({ index, register1, errors1, watch1, setValue1, activeTypes }) => {
+//   if (!activeTypes || activeTypes.length === 0) {
+//     return (
+//       <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
+//         <p className="text-xs text-gray-400">No active subscription found to assign resume types.</p>
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div>
+//       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+//         Resume Quota
+//         <span className="text-gray-400 font-normal normal-case ml-1">(set 0 if not needed)</span>
+//       </p>
+//       <div className={`grid gap-2 ${activeTypes.length === 1 ? 'grid-cols-1' : activeTypes.length === 2 ? 'grid-cols-2' : 'grid-cols-2'}`}>
+//         {activeTypes.map((type) => (
+//           <CounterField
+//             key={type.key}
+//             label={type.label}
+//             icon={type.icon}
+//             color={type.color}
+//             fieldKey={type.key}
+//             index={index}
+//             register1={register1}
+//             errors1={errors1}
+//             watch1={watch1}
+//             setValue1={setValue1}
+//           />
+//         ))}
+//       </div>
+//     </div>
+//   )
+// }
+
+// // ─── Main Page ────────────────────────────────────────────────────────────────
 // const page = () => {
 //   const { loading_for_csv, loading_for_manual, loading } = useSelector((state) => state?.inviteStd)
-
+//   const { currentSubscriptionData } = useSelector((state) => state?.planst)
 //   const dispatch = useDispatch()
+//   const studentListRef = React.useRef(null)
 
+//   // Determine which resume types are active in current subscription
+//   const activeTypes = React.useMemo(() => {
+//     if (!currentSubscriptionData?.data || !Array.isArray(currentSubscriptionData.data)) {
+//       // fallback: show all types if no subscription data
+//       return RESUME_TYPE_CONFIG
+//     }
+
+//     // Aggregate counts across all active subscriptions
+//     const totals = { imp_count: 0, link_count: 0, jd_count: 0, scratch_count: 0 }
+//     currentSubscriptionData.data.forEach((sub) => {
+//       if (sub.status === 1) {
+//         totals.imp_count += sub.imp_count || 0
+//         totals.link_count += sub.link_count || 0
+//         totals.jd_count += sub.jd_count || 0
+//         totals.scratch_count += sub.scratch_count || 0
+//       }
+//     })
+
+//     // Only show types that have quota > 0
+//     const active = RESUME_TYPE_CONFIG.filter((t) => totals[t.subscriptionKey] > 0)
+//     // If none active (e.g. fresh/no quota), show all so admin can still assign
+//     return active.length > 0 ? active : RESUME_TYPE_CONFIG
+//   }, [currentSubscriptionData])
+
+//   const emptyStudent = () => ({
+//     name: '', email: '', phone: '', improve: 0, linkdin: 0,
+//   })
 
 //   const handleDownload = async () => {
 //     try {
-//       // Tell axios to expect a blob
-//       const response = await serverApi.get("/api/usercsv/download", {
-//         responseType: "blob",
-//       });
-
-//       // Create blob URL
-//       const url = window.URL.createObjectURL(new Blob([response.data]));
-
-//       // Create <a> element to trigger download
-//       const a = document.createElement("a");
-//       a.href = url;
-//       a.download = "sample.csv"; // file name
-//       document.body.appendChild(a);
-//       a.click();
-
-//       // Cleanup
-//       a.remove();
-//       window.URL.revokeObjectURL(url);
+//       const response = await serverApi.get("/api/usercsv/download", { responseType: "blob" })
+//       const url = window.URL.createObjectURL(new Blob([response.data]))
+//       const a = document.createElement("a")
+//       a.href = url
+//       a.download = "sample.csv"
+//       document.body.appendChild(a)
+//       a.click()
+//       a.remove()
+//       window.URL.revokeObjectURL(url)
 //     } catch (error) {
-//       console.error("Error downloading file:", error);
+//       console.error("Error downloading file:", error)
 //     }
-//   };
+//   }
 
-
-//   const {
-//     register,
-//     handleSubmit,
-//     watch,
-//     setValue,
-//     formState: { errors },
-//   } = useForm();
+//   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm()
 
 //   const {
 //     register: register1,
 //     handleSubmit: handleSubmit1,
 //     control,
 //     reset: reset1,
+//     watch: watch1,
+//     setValue: setValue1,
 //     formState: { errors: errors1 },
-//   } = useForm({
-//     defaultValues: {
-//       students: [
-//         { name: "", email: "", phone: "", resume_count: "" } // start with one student
-//       ]
-//     }
-//   });
+//   } = useForm({ defaultValues: { students: [emptyStudent()] } })
 
-//   const { fields, append, remove } = useFieldArray({
-//     control,
-//     name: "students",
-//   });
+//   const { fields, append, remove } = useFieldArray({ control, name: "students" })
+
 //   const csvFile = watch("file")
+
 //   const onSubmit = (data) => {
 //     const formData = new FormData()
 //     if (data.file && data.file[0]) {
-
-//       formData.append("csv", data.file[0]);
+//       formData.append("csv", data.file[0])
 //     } else {
-//       console.error("No resume file selected");
-//       toast.error("Please select a resume file to upload");
-//       return;
+//       toast.error("Please select a resume file to upload")
+//       return
 //     }
 //     dispatch(inviteStudents(formData)).then((res) => {
-//       console.log("csvREs", res);
 //       if (res?.payload?.response?.data?.status_code === 422) {
 //         toast.error(res?.payload?.response?.data?.message)
-//       }
-//       else if (res?.payload?.status_code === 200) {
-//         dispatch(invitedStudentsList({
-//           page: 1,
-//           limit: 10
-//         }))
+//       } else if (res?.payload?.status_code === 200) {
+//         dispatch(invitedStudentsList({ page: 1, limit: 10 }))
 //         toast.success(res?.payload?.message)
-
+//         reset()
+//         setTimeout(() => {
+//           studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+//         }, 300)
 //       }
-
 //     })
 //   }
 
-//   // const onSubmitManual = (data) => {
-//   //   if (!data.students || data.students.length === 0) {
-//   //     toast.error("Please add at least one student");
-//   //     return;
-//   //   }
-
-//   //   // Loop through each student and dispatch
-//   //   data.students.forEach((student) => {
-//   //     const payload = {
-//   //       name: student.name,
-//   //       email: student.email,
-//   //       phone: student.phone,
-//   //       resume_count: student.resume_count,
-//   //     };
-
-//   //     dispatch(inviteStudentsMannually(payload))
-//   //       .unwrap()
-//   //       .then((res) => {
-//   //         console.log("Student invited:", res);
-//   //         if(res?.status_code===201){
-//   //             toast.success(`${student.name} invited successfully`);
-//   //         }
-
-
-//   //       })
-//   //       .catch((err) => {
-//   //         console.error("Error inviting student:", err);
-//   //         toast.error(
-//   //           err?.message || `Failed to invite ${student.name}`
-//   //         );
-//   //       });
-//   //   });
-//   // };
-
-
 //   const onSubmitManual = (data) => {
-
-//     // store all invited student ids
-//     const invitedIds = [];
-
-//     // Loop through students one by one
 //     for (const student of data.students) {
 //       const payload = {
 //         name: student.name,
 //         email: student.email,
 //         phone: student.phone,
-//         resume_count: student.resume_count,
-//       };
-
+//         improve: Number(student.improve) || 0,
+//         linkdin: Number(student.linkdin) || 0,
+//       }
 
 //       dispatch(inviteStudentsMannually(payload)).then((res) => {
-//         console.log("res", res);
 //         if (res?.payload?.response?.data?.status_code === 422) {
 //           toast.error(res?.payload?.response?.data?.message)
-//         }
-//         else if (res?.payload?.status_code === 201) {
+//         } else if (res?.payload?.status_code === 201) {
 //           toast.success(res?.payload?.message)
-//           dispatch(invitedStudentsList({
-//             page: 1,
-//             limit: 10
-//           }))
-//           toast.success(res?.payload?.message)
+//           dispatch(invitedStudentsList({ page: 1, limit: 10 }))
 //         }
-
+//         setTimeout(() => {
+//           studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+//         }, 300)
 //       })
-
-
-//     };
+//     }
+//     // Reset only the quota fields (improve, linkdin) to 0, keep name/email/phone
+//     const currentVals = data.students.map((s) => ({
+//       name: s.name,
+//       email: s.email,
+//       phone: s.phone,
+//       improve: 0,
+//       linkdin: 0,
+//     }))
+//     reset1({ students: currentVals })
 //   }
 
-
-
+//   // Listen for fill-form event from StudentList floating bar
+//   useEffect(() => {
+//     const handler = (e) => {
+//       const selectedStudents = e.detail || []
+//       if (selectedStudents.length === 0) return
+//       const newStudents = selectedStudents.map((s) => ({
+//         name: s?.user?.fullname || '',
+//         email: s?.user?.email || '',
+//         phone: s?.user?.phone || '',
+//         improve: 0,
+//         linkdin: 0,
+//       }))
+//       reset1({ students: newStudents })
+//       // Scroll to manual form
+//       setTimeout(() => {
+//         document.getElementById('manual-invite-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+//       }, 100)
+//     }
+//     window.addEventListener('fill-invite-form', handler)
+//     return () => window.removeEventListener('fill-invite-form', handler)
+//   }, [reset1])
 
 //   useEffect(() => {
 //     if (csvFile && csvFile[0]) {
-//       console.log("Resume file selected:", csvFile[0]);
+//       console.log("Resume file selected:", csvFile[0])
 //     }
-//   }, [csvFile]);
-
-
-
+//   }, [csvFile])
 
 //   return (
 //     <div className={`${inter.className} antialiased pb-8`}>
 //       <ToastContainer />
-//       <div className='mb-5 lg:mb-10 pt-6'>
+//       <div className='mb-5 lg:mb-10 pt-6 px-5'>
 //         <h2 className='text-xl lg:text-[30px] leading-[30px] text-[#151515] font-semibold mb-1 lg:mb-4'>Invite Students</h2>
-//         <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>Easily invite and manage student profiles with seamless Excel upload or manual entry.</p>
+//         <p className='text-sm leading-[18px] lg:text-[16px] lg:leading-[23px] text-[#575757] font-normal mb-0'>
+//           Easily invite and manage student profiles with seamless Excel upload or manual entry.
+//         </p>
 //       </div>
+
 //       <div className='bg-white rounded-[10px] p-5 lg:p-10 lg:flex gap-6 mb-5'>
 
+//         {/* ── CSV Upload ── */}
 //         <div className='lg:w-6/12 mb-4 lg:mb-0'>
 //           <form onSubmit={handleSubmit(onSubmit)}>
-//             <div className='mb-0'>
-//               <div>
-//                 <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
+//             <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
+
+//             <div className="flex gap-4 items-start">
+
+//               {/* Left: Upload box + buttons */}
+//               <div className="w-1/2 flex-shrink-0">
+//                 <div className="flex w-full items-center justify-center">
+//                   <Label
+//                     htmlFor="dropzone-file"
+//                     className="resume_upload_box_small2 flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100"
+//                   >
+//                     <div className="flex flex-col items-center justify-center pb-6 pt-5">
+//                       <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
+//                       <p className="my-2 text-sm text-[#000000] text-center">
+//                         {csvFile && csvFile[0] ? csvFile[0].name : "Select a CSV file to import"}
+//                       </p>
+//                       <p className='text-[#A4A4A4] text-xs text-center'>or drag and drop it here</p>
+//                     </div>
+//                     <FileInput
+//                       {...register("file", { required: true })}
+//                       accept='.csv'
+//                       id="dropzone-file"
+//                       className="hidden"
+//                       aria-invalid={errors.resume_file ? "true" : "false"}
+//                     />
+//                   </Label>
+//                 </div>
+//                 {errors.file?.type === "required" && (
+//                   <p className="text-red-700 text-sm mt-1" role="alert">Please upload csv</p>
+//                 )}
+//                 <div className="flex flex-col gap-2 mt-3">
+//                   <button
+//                     type='button'
+//                     onClick={handleDownload}
+//                     className="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer text-[13px] leading-[40px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center justify-center"
+//                   >
+//                     <BiImport className="text-[18px]" /> Download Sample CSV
+//                   </button>
+//                   <button className="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer text-[13px] leading-[40px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">
+//                     {loading_for_csv || loading ? "Waiting..." : "Invite Students"}
+//                   </button>
+//                 </div>
 //               </div>
-//               <div className="flex w-full items-center justify-center">
-//                 <Label
-//                   htmlFor="dropzone-file"
-//                   className="resume_upload_box_small2 flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-//                 >
-//                   <div className="flex flex-col items-center justify-center pb-6 pt-5">
-//                     <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
-//                     <p className="my-2 text-xl text-[#000000]">
 
-//                       {csvFile && csvFile[0]
-//                         ? csvFile[0].name
-//                         : "Select a CSV file to import"}
-//                     </p>
+//               {/* Right: Instructions */}
+//               <div className="w-1/2 rounded-xl border border-purple-100 bg-gradient-to-br from-purple-50 to-white p-3">
 
-//                     <p className='text-[#A4A4A4] text-base'>or drag and drop it here</p>
+//                 {/* Header */}
+//                 <div className="flex items-center gap-1.5 mb-3">
+//                   <div className="w-5 h-5 rounded-md bg-purple-100 flex items-center justify-center flex-shrink-0">
+//                     <BiImport className="text-purple-600 text-xs" />
 //                   </div>
-//                   <FileInput {...register("file", { required: true })}
-//                     accept='.csv'
-//                     id="dropzone-file" className="hidden"
-//                     aria-invalid={errors.resume_file ? "true" : "false"}
-//                   />
-//                 </Label>
+//                   <p className="text-xs font-bold text-purple-800 tracking-tight leading-tight">
+//                     How to upload via CSV
+//                   </p>
+//                 </div>
 
-//               </div>
-//               {errors.file?.type === "required" && (
-//                 <p className="text-red-700 text-sm" role="alert">
-//                   Please upload csv
-//                 </p>
-//               )}
-//               <div className='lg:flex gap-4 mt-3'>
-//                 <button type='button' onClick={handleDownload} class="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer px-10 text-[15px] leading-[45px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center mb-2 lg:mb-0"><BiImport className="text-[24px]" /> Download Sample CSV</button>
-//                 <button class="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer px-10 text-[15px] leading-[45px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">{loading_for_csv || loading ? "Waiting..." : "Invite Students"}</button>
+//                 {/* Steps */}
+//                 <ol className="space-y-2 mb-3">
+//                   {[
+//                     { step: "1", text: <>Download the <span className="font-semibold text-gray-800">Sample CSV</span> template.</> },
+//                     { step: "2", text: <>Fill in student details — one row per student.</> },
+//                     { step: "3", text: <>Save as <span className="font-semibold text-gray-800">.csv</span> and upload above.</> },
+//                     { step: "4", text: <>Always use the <span className="font-semibold text-gray-800">downloaded sample sheet</span> — do not modify column headers, reorder columns, or substitute your own spreadsheet format.</> },
+//                   ].map(({ step, text }) => (
+//                     <li key={step} className="flex items-start gap-2">
+//                       <span className="w-4 h-4 rounded-full bg-purple-600 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+//                         {step}
+//                       </span>
+//                       <p className="text-[11px] text-gray-600 leading-relaxed">{text}</p>
+//                     </li>
+//                   ))}
+//                 </ol>
+
+//                 {/* Column guide */}
+//                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">CSV Column Guide</p>
+//                 <div className="flex flex-col gap-1">
+//                   {[
+//                     { col: "email", desc: "Email address", example: "john@example.com", required: true, color: "gray" },
+//                     { col: "name", desc: "Full name", example: "John Doe", required: true, color: "gray" },
+//                     { col: "phone", desc: "Phone (with code)", example: "+91-9876543210", required: true, color: "gray" },
+//                     {
+//                       col: "improve", desc: "Improve Resume credits",
+//                       example: "2", required: false, color: "purple",
+//                       badge: "Improve Existing Resume",
+//                       badgeColor: "bg-purple-100 text-purple-700",
+//                       icon: <HiDocumentText className="text-purple-500 text-[10px]" />,
+//                     },
+//                     {
+//                       col: "linkedin", desc: "LinkedIn Rewrite credits",
+//                       example: "1", required: false, color: "blue",
+//                       badge: "LinkedIn Rewrite",
+//                       badgeColor: "bg-blue-100 text-blue-700",
+//                       icon: <BiLogoLinkedinSquare className="text-blue-500 text-[10px]" />,
+//                     },
+//                   ].map(({ col, desc, example, required, color, badge, badgeColor, icon }) => (
+//                     <div
+//                       key={col}
+//                       className={`flex items-start gap-2 rounded-lg px-2 py-1.5 border ${color === "purple" ? "border-purple-100 bg-purple-50/60" :
+//                         color === "blue" ? "border-blue-100 bg-blue-50/60" :
+//                           "border-gray-100 bg-white"
+//                         }`}
+//                     >
+//                       <code className={`text-[10px] font-bold px-1 py-0.5 rounded font-mono flex-shrink-0 mt-0.5 ${color === "purple" ? "bg-purple-100 text-purple-700" :
+//                         color === "blue" ? "bg-blue-100 text-blue-700" :
+//                           "bg-gray-100 text-gray-700"
+//                         }`}>
+//                         {col}
+//                       </code>
+//                       <div className="flex-1 min-w-0">
+//                         <div className="flex flex-wrap items-center gap-1">
+//                           <p className="text-[11px] text-gray-700 leading-snug">{desc}</p>
+//                           {badge && (
+//                             <span className={`inline-flex items-center gap-0.5 text-[9px] font-semibold px-1 py-0.5 rounded ${badgeColor}`}>
+//                               {icon}{badge}
+//                             </span>
+//                           )}
+//                         </div>
+//                         <p className="text-[10px] text-gray-400 mt-0.5">
+//                           e.g. <span className="font-mono text-gray-500">{example}</span>
+//                           {required
+//                             ? <span className="ml-1.5 text-red-400 font-semibold">required</span>
+//                             : <span className="ml-1.5 text-gray-400">optional · 0 if not needed</span>
+//                           }
+//                         </p>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
 //               </div>
 //             </div>
 //           </form>
 //         </div>
-//         <div className='lg:w-6/12'>
+//         {/* ── Manual Invite ── */}
+//         <div className='lg:w-6/12' id="manual-invite-form">
 //           <form onSubmit={handleSubmit1(onSubmitManual)}>
-//             <div className=''>
-
-//               <div>
-//                 <div className="mb-4 flex items-center justify-between">
-//                   <h4 className="text-[16px] lg:text-[20px] text-[#151515] font-semibold pb-1">
-//                     Invite students manually
-//                   </h4>
-//                   <button
-//                     type="button"
-//                     onClick={() =>
-//                       append({ name: "", email: "", phone: "", resume_count: "" })
-//                     }
-//                     className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[32px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
-//                   >
-//                     <BsFillPlusCircleFill className="text-sm" /> Add Another Student
-//                   </button>
-//                 </div>
-
-//                 {/* Loop through students */}
-//                 {fields.map((field, index) => (
-//                   <div
-//                     key={field.id}
-//                     className="resume_form_area  p-4 rounded mb-4 relative"
-//                   >
-//                     {/* Student Name */}
-//                     <div className="resume_form_box mb-3">
-//                       <Label>Student Name <span>*</span></Label>
-//                       <div className="field_box flex items-center">
-//                         <div className="p-3">
-//                           <BiSolidUser className="text-[#928F8F]" />
-//                         </div>
-//                         <TextInput
-//                           {...register1(`students.${index}.name`, {
-//                             required: "Name is Required",
-//                           })}
-//                           type="text"
-//                           placeholder="Student Name"
-//                         />
-//                       </div>
-//                       {errors1?.students?.[index]?.name && (
-//                         <span className="text-red-500">
-//                           {errors1.students[index].name.message}
-//                         </span>
-//                       )}
-//                     </div>
-
-//                     {/* Email + Phone */}
-//                     <div className="lg:flex gap-4 mb-3">
-//                       <div className="lg:w-6/12 resume_form_box">
-//                         <Label>Email <span>*</span></Label>
-//                         <div className="field_box flex items-center">
-//                           <div className="p-3">
-//                             <MdEmail className="text-[#928F8F]" />
-//                           </div>
-//                           <TextInput
-//                             {...register1(`students.${index}.email`, {
-//                               required: "Email is required",
-//                             })}
-//                             type="email"
-//                             placeholder="Enter student email"
-//                           />
-//                         </div>
-//                         {errors1?.students?.[index]?.email && (
-//                           <span className="text-red-500">
-//                             {errors1.students[index].email.message}
-//                           </span>
-//                         )}
-//                       </div>
-
-//                       <div className="lg:w-6/12 resume_form_box">
-//                         <Label>Phone <span>*</span></Label>
-//                         <div className="field_box flex items-center">
-//                           <div className="p-3">
-//                             <BiSolidPhone className="text-[#928F8F]" />
-//                           </div>
-//                           <TextInput
-//                             {...register1(`students.${index}.phone`, {
-//                               required: "Phone is required",
-//                             })}
-//                             type="text"
-//                             placeholder="+91-5362563762"
-//                           />
-//                         </div>
-//                         {errors1?.students?.[index]?.phone && (
-//                           <span className="text-red-500">
-//                             {errors1.students[index].phone.message}
-//                           </span>
-//                         )}
-//                       </div>
-//                     </div>
-
-//                     {/* Resume Count */}
-//                     <div className="resume_form_box">
-//                       <Label>Resumes Assigned <span>*</span></Label>
-//                       <div className="field_box flex items-center">
-//                         <div className="p-3">
-//                           <HiDocumentText className="text-[#928F8F]" />
-//                         </div>
-//                         <TextInput
-//                           {...register1(`students.${index}.resume_count`, {
-//                             required: "Resume Count is required",
-//                             valueAsNumber: true,
-//                             max: { value: 100, message: "Value cannot be greater than 100" },
-//                           })}
-//                           type="number"
-//                           placeholder="Max 100"
-//                         />
-//                       </div>
-//                       {errors1?.students?.[index]?.resume_count && (
-//                         <span className="text-red-500">
-//                           {errors1.students[index].resume_count.message}
-//                         </span>
-//                       )}
-//                     </div>
-
-//                     {/* Delete button */}
-//                     {fields.length > 1 && (
-//                       <button
-//                         type="button"
-//                         onClick={() => remove(index)}
-//                         className="absolute top-2 right-2 text-red-500 hover:text-black"
-//                       >
-//                         <MdOutlineDelete className="text-xl" />
-//                       </button>
-//                     )}
-//                   </div>
-//                 ))}
-
-//                 {/* Single Add Student button */}
+//             <div>
+//               {/* Header */}
+//               <div className="mb-4 flex items-center justify-between">
+//                 <h4 className="text-[16px] lg:text-[20px] text-[#151515] font-semibold pb-1">
+//                   Invite students manually
+//                 </h4>
 //                 <button
-//                   type="submit"
-//                   className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-[#ffffff] font-semibold w-full text-center rounded-[7px]"
+//                   type="button"
+//                   onClick={() => append(emptyStudent())}
+//                   className="bg-[#F6EFFF] hover:bg-[#800080] rounded-[7px] text-[10px] leading-[32px] text-[#92278F] hover:text-[#ffffff] font-medium cursor-pointer px-2 flex items-center gap-1"
 //                 >
-//                   {loading_for_manual || loading ? "Waiting..." : "Add Student"}
+//                   <BsFillPlusCircleFill className="text-sm" /> Add Another Student
 //                 </button>
 //               </div>
 
+//               {/* Student fields loop */}
+//               {fields.map((field, index) => (
+//                 <div key={field.id} className="resume_form_area p-4 rounded-xl border border-gray-100 bg-gray-50/50 mb-4 relative">
 
+//                   {/* Student index label */}
+//                   {fields.length > 1 && (
+//                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+//                       Student {index + 1}
+//                     </p>
+//                   )}
 
+//                   {/* Name */}
+//                   <div className="resume_form_box mb-3">
+//                     <Label>Student Name <span>*</span></Label>
+//                     <div className="field_box flex items-center">
+//                       <div className="p-3"><BiSolidUser className="text-[#928F8F]" /></div>
+//                       <TextInput
+//                         {...register1(`students.${index}.name`, { required: "Name is Required" })}
+//                         type="text"
+//                         placeholder="Student Name"
+//                       />
+//                     </div>
+//                     {errors1?.students?.[index]?.name && (
+//                       <span className="text-red-500 text-xs">{errors1.students[index].name.message}</span>
+//                     )}
+//                   </div>
+
+//                   {/* Email + Phone */}
+//                   <div className="lg:flex gap-4 mb-3">
+//                     <div className="lg:w-6/12 resume_form_box mb-2 lg:mb-0">
+//                       <Label>Email <span>*</span></Label>
+//                       <div className="field_box flex items-center">
+//                         <div className="p-3"><MdEmail className="text-[#928F8F]" /></div>
+//                         <TextInput
+//                           {...register1(`students.${index}.email`, { required: "Email is required" })}
+//                           type="email"
+//                           placeholder="Enter student email"
+//                         />
+//                       </div>
+//                       {errors1?.students?.[index]?.email && (
+//                         <span className="text-red-500 text-xs">{errors1.students[index].email.message}</span>
+//                       )}
+//                     </div>
+//                     <div className="lg:w-6/12 resume_form_box">
+//                       <Label>Phone <span>*</span></Label>
+//                       <div className="field_box flex items-center">
+//                         <div className="p-3"><BiSolidPhone className="text-[#928F8F]" /></div>
+//                         <TextInput
+//                           {...register1(`students.${index}.phone`, { required: "Phone is required" })}
+//                           type="text"
+//                           placeholder="+91-9876543210"
+//                         />
+//                       </div>
+//                       {errors1?.students?.[index]?.phone && (
+//                         <span className="text-red-500 text-xs">{errors1.students[index].phone.message}</span>
+//                       )}
+//                     </div>
+//                   </div>
+
+//                   {/* ── Dynamic Resume Quota Fields ── */}
+//                   <ResumeQuotaFields
+//                     index={index}
+//                     register1={register1}
+//                     errors1={errors1}
+//                     watch1={watch1}
+//                     setValue1={setValue1}
+//                     activeTypes={activeTypes}
+//                   />
+
+//                   {/* Delete button */}
+//                   {fields.length > 1 && (
+//                     <button
+//                       type="button"
+//                       onClick={() => remove(index)}
+//                       className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 transition"
+//                     >
+//                       <MdOutlineDelete className="text-base" />
+//                     </button>
+//                   )}
+//                 </div>
+//               ))}
+
+//               {/* Submit */}
+//               <button
+//                 type="submit"
+//                 className="bg-[#800080] hover:bg-[#151515] cursor-pointer px-10 text-[15px] leading-[45px] text-white font-semibold w-full text-center rounded-[7px] transition"
+//               >
+//                 {loading_for_manual || loading ? "Waiting..." : "Add Student"}
+//               </button>
 //             </div>
 //           </form>
 //         </div>
 //       </div>
-//       <StudentList />
+
+//       <div ref={studentListRef}>
+//         <StudentList />
+//       </div>
 //     </div>
 //   )
 // }
@@ -489,12 +644,13 @@ import { BsFillPersonVcardFill } from "react-icons/bs";
 import { BiCodeAlt } from "react-icons/bi";
 import { BiLink } from "react-icons/bi";
 import { HiDocumentText } from "react-icons/hi2";
-import { BsFiletypeCsv } from "react-icons/bs";
+import { BsFiletypeCsv, BsFiletypeXlsx } from "react-icons/bs";
 import { RiSearchLine } from "react-icons/ri";
 import { FaArrowUpWideShort } from "react-icons/fa6";
 import { AiOutlineEdit } from "react-icons/ai";
 import { MdOutlineDelete } from "react-icons/md";
 import { BiFilter } from "react-icons/bi";
+import { RiFileExcel2Line } from "react-icons/ri";
 import {
   Label, TextInput, Modal, ModalBody, ModalFooter, ModalHeader, Checkbox, Textarea, Datepicker,
   Select, FileInput, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow
@@ -552,7 +708,6 @@ const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1,
 
   return (
     <div className={`rounded-xl border ${c.border} ${c.bg} p-3`}>
-      {/* Label row */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shadow-sm flex-shrink-0">
           {icon}
@@ -560,9 +715,7 @@ const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1,
         <span className={`text-xs font-semibold ${c.text} leading-tight`}>{label}</span>
       </div>
 
-      {/* Counter row */}
       <div className="flex items-center gap-2">
-        {/* Decrement */}
         <button
           type="button"
           onClick={decrement}
@@ -572,7 +725,6 @@ const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1,
           −
         </button>
 
-        {/* Manual input */}
         <input
           type="number"
           min={0}
@@ -586,7 +738,6 @@ const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1,
           style={{ MozAppearance: 'textfield' }}
         />
 
-        {/* Increment */}
         <button
           type="button"
           onClick={increment}
@@ -597,7 +748,6 @@ const CounterField = ({ label, icon, color, fieldKey, index, register1, errors1,
         </button>
       </div>
 
-      {/* Max label */}
       <p className="text-[10px] text-gray-400 text-center mt-1.5">Max 100</p>
 
       {errors1?.students?.[index]?.[fieldKey] && (
@@ -650,14 +800,15 @@ const page = () => {
   const dispatch = useDispatch()
   const studentListRef = React.useRef(null)
 
+  // ── NEW: upload type toggle state ──
+  const [uploadType, setUploadType] = useState('csv') // 'csv' | 'xls'
+
   // Determine which resume types are active in current subscription
   const activeTypes = React.useMemo(() => {
     if (!currentSubscriptionData?.data || !Array.isArray(currentSubscriptionData.data)) {
-      // fallback: show all types if no subscription data
       return RESUME_TYPE_CONFIG
     }
 
-    // Aggregate counts across all active subscriptions
     const totals = { imp_count: 0, link_count: 0, jd_count: 0, scratch_count: 0 }
     currentSubscriptionData.data.forEach((sub) => {
       if (sub.status === 1) {
@@ -668,9 +819,7 @@ const page = () => {
       }
     })
 
-    // Only show types that have quota > 0
     const active = RESUME_TYPE_CONFIG.filter((t) => totals[t.subscriptionKey] > 0)
-    // If none active (e.g. fresh/no quota), show all so admin can still assign
     return active.length > 0 ? active : RESUME_TYPE_CONFIG
   }, [currentSubscriptionData])
 
@@ -678,7 +827,8 @@ const page = () => {
     name: '', email: '', phone: '', improve: 0, linkdin: 0,
   })
 
-  const handleDownload = async () => {
+  // ── Download Sample CSV ──
+  const handleDownloadCsv = async () => {
     try {
       const response = await serverApi.get("/api/usercsv/download", { responseType: "blob" })
       const url = window.URL.createObjectURL(new Blob([response.data]))
@@ -690,7 +840,24 @@ const page = () => {
       a.remove()
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      console.error("Error downloading file:", error)
+      console.error("Error downloading CSV:", error)
+    }
+  }
+
+  // ── Download Sample XLS ──
+  const handleDownloadXls = async () => {
+    try {
+      const response = await serverApi.get("/api/usercsv/download-excel", { responseType: "blob" })
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "sample.xlsx"
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Error downloading XLS:", error)
     }
   }
 
@@ -708,28 +875,52 @@ const page = () => {
 
   const { fields, append, remove } = useFieldArray({ control, name: "students" })
 
-  const csvFile = watch("file")
+  const uploadedFile = watch("file")
 
+  // ── Reset file input when toggle changes ──
+  useEffect(() => {
+    reset({ file: null })
+  }, [uploadType])
+
+  // ── Submit: CSV or XLS based on toggle ──
   const onSubmit = (data) => {
     const formData = new FormData()
     if (data.file && data.file[0]) {
-      formData.append("csv", data.file[0])
-    } else {
-      toast.error("Please select a resume file to upload")
-      return
-    }
-    dispatch(inviteStudents(formData)).then((res) => {
-      if (res?.payload?.response?.data?.status_code === 422) {
-        toast.error(res?.payload?.response?.data?.message)
-      } else if (res?.payload?.status_code === 200) {
-        dispatch(invitedStudentsList({ page: 1, limit: 10 }))
-        toast.success(res?.payload?.message)
-        reset()
-        setTimeout(() => {
-          studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 300)
+      if (uploadType === 'csv') {
+        formData.append("csv", data.file[0])
+        dispatch(inviteStudents(formData)).then((res) => {
+          if (res?.payload?.response?.data?.status_code === 422) {
+            toast.error(res?.payload?.response?.data?.message)
+          } else if (res?.payload?.status_code === 200) {
+            dispatch(invitedStudentsList({ page: 1, limit: 10 }))
+            toast.success(res?.payload?.message)
+            reset()
+            setTimeout(() => {
+              studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }, 300)
+          }
+        })
+      } else {
+        // XLS upload
+        formData.append("excel", data.file[0])
+        serverApi.post('/api/usercsv/upload-excel', formData)
+          .then((res) => {
+            if (res?.data?.status_code === 200) {
+              dispatch(invitedStudentsList({ page: 1, limit: 10 }))
+              toast.success(res?.data?.message || "Excel uploaded successfully!")
+              reset()
+              setTimeout(() => {
+                studentListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }, 300)
+            } else {
+              toast.error(res?.data?.message || "Something went wrong.")
+            }
+          })
+          .catch(() => toast.error("Upload failed. Please try again."))
       }
-    })
+    } else {
+      toast.error(`Please select a ${uploadType === 'csv' ? 'CSV' : 'XLS/XLSX'} file to upload`)
+    }
   }
 
   const onSubmitManual = (data) => {
@@ -754,7 +945,6 @@ const page = () => {
         }, 300)
       })
     }
-    // Reset only the quota fields (improve, linkdin) to 0, keep name/email/phone
     const currentVals = data.students.map((s) => ({
       name: s.name,
       email: s.email,
@@ -765,7 +955,6 @@ const page = () => {
     reset1({ students: currentVals })
   }
 
-  // Listen for fill-form event from StudentList floating bar
   useEffect(() => {
     const handler = (e) => {
       const selectedStudents = e.detail || []
@@ -778,7 +967,6 @@ const page = () => {
         linkdin: 0,
       }))
       reset1({ students: newStudents })
-      // Scroll to manual form
       setTimeout(() => {
         document.getElementById('manual-invite-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 100)
@@ -787,11 +975,15 @@ const page = () => {
     return () => window.removeEventListener('fill-invite-form', handler)
   }, [reset1])
 
-  useEffect(() => {
-    if (csvFile && csvFile[0]) {
-      console.log("Resume file selected:", csvFile[0])
-    }
-  }, [csvFile])
+  // ── Dynamic instruction text based on uploadType ──
+  const isCsv = uploadType === 'csv'
+  const uploadLabel = isCsv ? 'CSV' : 'XLS / XLSX'
+  const uploadExt = isCsv ? '.csv' : '.xlsx'
+  const uploadAccept = isCsv ? '.csv' : '.xlsx,.xls'
+  const uploadIcon = isCsv
+    ? <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
+    : <RiFileExcel2Line className="text-[70px] text-[#1D6F42]" />
+  const uploadPlaceholder = isCsv ? "Select a CSV file to import" : "Select an XLS / XLSX file to import"
 
   return (
     <div className={`${inter.className} antialiased pb-8`}>
@@ -805,10 +997,41 @@ const page = () => {
 
       <div className='bg-white rounded-[10px] p-5 lg:p-10 lg:flex gap-6 mb-5'>
 
-        {/* ── CSV Upload ── */}
+        {/* ── File Upload Section ── */}
         <div className='lg:w-6/12 mb-4 lg:mb-0'>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>Invite students through CSV.</h4>
+
+            {/* ── Toggle: CSV / XLS ── */}
+            <div className="flex items-center gap-0 mb-5 w-fit rounded-[10px] border border-gray-200 p-1 bg-gray-50">
+              <button
+                type="button"
+                onClick={() => setUploadType('csv')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-[7px] text-[13px] font-semibold transition-all duration-200 ${
+                  uploadType === 'csv'
+                    ? 'bg-white text-[#23A566] shadow-sm border border-green-100'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <BsFiletypeCsv className={`text-[18px] ${uploadType === 'csv' ? 'text-[#23A566]' : 'text-gray-400'}`} />
+                CSV Upload
+              </button>
+              <button
+                type="button"
+                onClick={() => setUploadType('xls')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-[7px] text-[13px] font-semibold transition-all duration-200 ${
+                  uploadType === 'xls'
+                    ? 'bg-white text-[#1D6F42] shadow-sm border border-green-200'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <RiFileExcel2Line className={`text-[18px] ${uploadType === 'xls' ? 'text-[#1D6F42]' : 'text-gray-400'}`} />
+                XLS Upload
+              </button>
+            </div>
+
+            <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>
+              Invite students through {uploadLabel}.
+            </h4>
 
             <div className="flex gap-4 items-start">
 
@@ -820,39 +1043,54 @@ const page = () => {
                     className="resume_upload_box_small2 flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100"
                   >
                     <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                      <BsFiletypeCsv className="text-[70px] text-[#23A566]" />
+                      {uploadIcon}
                       <p className="my-2 text-sm text-[#000000] text-center">
-                        {csvFile && csvFile[0] ? csvFile[0].name : "Select a CSV file to import"}
+                        {uploadedFile && uploadedFile[0] ? uploadedFile[0].name : uploadPlaceholder}
                       </p>
                       <p className='text-[#A4A4A4] text-xs text-center'>or drag and drop it here</p>
                     </div>
                     <FileInput
                       {...register("file", { required: true })}
-                      accept='.csv'
+                      accept={uploadAccept}
                       id="dropzone-file"
                       className="hidden"
-                      aria-invalid={errors.resume_file ? "true" : "false"}
                     />
                   </Label>
                 </div>
                 {errors.file?.type === "required" && (
-                  <p className="text-red-700 text-sm mt-1" role="alert">Please upload csv</p>
+                  <p className="text-red-700 text-sm mt-1" role="alert">Please upload {uploadLabel} file</p>
                 )}
+
                 <div className="flex flex-col gap-2 mt-3">
+                  {/* Download Sample CSV */}
                   <button
                     type='button'
-                    onClick={handleDownload}
+                    onClick={handleDownloadCsv}
                     className="bg-[#F0F0F0] hover:bg-[#383737] cursor-pointer text-[13px] leading-[40px] text-[#383737] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center justify-center"
                   >
                     <BiImport className="text-[18px]" /> Download Sample CSV
                   </button>
-                  <button className="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer text-[13px] leading-[40px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px]">
+
+                  {/* Download Sample XLS — shown below */}
+                  <button
+                    type='button'
+                    onClick={handleDownloadXls}
+                    className="bg-[#E8F5E9] hover:bg-[#1D6F42] cursor-pointer text-[13px] leading-[40px] text-[#1D6F42] hover:text-[#ffffff] font-semibold w-full text-center rounded-[7px] flex gap-2 items-center justify-center transition-all duration-200"
+                  >
+                    <RiFileExcel2Line className="text-[18px]" /> Download Sample XLS
+                  </button>
+
+                  {/* Invite Students button */}
+                  <button
+                    type="submit"
+                    className="bg-[#F6EFFF] hover:bg-[#800080] cursor-pointer text-[13px] leading-[40px] text-[#800080] hover:text-[#F6EFFF] font-semibold w-full text-center rounded-[7px] transition-all duration-200"
+                  >
                     {loading_for_csv || loading ? "Waiting..." : "Invite Students"}
                   </button>
                 </div>
               </div>
 
-              {/* Right: Instructions */}
+              {/* Right: Instructions panel — dynamic based on uploadType */}
               <div className="w-1/2 rounded-xl border border-purple-100 bg-gradient-to-br from-purple-50 to-white p-3">
 
                 {/* Header */}
@@ -861,17 +1099,30 @@ const page = () => {
                     <BiImport className="text-purple-600 text-xs" />
                   </div>
                   <p className="text-xs font-bold text-purple-800 tracking-tight leading-tight">
-                    How to upload via CSV
+                    How to upload via {uploadLabel}
                   </p>
                 </div>
 
                 {/* Steps */}
                 <ol className="space-y-2 mb-3">
                   {[
-                    { step: "1", text: <>Download the <span className="font-semibold text-gray-800">Sample CSV</span> template.</> },
+                    {
+                      step: "1",
+                      text: isCsv
+                        ? <>Download the <span className="font-semibold text-gray-800">Sample CSV</span> template.</>
+                        : <>Download the <span className="font-semibold text-gray-800">Sample XLS</span> template.</>,
+                    },
                     { step: "2", text: <>Fill in student details — one row per student.</> },
-                    { step: "3", text: <>Save as <span className="font-semibold text-gray-800">.csv</span> and upload above.</> },
-                    { step: "4", text: <>Always use the <span className="font-semibold text-gray-800">downloaded sample sheet</span> — do not modify column headers, reorder columns, or substitute your own spreadsheet format.</> },
+                    {
+                      step: "3",
+                      text: isCsv
+                        ? <>Save as <span className="font-semibold text-gray-800">.csv</span> and upload above.</>
+                        : <>Save as <span className="font-semibold text-gray-800">.xlsx</span> or <span className="font-semibold text-gray-800">.xls</span> and upload above.</>,
+                    },
+                    {
+                      step: "4",
+                      text: <>Always use the <span className="font-semibold text-gray-800">downloaded sample sheet</span> — do not modify column headers, reorder columns, or substitute your own spreadsheet format.</>,
+                    },
                   ].map(({ step, text }) => (
                     <li key={step} className="flex items-start gap-2">
                       <span className="w-4 h-4 rounded-full bg-purple-600 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -882,39 +1133,50 @@ const page = () => {
                   ))}
                 </ol>
 
-                {/* Column guide */}
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">CSV Column Guide</p>
+                {/* Column guide label — dynamic */}
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                  {uploadLabel} Column Guide
+                </p>
                 <div className="flex flex-col gap-1">
                   {[
-                    { col: "email", desc: "Email address", example: "john@example.com", required: true, color: "gray" },
-                    { col: "name", desc: "Full name", example: "John Doe", required: true, color: "gray" },
-                    { col: "phone", desc: "Phone (with code)", example: "+91-9876543210", required: true, color: "gray" },
+                    // Column A
+                    { col: "Student Name", desc: "Full name of the student", example: "John Doe", required: true, color: "gray" },
+                    // Column B
+                    { col: "Phone Number", desc: "Phone number (with country code)", example: "1234567890", required: true, color: "gray" },
+                    // Column C
+                    { col: "Email ID", desc: "Email address", example: "john@example.com", required: true, color: "gray" },
+                    // Column D
                     {
-                      col: "improve", desc: "Improve Resume credits",
+                      col: "Improve existing resume",
+                      desc: "Improve Resume credits",
                       example: "2", required: false, color: "purple",
                       badge: "Improve Existing Resume",
                       badgeColor: "bg-purple-100 text-purple-700",
                       icon: <HiDocumentText className="text-purple-500 text-[10px]" />,
                     },
+                    // Column E
                     {
-                      col: "linkedin", desc: "LinkedIn Rewrite credits",
+                      col: "LinkedIn Rewrite",
+                      desc: "LinkedIn Rewrite credits",
                       example: "1", required: false, color: "blue",
                       badge: "LinkedIn Rewrite",
                       badgeColor: "bg-blue-100 text-blue-700",
                       icon: <BiLogoLinkedinSquare className="text-blue-500 text-[10px]" />,
                     },
-                  ].map(({ col, desc, example, required, color, badge, badgeColor, icon }) => (
+                  ].map(({ col, desc, example, required, color, badge, badgeColor, icon }, idx) => (
                     <div
-                      key={col}
-                      className={`flex items-start gap-2 rounded-lg px-2 py-1.5 border ${color === "purple" ? "border-purple-100 bg-purple-50/60" :
+                      key={idx}
+                      className={`flex items-start gap-2 rounded-lg px-2 py-1.5 border ${
+                        color === "purple" ? "border-purple-100 bg-purple-50/60" :
                         color === "blue" ? "border-blue-100 bg-blue-50/60" :
-                          "border-gray-100 bg-white"
-                        }`}
+                        "border-gray-100 bg-white"
+                      }`}
                     >
-                      <code className={`text-[10px] font-bold px-1 py-0.5 rounded font-mono flex-shrink-0 mt-0.5 ${color === "purple" ? "bg-purple-100 text-purple-700" :
+                      <code className={`text-[10px] font-bold px-1 py-0.5 rounded font-mono flex-shrink-0 mt-0.5 ${
+                        color === "purple" ? "bg-purple-100 text-purple-700" :
                         color === "blue" ? "bg-blue-100 text-blue-700" :
-                          "bg-gray-100 text-gray-700"
-                        }`}>
+                        "bg-gray-100 text-gray-700"
+                      }`}>
                         {col}
                       </code>
                       <div className="flex-1 min-w-0">
@@ -941,6 +1203,7 @@ const page = () => {
             </div>
           </form>
         </div>
+
         {/* ── Manual Invite ── */}
         <div className='lg:w-6/12' id="manual-invite-form">
           <form onSubmit={handleSubmit1(onSubmitManual)}>
@@ -963,7 +1226,6 @@ const page = () => {
               {fields.map((field, index) => (
                 <div key={field.id} className="resume_form_area p-4 rounded-xl border border-gray-100 bg-gray-50/50 mb-4 relative">
 
-                  {/* Student index label */}
                   {fields.length > 1 && (
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
                       Student {index + 1}
