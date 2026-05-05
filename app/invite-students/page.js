@@ -1030,7 +1030,7 @@ const page = () => {
             </div>
 
             <h4 className='text-[20px] text-[#151515] font-semibold pb-5'>
-              Invite students through {uploadLabel}.
+              Invite students through {uploadLabel} (Add Students to Downloaded Sample File ONLY).
             </h4>
 
             <div className="flex gap-4 items-start">
