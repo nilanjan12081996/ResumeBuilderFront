@@ -576,27 +576,11 @@ const Page = () => {
 
     let id = 0;
     const SKIP_KEYS = new Set();
-    const normalizeStr = (str) => str.trim().replace(/\s+/g, ' ').toUpperCase();
+    const normalizeStr = (str) => (str || "").trim().replace(/\s+/g, ' ').toUpperCase();
 
     // ----------------- SUMMARY -----------------
-    const summaryKeywords = ["PROFILE SUMMARY", "ABOUT ME", "SUMMARY", "PROFESSIONAL SUMMARY", "OBJECTIVE", "CAREER OBJECTIVE", "ABOUT", "EXECUTIVE SUMMARY"];
-    const profileSummaryKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => summaryKeywords.includes(normalizeStr(k))
-    );
-    if (profileSummaryKey) SKIP_KEYS.add(normalizeStr(profileSummaryKey));
-
-    const profileSummaryContent = profileSummaryKey
-      ? resumeData.additional_sections[profileSummaryKey]?.content
-      : null;
-
     let summaryText = "";
-    if (Array.isArray(profileSummaryContent) && profileSummaryContent.length > 0) {
-      summaryText = profileSummaryContent.length > 1
-        ? `<ul>${profileSummaryContent.map(p => `<li>${p}</li>`).join("")}</ul>`
-        : profileSummaryContent[0];
-    } else if (typeof profileSummaryContent === 'string' && profileSummaryContent.trim()) {
-      summaryText = profileSummaryContent;
-    } else if (resumeData?.professional_summary?.summary_text?.trim()) {
+    if (resumeData?.professional_summary?.summary_text?.trim()) {
       summaryText = resumeData.professional_summary.summary_text;
     } else if (Array.isArray(resumeData?.professional_summary?.key_highlights) && resumeData.professional_summary.key_highlights.length > 0) {
       // ✅ NEW FIX: Fetching from key_highlights if summary_text is empty
@@ -606,12 +590,20 @@ const Page = () => {
     }
 
     const summarySection = summaryText
-      ? { id: id++, title: profileSummaryKey || "Professional Summary", type: "summary", summary: summaryText }
+      ? { id: id++, title: "Professional Summary", type: "summary", summary: summaryText }
       : null;
 
     // ----------------- TECHNICAL SKILLS -----------------
-    const techCategories = resumeData?.technical_skills?.categories || {};
-    const techSkills = Object.values(techCategories).flat();
+    const techData = resumeData?.technical_skills || {};
+    const techSkillsSet = new Set();
+    Object.entries(techData).forEach(([key, value]) => {
+      if (key !== 'categories' && Array.isArray(value)) {
+        value.forEach(skill => {
+          if (typeof skill === 'string' && skill.trim()) techSkillsSet.add(skill.trim());
+        });
+      }
+    });
+    const techSkills = Array.from(techSkillsSet);
     const skillsSections = [];
 
     if (techSkills.length > 0) {
@@ -641,16 +633,10 @@ const Page = () => {
     }
 
     // ----------------- EDUCATION -----------------
-    const eduKeywords = ["EDUCATION", "QUALIFICATIONS", "ACADEMICS", "ACADEMIC BACKGROUND"];
-    const educationKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => eduKeywords.includes(normalizeStr(k))
-    );
-    if (educationKey) SKIP_KEYS.add(normalizeStr(educationKey));
-
     const educationSection = (resumeData?.education || []).length > 0
       ? {
         id: id++,
-        title: educationKey || "Education",
+        title: "Education",
         type: "education",
         educations: resumeData.education.map((edu, i) => ({
           id: `e_${i}_${Date.now()}`,
@@ -665,64 +651,57 @@ const Page = () => {
       : null;
 
     // ----------------- CERTIFICATIONS -----------------
-    const certKeywords = ["CERTIFICATIONS", "CERTIFICATES", "COURSES", "TRAINING"];
-    const certKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => certKeywords.includes(normalizeStr(k))
-    );
-    if (certKey) SKIP_KEYS.add(normalizeStr(certKey));
-
     const certSection = (resumeData?.certifications || []).length > 0
       ? {
         id: id++,
-        title: certKey || "Certifications",
+        title: "Certifications",
         type: "certifications",
         certifications: resumeData.certifications.map((c, i) => ({
           id: `c_${i}_${Date.now()}`,
           name: c.name || "",
-          organization: c.organization || "",
+          organization: c.organization || c.issuing_organization || "",
           city: "",
-          startYear: "",
-          endYear: "",
+          startYear: c.issue_date || "",
+          endYear: c.expiry_date || "",
           description: "",
         })),
       }
       : null;
 
     // ----------------- EXPERIENCE -----------------
-    const expKeywords = ["WORK EXPERIENCE", "EXPERIENCE", "EMPLOYMENT EXPERIENCE", "PROFESSIONAL EXPERIENCE", "WORK HISTORY"];
-    const experienceKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => expKeywords.includes(normalizeStr(k))
-    );
-    if (experienceKey) SKIP_KEYS.add(normalizeStr(experienceKey));
-
     const experienceSection = (resumeData?.work_experience || []).length > 0
       ? {
         id: id++,
-        title: experienceKey || "Experience",
+        title: "Experience",
         type: "experience",
-        experiences: resumeData.work_experience.map((exp, i) => ({
-          id: `x_${i}_${Date.now()}`,
-          jobTitle: exp.job_title || "",
-          company: exp.company_name || "",
-          city: exp.location || "",
-          startDate: exp.start_date || "",
-          endDate: exp.end_date || "",
-          description: (exp.responsibilities || []).join("<br/>"),
-        })),
+        experiences: resumeData.work_experience.map((exp, i) => {
+          let sDate = exp.start_date || "";
+          let eDate = exp.end_date || "";
+          if (sDate && !eDate && sDate.includes('-')) {
+            const parts = sDate.split('-');
+            sDate = parts[0].trim();
+            eDate = parts.slice(1).join('-').trim();
+          }
+          return {
+            id: `x_${i}_${Date.now()}`,
+            jobTitle: exp.job_title || "",
+            company: exp.company_name || "",
+            city: exp.location || "",
+            startDate: sDate,
+            endDate: eDate,
+            description: Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0
+              ? `<ul>${exp.responsibilities.map(r => `<li>${r}</li>`).join('')}</ul>`
+              : (exp.description || ""),
+          };
+        }),
       }
       : null;
 
     // ----------------- PROJECTS (New addition to prevent data loss) -----------------
-    const projKeywords = ["PROJECTS", "PROJECT PROFILE", "PROJECTS PROFILE", "PERSONAL PROJECTS"];
-    const projKey = Object.keys(resumeData?.additional_sections || {}).find(
-      k => projKeywords.includes(normalizeStr(k))
-    );
-    if (projKey) SKIP_KEYS.add(normalizeStr(projKey));
-
     const projectSection = (resumeData?.projects || []).length > 0
       ? {
         id: id++,
-        title: projKey || "Projects",
+        title: "Projects",
         type: "custom",
         items: resumeData.projects.map((proj, i) => ({
           id: `proj_${i}_${Date.now()}`,
@@ -730,25 +709,87 @@ const Page = () => {
           city: "",
           startDate: "",
           endDate: proj.duration || "",
-          description: proj.description || (proj.responsibilities || []).join("<br/>") || "",
+          description: Array.isArray(proj.description) && proj.description.length > 0
+            ? `<ul>${proj.description.map(r => `<li>${r}</li>`).join('')}</ul>`
+            : (typeof proj.description === 'string' ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
         }))
       }
       : null;
 
+    // ----------------- ACHIEVEMENTS & AWARDS -----------------
+    const achievementsSection = (resumeData?.achievements_awards || []).length > 0
+      ? {
+        id: id++,
+        title: "Achievements & Awards",
+        type: "custom",
+        items: resumeData.achievements_awards.map((ach, i) => ({
+          id: `ach_${i}_${Date.now()}`,
+          title: ach.title || "",
+          city: ach.issuer || "",
+          startDate: ach.date || "",
+          endDate: "",
+          description: ach.description || "",
+        }))
+      } : null;
+
+    // ----------------- PUBLICATIONS -----------------
+    const publicationsSection = (resumeData?.publications || []).length > 0
+      ? {
+        id: id++,
+        title: "Publications",
+        type: "custom",
+        items: resumeData.publications.map((pub, i) => ({
+          id: `pub_${i}_${Date.now()}`,
+          title: pub.title || "",
+          city: pub.publisher || "",
+          startDate: pub.date || pub.published_date || "",
+          endDate: "",
+          description: pub.description || "",
+        }))
+      } : null;
+
+    // ----------------- LANGUAGES -----------------
+    const languagesArray = resumeData?.personal_information?.languages || [];
+    const languageSection = languagesArray.length > 0
+      ? {
+        id: id++,
+        title: "Languages",
+        type: "languages",
+        hideProficiency: false,
+        languages: languagesArray.map((lang, i) => ({
+          id: `lang_${i}_${Date.now()}`,
+          language: typeof lang === "string" ? lang : (lang.name || lang.language || ""),
+          level: typeof lang === "object" && lang.level ? lang.level : "Intermediate"
+        }))
+      } : null;
+
     // ----------------- DYNAMIC ADDITIONAL SECTIONS -----------------
     // Skip redundant headers/contact details extracted by AI
     ["CONTACT DETAILS", "CONTACT INFORMATION", "HEADER", "IT SKILLS", "TECHNICAL SKILLS"].forEach(k => SKIP_KEYS.add(k));
-    Object.keys(resumeData?.additional_sections || {}).forEach(k => {
-      if (normalizeStr(k).includes("HEADER") || normalizeStr(k).includes("CONTACT")) {
-        SKIP_KEYS.add(normalizeStr(k));
+    
+    let addSectionsArray = [];
+    if (Array.isArray(resumeData?.additional_sections)) {
+      addSectionsArray = resumeData.additional_sections.map(sec => ({
+         key: sec.section_title || "",
+         value: sec
+      }));
+    } else if (resumeData?.additional_sections && typeof resumeData.additional_sections === 'object') {
+      addSectionsArray = Object.entries(resumeData.additional_sections).map(([k, v]) => ({
+         key: k,
+         value: v
+      }));
+    }
+
+    addSectionsArray.forEach(({key}) => {
+      if (normalizeStr(key).includes("HEADER") || normalizeStr(key).includes("CONTACT")) {
+        SKIP_KEYS.add(normalizeStr(key));
       }
     });
 
     const additionalSectionsList = [];
-    const additionalSections = resumeData?.additional_sections || {};
 
-    Object.entries(additionalSections).forEach(([key, value]) => {
-      if (SKIP_KEYS.has(normalizeStr(key))) return;
+    addSectionsArray.forEach(({key, value}) => {
+      if (!key || SKIP_KEYS.has(normalizeStr(key))) return;
       if (!value?.content && !value?.details) return;
       if (Array.isArray(value.content) && value.content.length === 0 && !value.details) return;
       if (typeof value.content === "string" && !value.content.trim() && !value.details) return;
@@ -798,10 +839,13 @@ const Page = () => {
     return [
       ...(summarySection ? [summarySection] : []),
       ...skillsSections,
+      ...(languageSection ? [languageSection] : []),
       ...(educationSection ? [educationSection] : []),
       ...(certSection ? [certSection] : []),
       ...(experienceSection ? [experienceSection] : []),
       ...(projectSection ? [projectSection] : []),
+      ...(achievementsSection ? [achievementsSection] : []),
+      ...(publicationsSection ? [publicationsSection] : []),
       ...additionalSectionsList,
     ];
   };
@@ -938,11 +982,14 @@ const Page = () => {
       const fullName = personal.full_name || "";
       const nameParts = fullName.split(" ");
   
-      setValue("job_target", meta.current_role || resumeSource.job_target || "");
+      const emailStr = Array.isArray(personal.email) ? personal.email.join(" / ") : personal.email;
+      const phoneStr = Array.isArray(personal.phone) ? personal.phone.join(" / ") : personal.phone;
+  
+      setValue("job_target", personal.job_title || meta.current_role || resumeSource.job_target || "");
       setValue("first_name", nameParts[0] || resumeSource.first_name || "");
       setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
-      setValue("email", personal.email || resumeSource.email || "");
-      setValue("phone", personal.phone || resumeSource.phone || "");
+      setValue("email", emailStr || resumeSource.email || "");
+      setValue("phone", phoneStr || resumeSource.phone || "");
       setValue(
         "city_state",
         [personal.location?.city, personal.location?.state].filter(Boolean).join(", ") || resumeSource.city_state || ""

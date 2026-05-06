@@ -309,9 +309,74 @@ const LinkedInResumeBuilder = () => {
     const sections = [];
     let id = 0;
 
+    const normalizeStr = (str) => (str || "").trim().replace(/\s+/g, ' ').toUpperCase();
+
+    const normalizeDateStr = (dateStr) => {
+      if (!dateStr) return "";
+      dateStr = dateStr.trim();
+      if (/^\d{4}-\d{2}$/.test(dateStr)) return dateStr;
+      const mmYyyyMatch = dateStr.match(/^(\d{2})\/(\d{4})$/);
+      if (mmYyyyMatch) return `${mmYyyyMatch[2]}-${mmYyyyMatch[1]}`;
+      const mmYyMatch = dateStr.match(/^(\d{2})\/(\d{2})$/);
+      if (mmYyMatch) return `20${mmYyMatch[2]}-${mmYyMatch[1]}`;
+      const mmYyyyMatchDash = dateStr.match(/^(\d{2})-(\d{4})$/);
+      if (mmYyyyMatchDash) return `${mmYyyyMatchDash[2]}-${mmYyyyMatchDash[1]}`;
+      
+      const monthMap = {
+        jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+        jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+      };
+      const strLower = dateStr.toLowerCase();
+      for (const [mName, mNum] of Object.entries(monthMap)) {
+        if (strLower.startsWith(mName)) {
+           const yearMatch = dateStr.match(/\d{2,4}$/);
+           if (yearMatch) {
+             let year = yearMatch[0];
+             if (year.length === 2) year = '20' + year;
+             return `${year}-${mNum}`;
+           }
+        }
+      }
+      if (/^\d{4}$/.test(dateStr)) return `${dateStr}-01`;
+      return dateStr;
+    };
+
+    const cleanBullet = (str) => {
+      if (typeof str !== 'string') return str;
+      return str.replace(/^[\u2022\-\*\u25E6\u2023\u25BA]\s*/, '');
+    };
+
+    let addSectionsArray = [];
+    if (Array.isArray(resumeData?.additional_sections)) {
+      addSectionsArray = resumeData.additional_sections.map(sec => ({
+         key: sec.section_title || "",
+         value: sec
+      }));
+    } else if (resumeData?.additional_sections && typeof resumeData.additional_sections === 'object') {
+      addSectionsArray = Object.entries(resumeData.additional_sections).map(([k, v]) => ({
+         key: k,
+         value: v
+      }));
+    }
+
     // 1. Skills
-    const techCategories = resumeData?.technical_skills?.categories || {};
-    const allSkills = Object.values(techCategories).flat();
+    const techData = resumeData?.technical_skills || {};
+    const techSkillsSet = new Set();
+    Object.entries(techData).forEach(([key, value]) => {
+      if (key !== 'categories' && Array.isArray(value)) {
+        value.forEach(skill => {
+          if (typeof skill === 'string' && skill.trim()) techSkillsSet.add(skill.trim());
+        });
+      }
+    });
+    // Fallback to categories logic if needed
+    if (techSkillsSet.size === 0 && techData.categories) {
+       Object.values(techData.categories).flat().forEach(skill => {
+          if (typeof skill === 'string' && skill.trim()) techSkillsSet.add(skill.trim());
+       });
+    }
+
+    const allSkills = Array.from(techSkillsSet);
     const softSkills = resumeData?.soft_skills || [];
 
     if (allSkills.length > 0 || softSkills.length > 0) {
@@ -339,7 +404,15 @@ const LinkedInResumeBuilder = () => {
     }
 
     // 3. Profile Summary
-    const profileSummaryContent = resumeData?.additional_sections?.["PROFILE SUMMARY"]?.content;
+    const summaryKeywords = ["PROFILE SUMMARY", "ABOUT ME", "SUMMARY", "PROFESSIONAL SUMMARY", "OBJECTIVE", "CAREER OBJECTIVE", "ABOUT", "EXECUTIVE SUMMARY"];
+    let profileSummaryContent = null;
+    
+    addSectionsArray.forEach(({key, value}) => {
+       if (summaryKeywords.includes(normalizeStr(key))) {
+           profileSummaryContent = value?.content;
+       }
+    });
+
     const fallbackSummary = resumeData?.professional_summary?.summary_text;
     let summaryHtml = "";
 
@@ -347,8 +420,12 @@ const LinkedInResumeBuilder = () => {
       summaryHtml = `<ul>${profileSummaryContent.map((p) => `<li>${p}</li>`).join("")}</ul>`;
     } else if (typeof profileSummaryContent === "string" && profileSummaryContent.trim()) {
       summaryHtml = profileSummaryContent;
-    } else if (fallbackSummary) {
+    } else if (fallbackSummary?.trim()) {
       summaryHtml = fallbackSummary;
+    } else if (Array.isArray(resumeData?.professional_summary?.key_highlights) && resumeData.professional_summary.key_highlights.length > 0) {
+      summaryHtml = resumeData.professional_summary.key_highlights.length > 1
+        ? `<ul>${resumeData.professional_summary.key_highlights.map(p => `<li>${p}</li>`).join("")}</ul>`
+        : resumeData.professional_summary.key_highlights[0];
     }
 
     if (summaryHtml) {
@@ -356,7 +433,14 @@ const LinkedInResumeBuilder = () => {
     }
 
     // 4. Core Competencies
-    const coreComp = resumeData?.additional_sections?.["CORE COMPETENCIES"]?.content;
+    let coreComp = null;
+    addSectionsArray.forEach(({key, value}) => {
+       const normKey = normalizeStr(key);
+       if (normKey.includes("CORE COMPETENCIES") || normKey === "CORECOMPETENCIES") {
+           coreComp = value?.content;
+       }
+    });
+
     if (Array.isArray(coreComp) && coreComp.length > 0) {
       sections.push({
         id: id++, title: "Core Competencies", type: "custom_simple",
@@ -373,17 +457,28 @@ const LinkedInResumeBuilder = () => {
     if ((resumeData?.work_experience || []).length > 0) {
       sections.push({
         id: id++, title: "Experience", type: "experience",
-        experiences: resumeData.work_experience.map((exp, i) => ({
-          id: `x_${i}_${Date.now()}`,
-          jobTitle: exp.job_title || "",
-          company: exp.company_name || "",
-          city: exp.location || "",
-          startDate: exp.start_date || "",
-          endDate: exp.end_date || "",
-          description: Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0
-            ? `<ul>${exp.responsibilities.map((r) => `<li>${r}</li>`).join("")}</ul>`
-            : exp.description || "",
-        })),
+        experiences: resumeData.work_experience.map((exp, i) => {
+          let rawSDate = exp.start_date || "";
+          let rawEDate = exp.end_date || "";
+          if (rawSDate && !rawEDate && rawSDate.includes('-') && !/^\d{4}-\d{2}$/.test(rawSDate)) {
+            const parts = rawSDate.split('-');
+            rawSDate = parts[0].trim();
+            rawEDate = parts.slice(1).join('-').trim();
+          }
+          let sDate = normalizeDateStr(rawSDate);
+          let eDate = normalizeDateStr(rawEDate);
+          return {
+            id: `x_${i}_${Date.now()}`,
+            jobTitle: exp.job_title || "",
+            company: exp.company_name || "",
+            city: exp.location || "",
+            startDate: sDate,
+            endDate: eDate,
+            description: Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0
+              ? `<ul>${exp.responsibilities.map((r) => `<li>${cleanBullet(r)}</li>`).join("")}</ul>`
+              : cleanBullet(exp.description),
+          };
+        }),
       });
     }
 
@@ -395,32 +490,76 @@ const LinkedInResumeBuilder = () => {
           id: `e_${i}_${Date.now()}`,
           institute: edu.institution || "",
           degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
-          startDate: edu.start_date || "",
-          endDate: edu.graduation_date || "",
+          startDate: normalizeDateStr(edu.start_date),
+          endDate: normalizeDateStr(edu.graduation_date),
           city: edu.location || "",
-          description: edu.description || "",
+          description: cleanBullet(edu.description),
         })),
       });
     }
 
     // 7. Honors & Awards
-    const honorsAwards = resumeData?.additional_sections?.["Honors-Awards"]?.content;
-    if (Array.isArray(honorsAwards) && honorsAwards.length > 0) {
+    const honorsAwards = (resumeData?.achievements_awards || []).length > 0 
+      ? resumeData.achievements_awards 
+      : null;
+
+    if (!honorsAwards) {
+      let tempHonors = null;
+      addSectionsArray.forEach(({key, value}) => {
+         const normKey = normalizeStr(key);
+         if (normKey.includes("HONORS") || normKey.includes("AWARDS")) {
+             tempHonors = value?.content;
+         }
+      });
+      if (Array.isArray(tempHonors) && tempHonors.length > 0) {
+        sections.push({
+          id: id++,
+          title: "Honors & Awards",
+          type: "honors",
+          items: tempHonors.map((item, i) => ({
+            id: `honor_${i}_${Date.now()}`,
+            title: typeof item === "string" ? item : (item.title || item.name || ""),
+            issuer: typeof item === "object" ? (item.issuer || "") : "",
+            startDate: typeof item === "object" ? normalizeDateStr(item.startDate || item.date || "") : "",
+            endDate: typeof item === "object" ? normalizeDateStr(item.endDate || "") : "",
+            description: typeof item === "object" ? cleanBullet(item.description) : "",
+          })),
+        });
+      }
+    } else {
       sections.push({
         id: id++,
         title: "Honors & Awards",
         type: "honors",
         items: honorsAwards.map((item, i) => ({
           id: `honor_${i}_${Date.now()}`,
-          title: typeof item === "string" ? item : (item.title || item.name || ""),
-          issuer: typeof item === "object" ? (item.issuer || "") : "",
-          startDate: typeof item === "object" ? (item.startDate || "") : "",
-          endDate: typeof item === "object" ? (item.endDate || "") : "",
-          description: typeof item === "object" ? (item.description || "") : "",
+          title: item.title || "",
+          issuer: item.issuer || "",
+          startDate: normalizeDateStr(item.date),
+          endDate: "",
+          description: cleanBullet(item.description),
         })),
       });
     }
 
+    // 8. Projects
+    if ((resumeData?.projects || []).length > 0) {
+      sections.push({
+        id: id++,
+        title: "Projects",
+        type: "custom",
+        items: resumeData.projects.map((proj, i) => ({
+          id: `proj_${i}_${Date.now()}`,
+          title: proj.project_name || "",
+          city: "",
+          startDate: "",
+          endDate: normalizeDateStr(proj.duration),
+          description: Array.isArray(proj.description) && proj.description.length > 0
+            ? `<ul>${proj.description.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
+            : cleanBullet(typeof proj.description === 'string' ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
+        }))
+      });
+    }
 
     return sections;
   };
@@ -437,6 +576,7 @@ const LinkedInResumeBuilder = () => {
     const nameParts = fullName.split(" ");
 
     const headlineText =
+      personal?.job_title ||
       additionalSections?.Headline?.content ||
       resumeData?.metadata?.current_role ||
       resumeSource.job_target ||
@@ -447,11 +587,14 @@ const LinkedInResumeBuilder = () => {
     const state = personal?.location?.state || "";
     const formattedCityState = [city, state].filter(Boolean).join(", ");
 
+    const emailStr = Array.isArray(personal.email) ? personal.email.join(" / ") : personal.email;
+    const phoneStr = Array.isArray(personal.phone) ? personal.phone.join(" / ") : personal.phone;
+
     setValue("job_target", headlineText);
     setValue("first_name", nameParts[0] || resumeSource.first_name || "");
     setValue("last_name", nameParts.slice(1).join(" ") || resumeSource.last_name || "");
-    setValue("email", personal.email || resumeSource.email || "");
-    setValue("phone", personal.phone || resumeSource.phone || "");
+    setValue("email", emailStr || resumeSource.email || "");
+    setValue("phone", phoneStr || resumeSource.phone || "");
     setValue("address", fullAddress || resumeSource.address || "");
     setValue("city_state", formattedCityState || resumeSource.city_state || "");
     setValue("linkedin", personal.linkedin || resumeSource.linkedin || "");
