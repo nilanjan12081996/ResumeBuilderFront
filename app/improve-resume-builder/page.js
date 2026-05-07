@@ -679,7 +679,7 @@ const Page = () => {
           institute: edu.institution || "",
           degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
           startDate: normalizeDateStr(edu.start_date),
-          endDate: normalizeDateStr(edu.graduation_date),
+          endDate: normalizeDateStr(edu.end_date || edu.graduation_date),
           city: edu.location || "",
           description: cleanBullet(edu.description),
         })),
@@ -692,15 +692,21 @@ const Page = () => {
         id: id++,
         title: "Certifications",
         type: "certifications",
-        certifications: resumeData.certifications.map((c, i) => ({
-          id: `c_${i}_${Date.now()}`,
-          name: c.name || "",
-          organization: c.organization || c.issuing_organization || "",
-          city: "",
-          startYear: c.issue_date || "",
-          endYear: c.expiry_date || "",
-          description: "",
-        })),
+        certifications: resumeData.certifications.map((c, i) => {
+          const rawIssue = c.issue_date || "";
+          const issueParts = rawIssue.split(/\s*[-–]\s*/);
+          const certStartYear = issueParts[0]?.trim() || "";
+          const certEndYear = issueParts.length > 1 ? issueParts[1]?.trim() : (c.expiry_date || "");
+          return {
+            id: `c_${i}_${Date.now()}`,
+            name: c.name || "",
+            organization: c.organization || c.issuing_organization || "",
+            city: "",
+            startYear: certStartYear,
+            endYear: certEndYear,
+            description: "",
+          };
+        }),
       }
       : null;
 
@@ -747,9 +753,11 @@ const Page = () => {
           city: "",
           startDate: "",
           endDate: normalizeDateStr(proj.duration),
-          description: Array.isArray(proj.description) && proj.description.length > 0
+          description: Array.isArray(proj.key_features) && proj.key_features.length > 0
+            ? `<ul>${proj.key_features.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
+            : Array.isArray(proj.description) && proj.description.length > 0
             ? `<ul>${proj.description.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
-            : cleanBullet(typeof proj.description === 'string' ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
+            : cleanBullet(typeof proj.description === 'string' && proj.description.trim() ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
         }))
       }
       : null;

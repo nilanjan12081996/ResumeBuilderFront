@@ -491,7 +491,7 @@ const LinkedInResumeBuilder = () => {
           institute: edu.institution || "",
           degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
           startDate: normalizeDateStr(edu.start_date),
-          endDate: normalizeDateStr(edu.graduation_date),
+          endDate: normalizeDateStr(edu.end_date || edu.graduation_date),
           city: edu.location || "",
           description: cleanBullet(edu.description),
         })),
@@ -554,9 +554,11 @@ const LinkedInResumeBuilder = () => {
           city: "",
           startDate: "",
           endDate: normalizeDateStr(proj.duration),
-          description: Array.isArray(proj.description) && proj.description.length > 0
+          description: Array.isArray(proj.key_features) && proj.key_features.length > 0
+            ? `<ul>${proj.key_features.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
+            : Array.isArray(proj.description) && proj.description.length > 0
             ? `<ul>${proj.description.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
-            : cleanBullet(typeof proj.description === 'string' ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
+            : cleanBullet(typeof proj.description === 'string' && proj.description.trim() ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
         }))
       });
     }
