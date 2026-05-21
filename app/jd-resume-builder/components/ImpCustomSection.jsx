@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
 import TipTapEditor from "../../editor/TipTapEditor";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import { FaTrash } from "react-icons/fa";
 import Datepicker from "../../ui/Datepicker";
 import {
@@ -124,25 +125,33 @@ const ImpCustomSection = ({
                                                     </div>
 
                                                     <div className="col-span-2">
-                                                        <Label className="!text-sm !font-medium !text-gray-500">City</Label>
+                                                        <Label className="!text-sm !font-medium !text-gray-500">Technologies</Label>
                                                         <input
                                                             className="w-full border p-2 rounded"
-                                                            value={item.city}
+                                                            value={item.technologies || ''}
+                                                            placeholder="e.g. React, Node.js, MongoDB"
                                                             onChange={(e) =>
-                                                                handleCustomUpdate(sectionIndex, item.id, "city", e.target.value)
+                                                                handleCustomUpdate(sectionIndex, item.id, "technologies", e.target.value)
                                                             }
                                                         />
                                                     </div>
 
-                                                    <div className="col-span-2">
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                                        <TipTapEditor
-                                                            value={item.description}
-                                                            onChange={(html) =>
-                                                                handleCustomUpdate(sectionIndex, item.id, "description", html)
-                                                            }
-                                                        />
-                                                    </div>
+                                                    {/* Combined Fields (Core + Custom) with Reordering */}
+                                                    <ImpDynamicFields
+                                                        coreFields={[{
+                                                            id: 'description',
+                                                            name: 'Description',
+                                                            value: item.description,
+                                                            type: 'long_text'
+                                                        }]}
+                                                        customFields={item.customFields || []}
+                                                        onChange={(newFields) => handleCustomUpdate(sectionIndex, item.id, "customFields", newFields)}
+                                                        onCoreFieldChange={(id, value) => handleCustomUpdate(sectionIndex, item.id, "description", value)}
+                                                        onOrderChange={(newOrder) => handleCustomUpdate(sectionIndex, item.id, "fieldOrder", newOrder)}
+                                                        fieldOrder={item.fieldOrder || []}
+                                                        suggestions={["Role", "Live URL", "Repository", "Impact"]}
+                                                    />
+
                                                 </div>
                                             </AccordionContent>
                                         </AccordionPanel>

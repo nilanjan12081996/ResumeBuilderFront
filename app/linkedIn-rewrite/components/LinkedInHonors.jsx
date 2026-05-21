@@ -4,6 +4,7 @@ import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } fr
 import { FaTrash, FaPlus } from 'react-icons/fa';
 import Datepicker from "../../ui/Datepicker";
 import TipTapEditor from "../../editor/TipTapEditor";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import DraggableWrapper from "../DraggableWrapper";
@@ -120,7 +121,7 @@ const LinkedInHonors = ({ section, sectionIndex, handleUpdate, handleAddItem }) 
                             />
                           </div>
 
-                        </div>
+                         </div>
                       </AccordionContent>
                     </AccordionPanel>
                   </Accordion>

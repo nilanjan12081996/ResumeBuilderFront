@@ -30,7 +30,7 @@ import { AiOutlineStrikethrough } from "react-icons/ai";
 import { TfiListOl } from "react-icons/tfi";
 import { AiOutlineBgColors } from "react-icons/ai";
 
-export default function TipTapEditor({ value, onChange }) {
+export default function TipTapEditor({ value, onChange, footer }) {
     const colorInputRef = useRef(null);
     const highlightInputRef = useRef(null);
 
@@ -244,10 +244,20 @@ export default function TipTapEditor({ value, onChange }) {
 
             {/* Editor */}
             <div
-                className="editor-wrapper p-3 min-h-[250px] text-sm font-medium text-[#000] bg-[#eff2f9] cursor-text"
-                onClick={() => editor.commands.focus()}
+                className="editor-wrapper flex flex-col p-3 min-h-[250px] text-sm font-medium text-[#000] bg-[#eff2f9] cursor-text"
+                onClick={(e) => {
+                    if (e.target.closest('.tiptap-footer')) return;
+                    editor.commands.focus();
+                }}
             >
-                <EditorContent editor={editor} spellCheck={true} />
+                <div className="flex-1">
+                    <EditorContent editor={editor} spellCheck={true} />
+                </div>
+                {footer && (
+                    <div className="tiptap-footer mt-auto pt-4">
+                        {footer}
+                    </div>
+                )}
             </div>
 
         </div>

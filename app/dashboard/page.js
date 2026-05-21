@@ -123,7 +123,7 @@ const handleCardClick = (type, action) => {
       {/* Create from Scratch */}
       <div
         onClick={() => handleCardClick("scratch", () => router.push("/resume-builder"))}
-        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+        className={`relative border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
           ${canCreate("scratch")
             ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
             : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
@@ -132,9 +132,12 @@ const handleCardClick = (type, action) => {
         <div className="bg-[#DBFCE7] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
           <BiPlus className="text-[#00A63E] text-[30px]" />
         </div>
-        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-2">
           Create Resume From Scratch
         </h3>
+        <div className="inline-block bg-[#F3E6F3] text-[#800080] rounded-full px-3 py-1 text-[12px] font-semibold mb-3">
+          Free resume without AI
+        </div>
         <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
           Start fresh with a new resume using our professional templates
         </p>
@@ -146,18 +149,26 @@ const handleCardClick = (type, action) => {
       {/* Improve Existing Resume */}
       <div
         onClick={() => handleCardClick("improve", () => setOpenModalImproveExistingResumeTwo(true))}
-        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+        className={`relative border bg-white rounded-[10px] px-5 py-7 transition-all duration-200 overflow-hidden group
           ${canCreate("improve")
             ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
             : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
           }`}
       >
+        {/* Animated AI Badge */}
+        <div className="absolute top-5 right-5 bg-gradient-to-r from-[#800080] to-[#C44BC4] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
+          ✨ AI
+        </div>
+
         <div className="bg-[#DBEAFE] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
           <RiExchange2Line className="text-[#2B7FFF] text-[30px]" />
         </div>
-        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-2 pr-10">
           Improve existing resume
         </h3>
+        <div className="inline-block bg-[#F3E6F3] text-[#800080] rounded-full px-3 py-1 text-[12px] font-semibold mb-3">
+          Prepare resume with AI
+        </div>
         <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
           Upload and enhance your current resume with AI-powered suggestions
         </p>
@@ -169,18 +180,26 @@ const handleCardClick = (type, action) => {
       {/* JD Based Resume */}
       <div
         onClick={() => handleCardClick("jd", () => setOpenModalImproveexistingResume(true))}
-        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+        className={`relative border bg-white rounded-[10px] px-5 py-7 transition-all duration-200 overflow-hidden group
           ${canCreate("jd")
             ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
             : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
           }`}
       >
+        {/* Animated AI Badge */}
+        <div className="absolute top-5 right-5 bg-gradient-to-r from-[#800080] to-[#C44BC4] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
+          ✨ AI
+        </div>
+
         <div className="bg-[#FFEDD4] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
           <BiBriefcaseAlt className="text-[#FF886D] text-[30px]" />
         </div>
-        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-2 pr-10">
           JD based resume
         </h3>
+        <div className="inline-block bg-[#F3E6F3] text-[#800080] rounded-full px-3 py-1 text-[12px] font-semibold mb-3">
+          Prepare resume with AI
+        </div>
         <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
           Tailor your resume to any job description with AI assistance
         </p>
@@ -192,18 +211,26 @@ const handleCardClick = (type, action) => {
       {/* LinkedIn Rewrite */}
       <div
         onClick={() => handleCardClick("linkedin", () => setOpenModalLinkedInRewrite(true))}
-        className={`border bg-white rounded-[10px] px-5 py-7 transition-all duration-200
+        className={`relative border bg-white rounded-[10px] px-5 py-7 transition-all duration-200 overflow-hidden group
           ${canCreate("linkedin")
             ? "border-[#D5D5D5] hover:border-[#800080] cursor-pointer"
             : "border-[#D5D5D5] opacity-50 cursor-not-allowed grayscale"
           }`}
       >
+        {/* Animated AI Badge */}
+        <div className="absolute top-5 right-5 bg-gradient-to-r from-[#800080] to-[#C44BC4] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
+          ✨ AI
+        </div>
+
         <div className="bg-[#EAD9FF] w-[42px] h-[42px] rounded-[10px] mb-5 flex items-center justify-center">
           <BiLogoLinkedin className="text-[#9747FF] text-[30px]" />
         </div>
-        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-3">
+        <h3 className="text-[#151515] text-[18px] leading-[22px] font-medium pb-2 pr-10">
           LinkedIn Rewrite
         </h3>
+        <div className="inline-block bg-[#F3E6F3] text-[#800080] rounded-full px-3 py-1 text-[12px] font-semibold mb-3">
+          Prepare LinkedIn with AI
+        </div>
         <p className="text-[#575757] text-[15px] leading-[23px] pb-0">
           Get AI-powered suggestions to enhance and optimize your LinkedIn profile.
         </p>

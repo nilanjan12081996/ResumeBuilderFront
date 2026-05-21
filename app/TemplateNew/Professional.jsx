@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { renderDynamicFields } from "./renderDynamicFields";
 
 const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSettings }) => {
   const { text, layout } = resumeSettings;
@@ -226,9 +227,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
                 {dateRange(job.startDate, job.endDate)}
               </div>
             )}
-            {job.description && (
-              <div className="resume-content" style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight }} dangerouslySetInnerHTML={{ __html: job.description }} />
-            )}
+            {renderDynamicFields(job, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
           </div>
         ))}
       </section>
@@ -251,9 +250,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
                 {dateRange(edu.startDate, edu.endDate)}
               </div>
             )}
-            {edu.description && (
-              <div className="resume-content" style={{ ...bodyStyle, color: '#374151' }} dangerouslySetInnerHTML={{ __html: edu.description }} />
-            )}
+            {renderDynamicFields(edu, { ...bodyStyle, color: '#374151' })}
           </div>
         ))}
       </section>
@@ -371,9 +368,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
                     {dateRange(item.startDate, item.endDate)}
                   </div>
                 )}
-                {item.description && (
-                  <div className="resume-content" style={{ ...bodyStyle, color: '#374151' }} dangerouslySetInnerHTML={{ __html: item.description }} />
-                )}
+                {renderDynamicFields(item, { ...bodyStyle, color: '#374151' })}
               </div>
             ))}
           </section>
@@ -408,9 +403,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
               {dateRange(exp.startDate, exp.endDate)}
             </div>
           )}
-          {exp.description && (
-            <div className="resume-content" style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight }} dangerouslySetInnerHTML={{ __html: exp.description }} />
-          )}
+          {renderDynamicFields(exp, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
         </div>
       ))}
     </section>
@@ -429,9 +422,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
               {dateRange(edu.startDate, edu.endDate)}
             </div>
           )}
-          {edu.description && (
-            <div className="resume-content" style={{ ...bodyStyle, color: '#374151' }} dangerouslySetInnerHTML={{ __html: edu.description }} />
-          )}
+          {renderDynamicFields(edu, { ...bodyStyle, color: '#374151' })}
         </div>
       ))}
     </section>
@@ -450,13 +441,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
               {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}
             </div>
           )}
-          {cert.description && (
-            <div
-              className="resume-content"
-              style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight }}
-              dangerouslySetInnerHTML={{ __html: cert.description }}
-            />
-          )}
+          {renderDynamicFields(cert, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
         </div>
       ))}
     </section>
@@ -561,9 +546,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
               {dateRange(item.startDate, item.endDate)}
             </div>
           )}
-          {item.description && (
-            <div className="resume-content" style={{ ...bodyStyle, color: '#374151' }} dangerouslySetInnerHTML={{ __html: item.description }} />
-          )}
+          {renderDynamicFields(item, { ...bodyStyle, color: '#374151' })}
         </div>
       ))}
     </section>
@@ -659,7 +642,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
                   {dateRange(item.startDate, item.endDate) && (
                     <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>{dateRange(item.startDate, item.endDate)}</div>
                   )}
-                  {item.description && <div className="resume-content" style={{ ...bodyStyle, color: '#374151' }} dangerouslySetInnerHTML={{ __html: item.description }} />}
+                  {renderDynamicFields(item, { ...bodyStyle, color: '#374151' })}
                 </div>
               ))}
             </section>

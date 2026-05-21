@@ -6,7 +6,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import { PiReadCvLogoDuotone } from 'react-icons/pi';
 import { MdOutlinePublishedWithChanges } from "react-icons/md";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { FiChevronDown } from "react-icons/fi";
+import { FiChevronDown, FiEye } from "react-icons/fi";
 
 const ATS_TIPS = [
     {
@@ -251,7 +251,7 @@ const HowToImprove = () => {
 };
 
 
-const ImpResumeScore = ({ score = 0, loading = false, guide = "", onCompareClick, isComparingLoading }) => {
+const ImpResumeScore = ({ score = 0, loading = false, guide = "", onCompareClick, isComparingLoading, onPreviewClick }) => {
     const safeScore = Math.min(100, Math.max(0, Number(score) || 0));
     const [progress, setProgress] = useState(0);
 
@@ -311,7 +311,7 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "", onCompareClick
                     {/* guide prop থাকলে How to improve দেখাবে — আগের condition same */}
                     {guide && <HowToImprove />}
 
-                    <div className="flex">
+                    <div className="flex gap-2">
                         <button
                             onClick={onCompareClick}
                             disabled={isComparingLoading}
@@ -324,15 +324,22 @@ const ImpResumeScore = ({ score = 0, loading = false, guide = "", onCompareClick
                             {isComparingLoading ? (
                                 <>
                                     <span className="w-3 h-3 border-2 border-[#800080]/30 border-t-[#800080] rounded-full animate-spin" />
-                                    Calculating Initial Score...
+                                    Calculating...
                                 </>
                             ) : (
                                 <>
                                     <MdOutlinePublishedWithChanges className="text-sm" />
-                                    Compare Resume
-                                    <span className="text-[10px] opacity-80">(Existing vs Updated)</span>
+                                    Compare
                                 </>
                             )}
+                        </button>
+
+                        <button
+                            onClick={onPreviewClick}
+                            className="flex items-center gap-2 px-3 py-1.5 cursor-pointer text-xs border border-[#800080] bg-[#800080] text-white rounded-md transition duration-200 hover:bg-black hover:border-black shadow-sm"
+                        >
+                            <FiEye className="text-sm" />
+                            Preview
                         </button>
                     </div>
                 </div>

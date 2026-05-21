@@ -11,6 +11,7 @@ import { FaTrash } from "react-icons/fa";
 import { Controller } from "react-hook-form";
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
+import ImpDynamicFields from "../ui/ImpDynamicFields";
 
 import {
   DndContext,
@@ -191,40 +192,47 @@ const EmpHistoryEdit = ({
                                 />
                               </div>
 
+                              {/* Dynamic Fields (Core + Custom) */}
                               <div className="md:col-span-2">
-                                <Label className="!text-sm !text-gray-500">Job Responsibilities</Label>
-                                <Controller
-                                  control={control}
-                                  name={`employmentHistory.${index}.description`}
-                                  defaultValue=""
-                                  render={({ field }) => (
-                                    <TipTapEditor
-                                      value={field.value}
-                                      onChange={field.onChange}
-                                    />
-                                  )}
+                                <ImpDynamicFields
+                                  coreFields={[{
+                                    id: 'description',
+                                    name: 'Job Responsibilities',
+                                    value: watch(`employmentHistory.${index}.description`) || "",
+                                    type: 'long_text',
+                                    footer: (
+                                      <div className="flex justify-end mt-2">
+                                        <div className="relative group">
+                                          <button
+                                            type="button"
+                                            disabled
+                                            className="flex items-center gap-2 px-4 py-1.5 rounded-[25px] text-sm !bg-gray-100 !text-gray-400 cursor-not-allowed opacity-80 border"
+                                            style={{ borderBottom: "1px solid #e5e7eb" }}
+                                          >
+                                            <HiSparkles className="text-md" />
+                                            Improve with AI
+                                          </button>
+                                          <div className="absolute bottom-full right-0 mb-2 w-56 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
+                                            Improve with AI is not available on the free plan.{" "}
+                                            <span className="text-purple-300 font-semibold">Upgrade your plan</span>{" "}
+                                            to use this feature.
+                                            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )
+                                  }]}
+                                  customFields={watch(`employmentHistory.${index}.customFields`) || []}
+                                  onChange={(newFields) => setValue(`employmentHistory.${index}.customFields`, newFields)}
+                                  onCoreFieldChange={(id, value) => {
+                                    if (id === 'description') {
+                                      setValue(`employmentHistory.${index}.description`, value);
+                                    }
+                                  }}
+                                  onOrderChange={(newOrder) => setValue(`employmentHistory.${index}.fieldOrder`, newOrder)}
+                                  fieldOrder={watch(`employmentHistory.${index}.fieldOrder`) || []}
+                                  suggestions={["Key Achievements", "Technologies", "Department", "Live URL", "Repository"]}
                                 />
-                                {/* Improve with AI — disabled with tooltip */}
-                                <div className="flex justify-end mt-2">
-                                  <div className="relative group">
-                                    <button
-                                      type="button"
-                                      disabled
-                                      className="flex items-center gap-2 px-4 py-1.5 rounded-[25px] text-sm !bg-gray-100 !text-gray-400 cursor-not-allowed opacity-80 !border"
-                                    >
-                                      <HiSparkles className="text-md" />
-                                      Improve with AI
-                                    </button>
-
-                                    {/* Tooltip */}
-                                    <div className="absolute bottom-full right-0 mb-2 w-56 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
-                                      Improve with AI is not available on the free plan.{" "}
-                                      <span className="text-purple-300 font-semibold">Upgrade your plan</span>{" "}
-                                      to use this feature.
-                                      <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
-                                    </div>
-                                  </div>
-                                </div>
                               </div>
                             </div>
                           </AccordionContent>

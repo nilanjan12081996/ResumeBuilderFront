@@ -49,82 +49,88 @@ const LinkedInSummary = ({
         Add impact-focused details such as metrics, problems solved, features worked on, and key products or capabilities built and scaled.
       </p>
 
-      <TipTapEditor value={summaryValue} onChange={handleSummaryChange} />
+      <TipTapEditor
+        value={summaryValue}
+        onChange={handleSummaryChange}
+        footer={
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="flex items-center gap-1 text-[10px] font-medium text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full cursor-pointer hover:bg-blue-100 transition-colors">
+              Add metrics and impact for a better ATS score
+            </span>
+            <div className="flex items-center gap-3">
+              {/* Count Badge */}
+              {typeof aiSummaryCount === 'number' && (
+                <div className="relative group flex items-center gap-1.5">
+                  {isExhausted ? (
+                    <span className="flex items-center gap-1 text-[11px] font-medium text-red-500 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
+                      AI limit reached
+                    </span>
+                  ) : (
+                    <span className={`flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border
+                      ${aiSummaryCount <= 2
+                        ? 'text-orange-600 bg-orange-50 border-orange-200'
+                        : 'text-purple-600 bg-[#f6efff] border-purple-200'
+                      }`}>
+                      <HiSparkles className="text-[10px]" />
+                      {aiSummaryCount}/{totalCount} left
+                    </span>
+                  )}
+                  {/* Tooltip on hover */}
+                  <div className="absolute bottom-full left-0 mb-2 w-56 bg-gray-800 text-white text-[10px] rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
+                    You can use this feature up to 5 times to improve your resume with AI.
+                    <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+                  </div>
+                </div>
+              )}
 
-      <div className="relative flex justify-end items-center mt-2 gap-3">
+              {/* Button with Tooltip */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isExhausted) setOpen(true);
+                  }}
+                  disabled={isExhausted}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs transition-all duration-200 font-semibold
+                    ${isExhausted
+                      ? '!bg-gray-100 !text-gray-400 cursor-not-allowed opacity-70'
+                      : '!bg-[#800080] !text-white hover:!bg-black shadow-sm hover:shadow-md'
+                    }`}
+                >
+                  <HiSparkles className="text-[14px]" />
+                  Improve with AI
+                </button>
 
-        <span className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full cursor-pointer">
-          Add metrics and impact for a better ATS score
-        </span>
-        {typeof aiSummaryCount === 'number' && (
-          <div className="relative group flex items-center gap-1.5">
-
-            {isExhausted ? (
-              <span className="flex items-center gap-1 text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full cursor-pointer">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
-                AI limit reached
-              </span>
-            ) : (
-              <span className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border cursor-pointer
-               ${aiSummaryCount <= 2
-                  ? 'text-orange-600 bg-orange-50 border-orange-200'
-                  : 'text-purple-600 bg-[#f6efff] border-purple-200'
-                }`}>
-                <HiSparkles className="text-xs" />
-                {aiSummaryCount}/{totalCount} left
-              </span>
-            )}
-
-            {/* Tooltip on hover */}
-            <div className="absolute bottom-full left-0 mb-2 w-56 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
-              You can use this feature up to 5 times to improve your resume with AI.
-              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+                {isExhausted && (
+                  <div className="absolute bottom-full right-0 mb-2 w-52 bg-gray-800 text-white text-[10px] rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
+                    You've used all 5 AI generations for this resume.{" "}
+                    <span className="text-purple-300 font-semibold">Buy a new plan</span>{" "}
+                    to use it again.
+                    <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        )}
+        }
+      />
 
-
-        {/* Button with Tooltip */}
-        <div className="relative group">
-          <button
-            type="button"
-            onClick={() => !isExhausted && setOpen(true)}
-            disabled={isExhausted}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-[25px] text-sm transition-all duration-200
-              ${isExhausted
-                ? '!bg-gray-100 !text-gray-400 cursor-not-allowed opacity-70'
-                : '!bg-[#f6efff] !text-[#800080] hover:!bg-[#ecdeff]'
-              }`}
-          >
-            <HiSparkles className="text-md" />
-            Improve with AI
-          </button>
-
-          {isExhausted && (
-            <div className="absolute bottom-full right-0 mb-2 w-52 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
-              You've used all 5 AI generations for this resume.{" "}
-              <span className="text-purple-300 font-semibold">Buy a new plan</span>{" "}
-              to use it again.
-              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
-            </div>
-          )}
-        </div>
-
-        {open && !isExhausted && (
-          <GenerateWithAiModal
-            open={open}
-            onClose={() => setOpen(false)}
-            aiType="linkdin_summary"
-            initialText={summaryValue || ""}
-            fullResumeData={resumeSource}
-            onUseAiCount={onUseAiCount}
-            onApply={(text) => {
-              handleSummaryChange(text);
-              onAtsRefresh && onAtsRefresh();
-            }}
-          />
-        )}
-      </div>
+      {open && !isExhausted && (
+        <GenerateWithAiModal
+          open={open}
+          onClose={() => setOpen(false)}
+          aiType="linkdin_summary"
+          initialText={summaryValue || ""}
+          fullResumeData={resumeSource}
+          onUseAiCount={onUseAiCount}
+          onApply={(text) => {
+            handleSummaryChange(text);
+            onAtsRefresh && onAtsRefresh();
+          }}
+        />
+      )}
     </>
   );
 };

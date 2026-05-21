@@ -10,6 +10,7 @@ import { FaTrash } from "react-icons/fa";
 import { Controller, useFormContext } from "react-hook-form";
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
+import ImpDynamicFields from "../ui/ImpDynamicFields";
 
 import {
   DndContext,
@@ -173,16 +174,29 @@ const Activities = ({ register, watch, control, fields, append, remove, move }) 
                                 />
                               </div>
 
+                              {/* Dynamic Fields (Core + Custom) */}
                               <div className="md:col-span-2">
-                                <label className="block text-xs font-semibold text-gray-500 uppercase">Description</label>
-                                <Controller
-                                  control={control}
-                                  name={`activityHistory.${index}.description`}
-                                  render={({ field }) => (
-                                    <TipTapEditor value={field.value} onChange={field.onChange} />
-                                  )}
+                                <ImpDynamicFields
+                                  coreFields={[{
+                                    id: 'description',
+                                    name: 'Description',
+                                    value: watch(`activityHistory.${index}.description`) || "",
+                                    type: 'long_text',
+                                    footer: null
+                                  }]}
+                                  customFields={watch(`activityHistory.${index}.customFields`) || []}
+                                  onChange={(newFields) => setValue(`activityHistory.${index}.customFields`, newFields)}
+                                  onCoreFieldChange={(id, value) => {
+                                    if (id === 'description') {
+                                      setValue(`activityHistory.${index}.description`, value);
+                                    }
+                                  }}
+                                  onOrderChange={(newOrder) => setValue(`activityHistory.${index}.fieldOrder`, newOrder)}
+                                  fieldOrder={watch(`activityHistory.${index}.fieldOrder`) || []}
+                                  suggestions={["Key Achievements", "Roles", "Awards"]}
                                 />
                               </div>
+
                             </div>
                           </AccordionContent>
                         </AccordionPanel>

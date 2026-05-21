@@ -4,6 +4,7 @@ import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } fr
 import { FaTrash, FaPlus } from 'react-icons/fa';
 import Datepicker from "../../ui/Datepicker";
 import TipTapEditor from '../../editor/TipTapEditor';
+import ImpDynamicFields from '../../ui/ImpDynamicFields';
 import {
   DndContext,
   closestCenter,

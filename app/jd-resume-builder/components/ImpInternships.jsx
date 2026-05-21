@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from '../../ui/Datepicker';
-import TipTapEditor from '../../editor/TipTapEditor';
+import ImpDynamicFields from '../../ui/ImpDynamicFields';
 import {
     DndContext,
     closestCenter,
@@ -149,13 +149,22 @@ const ImpInternships = ({
                                                         />
                                                     </div>
 
-                                                    <div className="col-span-2">
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                                        <TipTapEditor
-                                                            value={item.description || ''}
-                                                            onChange={(html) => handleUpdate(sectionIndex, item.id, 'description', html)}
-                                                        />
-                                                    </div>
+                                                    {/* Description + Custom Fields — draggable together */}
+                                                    <ImpDynamicFields
+                                                        coreFields={[{
+                                                            id: 'description',
+                                                            name: 'Description',
+                                                            value: item.description,
+                                                            type: 'long_text',
+                                                        }]}
+                                                        customFields={item.customFields || []}
+                                                        onChange={(newFields) => handleUpdate(sectionIndex, item.id, 'customFields', newFields)}
+                                                        onCoreFieldChange={(id, value) => handleUpdate(sectionIndex, item.id, 'description', value)}
+                                                        onOrderChange={(newOrder) => handleUpdate(sectionIndex, item.id, 'fieldOrder', newOrder)}
+                                                        fieldOrder={item.fieldOrder || []}
+                                                        suggestions={["Key Achievements", "Technologies", "Department"]}
+                                                    />
+
                                                 </div>
                                             </AccordionContent>
                                         </AccordionPanel>

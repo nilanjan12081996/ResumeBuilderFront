@@ -49,6 +49,7 @@ import ResumeCompareModal from '../modal/ResumeCompareModal';
 import { useDownload } from '../hooks/useDownload';
 import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 import ResumePageViewer from '../ui/ResumePageViewer';
+import ResumePreviewModal from '../modal/ResumePreviewModal';
 
 
 const LinkedInResumeBuilder = () => {
@@ -80,6 +81,7 @@ const LinkedInResumeBuilder = () => {
   const isInitialLoad = useRef(true);
   const [savingStatus, setSavingStatus] = useState('unsaved');
   const [showCompare, setShowCompare] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [originalResumeData, setOriginalResumeData] = useState(null);
   const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
@@ -1262,6 +1264,7 @@ const LinkedInResumeBuilder = () => {
                 guide={checkATSData?.Improvment_Guide}
                 isComparingLoading={originalAtsScore === null}
                 onCompareClick={() => originalAtsScore !== null && setShowCompare(true)}
+                onPreviewClick={() => setShowPreview(true)}
               />
 
               <LinkedInPersonalDetails register={register} watch={watch} setValue={setValue} />
@@ -1482,7 +1485,7 @@ const LinkedInResumeBuilder = () => {
       </div>
 
       {/* ── Template preview ── */}
-      <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+      <div className='lg:w-6/12 bg-white h-[calc(100vh-64px)] overflow-hidden px-0'>
         {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
           <div ref={componentRef}>
             <ActiveResume
@@ -1525,6 +1528,15 @@ const LinkedInResumeBuilder = () => {
         oldResumeSettings={originalResumeData?.oldResumeSettings}
         resumeSettings={resumeSettings}
         defaultOldTemplate="linkedin"
+      />
+      <ResumePreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        formData={formValues}
+        sections={sections}
+        themeColor={themeColor}
+        resumeSettings={resumeSettings}
+        selectedTemplate={selectedTemplate}
       />
     </div>
   );

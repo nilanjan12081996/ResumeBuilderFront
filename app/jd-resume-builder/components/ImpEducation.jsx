@@ -3,6 +3,7 @@ import { Label } from "flowbite-react";
 import { FaTrash } from "react-icons/fa";
 import TipTapEditor from "../../editor/TipTapEditor";
 import Datepicker from "../../ui/Datepicker";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import {
   DndContext,
   closestCenter,
@@ -154,6 +155,13 @@ const ImpEducation = ({
                             onChange={(html) => handleEducationUpdate(sectionIndex, edu.id, "description", html)}
                           />
                         </div>
+
+                        {/* Dynamic Fields */}
+                        <ImpDynamicFields
+                          customFields={edu.customFields || []}
+                          onChange={(newFields) => handleEducationUpdate(sectionIndex, edu.id, "customFields", newFields)}
+                          suggestions={["Board", "CGPA", "Major", "Minor"]}
+                        />
                       </AccordionContent>
                     </AccordionPanel>
                   </Accordion>

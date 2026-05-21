@@ -9,6 +9,7 @@ import { FaUser } from 'react-icons/fa';
 import { BiSolidCrown } from 'react-icons/bi';
 import { MdOutlineLogout } from 'react-icons/md';
 import { MdDownload } from "react-icons/md";
+import { MdOutlinePreview } from "react-icons/md";
 import { getProfile, logout } from '../reducers/AuthSlice';
 import { getIpData, currentSubscription, cancelSubscription } from '../reducers/PlanSlice';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -162,6 +163,17 @@ const Insideheader = () => {
 
         {/* Buttons and profile */}
         <div className='flex justify-end items-center gap-3'>
+
+          {/* Preview Button - Desktop only */}
+          {showTabs && (
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("open-preview"))}
+              className="hidden md:flex cursor-pointer items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border-2 border-purple-400 text-purple-600 hover:bg-purple-50 transition-all duration-200"
+            >
+              <MdOutlinePreview className="text-lg" />
+              <span>Preview</span>
+            </button>
+          )}
 
           {showTabs && (
             <div className="relative">

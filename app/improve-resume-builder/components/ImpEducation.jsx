@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Label } from "flowbite-react";
 import { FaTrash } from "react-icons/fa";
-import TipTapEditor from "../../editor/TipTapEditor";
 import Datepicker from "../../ui/Datepicker";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import {
   DndContext,
-  closestCenter,
+  closestCorners,
   PointerSensor,
   useSensor,
   useSensors,
@@ -58,7 +58,7 @@ const ImpEducation = ({
         Mention all the Educational details below.
       </p>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <SortableContext items={educationIds} strategy={verticalListSortingStrategy}>
           {section.educations.map((edu, eIndex) => (
             <DraggableWrapper key={edu.id} id={edu.id}>
@@ -146,14 +146,21 @@ const ImpEducation = ({
                           </div>
                         </div>
 
-                        <div>
-                          <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                          <TipTapEditor
-                            placeholder="e.g. Graduated with High Honors."
-                            value={edu.description}
-                            onChange={(html) => handleEducationUpdate(sectionIndex, edu.id, "description", html)}
-                          />
-                        </div>
+                        {/* Description + Custom Fields — all draggable together */}
+                        <ImpDynamicFields
+                          coreFields={[{
+                            id: 'description',
+                            name: 'Description',
+                            value: edu.description,
+                            type: 'long_text',
+                          }]}
+                          customFields={edu.customFields || []}
+                          onChange={(newFields) => handleEducationUpdate(sectionIndex, edu.id, "customFields", newFields)}
+                          onCoreFieldChange={(id, value) => handleEducationUpdate(sectionIndex, edu.id, "description", value)}
+                          onOrderChange={(newOrder) => handleEducationUpdate(sectionIndex, edu.id, "fieldOrder", newOrder)}
+                          fieldOrder={edu.fieldOrder || []}
+                          suggestions={["Board", "CGPA", "Major", "Minor"]}
+                        />
                       </AccordionContent>
                     </AccordionPanel>
                   </Accordion>

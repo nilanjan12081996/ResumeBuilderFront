@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { renderDynamicFields } from "./renderDynamicFields";
 import { IoMdContact } from "react-icons/io";
 import { BsBagFill } from "react-icons/bs";
 import { FaStar } from "react-icons/fa";
@@ -110,7 +111,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
     </div>
   );
 
-  const TimelineEntry = ({ heading, period, html}) => (
+  const TimelineEntry = ({ heading, period, html, content }) => (
     <div style={{ marginBottom: "8pt" }}>
       <div style={{
         fontFamily: secondaryFont,
@@ -133,13 +134,13 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           {period}
         </div>
       )}
-      {html && (
+      {content ? content : (html && (
         <div
           className="resume-content"
           style={{ ...bodyStyle, color: "#4b5563" }}
           dangerouslySetInnerHTML={{ __html: html }}
         />
-      )}
+      ))}
     </div>
   );
 
@@ -154,6 +155,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           heading={item.heading}
           period={item.period}
           html={item.html}
+          content={item.content}
         />
       ))}
     </div>
@@ -350,7 +352,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.experiences || []).map(exp => ({
         heading: [exp.jobTitle, exp.company, exp.city].filter(Boolean).join(" - "),
         period: dateRange(exp.startDate, exp.endDate),
-        html: exp.description || null,
+        content: renderDynamicFields(exp, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -365,7 +367,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.educations || []).map(edu => ({
         heading: [edu.degree, edu.institute, edu.city].filter(Boolean).join(", "),
         period: dateRange(edu.startDate, edu.endDate),
-        html: edu.description || null,
+        content: renderDynamicFields(edu, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -379,7 +381,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.certifications || []).map(cert => ({
         heading: [cert.name, cert.organization].filter(Boolean).join(", "),
         period: dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear),
-        html: cert.description ? `<p>${cert.description}</p>` : null,
+        content: renderDynamicFields(cert, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -394,7 +396,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.courses || []).map(c => ({
         heading: [c.course, c.institution].filter(Boolean).join(", "),
         period: dateRange(c.startDate, c.endDate),
-        html: c.description || null,
+        content: renderDynamicFields(c, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -408,7 +410,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.internships || []).map(i => ({
         heading: [i.jobTitle, i.employer, i.city].filter(Boolean).join(", "),
         period: dateRange(i.startDate, i.endDate),
-        html: i.description || null,
+        content: renderDynamicFields(i, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -422,7 +424,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.activities || []).map(a => ({
         heading: [a.functionTitle, a.employer, a.city].filter(Boolean).join(", "),
         period: dateRange(a.startDate, a.endDate),
-        html: a.description || null,
+        content: renderDynamicFields(a, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -436,7 +438,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.items || []).map(item => ({
         heading: [item.title, item.issuer].filter(Boolean).join(", "),
         period: dateRange(item.startDate, item.endDate),
-        html: item.description || null,
+        content: renderDynamicFields(item, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -470,7 +472,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       items={(section.items || []).map(item => ({
         heading: [item.title, item.city].filter(Boolean).join(", "),
         period: dateRange(item.startDate, item.endDate),
-        html: item.description || null,
+        content: renderDynamicFields(item, { ...bodyStyle, color: "#4b5563" }),
       }))}
     />
   );
@@ -503,7 +505,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           .map(e => ({
             heading: [e.job_title, e.employer, e.city_state].filter(Boolean).join(" - "),
             period: dateRange(e.startDate, e.endDate),
-            html: e.description || null,
+            content: renderDynamicFields(e, { ...bodyStyle, color: "#4b5563" }),
           }))}
       />
     ) : null;
@@ -521,7 +523,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           .map(e => ({
             heading: [e.degree, e.school, e.city_state].filter(Boolean).join(", "),
             period: dateRange(e.startDate, e.endDate),
-            html: e.description || null,
+            content: renderDynamicFields(e, { ...bodyStyle, color: "#4b5563" }),
           }))}
       />
     ) : null;
@@ -538,7 +540,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           .map(i => ({
             heading: [i.jobTitle, i.employer, i.city].filter(Boolean).join(", "),
             period: dateRange(i.startDate, i.endDate),
-            html: i.description || null,
+            content: renderDynamicFields(i, { ...bodyStyle, color: "#4b5563" }),
           }))}
       />
     ) : null;
@@ -555,7 +557,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           .map(a => ({
             heading: [a.functionTitle, a.employer, a.city].filter(Boolean).join(", "),
             period: dateRange(a.startDate, a.endDate),
-            html: a.description || null,
+            content: renderDynamicFields(a, { ...bodyStyle, color: "#4b5563" }),
           }))}
       />
     ) : null;
@@ -573,7 +575,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
           .map(c => ({
             heading: [c.course, c.institution].filter(Boolean).join(", "),
             period: dateRange(c.startDate, c.endDate),
-            html: null,
+            content: renderDynamicFields(c, { ...bodyStyle, color: "#4b5563" }),
           }))}
       />
     ) : null;
@@ -619,7 +621,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
             items={history.filter(i => i.title || i.city).map(item => ({
               heading: [item.title, item.city].filter(Boolean).join(", "),
               period: dateRange(item.startDate, item.endDate),
-              html: item.description || null,
+              content: renderDynamicFields(item, { ...bodyStyle, color: "#4b5563" }),
             }))}
           />
         );

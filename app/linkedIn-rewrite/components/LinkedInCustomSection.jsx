@@ -4,6 +4,7 @@ import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } fr
 import { FaTrash, FaPlus } from "react-icons/fa";
 import TipTapEditor from "../../editor/TipTapEditor";
 import Datepicker from "../../ui/Datepicker";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import DraggableWrapper from "../DraggableWrapper";
@@ -132,24 +133,34 @@ const LinkedInCustomSection = ({
                             </div>
                           </div>
 
-                          <div className="col-span-2">
-                            <Label className="!text-sm !font-medium !text-gray-500">City</Label>
+                          <div>
+                            <Label className="!text-sm !font-medium !text-gray-500">Technologies</Label>
                             <input
                               className="w-full border border-gray-300 p-2 rounded-md text-sm"
-                              value={item.city || ''}
-                              onChange={(e) => handleCustomUpdate(sectionIndex, item.id, "city", e.target.value)}
-                              placeholder="City, Country"
+                              value={item.technologies || ""}
+                              onChange={(e) => handleCustomUpdate(sectionIndex, item.id, "technologies", e.target.value)}
+                              placeholder="e.g. React, Node.js, Python"
                             />
                           </div>
-
-                          <div className="col-span-2">
-                            <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                            <TipTapEditor
-                              value={item.description || ''}
-                              onChange={(html) => handleCustomUpdate(sectionIndex, item.id, "description", html)}
+                          <div>
+                            <Label className="!text-sm !font-medium !text-gray-500">Project Link</Label>
+                            <input
+                              className="w-full border border-gray-300 p-2 rounded-md text-sm"
+                              value={item.projectLink || ""}
+                              onChange={(e) => handleCustomUpdate(sectionIndex, item.id, "projectLink", e.target.value)}
+                              placeholder="e.g. https://github.com/..."
                             />
                           </div>
                         </div>
+
+                        <div>
+                            <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
+                            <TipTapEditor
+                              value={item.description}
+                              onChange={(html) => handleCustomUpdate(sectionIndex, item.id, "description", html)}
+                            />
+                          </div>
+
                       </AccordionContent>
                     </AccordionPanel>
                   </Accordion>

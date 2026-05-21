@@ -6,7 +6,7 @@ import { HiSparkles } from "react-icons/hi";
 import { FaPen, FaTrash } from 'react-icons/fa';
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
-
+import ImpDynamicFields from "../ui/ImpDynamicFields";
 import {
   DndContext,
   closestCenter,
@@ -200,20 +200,47 @@ const EducationNew = ({ register, watch, control, fields, append, remove, move, 
                                       />
                                     </div>
 
-                                    {/* Description with TipTap */}
+                                    {/* Dynamic Fields (Core + Custom) */}
                                     <div className="md:col-span-2">
-                                      <label className="block text-xs font-semibold text-gray-500">Description</label>
-                                      <Controller
-                                        name={`educationHistory.${index}.description`}
-                                        control={control}
-                                        render={({ field }) => <TipTapEditor value={field.value} onChange={field.onChange} />}
+                                      <ImpDynamicFields
+                                        coreFields={[{
+                                          id: 'description',
+                                          name: 'Description',
+                                          value: watch(`educationHistory.${index}.description`) || "",
+                                          type: 'long_text',
+                                          footer: (
+                                            <div className="flex justify-end mt-2">
+                                              <div className="relative group">
+                                                <button
+                                                  type="button"
+                                                  disabled
+                                                  className="flex items-center gap-2 px-4 py-1.5 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] opacity-80 border"
+                                                  style={{ borderBottom: "1px solid #e5e7eb" }}
+                                                >
+                                                  <HiSparkles className="text-md" />
+                                                  Improve with AI
+                                                </button>
+                                                <div className="absolute bottom-full right-0 mb-2 w-56 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 text-center shadow-lg">
+                                                  Improve with AI is not available on the free plan.{" "}
+                                                  <span className="text-purple-300 font-semibold">Upgrade your plan</span>{" "}
+                                                  to use this feature.
+                                                  <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800" />
+                                                </div>
+                                              </div>
+                                            </div>
+                                          )
+                                        }]}
+                                        customFields={watch(`educationHistory.${index}.customFields`) || []}
+                                        onChange={(newFields) => setValue(`educationHistory.${index}.customFields`, newFields)}
+                                        onCoreFieldChange={(id, value) => {
+                                          if (id === 'description') {
+                                            setValue(`educationHistory.${index}.description`, value);
+                                          }
+                                        }}
+                                        onOrderChange={(newOrder) => setValue(`educationHistory.${index}.fieldOrder`, newOrder)}
+                                        fieldOrder={watch(`educationHistory.${index}.fieldOrder`) || []}
+                                        suggestions={["Board", "CGPA", "Major", "Minor"]}
                                       />
-                                      <div className="relative flex justify-end mt-1">
-                                        <button type="button" className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080] hover:bg-[#ebdcfc] transition-colors">
-                                          <HiSparkles className="text-md" />
-                                          Improve with AI
-                                        </button>
-                                      </div>
                                     </div>
                                   </div>
                                 </AccordionContent>

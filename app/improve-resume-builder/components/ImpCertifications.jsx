@@ -1,9 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
-import TipTapEditor from '../../editor/TipTapEditor';
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from "../../ui/Datepicker";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import {
   DndContext,
   closestCenter,
@@ -143,13 +143,20 @@ const ImpCertifications = ({
                           </div>
                         </div>
 
-                        <div>
-                          <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                          <TipTapEditor
-                            value={cert.description}
-                            onChange={(html) => handleCertUpdate(sectionIndex, cert.id, "description", html)}
-                          />
-                        </div>
+                        <ImpDynamicFields
+                          coreFields={[{
+                            id: 'description',
+                            name: 'Description',
+                            value: cert.description,
+                            type: 'long_text',
+                          }]}
+                          customFields={cert.customFields || []}
+                          onChange={(newFields) => handleCertUpdate(sectionIndex, cert.id, "customFields", newFields)}
+                          onCoreFieldChange={(id, value) => handleCertUpdate(sectionIndex, cert.id, "description", value)}
+                          onOrderChange={(newOrder) => handleCertUpdate(sectionIndex, cert.id, "fieldOrder", newOrder)}
+                          fieldOrder={cert.fieldOrder || []}
+                          suggestions={["Issuer", "Credential ID", "Certificate URL", "Skills Covered"]}
+                        />
 
                       </AccordionContent>
                     </AccordionPanel>

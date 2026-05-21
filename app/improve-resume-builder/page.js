@@ -53,6 +53,7 @@ import { resetAiCount } from '../reducers/PlanSlice';
 import CVSkeletonLoader from '../ui/CVSkeletonLoader';
 import LinkedInPrime from '../TemplateNew/LinkedInPrime';
 import ResumePageViewer from '../ui/ResumePageViewer';
+import ResumePreviewModal from '../modal/ResumePreviewModal';
 
 const Page = () => {
   const componentRef = useRef();
@@ -85,6 +86,7 @@ const Page = () => {
   const isInitialLoad = useRef(true);
   const [savingStatus, setSavingStatus] = useState('unsaved');
   const [showCompare, setShowCompare] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [originalResumeData, setOriginalResumeData] = useState(null);
   const [originalAtsScore, setOriginalAtsScore] = useState(null);
 
@@ -355,6 +357,13 @@ const Page = () => {
     }
   }, [savingStatus]);
 
+  // -------------------- PREVIEW EVENT LISTENER --------------------
+  useEffect(() => {
+    const handleOpenPreview = () => setShowPreview(true);
+    window.addEventListener("open-preview", handleOpenPreview);
+    return () => window.removeEventListener("open-preview", handleOpenPreview);
+  }, []);
+
   // Helper function to map resume data to sections
   // const mapextracteResumeDataToSections = (resumeData) => {
   //   if (!resumeData) return [];
@@ -614,6 +623,64 @@ const Page = () => {
       return str.replace(/^[\u2022\-\*\u25E6\u2023\u25BA]\s*/, '');
     };
 
+    // --- Auto custom-field helpers ---
+    /** Replace _ with space and title-case */
+    const keyToLabel = (key) =>
+      key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    /** Detect field type: 'link' | 'long_text' | 'text' */
+    const detectFieldType = (value) => {
+      if (!value) return 'text';
+      const str = typeof value === 'string' ? value
+        : Array.isArray(value) ? value.join(' ') : String(value);
+      if (/^https?:\/\//i.test(str.trim())) return 'link';
+      if (str.length > 120 || Array.isArray(value)) return 'long_text';
+      return 'text';
+    };
+
+    /** Stringify a value for a custom field */
+    const valueToCustomStr = (value, type) => {
+      if (!value) return '';
+      if (Array.isArray(value)) {
+        if (value.length === 0) return '';
+        if (type === 'long_text')
+          return `<ul>${value.map(v => `<li>${cleanBullet(String(v))}</li>`).join('')}</ul>`;
+        return value.filter(Boolean).join(', ');
+      }
+      return String(value).trim();
+    };
+
+    const extractCustomFields = (obj, handledKeys, prefix = 'cf') => {
+      const result = [];
+      let idx = 0;
+      
+      const processObj = (sourceObj) => {
+        Object.entries(sourceObj || {}).forEach(([key, value]) => {
+          if (handledKeys.has(key)) return;
+          if (key === 'custom_fields') return; // Handled below
+          if (value === null || value === undefined || value === '') return;
+          if (Array.isArray(value) && value.length === 0) return;
+          if (typeof value === 'object' && !Array.isArray(value)) return; // skip nested objects
+          const type = detectFieldType(value);
+          const str = valueToCustomStr(value, type);
+          if (!str) return;
+          result.push({
+            id: `${prefix}_${idx++}_${Date.now()}`,
+            name: keyToLabel(key),
+            value: str,
+            type,
+          });
+        });
+      };
+
+      processObj(obj);
+      if (obj && obj.custom_fields && typeof obj.custom_fields === 'object') {
+        processObj(obj.custom_fields);
+      }
+
+      return result;
+    };
+
     // ----------------- SUMMARY -----------------
     let summaryText = "";
     if (resumeData?.professional_summary?.summary_text?.trim()) {
@@ -668,25 +735,67 @@ const Page = () => {
       });
     }
 
-    // ----------------- EDUCATION -----------------
+    // Known keys already mapped as built-in edu fields
+    const EDU_HANDLED = new Set(['degree', 'field_of_study', 'institution', 'location',
+      'graduation_date', 'start_date', 'end_date', 'gpa', 'percentage',
+      'achievements', 'relevant_coursework', 'description']);
+
     const educationSection = (resumeData?.education || []).length > 0
       ? {
         id: id++,
         title: "Education",
         type: "education",
-        educations: resumeData.education.map((edu, i) => ({
-          id: `e_${i}_${Date.now()}`,
-          institute: edu.institution || "",
-          degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
-          startDate: normalizeDateStr(edu.start_date),
-          endDate: normalizeDateStr(edu.end_date || edu.graduation_date),
-          city: edu.location || "",
-          description: cleanBullet(edu.description),
-        })),
+        educations: resumeData.education.map((edu, i) => {
+          const customFields = [];
+          let cfIdx = 0;
+          // GPA / CGPA
+          if (edu.gpa && String(edu.gpa).trim()) {
+            customFields.push({ id: `cf_gpa_${i}_${Date.now()}`, name: 'CGPA', value: String(edu.gpa).trim(), type: 'text' });
+          }
+          // Percentage
+          if (edu.percentage && String(edu.percentage).trim()) {
+            customFields.push({ id: `cf_pct_${i}_${Date.now()}`, name: 'Percentage', value: String(edu.percentage).trim(), type: 'text' });
+          }
+          // Achievements array
+          if (Array.isArray(edu.achievements) && edu.achievements.length > 0) {
+            customFields.push({
+              id: `cf_ach_${i}_${Date.now()}`,
+              name: 'Achievements',
+              value: `<ul>${edu.achievements.map(a => `<li>${cleanBullet(String(a))}</li>`).join('')}</ul>`,
+              type: 'long_text',
+            });
+          }
+          // Relevant Coursework
+          if (Array.isArray(edu.relevant_coursework) && edu.relevant_coursework.length > 0) {
+            customFields.push({
+              id: `cf_rc_${i}_${Date.now()}`,
+              name: 'Relevant Coursework',
+              value: edu.relevant_coursework.join(', '),
+              type: 'text',
+            });
+          }
+          // Any other uncommon keys
+          customFields.push(...extractCustomFields(edu, EDU_HANDLED, `edu_${i}`));
+
+          return {
+            id: `e_${i}_${Date.now()}`,
+            institute: edu.institution || "",
+            degree: `${edu.degree || ""} ${edu.field_of_study || ""}`.trim(),
+            startDate: normalizeDateStr(edu.start_date),
+            endDate: normalizeDateStr(edu.end_date || edu.graduation_date),
+            city: edu.location || "",
+            description: cleanBullet(edu.description),
+            customFields,
+          };
+        }),
       }
       : null;
 
     // ----------------- CERTIFICATIONS -----------------
+    const CERT_HANDLED = new Set(['name', 'organization', 'issuing_organization',
+      'issue_date', 'expiry_date', 'description', 'location',
+      'credential_id', 'credential_url', 'certificate_url']);
+
     const certSection = (resumeData?.certifications || []).length > 0
       ? {
         id: id++,
@@ -694,9 +803,22 @@ const Page = () => {
         type: "certifications",
         certifications: resumeData.certifications.map((c, i) => {
           const rawIssue = c.issue_date || "";
-          const issueParts = rawIssue.split(/\s*[-–]\s*/);
+          const issueParts = rawIssue.split(/\s*[-\u2013]\s*/);
           const certStartYear = issueParts[0]?.trim() || "";
           const certEndYear = issueParts.length > 1 ? issueParts[1]?.trim() : (c.expiry_date || "");
+
+          const customFields = [];
+          if (c.issuing_organization || c.organization) {
+            customFields.push({ id: `cf_issuer_${i}_${Date.now()}`, name: 'Issuer', value: c.issuing_organization || c.organization, type: 'text' });
+          }
+          if (c.credential_id) {
+            customFields.push({ id: `cf_cid_${i}_${Date.now()}`, name: 'Credential ID', value: c.credential_id, type: 'text' });
+          }
+          if (c.credential_url || c.certificate_url) {
+            customFields.push({ id: `cf_curl_${i}_${Date.now()}`, name: 'Certificate URL', value: c.credential_url || c.certificate_url, type: 'link' });
+          }
+          customFields.push(...extractCustomFields(c, CERT_HANDLED, `cert_${i}`));
+
           return {
             id: `c_${i}_${Date.now()}`,
             name: c.name || "",
@@ -704,13 +826,18 @@ const Page = () => {
             city: "",
             startYear: certStartYear,
             endYear: certEndYear,
-            description: "",
+            description: cleanBullet(c.description) || "",
+            customFields,
           };
         }),
       }
       : null;
 
     // ----------------- EXPERIENCE -----------------
+    const EXP_HANDLED = new Set(['job_title', 'company_name', 'location', 'employment_type',
+      'start_date', 'end_date', 'duration', 'responsibilities', 'achievements',
+      'technologies', 'key_metrics', 'description']);
+
     const experienceSection = (resumeData?.work_experience || []).length > 0
       ? {
         id: id++,
@@ -724,8 +851,33 @@ const Page = () => {
             rawSDate = parts[0].trim();
             rawEDate = parts.slice(1).join('-').trim();
           }
-          let sDate = normalizeDateStr(rawSDate);
-          let eDate = normalizeDateStr(rawEDate);
+          const sDate = normalizeDateStr(rawSDate);
+          const eDate = normalizeDateStr(rawEDate);
+
+          const description = Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0
+            ? `<ul>${exp.responsibilities.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
+            : cleanBullet(exp.description);
+
+          // Build customFields from extra keys
+          const customFields = [];
+          if (Array.isArray(exp.technologies) && exp.technologies.length > 0) {
+            customFields.push({
+              id: `cf_tech_${i}_${Date.now()}`,
+              name: 'Technologies',
+              value: exp.technologies.join(', '),
+              type: 'text',
+            });
+          }
+          if (Array.isArray(exp.achievements) && exp.achievements.length > 0) {
+            customFields.push({
+              id: `cf_ach_${i}_${Date.now()}`,
+              name: 'Key Achievements',
+              value: `<ul>${exp.achievements.map(a => `<li>${cleanBullet(String(a))}</li>`).join('')}</ul>`,
+              type: 'long_text',
+            });
+          }
+          customFields.push(...extractCustomFields(exp, EXP_HANDLED, `exp_${i}`));
+
           return {
             id: `x_${i}_${Date.now()}`,
             jobTitle: exp.job_title || "",
@@ -733,32 +885,74 @@ const Page = () => {
             city: exp.location || "",
             startDate: sDate,
             endDate: eDate,
-            description: Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0
-              ? `<ul>${exp.responsibilities.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
-              : cleanBullet(exp.description),
+            description,
+            customFields,
+            fieldOrder: [...customFields.map(f => f.id), 'description'],
           };
         }),
       }
       : null;
 
-    // ----------------- PROJECTS (New addition to prevent data loss) -----------------
+    // ----------------- PROJECTS -----------------
+    const PROJ_HANDLED = new Set(['project_name', 'description', 'technologies', 'role',
+      'duration', 'key_features', 'achievements', 'links', 'location',
+      'start_date', 'end_date', 'key_metrics']);
+
     const projectSection = (resumeData?.projects || []).length > 0
       ? {
         id: id++,
         title: "Projects",
         type: "custom",
-        items: resumeData.projects.map((proj, i) => ({
-          id: `proj_${i}_${Date.now()}`,
-          title: proj.project_name || "",
-          city: "",
-          startDate: "",
-          endDate: normalizeDateStr(proj.duration),
-          description: Array.isArray(proj.key_features) && proj.key_features.length > 0
+        items: resumeData.projects.map((proj, i) => {
+          const description = Array.isArray(proj.key_features) && proj.key_features.length > 0
             ? `<ul>${proj.key_features.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
             : Array.isArray(proj.description) && proj.description.length > 0
             ? `<ul>${proj.description.map(r => `<li>${cleanBullet(r)}</li>`).join('')}</ul>`
-            : cleanBullet(typeof proj.description === 'string' && proj.description.trim() ? proj.description : ((proj.responsibilities || []).join("<br/>") || "")),
-        }))
+            : cleanBullet(typeof proj.description === 'string' && proj.description.trim()
+                ? proj.description
+                : ((proj.responsibilities || []).join('<br/>') || ""));
+
+          // Technologies → built-in field
+          const technologies = Array.isArray(proj.technologies)
+            ? proj.technologies.join(', ')
+            : (proj.technologies || '');
+
+          const customFields = [];
+          // Role
+          if (proj.role) {
+            customFields.push({ id: `cf_role_${i}_${Date.now()}`, name: 'Role', value: proj.role, type: 'text' });
+          }
+          // Links → link type
+          if (Array.isArray(proj.links)) {
+            proj.links.forEach((link, li) => {
+              if (link && typeof link === 'string' && link.trim()) {
+                customFields.push({ id: `cf_link_${i}_${li}_${Date.now()}`, name: li === 0 ? 'Live URL' : 'Repository', value: link.trim(), type: 'link' });
+              }
+            });
+          }
+          // Achievements
+          if (Array.isArray(proj.achievements) && proj.achievements.length > 0) {
+            customFields.push({
+              id: `cf_ach_${i}_${Date.now()}`,
+              name: 'Achievements',
+              value: `<ul>${proj.achievements.map(a => `<li>${cleanBullet(String(a))}</li>`).join('')}</ul>`,
+              type: 'long_text',
+            });
+          }
+          // Any other uncommon keys
+          customFields.push(...extractCustomFields(proj, PROJ_HANDLED, `proj_${i}`));
+
+          return {
+            id: `proj_${i}_${Date.now()}`,
+            title: proj.project_name || "",
+            technologies,
+            startDate: "",
+            endDate: normalizeDateStr(proj.duration),
+            description,
+            customFields,
+            fieldOrder: [...customFields.map(f => f.id), 'technologies', 'description'],
+          };
+        })
       }
       : null;
 
@@ -1916,6 +2110,7 @@ const Page = () => {
                 guide={checkATSData?.Improvment_Guide}
                 isComparingLoading={originalAtsScore === null}
                 onCompareClick={() => originalAtsScore !== null && setShowCompare(true)}
+                onPreviewClick={() => setShowPreview(true)}
               />
 
               <ImpPersonalDetails register={register} watch={watch} selectedTemplate={selectedTemplate} setValue={setValue} />
@@ -2199,7 +2394,7 @@ const Page = () => {
         </div>
       </div>
 
-      <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+      <div className='lg:w-6/12 bg-white h-[calc(100vh-64px)] overflow-hidden px-0'>
         <ResumePageViewer
           contentRef={componentRef}
           sections={sections}
@@ -2231,6 +2426,15 @@ const Page = () => {
         oldResumeSettings={originalResumeData?.oldResumeSettings}
         resumeSettings={resumeSettings}
         defaultOldTemplate="ats"
+      />
+      <ResumePreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        formData={formValues}
+        sections={sections}
+        themeColor={themeColor}
+        resumeSettings={resumeSettings}
+        selectedTemplate={selectedTemplate}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { renderDynamicFields } from "./renderDynamicFields";
 
 const skillLevels = ["Novice", "Beginner", "Skillful", "Experienced", "Expert"];
 
@@ -187,10 +188,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
               sub={`${job.employer ? `, ${job.employer}` : ""}${job.city_state ? `, ${job.city_state}` : ""}`}
             />
             <DateLine range={dateRange(job.startDate, job.endDate)} />
-            {job.description && (
-              <div className="resume-content" style={bodyStyle}
-                dangerouslySetInnerHTML={{ __html: job.description }} />
-            )}
+            {renderDynamicFields(job, bodyStyle)}
           </div>
         ))}
       </div>
@@ -209,10 +207,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
               sub={`${edu.school ? `, ${edu.school}` : ""}${edu.city_state ? `, ${edu.city_state}` : ""}`}
             />
             <DateLine range={dateRange(edu.startDate, edu.endDate)} />
-            {edu.description && (
-              <div className="resume-content" style={bodyStyle}
-                dangerouslySetInnerHTML={{ __html: edu.description }} />
-            )}
+            {renderDynamicFields(edu, bodyStyle)}
           </div>
         ))}
       </div>
@@ -231,10 +226,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
               sub={`${job.employer ? `, ${job.employer}` : ""}${job.city ? `, ${job.city}` : ""}`}
             />
             <DateLine range={dateRange(job.startDate, job.endDate)} />
-            {job.description && (
-              <div className="resume-content" style={bodyStyle}
-                dangerouslySetInnerHTML={{ __html: job.description }} />
-            )}
+            {renderDynamicFields(job, bodyStyle)}
           </div>
         ))}
       </div>
@@ -253,10 +245,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
               sub={`${act.employer ? ` - ${act.employer}` : ""}${act.city ? `, ${act.city}` : ""}`}
             />
             <DateLine range={dateRange(act.startDate, act.endDate)} />
-            {act.description && (
-              <div className="resume-content" style={bodyStyle}
-                dangerouslySetInnerHTML={{ __html: act.description }} />
-            )}
+            {renderDynamicFields(act, bodyStyle)}
           </div>
         ))}
       </div>
@@ -286,24 +275,40 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
     return (
       <div key="skills" style={sectionGap}>
         <SectionHeading title={formData.skillSectionTitle || "Skills"} />
-        {formData.newSkillHistory.map((item, i) => (
-          <div key={i} style={{ marginBottom: "4pt" }}>
-            <div style={{
-              fontFamily: secondaryFont,
-              fontSize: `${bodySize}pt`,
-              fontWeight: "700",
-              color: "#111",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-              marginBottom: "1pt",
-            }}>
-              {item.skill}
-            </div>
-            {!formData.hideExperienceLevel && (
-              <SkillBar level={item.level ?? 3} total={5} />
-            )}
-          </div>
-        ))}
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+          <colgroup>
+            <col style={{ width: "50%" }} />
+            <col style={{ width: "50%" }} />
+          </colgroup>
+          <tbody>
+            {Array.from({ length: Math.ceil(formData.newSkillHistory.length / 2) }).map((_, rowIdx) => (
+              <tr key={rowIdx}>
+                {[0, 1].map(colIdx => {
+                  const item = formData.newSkillHistory[rowIdx * 2 + colIdx];
+                  if (!item || !item.skill) return <td key={colIdx} />;
+                  return (
+                    <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
+                      <div style={{
+                        fontFamily: secondaryFont,
+                        fontSize: `${bodySize}pt`,
+                        fontWeight: "700",
+                        color: "#111",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                        marginBottom: "1pt",
+                      }}>
+                        {item.skill}
+                      </div>
+                      {!formData.hideExperienceLevel && (
+                        <SkillBar level={item.level ?? 3} total={5} />
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -410,10 +415,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
                   sub={item.city ? `, ${item.city}` : ""}
                 />
                 <DateLine range={dateRange(item.startDate, item.endDate)} />
-                {item.description && (
-                  <div className="resume-content" style={bodyStyle}
-                    dangerouslySetInnerHTML={{ __html: item.description }} />
-                )}
+                {renderDynamicFields(item, bodyStyle)}
               </div>
             ))}
           </div>
@@ -442,10 +444,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             sub={`${exp.company ? `, ${exp.company}` : ""}${exp.city ? `, ${exp.city}` : ""}`}
           />
           <DateLine range={dateRange(exp.startDate, exp.endDate)} />
-          {exp.description && (
-            <div className="resume-content" style={bodyStyle}
-              dangerouslySetInnerHTML={{ __html: exp.description }} />
-          )}
+          {renderDynamicFields(exp, bodyStyle)}
         </div>
       ))}
     </div>
@@ -461,10 +460,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             sub={`${edu.institute ? `, ${edu.institute}` : ""}${edu.city ? `, ${edu.city}` : ""}`}
           />
           <DateLine range={dateRange(edu.startDate, edu.endDate)} />
-          {edu.description && (
-            <div className="resume-content" style={bodyStyle}
-              dangerouslySetInnerHTML={{ __html: edu.description }} />
-          )}
+          {renderDynamicFields(edu, bodyStyle)}
         </div>
       ))}
     </div>
@@ -480,10 +476,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             sub={cert.organization ? `, ${cert.organization}` : ""}
           />
           <DateLine range={dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)} />
-          {cert.description && (
-            <div className="resume-content" style={bodyStyle}
-              dangerouslySetInnerHTML={{ __html: cert.description }} />
-          )}
+          {renderDynamicFields(cert, bodyStyle)}
         </div>
       ))}
     </div>
@@ -514,10 +507,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             sub={`${intern.employer ? `, ${intern.employer}` : ""}${intern.city ? `, ${intern.city}` : ""}`}
           />
           <DateLine range={dateRange(intern.startDate, intern.endDate)} />
-          {intern.description && (
-            <div className="resume-content" style={bodyStyle}
-              dangerouslySetInnerHTML={{ __html: intern.description }} />
-          )}
+          {renderDynamicFields(intern, bodyStyle)}
         </div>
       ))}
     </div>
@@ -533,10 +523,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             sub={`${a.employer ? ` - ${a.employer}` : ""}${a.city ? `, ${a.city}` : ""}`}
           />
           <DateLine range={dateRange(a.startDate, a.endDate)} />
-          {a.description && (
-            <div className="resume-content" style={bodyStyle}
-              dangerouslySetInnerHTML={{ __html: a.description }} />
-          )}
+          {renderDynamicFields(a, bodyStyle)}
         </div>
       ))}
     </div>
@@ -547,22 +534,38 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
     return (
       <div key={section.id} style={sectionGap}>
         <SectionHeading title={section.title} />
-        {section.skills?.map((skill, i) => (
-          <div key={skill.id || i} style={{ marginBottom: "4pt" }}>
-            <div style={{
-              fontFamily: secondaryFont,
-              fontSize: `${bodySize}pt`,
-              fontWeight: "700",
-              color: "#111",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-              marginBottom: "1pt",
-            }}>
-              {skill.name}
-            </div>
-            {showLevel && <SkillBar level={skill.level ?? 3} total={5} />}
-          </div>
-        ))}
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+          <colgroup>
+            <col style={{ width: "50%" }} />
+            <col style={{ width: "50%" }} />
+          </colgroup>
+          <tbody>
+            {Array.from({ length: Math.ceil((section.skills?.length || 0) / 2) }).map((_, rowIdx) => (
+              <tr key={rowIdx}>
+                {[0, 1].map(colIdx => {
+                  const skill = section.skills?.[rowIdx * 2 + colIdx];
+                  if (!skill || !skill.name) return <td key={colIdx} />;
+                  return (
+                    <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
+                      <div style={{
+                        fontFamily: secondaryFont,
+                        fontSize: `${bodySize}pt`,
+                        fontWeight: "700",
+                        color: "#111",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                        marginBottom: "1pt",
+                      }}>
+                        {skill.name}
+                      </div>
+                      {showLevel && <SkillBar level={skill.level ?? 3} total={5} />}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -653,10 +656,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             sub={item.city ? `, ${item.city}` : ""}
           />
           <DateLine range={dateRange(item.startDate, item.endDate)} />
-          {item.description && (
-            <div className="resume-content" style={bodyStyle}
-              dangerouslySetInnerHTML={{ __html: item.description }} />
-          )}
+          {renderDynamicFields(item, bodyStyle)}
         </div>
       ))}
     </div>
@@ -774,7 +774,8 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
 
   // photo না থাকলে contact header এ দেখায়, থাকলে details section এ নামে
   const hasPersonalDetails = formData.driving_licence || formData.nationality || formData.dob || formData.birth_place;
-  const hasContactInDetails = hasPhoto && (
+  // Always show contact info in Details section (regardless of photo)
+  const hasContactInDetails = (
     formData.address || formData.city_state || formData.country ||
     formData.email || formData.phone || formData.postal_code
   );
@@ -881,78 +882,44 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
             </tbody>
           </table>
         ) : (
+          /* ── No photo mode: Name left + Job Role below name ── */
           <table style={{ width: "100%", borderCollapse: "collapse", backgroundColor: headerBg }}>
             <tbody>
               <tr>
-                {(
-                  /* ── No photo mode: name left | job_title + contact right (original layout) ── */
-                  <td style={{
-                    verticalAlign: "top",
-                    paddingTop: "40pt",
-                    paddingBottom: "16pt",
-                    paddingLeft: `${16 + leftRight}pt`,
-                    paddingRight: `${16 + leftRight}pt`,
+                <td style={{
+                  verticalAlign: "top",
+                  paddingTop: "40pt",
+                  paddingBottom: "16pt",
+                  paddingLeft: `${16 + leftRight}pt`,
+                  paddingRight: `${16 + leftRight}pt`,
+                }}>
+                  {/* Name */}
+                  <div style={{
+                    fontFamily: secondaryFont,
+                    fontSize: `${primaryHeadingSize}pt`,
+                    fontWeight: primaryHeadingWeight,
+                    color: "#111",
+                    lineHeight: "1.05",
+                    letterSpacing: "-0.01em",
+                    marginBottom: formData.job_target ? "8pt" : "0",
                   }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <tbody>
-                        <tr>
-                          {/* Left: Name */}
-                          <td style={{ verticalAlign: "middle", width: "55%" }}>
-                            <div style={{
-                              fontFamily: secondaryFont,
-                              fontSize: `${primaryHeadingSize}pt`,
-                              fontWeight: primaryHeadingWeight,
-                              color: "#111",
-                              lineHeight: "1.0",
-                              letterSpacing: "-0.01em",
-                            }}>
-                              {formData.first_name && <div>{formData.first_name}</div>}
-                              {formData.last_name && <div>{formData.last_name}</div>}
-                            </div>
-                          </td>
-                          {/* Right: Job title + contact */}
-                          <td style={{ verticalAlign: "top", width: "45%", paddingLeft: "12pt" }}>
-                            {formData.job_target && (
-                              <div style={{
-                                fontFamily: secondaryFont,
-                                fontSize: `${secondaryHeadingSize}pt`,
-                                fontWeight: secondaryHeadingWeight,
-                                textTransform: "uppercase",
-                                letterSpacing: "0.08em",
-                                color: "#333",
-                                marginBottom: "6pt",
-                              }}>
-                                {formData.job_target}
-                              </div>
-                            )}
-                            {(formData.address || formData.city_state || formData.country) && (
-                              <div style={{ ...bodyStyle, color: "#333", marginBottom: "1pt" }}>
-                                {formData.address && <>{formData.address}, </>}
-                                {formData.city_state}
-                                {formData.city_state && formData.country ? ", " : ""}
-                                {formData.country}
-                                {formData.postal_code ? ` ${formData.postal_code}` : ""}
-                              </div>
-                            )}
-                            {formData.email && (
-                              <div style={{ marginBottom: "1pt" }}>
-                                <a href={`mailto:${formData.email}`} style={{ ...bodyStyle, color: "#333", textDecoration: "none", fontWeight: "500" }}>
-                                  {formData.email}
-                                </a>
-                              </div>
-                            )}
-                            {formData.phone && (
-                              <div style={{ ...bodyStyle, color: "#333", fontWeight: "500" }}>
-                                {formData.phone}
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                )}
-
+                    {formData.first_name && <div>{formData.first_name}</div>}
+                    {formData.last_name && <div>{formData.last_name}</div>}
+                  </div>
+                  {/* Job Role below name */}
+                  {formData.job_target && (
+                    <div style={{
+                      fontFamily: secondaryFont,
+                      fontSize: `${secondaryHeadingSize}pt`,
+                      fontWeight: secondaryHeadingWeight,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      color: "#333",
+                    }}>
+                      {formData.job_target}
+                    </div>
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -985,8 +952,8 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
                           <table style={{ borderCollapse: "collapse", width: "100%" }}>
                             <tbody>
 
-                              {/* Contact — only when photo exists */}
-                              {hasPhoto && (formData.address || formData.city_state || formData.country) && (
+                              {/* Contact — always shown in details */}
+                              {(formData.address || formData.city_state || formData.country) && (
                                 <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
                                   <div style={detailLabelStyle}>Address</div>
                                   <div style={bodyStyle}>
@@ -998,13 +965,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
                                   </div>
                                 </td></tr>
                               )}
-                              {hasPhoto && formData.phone && (
+                              {formData.phone && (
                                 <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
                                   <div style={detailLabelStyle}>Phone</div>
                                   <div style={bodyStyle}>{formData.phone}</div>
                                 </td></tr>
                               )}
-                              {hasPhoto && formData.email && (
+                              {formData.email && (
                                 <tr><td style={{ verticalAlign: "top", paddingBottom: "4pt" }}>
                                   <div style={detailLabelStyle}>Email</div>
                                   <div style={bodyStyle}>

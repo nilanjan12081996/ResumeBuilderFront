@@ -4,6 +4,7 @@ import { FaTrash } from 'react-icons/fa';
 import { HiSparkles } from "react-icons/hi2";
 import Datepicker from "../../ui/Datepicker";
 import TipTapEditor from '../../editor/TipTapEditor';
+import ImpDynamicFields from '../../ui/ImpDynamicFields';
 import GenerateWithAiModal from '../../modal/GenerateWithAiModal';
 import { useSelector } from 'react-redux';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -141,12 +142,21 @@ const LinkedInEducation = ({
                             </div>
                           </div>
 
-                          <div className="col-span-2">
+                          <div>
                             <Label className="!text-sm !font-medium !text-gray-500">Location</Label>
                             <input
                               value={edu.city}
                               onChange={(e) => handleEducationUpdate(sectionIndex, edu.id, "city", e.target.value)}
                               placeholder="City, Country"
+                              className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="!text-sm !font-medium !text-gray-500">CGPA</Label>
+                            <input
+                              value={edu.cgpa}
+                              onChange={(e) => handleEducationUpdate(sectionIndex, edu.id, "cgpa", e.target.value)}
+                              placeholder="e.g. 3.8/4.0"
                               className="w-full rounded-md border border-gray-300 p-2 text-sm"
                             />
                           </div>
@@ -157,18 +167,24 @@ const LinkedInEducation = ({
                           <TipTapEditor
                             value={edu.description}
                             onChange={(html) => handleEducationUpdate(sectionIndex, edu.id, "description", html)}
+                            footer={
+                              <div className="flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveEduId(edu.id);
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold !bg-[#800080] !text-white hover:!bg-black shadow-sm transition-all"
+                                >
+                                  <HiSparkles className="text-[14px]" />
+                                  Improve with AI
+                                </button>
+                              </div>
+                            }
                           />
-                          <div className="relative flex justify-end mt-1">
-                            <button
-                              type="button"
-                              onClick={() => setActiveEduId(edu.id)}
-                              className="flex items-center gap-2 px-4 py-1 rounded-[25px] text-sm !bg-[#f6efff] !text-[#800080]"
-                            >
-                              <HiSparkles className="text-md" />
-                              Improve with AI
-                            </button>
 
-                            {activeEduId === edu.id && (
+                          {activeEduId === edu.id && (
                               <GenerateWithAiModal
                                 open={true}
                                 onClose={() => setActiveEduId(null)}
@@ -181,8 +197,8 @@ const LinkedInEducation = ({
                               />
                             )}
                           </div>
-                        </div>
-                      </AccordionContent>
+
+                        </AccordionContent>
                     </AccordionPanel>
                   </Accordion>
 

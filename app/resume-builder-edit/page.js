@@ -171,6 +171,7 @@ const page = () => {
   // Auto-Save State
   const [resumeIds, setResumeIds] = useState({ mongo_id: null, mysql_id: null });
   const [savingStatus, setSavingStatus] = useState('unsaved');
+  const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const lastSavedData = useRef(null);
 
   // ── NEW: Profile crop states ──
@@ -636,6 +637,13 @@ const page = () => {
     }
   }, [savingStatus]);
 
+  // -------------------- PREVIEW EVENT LISTENER --------------------
+  useEffect(() => {
+    const handleOpenPreview = () => setOpenPreviewModal(true);
+    window.addEventListener("open-preview", handleOpenPreview);
+    return () => window.removeEventListener("open-preview", handleOpenPreview);
+  }, []);
+
   const handleAddNewSection = (sectionData) => {
     const timestamp = Date.now();
 
@@ -848,6 +856,49 @@ const page = () => {
 
   return (
     <div>
+
+      {/* ========== PREVIEW MODAL ========== */}
+      {openPreviewModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+        >
+          <div className="relative bg-white rounded-2xl shadow-2xl w-[55%] max-w-[680px] min-w-[320px] max-h-[90vh] flex flex-col overflow-hidden">
+            <div
+              className="flex items-center justify-between px-5 py-3 border-b border-gray-100 flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #faf5ff, #f3e8ff)" }}
+            >
+              <div>
+                <p className="text-sm font-bold text-purple-700">Resume Preview</p>
+                <p className="text-[11px] text-gray-400">Live preview of your resume</p>
+              </div>
+              <button
+                onClick={() => setOpenPreviewModal(false)}
+                className="w-8 h-8 rounded-full bg-white/70 hover:bg-white flex items-center justify-center text-gray-500 hover:text-gray-800 transition shadow-sm"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4 bg-gray-50">
+              <ResumePageViewer
+                sections={[]}
+                formValues={formValues}
+                resumeSettings={resumeSettings}
+              >
+                <ActiveResume
+                  formData={formValues}
+                  empHistory={empHistory}
+                  themeColor={themeColor}
+                  sectionOrder={sectionOrder}
+                  resumeSettings={resumeSettings}
+                />
+              </ResumePageViewer>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Profile Crop Modal */}
       {profileCropSrc && (
@@ -1382,7 +1433,7 @@ const page = () => {
           </div>
         </div>
 
-        <div className='lg:w-6/12 bg-[#ffffff] px-0'>
+        <div className='lg:w-6/12 bg-white h-[calc(100vh-64px)] overflow-hidden px-0'>
           {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
 
             <div ref={componentRef}>

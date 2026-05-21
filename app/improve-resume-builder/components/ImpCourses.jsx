@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, Label } from "flowbite-react";
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from '../../ui/Datepicker';
-import TipTapEditor from "../../editor/TipTapEditor";
+import ImpDynamicFields from "../../ui/ImpDynamicFields";
 import {
     DndContext,
     closestCenter,
@@ -139,15 +139,20 @@ const ImpCourses = ({
                                                         </div>
                                                     </div>
 
-                                                    <div className="col-span-2">
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
-                                                        <div className="mt-1">
-                                                            <TipTapEditor
-                                                                value={course.description || ''}
-                                                                onChange={(content) => handleUpdate(sectionIndex, course.id, 'description', content)}
-                                                            />
-                                                        </div>
-                                                    </div>
+                                                    <ImpDynamicFields
+                                                        coreFields={[{
+                                                            id: 'description',
+                                                            name: 'Description',
+                                                            value: course.description,
+                                                            type: 'long_text',
+                                                        }]}
+                                                        customFields={course.customFields || []}
+                                                        onChange={(newFields) => handleUpdate(sectionIndex, course.id, 'customFields', newFields)}
+                                                        onCoreFieldChange={(id, value) => handleUpdate(sectionIndex, course.id, 'description', value)}
+                                                        onOrderChange={(newOrder) => handleUpdate(sectionIndex, course.id, 'fieldOrder', newOrder)}
+                                                        fieldOrder={course.fieldOrder || []}
+                                                        suggestions={["Provider", "Certificate URL", "Platform", "Skills Learned"]}
+                                                    />
                                                 </div>
                                             </AccordionContent>
                                         </AccordionPanel>

@@ -5,6 +5,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FaTrash } from 'react-icons/fa';
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
+import ImpDynamicFields from "../ui/ImpDynamicFields";
 
 import {
   DndContext,
@@ -170,17 +171,26 @@ const Courses = ({ register, watch, control, fields, append, remove, move }) => 
                                     </div>
                                   </div>
 
+                                  {/* Dynamic Fields (Core + Custom) */}
                                   <div className="md:col-span-2">
-                                    <label className="!text-sm !text-gray-500 font-semibold">Description</label>
-                                    <Controller
-                                      control={control}
-                                      name={`coursesHistory.${index}.description`}
-                                      render={({ field }) => (
-                                        <TipTapEditor
-                                          value={field.value}
-                                          onChange={field.onChange}
-                                        />
-                                      )}
+                                    <ImpDynamicFields
+                                      coreFields={[{
+                                        id: 'description',
+                                        name: 'Description',
+                                        value: watch(`coursesHistory.${index}.description`) || "",
+                                        type: 'long_text',
+                                        footer: null
+                                      }]}
+                                      customFields={watch(`coursesHistory.${index}.customFields`) || []}
+                                      onChange={(newFields) => setValue(`coursesHistory.${index}.customFields`, newFields)}
+                                      onCoreFieldChange={(id, value) => {
+                                        if (id === 'description') {
+                                          setValue(`coursesHistory.${index}.description`, value);
+                                        }
+                                      }}
+                                      onOrderChange={(newOrder) => setValue(`coursesHistory.${index}.fieldOrder`, newOrder)}
+                                      fieldOrder={watch(`coursesHistory.${index}.fieldOrder`) || []}
+                                      suggestions={["Provider", "Certificate URL", "Platform", "Skills Learned"]}
                                     />
                                   </div>
                                 </div>

@@ -5,6 +5,7 @@ import { FaPlus, FaTrash } from "react-icons/fa6";
 import { Controller } from "react-hook-form";
 import Datepicker from "../ui/Datepicker";
 import TipTapEditor from "../editor/TipTapEditor";
+import ImpDynamicFields from "../ui/ImpDynamicFields";
 
 import {
   DndContext,
@@ -76,7 +77,7 @@ const AdvancedCustomSection = ({
             <div className="space-y-3">
               {fields.map((item, index) => {
                 const watchedTitle = watch(`${historyFieldName}.${index}.title`);
-                const watchedCity = watch(`${historyFieldName}.${index}.city`);
+                const watchedTechnologies = watch(`${historyFieldName}.${index}.technologies`);
                 const isOngoing = watch(`${historyFieldName}.${index}.isOngoing`);
 
                 return (
@@ -94,8 +95,8 @@ const AdvancedCustomSection = ({
                         <Accordion collapseAll className="w-full !border !border-gray-300 rounded-lg overflow-hidden bg-white">
                           <AccordionPanel>
                             <AccordionTitle className="font-semibold text-sm">
-                              {watchedTitle || watchedCity
-                                ? `${watchedTitle || ''}${watchedCity ? ', ' + watchedCity : ''}`
+                              {watchedTitle || watchedTechnologies
+                                ? `${watchedTitle || ''}${watchedTechnologies ? ' — ' + watchedTechnologies : ''}`
                                 : "(Awaiting Input)"}
                             </AccordionTitle>
 
@@ -166,31 +167,37 @@ const AdvancedCustomSection = ({
                                   </div>
                                 </div>
 
-                                {/* City */}
+                                {/* Technologies */}
                                 <div className="col-span-2">
-                                  <label className="block text-xs font-semibold text-gray-500">City</label>
+                                  <label className="block text-xs font-semibold text-gray-500">Technologies</label>
                                   <input
                                     type="text"
-                                    placeholder="e.g. New York"
+                                    placeholder="e.g. React, Node.js, MongoDB"
                                     className="mt-1 w-full rounded-lg border border-gray-300 p-2 text-sm"
-                                    {...register(`${historyFieldName}.${index}.city`)}
+                                    {...register(`${historyFieldName}.${index}.technologies`)}
                                   />
                                 </div>
 
-                                {/* Description - TipTapEditor */}
+                                {/* Dynamic Fields (Core + Custom) */}
                                 <div className="col-span-2">
-                                  <label className="block text-xs font-semibold text-gray-500">Description</label>
-                                  <Controller
-                                    control={control}
-                                    name={`${historyFieldName}.${index}.description`}
-                                    defaultValue=""
-                                    render={({ field }) => (
-                                      <TipTapEditor
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        placeholder="Describe details..."
-                                      />
-                                    )}
+                                  <ImpDynamicFields
+                                    coreFields={[{
+                                      id: 'description',
+                                      name: 'Description',
+                                      value: watch(`${historyFieldName}.${index}.description`) || "",
+                                      type: 'long_text',
+                                      footer: null // No AI button for AdvancedCustomSection
+                                    }]}
+                                    customFields={watch(`${historyFieldName}.${index}.customFields`) || []}
+                                    onChange={(newFields) => setValue(`${historyFieldName}.${index}.customFields`, newFields)}
+                                    onCoreFieldChange={(id, value) => {
+                                      if (id === 'description') {
+                                        setValue(`${historyFieldName}.${index}.description`, value);
+                                      }
+                                    }}
+                                    onOrderChange={(newOrder) => setValue(`${historyFieldName}.${index}.fieldOrder`, newOrder)}
+                                    fieldOrder={watch(`${historyFieldName}.${index}.fieldOrder`) || []}
+                                    suggestions={["Role", "Live URL", "Repository", "Issued By", "Credential ID", "Credential URL"]}
                                   />
                                 </div>
 
