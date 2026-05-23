@@ -305,6 +305,13 @@ const LinkedInResumeBuilder = () => {
     }
   }, [savingStatus]);
 
+  // -------------------- PREVIEW EVENT LISTENER --------------------
+  useEffect(() => {
+    const handleOpenPreview = () => setShowPreview(true);
+    window.addEventListener("open-preview", handleOpenPreview);
+    return () => window.removeEventListener("open-preview", handleOpenPreview);
+  }, []);
+
   // -------------------- SECTION MAPPER --------------------
   const mapLinkedInDataToSections = (resumeData) => {
     if (!resumeData) return [];

@@ -2100,7 +2100,7 @@ const Page = () => {
     <div className='lg:flex gap-1 pb-0'>
       <ToastContainer />
 
-      <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-screen overflow-auto hide-scrollbar'>
+      <div className='lg:w-6/12 bg-[#eff2f9] rounded-[8px] h-[calc(100vh-64px)] overflow-auto hide-scrollbar'>
         {activeTab === 'edit' ? (
           <form onSubmit={handleSubmit(onSubmit)}>
             <div>

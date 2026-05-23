@@ -306,7 +306,9 @@ const Insideheader = () => {
             </div>
 
             {open && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden">
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden">
                 <div className="px-4 py-3 border-b border-gray-100"
                   style={{ background: "linear-gradient(135deg, #faf5ff, #f5f3ff)" }}
                 >
@@ -379,6 +381,7 @@ const Insideheader = () => {
                   </li>
                 </ul>
               </div>
+              </>
             )}
           </div>
         </div>

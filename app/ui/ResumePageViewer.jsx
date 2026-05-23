@@ -6,16 +6,16 @@ const A4_W = 794;
 const A4_H = 1123;
 
 const TEMPLATE_PAGE_BREAK_MAP = {
-  "prime ats":      1028,
-  "prime":          1040,
-  "primeats":       1040,
-  "professional":   1064,
-  "clear":          1065,
-  "clean":          1040,
-  "corporate":      1081,
-  "vivid":          1055,
+  "prime ats": 1028,
+  "prime": 1040,
+  "primeats": 1040,
+  "professional": 1064,
+  "clear": 1065,
+  "clean": 1040,
+  "corporate": 1081,
+  "vivid": 1055,
   "linkedin prime": 1010,
-  "linkedinprime":  1010,
+  "linkedinprime": 1010,
 };
 const DEFAULT_PAGE_BREAK_H = 1028;
 
@@ -72,24 +72,24 @@ function computeSafeBreaks(container, pageBreakH) {
 }
 
 const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) => {
-  const [totalPages, setTotalPages]   = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
-  const [scale, setScale]             = useState(1);
-  const [baseScale, setBaseScale]     = useState(1);
-  const [isAutoFit, setIsAutoFit]     = useState(true);
-  const [isPanMode, setIsPanMode]     = useState(false);
-  const [safeBreaks, setSafeBreaks]   = useState([]);
+  const [scale, setScale] = useState(1);
+  const [baseScale, setBaseScale] = useState(1);
+  const [isAutoFit, setIsAutoFit] = useState(true);
+  const [isPanMode, setIsPanMode] = useState(false);
+  const [safeBreaks, setSafeBreaks] = useState([]);
 
-  const containerRef       = useRef(null);
-  const measurementRef     = useRef(null);
+  const containerRef = useRef(null);
+  const measurementRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [coords, setCoords] = useState({ startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
 
   const templateName = (
     resumeSettings?.theme?.template ||
-    resumeSettings?.templateName    ||
-    resumeSettings?.templateId      ||
+    resumeSettings?.templateName ||
+    resumeSettings?.templateId ||
     ""
   ).toLowerCase();
 
@@ -124,7 +124,7 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
     return () => { obs.disconnect(); window.removeEventListener("resize", recalculate); };
   }, [recalculate]);
 
-  const handleZoomIn  = () => { setScale(p => Math.min(2,   p + 0.1)); setIsAutoFit(false); };
+  const handleZoomIn = () => { setScale(p => Math.min(2, p + 0.1)); setIsAutoFit(false); };
   const handleZoomOut = () => { setScale(p => Math.max(0.2, p - 0.1)); setIsAutoFit(false); };
 
   const onMouseDown = (e) => {
@@ -138,13 +138,13 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
     e.preventDefault();
     const c = scrollContainerRef.current;
     c.scrollLeft = coords.scrollLeft - (e.pageX - c.offsetLeft - coords.startX) * 1.5;
-    c.scrollTop  = coords.scrollTop  - (e.pageY - c.offsetTop  - coords.startY) * 1.5;
+    c.scrollTop = coords.scrollTop - (e.pageY - c.offsetTop - coords.startY) * 1.5;
   };
 
   // start and height of each page's content slice
   const getPageSlice = (idx) => {
     const start = idx === 0 ? 0 : (safeBreaks[idx - 1] ?? idx * pageBreakH);
-    const end   = safeBreaks[idx] ?? (start + pageBreakH);
+    const end = safeBreaks[idx] ?? (start + pageBreakH);
     return { start, pageH: end - start };
   };
 
@@ -166,9 +166,10 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
         className={`flex-1 relative overflow-auto custom-preview-scrollbar flex flex-col items-center ${isPanMode ? "cursor-grab active:cursor-grabbing" : ""}`}
       >
         <div
-          className="m-auto py-12 flex flex-col items-center"
-          style={{ width: A4_W * scale, minWidth: A4_W * scale, overflow: "visible" }}
+          className="m-auto py-4 flex flex-col items-center !py-0 shadow-[0_30px_80px_rgba(0,0,0,0.12)] rounded-sm"
+          style={{ width: A4_W * scale, minWidth: A4_W * scale, height: A4_H * scale, minHeight: A4_H * scale }}
         >
+          <div style={{ overflow: "hidden", width: "100%", height: "100%", borderRadius: "0.125rem" }}>
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentPage * 100}%)`, width: `${totalPages * 100}%`, display: "flex" }}
@@ -176,16 +177,15 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
             {Array.from({ length: totalPages }).map((_, idx) => {
               const { start, pageH } = getPageSlice(idx);
               return (
-                <div key={idx} className="w-full flex justify-center flex-shrink-0">
+                <div key={idx} className="w-full h-full flex justify-start flex-shrink-0">
                   <div
                     style={{
                       width: A4_W,
                       height: A4_H,
                       transform: `scale(${scale})`,
-                      transformOrigin: "center top",
-                      marginBottom: `${Math.max(0, A4_H * (scale - 1))}px`,
+                      transformOrigin: "top left",
                     }}
-                    className="bg-white shadow-[0_30px_80px_rgba(0,0,0,0.12)] relative overflow-hidden rounded-sm"
+                    className="bg-white relative overflow-hidden"
                   >
                     <div style={{ overflow: "hidden", width: "100%" }}>
                       <div
@@ -201,6 +201,7 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
                 </div>
               );
             })}
+          </div>
           </div>
         </div>
       </div>

@@ -52,7 +52,7 @@ const ResumePreviewModal = ({
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 12 }}
                         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-                        className="relative z-10 w-[55%] max-w-[680px] min-w-[320px] max-h-[90vh] flex flex-col rounded-2xl overflow-hidden shadow-2xl"
+                        className="relative z-10 w-[55%] max-w-[800px] min-w-[320px] h-[100vh] flex flex-col rounded-none overflow-hidden shadow-2xl"
                         style={{ background: "#fff" }}
                     >
                         {/* Header */}
@@ -75,7 +75,7 @@ const ResumePreviewModal = ({
                         </div>
 
                         {/* Scrollable resume body */}
-                        <div className="overflow-y-auto flex-1 bg-gray-50 p-3">
+                        <div className="flex-1 bg-gray-50 p-0 overflow-hidden relative">
                             <ResumePageViewer
                                 sections={sections}
                                 formValues={formData}

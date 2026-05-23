@@ -31,8 +31,8 @@ export const renderDynamicFields = (item, containerStyle) => {
       const idxA = fieldOrder.indexOf(a.id);
       const idxB = fieldOrder.indexOf(b.id);
       if (idxA === -1 && idxB === -1) return 0;
-      if (idxA === -1) return 1;
-      if (idxB === -1) return -1;
+      if (idxA === -1) return -1; // Match ImpDynamicFields.jsx: put un-indexed items at the top
+      if (idxB === -1) return 1;
       return idxA - idxB;
     });
   }

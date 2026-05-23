@@ -716,7 +716,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
               items={history.filter(i => i.title || i.city).map(item => ({
                 heading: [item.title, item.city].filter(Boolean).join(", "),
                 period: dateRange(item.startDate, item.endDate),
-                html: item.description || null,
+                content: renderDynamicFields(item, { ...bodyStyle, color: "#4b5563" }),
               }))}
             />
           );
