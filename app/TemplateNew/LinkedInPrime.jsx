@@ -395,11 +395,6 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
                 {dr}
               </div>
             )}
-            {item.technologies && (
-              <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#374151", marginBottom: "1pt" }}>
-                <strong>Technologies:</strong> {item.technologies}
-              </div>
-            )}
             {item.projectLink && (
               <div style={{ ...bodyStyle, fontSize: `${text.body - 1}pt`, color: "#374151", marginBottom: "1pt" }}>
                 <strong>Project Link:</strong> <a href={item.projectLink.startsWith("http") ? item.projectLink : `https://${item.projectLink}`} style={{ color: "#2563eb", textDecoration: "none" }}>

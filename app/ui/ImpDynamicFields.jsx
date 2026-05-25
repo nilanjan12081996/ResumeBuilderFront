@@ -139,16 +139,24 @@ const ImpDynamicFields = ({
   // Combine items based on provided order or default to custom then core
   let combinedItems = [...customFields, ...coreFields];
   
-  if (fieldOrder && fieldOrder.length > 0) {
-    combinedItems.sort((a, b) => {
-      const indexA = fieldOrder.indexOf(a.id);
-      const indexB = fieldOrder.indexOf(b.id);
-      if (indexA === -1 && indexB === -1) return 0;
-      if (indexA === -1) return -1; // Place new custom fields at the top
-      if (indexB === -1) return 1;
-      return indexA - indexB;
-    });
-  }
+  combinedItems.sort((a, b) => {
+    // 1. Technologies is always last
+    if (a.id === 'technologies' && b.id !== 'technologies') return 1;
+    if (b.id === 'technologies' && a.id !== 'technologies') return -1;
+
+    // 2. Description is second to last
+    if (a.id === 'description' && b.id !== 'description') return 1;
+    if (b.id === 'description' && a.id !== 'description') return -1;
+
+    // 3. Other fields sorted by fieldOrder
+    const indexA = fieldOrder && fieldOrder.length > 0 ? fieldOrder.indexOf(a.id) : -1;
+    const indexB = fieldOrder && fieldOrder.length > 0 ? fieldOrder.indexOf(b.id) : -1;
+    
+    if (indexA === -1 && indexB === -1) return 0;
+    if (indexA === -1) return -1; // Place new custom fields at the top
+    if (indexB === -1) return 1;
+    return indexA - indexB;
+  });
 
   const handleDragEnd = (event) => {
     const { active, over } = event;

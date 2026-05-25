@@ -25,17 +25,27 @@ export const renderDynamicFields = (item, containerStyle) => {
     });
   }
   
-  // Sort by fieldOrder
-  if (fieldOrder.length > 0) {
-    combined.sort((a, b) => {
-      const idxA = fieldOrder.indexOf(a.id);
-      const idxB = fieldOrder.indexOf(b.id);
-      if (idxA === -1 && idxB === -1) return 0;
-      if (idxA === -1) return -1; // Match ImpDynamicFields.jsx: put un-indexed items at the top
-      if (idxB === -1) return 1;
-      return idxA - idxB;
-    });
-  }
+  // Sort all fields enforcing strict client rules:
+  // 1. Custom fields at the top (ordered by fieldOrder)
+  // 2. Description at the bottom
+  // 3. Technologies at the very bottom
+  combined.sort((a, b) => {
+    // Technologies is always last
+    if (a.id === 'technologies' && b.id !== 'technologies') return 1;
+    if (b.id === 'technologies' && a.id !== 'technologies') return -1;
+
+    // Description is second to last
+    if (a.id === 'description' && b.id !== 'description') return 1;
+    if (b.id === 'description' && a.id !== 'description') return -1;
+
+    // Other fields sorted by fieldOrder
+    const idxA = fieldOrder.indexOf(a.id);
+    const idxB = fieldOrder.indexOf(b.id);
+    if (idxA === -1 && idxB === -1) return 0;
+    if (idxA === -1) return -1; // Un-indexed custom items at top
+    if (idxB === -1) return 1;
+    return idxA - idxB;
+  });
   
   return combined.map(field => {
     if (!field.value) return null;

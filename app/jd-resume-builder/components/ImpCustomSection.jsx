@@ -124,31 +124,28 @@ const ImpCustomSection = ({
                                                         </div>
                                                     </div>
 
-                                                    <div className="col-span-2">
-                                                        <Label className="!text-sm !font-medium !text-gray-500">Technologies</Label>
-                                                        <input
-                                                            className="w-full border p-2 rounded"
-                                                            value={item.technologies || ''}
-                                                            placeholder="e.g. React, Node.js, MongoDB"
-                                                            onChange={(e) =>
-                                                                handleCustomUpdate(sectionIndex, item.id, "technologies", e.target.value)
-                                                            }
-                                                        />
-                                                    </div>
-
                                                     {/* Combined Fields (Core + Custom) with Reordering */}
                                                     <ImpDynamicFields
-                                                        coreFields={[{
-                                                            id: 'description',
-                                                            name: 'Description',
-                                                            value: item.description,
-                                                            type: 'long_text'
-                                                        }]}
+                                                        coreFields={[
+                                                            {
+                                                                id: 'description',
+                                                                name: 'Description',
+                                                                value: item.description,
+                                                                type: 'long_text'
+                                                            },
+                                                            {
+                                                                id: 'technologies',
+                                                                name: 'Technologies',
+                                                                value: item.technologies || '',
+                                                                type: 'text',
+                                                                width: 100
+                                                            }
+                                                        ]}
                                                         customFields={item.customFields || []}
                                                         onChange={(newFields) => handleCustomUpdate(sectionIndex, item.id, "customFields", newFields)}
-                                                        onCoreFieldChange={(id, value) => handleCustomUpdate(sectionIndex, item.id, "description", value)}
+                                                        onCoreFieldChange={(id, value) => handleCustomUpdate(sectionIndex, item.id, id, value)}
                                                         onOrderChange={(newOrder) => handleCustomUpdate(sectionIndex, item.id, "fieldOrder", newOrder)}
-                                                        fieldOrder={item.fieldOrder || []}
+                                                        fieldOrder={item.fieldOrder || ['description', 'technologies']}
                                                         suggestions={["Role", "Live URL", "Repository", "Impact"]}
                                                     />
 
