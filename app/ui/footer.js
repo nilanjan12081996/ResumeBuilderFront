@@ -1,105 +1,71 @@
 'use client';
 
 import React from 'react'
-
-import { Roboto } from 'next/font/google';
-import { Plus_Jakarta_Sans } from 'next/font/google';
 import Link from 'next/link';
-
-import { IoLocationSharp } from "react-icons/io5";
-import { FaEnvelope } from "react-icons/fa6";
-import { MdPhone } from "react-icons/md";
-import { BiLogoFacebook } from "react-icons/bi";
-import { AiFillInstagram } from "react-icons/ai";
-import { BsYoutube } from "react-icons/bs";
-import { BsTwitterX } from "react-icons/bs";
-import { BiLogoLinkedin } from "react-icons/bi";
-
-import { FaFacebook } from "react-icons/fa6";
-
 import footerLogo from "../assets/imagesource/ResumeMile_logo_footer.png";
 import Image from 'next/image';
 
-import { ImLocation } from "react-icons/im";
-import { IoDocumentTextSharp } from "react-icons/io5";
-import { BiSupport } from "react-icons/bi";
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['700'], // optional: define font weights
-  variable: '--font-roboto', // optional: for CSS variables
-});
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'], // specify desired weights
-  display: 'swap',
-});
-
 const Footer = () => {
   return (
-    <div className='bg-[#F0E3FA]'>
+    <div className='bg-[#18181B] text-[#A1A1AA] py-16 px-6 lg:px-10 font-jakarta border-t border-[#27272A]'>
+      <div className='max-w-7xl mx-auto'>
+        <div className='grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8'>
 
-      <div className='footer_top lg:pt-20 py-10 px-6 lg:px-0'>
-        <div className='max-w-6xl mx-auto'>
-          <div className='footer_top_container'>
-            <div className='lg:w-full mb-6 lg:mb-0 text-center'>
-              <Image src={footerLogo} alt='footerLogo' className='inline-block mb-8' />
-              <div className="flex lg:justify-center lg:items-start items-start">
-                <ImLocation className="text-[#92278F] text-xl mr-[-18px] mt-[5px]" />
-                <p className="text-black text-sm leading-[24px] break-words whitespace-normal max-w-[400px]">
-                  T-Hub, Plot No 1/C, Sy No 83/1, Raidurgam Panmaktha, Hyderabad Knowledge City,
-                  Serilingampally, Hyderabad, Telangana 500081
-                </p>
-              </div>
-
-              <div className='mt-3'>
-                <ul className='lg:flex justify-center items-center gap-4'>
-
-                  <li className='flex justify-center items-center mb-2 lg:mb-0'>
-                    <FaEnvelope className='text-[#92278F] text-xl mr-1' />
-                    <p className='text-black text-sm leading-[24px]'>info@resumemile.ai</p>
-                  </li>
-                  <li className='mb-2 lg:mb-0'>
-                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/terms-conditions" passHref>
-                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1' />
-                      <p>Terms & Conditions</p>
-                    </Link>
-                  </li>
-                  <li className='mb-2 lg:mb-0'>
-                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/privacy-policy" passHref>
-                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1' />
-                      <p>Privacy Policy</p>
-                    </Link>
-                  </li>
-                  <li className='mb-2 lg:mb-0'>
-                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/cancellation-policy" passHref>
-                      <IoDocumentTextSharp className='text-[#92278F] text-xl mr-1' />
-                      <p>Cancellation policy</p>
-                    </Link>
-                  </li>
-                  <li className='mb-2 lg:mb-0'>
-                    <Link className='flex justify-center items-center text-black text-sm leading-[24px] hover:text-[#92278f]' href="/support" passHref>
-                      <BiSupport className='text-[#92278F] text-xl mr-1' />
-                      <p>Support</p>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+          {/* Logo & Description */}
+          <div className='lg:col-span-4'>
+            <div className='mb-6'>
+              <Image src={footerLogo} alt='ResumeMile Logo' className='h-[42px] w-auto' style={{ filter: 'brightness(0) invert(1)' }} />
             </div>
+            <p className='text-[14px] leading-[24px] font-light mb-6 pr-4 text-[#A1A1AA]'>
+              Built by ex-MAANG recruiters who've reviewed 50,000+ resumes. We know exactly what gets you shortlisted — and what gets you filtered out.
+            </p>
+            <a href="mailto:info@resumemile.ai" className='text-[#dfa8de] hover:text-[#CE82CC] transition-colors text-[14px]'>
+              info@resumemile.ai
+            </a>
           </div>
+
+          {/* Spacer */}
+          <div className='hidden lg:block lg:col-span-2'></div>
+
+          {/* Links Columns */}
+          <div className='lg:col-span-2'>
+            <h4 className='text-[11px] font-bold tracking-widest text-[#71717A] uppercase mb-6'>Services</h4>
+            <ul className='flex flex-col gap-4 text-[14px] font-light'>
+              <li><button onClick={() => window.dispatchEvent(new Event('open-signup-modal'))} className='hover:text-white transition-colors text-left w-full'>Build My Resume</button></li>
+              <li><button onClick={() => window.dispatchEvent(new Event('open-signup-modal'))} className='text-[#dfa8de] hover:text-[#CE82CC] transition-colors text-left w-full'>Match to Job Description</button></li>
+              <li><button onClick={() => window.dispatchEvent(new Event('open-signup-modal'))} className='hover:text-white transition-colors text-left w-full'>LinkedIn Rewrite</button></li>
+              <li><button onClick={() => window.dispatchEvent(new Event('open-signup-modal'))} className='hover:text-white transition-colors text-left w-full'>Resume Templates</button></li>
+            </ul>
+          </div>
+
+          <div className='lg:col-span-2'>
+            <h4 className='text-[11px] font-bold tracking-widest text-[#71717A] uppercase mb-6'>Company</h4>
+            <ul className='flex flex-col gap-4 text-[14px] font-light'>
+              <li><Link href="/#services" className='hover:text-white transition-colors'>About Us</Link></li>
+              <li><Link href="/#pricing" className='hover:text-white transition-colors'>Pricing</Link></li>
+              <li><Link href="/support" className='hover:text-white transition-colors'>Support</Link></li>
+            </ul>
+          </div>
+
+          <div className='lg:col-span-2'>
+            <h4 className='text-[11px] font-bold tracking-widest text-[#71717A] uppercase mb-6'>Legal</h4>
+            <ul className='flex flex-col gap-4 text-[14px] font-light'>
+              <li><Link href="/privacy-policy" className='hover:text-white transition-colors'>Privacy Policy</Link></li>
+              <li><Link href="/terms-conditions" className='hover:text-white transition-colors'>Terms & Conditions</Link></li>
+              <li><Link href="/cancellation-policy" className='hover:text-white transition-colors'>Cancellation Policy</Link></li>
+            </ul>
+          </div>
+
         </div>
 
-        <div className='border-t border-[#433c4e] pt-5 text-center mt-10'>
-          <p className='text-sm text-[#433c4e]'>© 2026 HiringEye Solutions Private Limited</p>
+        {/* Bottom line */}
+        <div className='border-t border-[#27272A] mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[12px] text-[#71717A] font-light'>
+          <p>© 2026 HiringEye Solutions Private Limited · T-Hub, Hyderabad Knowledge City, Telangana 500081</p>
+          <p></p>
         </div>
-
       </div>
-
-
-
     </div>
   )
 }
 
-export default Footer
+export default Footer;

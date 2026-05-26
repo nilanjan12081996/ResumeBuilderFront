@@ -1,158 +1,283 @@
 'use client';
 
 import Image from "next/image";
-
-import bannerImg from "../app/assets/imagesource/banner_img.png";
-import banner01 from "../app/assets/imagesource/banner01.png";
-import howItWorksImg from "../app/assets/imagesource/how_it_works_img.png";
-import hw01 from "../app/assets/imagesource/hw01.png";
-import hw02 from "../app/assets/imagesource/hw02.png";
-import hw03 from "../app/assets/imagesource/hw03.png";
-
-import bitCoinIcon from "../app/assets/imagesource/bit_coin_icon.png";
-import etherum_icon from "../app/assets/imagesource/etherum_icon.png";
-import x_coins_icon from "../app/assets/imagesource/x_coins_icon.png";
-import Tether_icon from "../app/assets/imagesource/Tether_icon.png";
-import bn_binance_coin_icon from "../app/assets/imagesource/bn_binance_coin_icon.png";
-import solana_coin from "../app/assets/imagesource/solana_coin.png";
-import usdc_icon from "../app/assets/imagesource/usdc_icon.png";
-import Create_New_Resume_icon from "../app/assets/imagesource/Create_New_Resume_icon.png";
-import ResumeTemplates_icon from "../app/assets/imagesource/ResumeTemplates_icon.png";
-import sub01 from "../app/assets/imagesource/sub01.png";
-import sub02 from "../app/assets/imagesource/sub02.png";
-import Check from "../app/assets/imagesource/Check.png";
-import hiring_icon from "../app/assets/imagesource/hiring_icon.png";
-import check_point from "../app/assets/imagesource/check_point.png";
-
-import about_img from "../app/assets/imagesource/about_img.png";
-
-
-import Linkedin_img from "../app/assets/imagesource/Linkedin_img.png";
-import Linkedin_icon from "../app/assets/imagesource/Linkedin_icon.png";
-
-
-
-
-
-import { Checkbox, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
-
-import Link from "next/link";
-
-import { Poppins } from 'next/font/google';
-import Testimonial from "./testimonial/page";
-
-import { IoIosCheckmarkCircle } from "react-icons/io";
-import { FaArrowRightLong } from "react-icons/fa6";
-import { IoSearchOutline } from "react-icons/io5"
-import { IoMdSave } from "react-icons/io";
-import { MdTipsAndUpdates } from "react-icons/md";
-import { SlCloudUpload } from "react-icons/sl";
-import { TiDocumentText } from "react-icons/ti";
-import { GrSettingsOption } from "react-icons/gr";
-
-import { LuLinkedin } from "react-icons/lu";
-
-
+import { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import { Button, Select, TextInput } from "flowbite-react";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { features } from "process";
-import { getCoins } from "./reducers/CoinSlice";
-import { useRouter } from "next/navigation";
-import LoginModal from "./modal/LoginModal";
-import TradingCoinList from "./TradingCoinList";
-import FreeResumeTemplates from "./FreeResumeTemplates/page";
-import RegistrationModal from "./modal/RegistrationModal";
-import ChoiceModal from "./modal/ChoiceModal";
+
 import { getIpData, getPlans, getPlansHome } from "./reducers/PlanSlice";
 import { getFeatureJobOutSide } from "./reducers/FeatureJobSlice";
-import striptags from "striptags";
 
+import LoginModal from "./modal/LoginModal";
+import RegistrationModal from "./modal/RegistrationModal";
+import ChoiceModal from "./modal/ChoiceModal";
+import PriceListModal from './modal/PriceListModal';
 
+import './home.css';
 
+const AnimatedCounter = ({ end, duration = 2000, decimals = 0, suffix = "", prefix = "", isString = false, stringVal = "" }) => {
+   const [count, setCount] = useState(0);
+   const [isVisible, setIsVisible] = useState(false);
+   const ref = useRef(null);
 
-const poppins = Poppins({
-   subsets: ['latin'],
-   weight: ['400', '500', '600', '700'], // specify desired weights
-   display: 'swap',
-});
+   useEffect(() => {
+      const observer = new IntersectionObserver(([entry]) => {
+         setIsVisible(entry.isIntersecting);
+      }, { threshold: 0.1 });
+      if (ref.current) observer.observe(ref.current);
+      return () => observer.disconnect();
+   }, []);
+
+   useEffect(() => {
+      if (isString) return;
+      if (!isVisible) {
+         setCount(0);
+         return;
+      }
+      let startTimestamp = null;
+      const step = (timestamp) => {
+         if (!startTimestamp) startTimestamp = timestamp;
+         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+         const easeProgress = 1 - Math.pow(1 - progress, 3);
+         setCount(easeProgress * end);
+         if (progress < 1) {
+            window.requestAnimationFrame(step);
+         } else {
+            setCount(end);
+         }
+      };
+      window.requestAnimationFrame(step);
+   }, [isVisible, end, duration, isString]);
+
+   if (isString) {
+      return (
+         <span ref={ref} style={{ opacity: isVisible ? 1 : 0, transition: 'opacity 1s ease-out 0.2s', display: 'inline-block' }}>
+            {stringVal}
+         </span>
+      );
+   }
+
+   const formattedCount = count.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+   });
+   return <span ref={ref}>{prefix}{formattedCount}{suffix}</span>;
+};
+
+const ScrollReveal = ({ children, delay = 0, style = {} }) => {
+   const [isVisible, setIsVisible] = useState(false);
+   const ref = useRef(null);
+
+   useEffect(() => {
+      const observer = new IntersectionObserver(
+         ([entry]) => {
+            setIsVisible(entry.isIntersecting);
+         },
+         { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      );
+      if (ref.current) observer.observe(ref.current);
+      return () => {
+         if (ref.current) observer.unobserve(ref.current);
+      };
+   }, []);
+
+   return (
+      <div
+         ref={ref}
+         style={{
+            ...style,
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateX(0)' : 'translateX(80px)',
+            transition: `opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) ${delay}ms, transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) ${delay}ms`,
+         }}
+      >
+         {children}
+      </div>
+   );
+};
+
+const AnimatedDonut = ({ end, delay = 0, className = "score-donut", innerClassName = "sd-num" }) => {
+   const [count, setCount] = useState(0);
+   const [isVisible, setIsVisible] = useState(false);
+   const ref = useRef(null);
+
+   useEffect(() => {
+      const observer = new IntersectionObserver(([entry]) => {
+         setIsVisible(entry.isIntersecting);
+      }, { threshold: 0.1 });
+      if (ref.current) observer.observe(ref.current);
+      return () => { if (ref.current) observer.unobserve(ref.current); };
+   }, []);
+
+   useEffect(() => {
+      if (!isVisible) {
+         setCount(0);
+         return;
+      }
+      let startTime;
+      let animationFrame;
+      const duration = 1500;
+
+      const animate = (timestamp) => {
+         if (!startTime) startTime = timestamp;
+         const progress = timestamp - startTime;
+         const percentage = Math.min(progress / duration, 1);
+
+         const easeOutQuart = 1 - Math.pow(1 - percentage, 4);
+         setCount(end * easeOutQuart);
+
+         if (progress < duration) {
+            animationFrame = requestAnimationFrame(animate);
+         } else {
+            setCount(end);
+         }
+      };
+
+      const timeoutId = setTimeout(() => {
+         animationFrame = requestAnimationFrame(animate);
+      }, delay);
+
+      return () => {
+         clearTimeout(timeoutId);
+         if (animationFrame) cancelAnimationFrame(animationFrame);
+      };
+   }, [end, isVisible, delay]);
+
+   const currentVal = Math.round(count);
+   return (
+      <div
+         ref={ref}
+         className={className}
+         style={{ background: `conic-gradient(var(--p40) 0% ${currentVal}%, var(--surface2) ${currentVal}% 100%)` }}
+      >
+         <div className={innerClassName}>{currentVal}</div>
+      </div>
+   );
+};
+
+const AnimatedProgress = ({ width, delay = 0, className = "ats-row-fill" }) => {
+   const [isVisible, setIsVisible] = useState(false);
+   const ref = useRef(null);
+
+   useEffect(() => {
+      const observer = new IntersectionObserver(([entry]) => {
+         setIsVisible(entry.isIntersecting);
+      }, { threshold: 0.1 });
+      if (ref.current) observer.observe(ref.current);
+      return () => { if (ref.current) observer.unobserve(ref.current); };
+   }, []);
+
+   return (
+      <div
+         ref={ref}
+         className={className}
+         style={{
+            width: isVisible ? `${width}%` : '0%',
+            transition: `width 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) ${delay}ms`
+         }}
+      />
+   );
+};
+
+const TornEdge = ({ fill = "#FBF5FB", bg = "#FFFFFF", flip = false }) => (
+   <div style={{ background: bg, lineHeight: 0, transform: flip ? 'scaleY(-1)' : 'none', marginTop: '-1px', marginBottom: '-1px' }}>
+      <svg viewBox="0 0 1440 24" preserveAspectRatio="none" style={{ width: '100%', height: '32px', display: 'block' }}>
+         <path d="M0,24 L24,4 L48,20 L72,6 L96,22 L120,8 L144,18 L168,2 L192,20 L216,5 L240,23 L264,9 L288,19 L312,3 L336,21 L360,7 L384,17 L408,1 L432,22 L456,8 L480,18 L504,4 L528,20 L552,5 L576,23 L600,9 L624,19 L648,2 L672,21 L696,7 L720,18 L744,3 L768,22 L792,8 L816,17 L840,1 L864,20 L888,6 L912,23 L936,9 L960,19 L984,4 L1008,22 L1032,7 L1056,18 L1080,2 L1104,21 L1128,8 L1152,17 L1176,1 L1200,22 L1224,9 L1248,19 L1272,4 L1296,21 L1320,6 L1344,20 L1368,3 L1392,18 L1416,8 L1440,24 Z" fill={fill} />
+      </svg>
+   </div>
+);
+
+const WaveEdge = ({ fill = "#FBF5FB", bg = "#FFFFFF", flip = false }) => (
+   <div style={{ background: bg, lineHeight: 0, transform: flip ? 'scaleY(-1)' : 'none', marginTop: '-1px', marginBottom: '-1px' }}>
+      <svg viewBox="0 0 1440 48" preserveAspectRatio="none" style={{ width: '100%', height: '3.5vw', minHeight: '30px', display: 'block' }}>
+         <path d="M0,48 C320,48 420,0 720,0 C1020,0 1120,48 1440,48 L1440,48 L0,48 Z" fill={fill} />
+      </svg>
+   </div>
+);
 
 export default function Home() {
-
-   const { coins } = useSelector((state) => state?.coinData)
-   const { fetJobsOutSide } = useSelector((state) => state?.featJob)
-   const dispatch = useDispatch()
-   const [searchTerm, setSearchTerm] = useState("");
-   const [selectedCurrency, setSelectedCurrency] = useState('USD');
-   const [selectedCoin, setSelectedCoin] = useState('');
-   const [selectedCoinSymbol, setSelectedCoinSymbol] = useState('');
-   const [showDropdown, setShowDropdown] = useState(false);
+   const dispatch = useDispatch();
    const router = useRouter();
    const [openLoginModal, setOpenLoginModal] = useState(false);
-   const [openChoiceModal, setOpenChoiceModal] = useState(false)
-   const [chooseResumeType, setChooseResumeType] = useState()
+   const [openChoiceModal, setOpenChoiceModal] = useState(false);
+   const [chooseResumeType, setChooseResumeType] = useState();
    const [openVerifyOtpModal, setOpenVerifyOtpModal] = useState(false);
-   const [openPricModal, setOpenPriceModal] = useState(false)
+   const [openPricModal, setOpenPriceModal] = useState(false);
    const [openRegisterModal, setOpenRegisterModal] = useState(false);
-   const { plans, loading, ipData, createOrderData, error, currentSubscriptionData, plansHomeData } = useSelector(
-      (state) => state.planst
-   );
+   const { plans, plansHomeData } = useSelector((state) => state.planst);
 
    useEffect(() => {
       dispatch(getIpData()).then((res) => {
-         console.log("Ipres:", res);
          if (res?.payload?.ip) {
-            dispatch(
-               getPlans({
-                  plan_type: 1,
-                  ip_address: res?.payload?.ip,
-               })
-            );
-         }
-         if (res?.payload?.ip) {
-            dispatch(
-               getPlansHome({
-                  plan_type: 2,
-                  ip_address: res?.payload?.ip,
-               })
-            );
+            dispatch(getPlans({ plan_type: 1, ip_address: res?.payload?.ip }));
+            dispatch(getPlansHome({ plan_type: 2, ip_address: res?.payload?.ip }));
          }
       });
+      dispatch(getFeatureJobOutSide({ page: 1, limit: 3 }));
    }, [dispatch]);
 
-   console.log("plans", plans);
-   console.log("plansHomeData", plansHomeData);
-
    useEffect(() => {
-      dispatch(getFeatureJobOutSide({ page: 1, limit: 3 }))
-   }, [])
-   console.log("fetJobsOutSide", fetJobsOutSide);
+      const revObs = new IntersectionObserver(entries => {
+         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); } });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.r').forEach(el => revObs.observe(el));
 
-   // ─── Plan Type Badge ──────────────────────────────────────────────────────────
+      const barObs = new IntersectionObserver(entries => {
+         entries.forEach(e => {
+            if (e.isIntersecting) {
+               e.target.querySelectorAll('.ats-row-fill').forEach(b => {
+                  setTimeout(() => { b.style.width = b.dataset.w + '%'; }, 100);
+               });
+            }
+         });
+      }, { threshold: 0.4 });
+      document.querySelectorAll('#atsCard').forEach(el => barObs.observe(el));
+
+      return () => {
+         revObs.disconnect();
+         barObs.disconnect();
+      };
+   }, []);
+
+   const scrollTo = (id) => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+   };
+
+   const toggleFaq = (e) => {
+      const item = e.currentTarget.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+   };
+
+   const createRipple = (e) => {
+      const btn = e.currentTarget;
+      const r = document.createElement('span');
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+      r.className = 'ripple';
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+   };
+
+   const handleRippleClick = (action) => (e) => {
+      createRipple(e);
+      if (action) action();
+   };
+
    const getPlanMeta = (placeholder) => {
       if (!placeholder) return null;
       const p = placeholder.toLowerCase();
-
-      if (p.includes("watermark"))
-         return { label: "Scratch Resume", color: "#6B7280", bg: "#F3F4F6" };
-
-      if (p.includes("jd based") && p.includes("improve"))
-         return { label: "Improve existing resume + JD based resume", color: "#7C3AED", bg: "#EDE9FE" };
-
-      if (p.includes("jd based"))
-         return { label: "JD Based Resume", color: "#DC2626", bg: "#FEE2E2" };
-
-      if (p.includes("linkedin") && p.includes("improve"))
-         return { label: "Improve existing resume + LinkedIn Rewrite", color: "#0284C7", bg: "#E0F2FE" };
-
-      if (p.includes("linkedin"))
-         return { label: "LinkedIn Rewrite", color: "#0077B5", bg: "#E8F4FD" };
-
-      if (p.includes("improve"))
-         return { label: "Improve existing resume", color: "#059669", bg: "#D1FAE5" };
-
+      if (p.includes("watermark")) return { label: "Scratch Resume", color: "#6B7280", bg: "#F3F4F6" };
+      if (p.includes("jd based") && p.includes("improve")) return { label: "Improve existing resume + JD based resume", color: "#7C3AED", bg: "#EDE9FE" };
+      if (p.includes("jd based")) return { label: "JD Based Resume", color: "#DC2626", bg: "#FEE2E2" };
+      if (p.includes("linkedin") && p.includes("improve")) return { label: "Improve existing resume + LinkedIn Rewrite", color: "#0284C7", bg: "#E0F2FE" };
+      if (p.includes("linkedin")) return { label: "LinkedIn Rewrite", color: "#0077B5", bg: "#E8F4FD" };
+      if (p.includes("improve")) return { label: "Improve existing resume", color: "#059669", bg: "#D1FAE5" };
       return null;
    };
 
@@ -163,7 +288,7 @@ export default function Home() {
       const planMeta = getPlanMeta(oneTime?.placeholder);
 
       return (
-         <div className="plan-card-wrapper" style={{ position: "relative", display: "flex", flexDirection: "column" }}>
+         <div className="plan-card-wrapper" style={{ position: "relative", display: "flex", flexDirection: "column", height: '100%' }}>
             {isPopular && (
                <div style={{
                   position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)",
@@ -194,7 +319,6 @@ export default function Home() {
                )}
                <div style={{ padding: "24px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
                   <div style={{ marginBottom: "16px" }}>
-                     {/* <h1>{oneTime?.id}</h1> */}
                      <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1B223C", margin: "0 0 4px 0", lineHeight: 1.3 }}>{oneTime?.plan_name}</h3>
                      <p style={{ fontSize: "12px", color: "#808897", margin: 0, lineHeight: 1.4 }}>{oneTime?.placeholder}</p>
                   </div>
@@ -243,493 +367,629 @@ export default function Home() {
          </div>
       );
    };
+
    return (
-      <div className={`${poppins.variable} antialiased home_wrapper_arera`}>
+      <div className="home-page-wrapper">
+         <section className="hero" style={{ marginTop: '30px' }}>
+            <div className="hero-left">
+               <div className="hero-chip">
+                  <div className="chip-dot"></div>
+                  Built by ex-MAANG recruiters · 50,000+ resumes reviewed
+               </div>
 
-         {/* home banner section start here */}
-         <div className="home_banner_area relative">
-            <Image src={bannerImg} alt='bannerImg' className='w-full hidden lg:block' />
-            <div className="banner_content_area lg:absolute w-full h-full left-0 top-0">
-               <div className='max-w-6xl mx-auto lg:flex justify-center items-center h-full'>
-                  <div className="lg:w-6/12 px-4 pt-20 lg:pt-24">
-                     {/* <p className="text-[16px] leading-[18px] text-[#000000] font-semibold mb-4">Built by ex-MAANG recruiters. Designed for your success.</p> */}
-                     <p className="text-[18px] leading-[18px] text-[#800080] uppercase font-semibold mb-2"> AI RESUME BUILDER</p>
-                     <h1 className="text-2xl leading-[30px] lg:text-[60px] lg:leading-[60px] text-black font-bold mb-2 lg:mb-4">Build an ATS-Ready Resume <span>Instantly with AI</span>.</h1>
-                     <p className="text-[#2A2A2A] text-sm lg:text-[18px] leading-[28px] mb-5 lg:mb-6">
-                        Create an interview-ready resume tailored to any job description in seconds. Built by ex-MAANG recruiters. Designed for your success.
-                     </p>
-                     <ul>
-                        <li className="text-[#2A2A2A] text-[18px] leading-[28px] float-left flex items-center mr-5 mb-3"><Image src={check_point} alt='check_point' className='mr-2' /> Create New Resume</li>
-                        <li className="text-[#2A2A2A] text-[18px] leading-[28px] float-left flex items-center mr-5 mb-3"><Image src={check_point} alt='check_point' className='mr-2' /> ATS Friendly</li>
-                        <li className="text-[#2A2A2A] text-[18px] leading-[28px] float-left flex items-center mr-5 mb-3"><Image src={check_point} alt='check_point' className='mr-2' /> Customize your existing resume</li>
-                     </ul>
+               <h1 className="hero-h1">
+                  Your resume is<br />
+                  getting filtered out.<br />
+                  <span className="italic-accent">We fix that.</span>
+               </h1>
+
+               <p className="hero-sub">
+                  75% of resumes are rejected by ATS software before a human ever reads them. Sign up, build your resume with our drag-and-drop editor, and get shortlisted faster.
+               </p>
+
+               <div className="hero-ctas">
+                  <button className="btn-hero-primary" onClick={handleRippleClick(() => setOpenRegisterModal(true))}>
+                     Sign up &amp; build my resume
+                     <span className="btn-icon">→</span>
+                  </button>
+                  <button className="btn-hero-secondary" onClick={() => scrollTo('services')}>
+                     See our services ↓
+                  </button>
+               </div>
+
+               <div className="hero-proof">
+                  <div className="proof-item">
+                     <div className="proof-check">
+                        <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                     </div>
+                     Sign up to get started
                   </div>
-                  <div className="lg:w-6/12">
-                     <Image src={banner01} alt='banner01' className='lg:mb-[0]' />
+                  <div className="proof-item">
+                     <div className="proof-check">
+                        <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                     </div>
+                     Drag-and-drop resume builder
+                  </div>
+                  <div className="proof-item">
+                     <div className="proof-check">
+                        <svg viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                     </div>
+                     Results in minutes
                   </div>
                </div>
             </div>
-         </div>
-         {/* home banner section ends here */}
 
-         {/* how it works section start here */}
-         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20" id="about">
-            <div className='max-w-6xl mx-auto h-full'>
-               <div>
-                  <div className="lg:flex gap-20 mb-0 lg:mb-0">
-                     <div className="lg:w-6/12 mb-4 lg:mb-0">
-                        <Image src={about_img} alt='about_img' className='rounded-[15px]' />
-                     </div>
-                     <div className="lg:w-6/12">
-                        <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">About <span className="text-[#a536a2]">Us</span></h2>
-                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           At <strong>ResumeMile</strong>, we believe your resume isn’t just a document — it’s your story, your first impression,
-                           and your ticket to new opportunities. Yet most job seekers struggle to create resumes that are both <strong>ATS-friendly</strong> and <strong>eye-catching to recruiters.</strong>
-                           We built our AI-powered platform to <strong>eliminate the guesswork</strong> and give every job seeker the tools to shine. With <strong>ATS-friendly resumes, recruiter-approved
-                              templates, and personalized AI suggestions,</strong> we help you transform a plain document into a <strong>career-winning resume</strong>.
-                        </p>
-                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           But we don’t stop there. Your <strong>LinkedIn profile is your digital first impression</strong>, and we ensure it’s just as powerful.
-                           From rewriting your professional summary to optimizing keywords for recruiters, we craft LinkedIn profiles that <strong>get you noticed,
-                              grow your visibility, and open new opportunities</strong>.
-                        </p>
-                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           Whether you’re a <strong>student chasing your first break, a professional aiming for growth, or a leader targeting global roles</strong>,
-                           our platform adapts to your journey. In just minutes, you’ll have a <strong>resume and LinkedIn profile that are modern, impactful, and interview-ready.</strong>
-                        </p>
-                        <p className="text-[#737272] text-sm lg:text-[16px] leading-[30px] pb-6">
-                           Our mission is simple: <strong>to empower you to land the job you deserve with confidence.</strong>
-                        </p>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-         {/* how it works section ends here */}
+            <div className="hero-right">
+               <div className="hero-resume-wrap">
+                  <div className="before-tag">ATS Score: 34</div>
+                  <div className="after-tag">After: 83 ↑</div>
 
-         {/* how it works section start here */}
-         <div className="how_it_works_section px-4 lg:px-0 py-10 lg:py-20">
-            <div className='max-w-6xl mx-auto h-full'>
-               <div>
-                  <div className="text-center mb-10 lg:mb-28">
-                     <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">How It <span className="text-[#a536a2]">Works</span></h2>
-                     <p className="text-[#2A2A2A] text-sm lg:text-[20px] leading-[30px]">Quickly upload, customize, and download your resume tailored to any <br></br> job description in no time</p>
-                  </div>
-                  <div className="lg:flex gap-20 mb-10 lg:mb-20">
-                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center mb-4 lg:mb-0">
-                        <div>
-                           <div className="mb-4">
-                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><SlCloudUpload className="text-[#1570EF] text-xl mr-2" /> CREATE RESUME</p>
-                           </div>
-                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#1E6BFF]">Create or import</span> your resume with ease</h2>
-                           <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">CREATE MY REUSME</button>
-                           {/* <button onClick={()=>setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#1570EF] hover:bg-[#207AEF] hover:text-white font-medium uppercase border border-[#207AEF] rounded-[10px] px-5 py-3 inline-block">
-                              CREATE MY REUSME
-                           </button> */}
+                  <div className="resume-card">
+                     <div className="rc-top-bar">
+                        <div className="rc-title">Optimized Resume</div>
+                        <div className="rc-score-badge">
+                           <span className="rc-score-num">83</span>
+                           <span className="rc-score-delta">▲+49</span>
                         </div>
                      </div>
-                     <div className="lg:w-6/12">
-                        <Image src={hw01} alt='hw01' className='' />
-                     </div>
-                  </div>
-                  <div className="lg:flex gap-20 mb-10 lg:mb-20">
-                     <div className="lg:w-6/12 mb-4 lg:mb-0">
-                        <Image src={Linkedin_img} alt='Linkedin_img' className='' />
-                     </div>
-                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center">
-                        <div>
-                           <div className="mb-4">
-                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><LuLinkedin className="text-[#F28938] text-2xl mr-1.5" /> IMPROVE </p>
-                           </div>
-                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Quickly enhance  <span className="text-[#F28938]">your LinkedIn</span> profile with AI</h2>
-                           <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#F28938] hover:bg-[#F28938] hover:text-white font-medium uppercase border border-[#F28938] rounded-[10px] px-5 py-3 inline-block" >IMPROVE LINKEDIN PROFILE</button>
+                     <div className="rc-body">
+                        <div className="rc-name">Rahul Sharma</div>
+                        <div className="rc-role">Senior Product Manager · 8 years · Ex-Flipkart</div>
+                        <div className="rc-divider"></div>
+                        <div className="rc-section-lbl">Experience</div>
+                        <div className="rc-lines">
+                           <div className="rcl p w100"></div>
+                           <div className="rcl p w82"></div>
+                           <div className="rcl p w90"></div>
+                           <div className="rcl p w67"></div>
+                        </div>
+                        <div className="rc-section-lbl">Skills</div>
+                        <div className="rc-skills">
+                           <div className="rc-skill">Product Strategy</div>
+                           <div className="rc-skill">SQL</div>
+                           <div className="rc-skill">Agile</div>
+                           <div className="rc-skill">Stakeholder Mgmt</div>
+                           <div className="rc-skill">Data Analysis</div>
+                        </div>
+                        <div style={{ marginTop: '16px' }}>
+                           <div className="rc-section-lbl">Education</div>
+                           <div className="rcl w82" style={{ background: 'var(--surface2)' }}></div>
+                           <div className="rcl w55" style={{ background: 'var(--surface2)' }}></div>
                         </div>
                      </div>
                   </div>
-                  <div className="lg:flex gap-20 mb-4">
-                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center mb-4 lg:mb-0">
-                        <div>
-                           <div className="mb-4">
-                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><GrSettingsOption className="text-[#9747FF] text-xl mr-2" /> CUTOMIZATION</p>
-                           </div>
-                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5"><span className="text-[#9747FF]">Quickly customize</span> your resume with AI</h2>
-                           <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Simply input your experience, and let our AI generate impactful bullet points that showcase your skill and experience.</p>
-                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#9747FF] hover:bg-[#9747FF] hover:text-white font-medium uppercase border border-[#9747FF] rounded-[10px] px-5 py-3 inline-block">CUSTOMIZE MY REUSME</button>
+
+                  <div className="score-widget">
+                     <AnimatedDonut end={83} delay={200} className="sw-ring" innerClassName="sw-num" />
+                     <div>
+                        <div className="sw-label">JD Match Score</div>
+                        <div className="sw-val"><AnimatedCounter end={91} suffix="% aligned" duration={1200} /></div>
+                        <div className="sw-change">▲ +63% improvement</div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </section>
+
+         <div className="metrics r">
+            <div className="metric">
+               <div className="metric-num"><AnimatedCounter end={8400} suffix="+" duration={2500} /></div>
+               <div className="metric-label">Resumes optimized</div>
+            </div>
+            <div className="metric">
+               <div className="metric-num"><AnimatedCounter end={3.2} decimals={1} suffix="×" duration={2500} /></div>
+               <div className="metric-label">More interview callbacks</div>
+            </div>
+            <div className="metric">
+               <div className="metric-num"><AnimatedCounter end={50} suffix="K+" duration={2500} /></div>
+               <div className="metric-label">Resumes reviewed by our team</div>
+            </div>
+            <div className="metric">
+               <div className="metric-num"><AnimatedCounter isString={true} stringVal="MAANG" /></div>
+               <div className="metric-label">Insider recruiter knowledge</div>
+            </div>
+         </div>
+
+         <TornEdge bg="#FFFFFF" fill="#FBF5FB" />
+
+         <div className="trust-strip">
+            <div className="trust-inner">
+               <div className="sec-label r" style={{ justifyContent: 'center' }}>Why trust us</div>
+               <h2 className="sec-h r" style={{ textAlign: 'center', marginBottom: '8px' }}>MAANG insider knowledge,<br /><span className="it">built into every resume.</span></h2>
+               <p style={{ textAlign: 'center', fontSize: '17px', color: 'var(--on-surface2)', fontWeight: 300, maxWidth: '540px', margin: '0 auto' }} className="r">Our founding team didn't just study recruitment — they lived it.</p>
+
+               <div className="trust-grid r">
+                  <div className="trust-card">
+                     <div className="trust-stat">MAANG</div>
+                     <div className="trust-title">Where we recruited</div>
+                     <div className="trust-desc">Our team has recruited at Meta, Amazon, Apple, Netflix, and Google. We know their exact hiring bar — and we build it into your resume.</div>
+                  </div>
+                  <div className="trust-card">
+                     <div className="trust-stat"><AnimatedCounter end={50000} duration={2000} /><span style={{ fontWeight: 300 }}>+</span></div>
+                     <div className="trust-title">Resumes reviewed by hand</div>
+                     <div className="trust-desc">Not AI-generated stats. Real resumes, real hiring decisions. We have seen every mistake — and we have fixed them all into ResumeMile's engine.</div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <div className="services-bg" id="services">
+            <div className="sec">
+               <div className="sec-label r">What we do</div>
+               <h2 className="sec-h r">Three ways to get you <span className="it">shortlisted.</span></h2>
+               <p className="sec-body r">Resume builder, JD matching, LinkedIn rewrite — all in one place, all backed by MAANG recruiter expertise.</p>
+
+               <div className="services-grid r">
+                  <div className="srv">
+                     <div className="srv-accent srv-accent-purple"></div>
+                     <div className="srv-number">Resume Builder</div>
+                     <div className="srv-badge badge-purple">Most Popular</div>
+                     <h3 className="srv-h">Build or Improve<br />Your Resume</h3>
+                     <p className="srv-p">Start from scratch with our drag-and-drop builder — place every section exactly where you want it — or upload an existing resume. Our AI, trained on 50,000+ real resumes, optimizes your content.</p>
+                     <div className="srv-features">
+                        <div className="srv-feat">
+                           <div className="feat-dot"><svg viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2L6.5 2" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                           ATS-friendly structure and keywords
+                        </div>
+                        <div className="srv-feat">
+                           <div className="feat-dot"><svg viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2L6.5 2" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                           Recruiter-approved impact language
+                        </div>
+                        <div className="srv-feat">
+                           <div className="feat-dot"><svg viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2L6.5 2" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                           PDF or Word download, ready to apply
+                        </div>
+                        <div className="srv-feat">
+                           <div className="feat-dot"><svg viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2L6.5 2" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                           Import from LinkedIn in one click
+                        </div>
+                        <div className="srv-feat">
+                           <div className="feat-dot"><svg viewBox="0 0 8 8" fill="none"><path d="M1.5 4l2 2L6.5 2" stroke="#80007E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                           Drag-and-drop any section — add, remove, reorder freely
                         </div>
                      </div>
-                     <div className="lg:w-6/12">
-                        <Image src={hw03} alt='hw03' className='' />
+                     <div onClick={() => setOpenRegisterModal(true)} className="srv-link">Build my resume →</div>
+                  </div>
+
+                  <div className="srv">
+                     <div className="srv-accent srv-accent-gold"></div>
+                     <div className="srv-number">JD Matching</div>
+                     <div className="srv-badge badge-gold">Highest Shortlisting Rate</div>
+                     <h3 className="srv-h">Match Resume to<br />Job Description</h3>
+                     <p className="srv-p">Paste any job description. We rewrite your resume to use the exact keywords and language that employer's ATS is scanning for. One tailored resume per role.</p>
+                     <div className="srv-mini">
+                        <div className="jd-row"><span className="jd-lbl">Keyword match</span><div className="jd-bar"><AnimatedProgress width={91} delay={200} className="jd-fill" /></div><span className="jd-pct"><AnimatedCounter end={91} suffix="%" duration={1200} /></span></div>
+                        <div className="jd-row"><span className="jd-lbl">Skills aligned</span><div className="jd-bar"><AnimatedProgress width={88} delay={400} className="jd-fill" /></div><span className="jd-pct"><AnimatedCounter end={88} suffix="%" duration={1200} /></span></div>
+                        <div className="jd-row"><span className="jd-lbl">Role language</span><div className="jd-bar"><AnimatedProgress width={94} delay={600} className="jd-fill" /></div><span className="jd-pct"><AnimatedCounter end={94} suffix="%" duration={1200} /></span></div>
+                     </div>
+                     <div onClick={() => setOpenRegisterModal(true)} className="srv-link" style={{ color: '#92690A', borderColor: '#92690A' }}>Match to my dream job →</div>
+                  </div>
+
+                  <div className="srv">
+                     <div className="srv-accent srv-accent-blue"></div>
+                     <div className="srv-number">LinkedIn Rewrite</div>
+                     <div className="srv-badge badge-blue">3× More Recruiter Views</div>
+                     <h3 className="srv-h">LinkedIn Profile<br />Rewrite</h3>
+                     <p className="srv-p">Recruiters search LinkedIn every day. If your profile isn't optimized, they skip you. We rewrite your headline, summary, and skills so recruiters find you first.</p>
+                     <div className="srv-mini">
+                        <div className="li-header">
+                           <div className="li-av">R</div>
+                           <div><div className="li-n">Rahul Sharma</div><div className="li-hl">Senior PM · FinTech · Ex-Flipkart</div></div>
+                        </div>
+                        <div className="li-stats">
+                           <div className="li-stat"><div className="li-sn"><AnimatedCounter end={340} suffix="%" duration={2000} /></div><div className="li-sl">More views</div></div>
+                           <div className="li-stat"><div className="li-sn"><AnimatedCounter end={12} suffix="×" duration={2000} /></div><div className="li-sl">More InMails</div></div>
+                           <div className="li-stat"><div className="li-sn"><AnimatedCounter end={1} prefix="#" duration={2000} /></div><div className="li-sl">Search rank</div></div>
+                        </div>
+                     </div>
+                     <div onClick={() => setOpenRegisterModal(true)} className="srv-link" style={{ color: '#1D4ED8', borderColor: '#1D4ED8' }}>Rewrite my LinkedIn →</div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <WaveEdge bg="#FBF5FB" fill="#FFFFFF" />
+
+         <div className="builder-bg">
+            <div className="builder-inner">
+               <div className="r">
+                  <div className="sec-label">Resume builder</div>
+                  <h2 className="sec-h">Your resume,<br /><span className="it">your way.</span></h2>
+                  <p className="sec-body">Our drag-and-drop builder gives you full control. Add any section, place it anywhere, remove what you don't need. No rigid templates. No locked layouts.</p>
+
+                  <div className="builder-features">
+                     <div className="bf-item">
+                        <div className="bf-icon">⠿</div>
+                        <div>
+                           <div className="bf-title">Drag any section anywhere</div>
+                           <div className="bf-desc">Move Experience above Education, put Skills at the top, add a Projects block mid-page — arrange your resume exactly the way you want it.</div>
+                        </div>
+                     </div>
+                     <div className="bf-item">
+                        <div className="bf-icon">＋</div>
+                        <div>
+                           <div className="bf-title">Add or remove any field</div>
+                           <div className="bf-desc">Include a Publications section, a Languages block, or a custom Summary. Remove anything that doesn't fit your profile. Every field is optional.</div>
+                        </div>
+                     </div>
+                     <div className="bf-item">
+                        <div className="bf-icon">⚡</div>
+                        <div>
+                           <div className="bf-title">AI fills in the gaps</div>
+                           <div className="bf-desc">Once your structure is set, our AI rewrites each section with recruiter-approved language and ATS-optimised keywords — instantly.</div>
+                        </div>
                      </div>
                   </div>
-                  <div className="lg:flex gap-20 mb-10 lg:mb-20">
-                     <div className="lg:w-6/12 mb-4 lg:mb-0">
-                        <Image src={hw02} alt='hw02' className='' />
+               </div>
+
+               <div className="builder-canvas r d2">
+                  <div className="drag-hint">✦ Drag to reorder</div>
+                  <div className="builder-topbar">
+                     <div className="btb-dots">
+                        <div className="btb-dot r"></div>
+                        <div className="btb-dot y"></div>
+                        <div className="btb-dot g"></div>
                      </div>
-                     <div className="lg:w-6/12 lg:pr-20 flex justify-center items-center">
-                        <div>
-                           <div className="mb-4">
-                              <p className="text-black text-[16px] leading-[24px] font-medium uppercase flex items-center"><TiDocumentText className="text-[#039855] text-2xl mr-1.5 rotate-10" /> ATS RESUME GENERATOR</p>
+                     <div className="btb-title">Resume Builder — ResumeMile</div>
+                     <div className="btb-btn">Download PDF</div>
+                  </div>
+                  <div className="builder-body" style={{ overflowX: 'hidden' }}>
+
+                     <ScrollReveal delay={100}>
+                        <div className="dnd-block" style={{ borderColor: 'var(--p80)', background: 'var(--p99)' }}>
+                           <div className="dnd-header">
+                              <div className="dnd-grip" style={{ opacity: 0.2 }}>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                              </div>
+                              <div className="dnd-label" style={{ color: 'var(--p30)' }}>Contact Header</div>
+                              <div className="dnd-actions">
+                                 <div className="dnd-action">✎</div>
+                              </div>
                            </div>
-                           <h2 className="text-2xl text-[#1D2939] lg:text-[42px] lg:leading-[45px] font-semibold mb-5">Build an <span className="text-[#039855]">ATS-Friendly Resume</span> Instantly with AI</h2>
-                           <p className="text-[#000000] text-[16px] leading-[26px] mb-6">Start your resume from scratch with our templates, upload an existing one, or import your LinkedIn profile.</p>
-                           <button onClick={() => setOpenRegisterModal(true)} className="text-xs cursor-pointer lg:text-[16px] text-[#039855] hover:bg-[#039855] hover:text-white font-medium uppercase border border-[#039855] rounded-[10px] px-5 py-3 inline-block" >CREATE ATS FRIENDLY REUSME</button>
+                           <div className="dnd-content">
+                              <div className="dnd-line p w75"></div>
+                              <div className="dnd-line p w40"></div>
+                           </div>
+                        </div>
+                     </ScrollReveal>
+
+                     <ScrollReveal delay={250}>
+                        <div className="dnd-block dragging">
+                           <div className="dnd-header">
+                              <div className="dnd-grip">
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                              </div>
+                              <div className="dnd-label">Experience</div>
+                              <div className="dnd-actions">
+                                 <div className="dnd-action">✎</div>
+                                 <div className="dnd-action">⊕</div>
+                                 <div className="dnd-action">✕</div>
+                              </div>
+                           </div>
+                           <div className="dnd-content">
+                              <div className="dnd-line p w88"></div>
+                              <div className="dnd-line w100"></div>
+                              <div className="dnd-line w75"></div>
+                              <div className="dnd-line w55"></div>
+                           </div>
+                        </div>
+                     </ScrollReveal>
+
+                     <ScrollReveal delay={400}>
+                        <div className="dnd-block">
+                           <div className="dnd-header">
+                              <div className="dnd-grip">
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                              </div>
+                              <div className="dnd-label">Skills</div>
+                              <div className="dnd-actions">
+                                 <div className="dnd-action">✎</div>
+                                 <div className="dnd-action">✕</div>
+                              </div>
+                           </div>
+                           <div className="dnd-content">
+                              <div className="dnd-line p w55"></div>
+                              <div className="dnd-line w40"></div>
+                           </div>
+                        </div>
+                     </ScrollReveal>
+
+                     <ScrollReveal delay={550}>
+                        <div className="dnd-block">
+                           <div className="dnd-header">
+                              <div className="dnd-grip">
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                                 <div className="grip-row"><div className="grip-dot"></div><div className="grip-dot"></div></div>
+                              </div>
+                              <div className="dnd-label">Education</div>
+                              <div className="dnd-actions">
+                                 <div className="dnd-action">✎</div>
+                                 <div className="dnd-action">✕</div>
+                              </div>
+                           </div>
+                           <div className="dnd-content">
+                              <div className="dnd-line w88"></div>
+                              <div className="dnd-line w55"></div>
+                           </div>
+                        </div>
+                     </ScrollReveal>
+
+                     <ScrollReveal delay={700}>
+                        <div className="dnd-add" onMouseEnter={(e) => e.currentTarget.style.background = 'var(--p95)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                           <div className="dnd-add-icon">+</div>
+                           Add a section — Certifications, Projects, Languages…
+                        </div>
+                     </ScrollReveal>
+
+                  </div>
+               </div>
+            </div>
+         </div>
+
+
+
+         <div id="how">
+            <div className="sec">
+               <div className="how-grid">
+                  <div>
+                     <div className="sec-label r">How it works</div>
+                     <h2 className="sec-h r">Three steps.<br /><span className="it">One shortlist.</span></h2>
+                     <div className="how-steps">
+                        <ScrollReveal delay={100} style={{ transform: 'translateX(0)', transform: 'translateY(30px)' }}>
+                           <div className="how-step r">
+                              <div className="how-step-num">1</div>
+                              <div>
+                                 <div className="how-step-tag">2 minutes to set up</div>
+                                 <div className="how-step-h">Sign up and build your resume</div>
+                                 <p className="how-step-p">Create an account and use our drag-and-drop resume builder — add, remove, and rearrange any section exactly where you want it. Or import your existing resume.</p>
+                              </div>
+                           </div>
+                        </ScrollReveal>
+
+                        <ScrollReveal delay={300} style={{ transform: 'translateX(0)', transform: 'translateY(30px)' }}>
+                           <div className="how-step r d1">
+                              <div className="how-step-num">2</div>
+                              <div>
+                                 <div className="how-step-h">Paste the job description</div>
+                                 <p className="how-step-p">Our AI rewrites your resume with the exact keywords and structure that employer's ATS is scanning for — matched to that specific role.</p>
+                              </div>
+                           </div>
+                        </ScrollReveal>
+
+                        <ScrollReveal delay={500} style={{ transform: 'translateX(0)', transform: 'translateY(30px)' }}>
+                           <div className="how-step r d2">
+                              <div className="how-step-num">3</div>
+                              <div>
+                                 <div className="how-step-h">Download and apply</div>
+                                 <p className="how-step-p">Download as PDF or Word in one click. ATS-tested. Recruiter-approved. Apply knowing your resume will actually reach a human.</p>
+                              </div>
+                           </div>
+                        </ScrollReveal>
+                     </div>
+                  </div>
+
+                  <div className="r d2">
+                     <div className="ats-dashboard" id="atsCard">
+                        <div className="ats-dash-header">
+                           <div className="ats-dash-title">ATS Analysis Report</div>
+                           <div className="ats-dash-meta">ResumeMile · Live score</div>
+                        </div>
+                        <div className="ats-dash-body">
+                           <div className="score-display">
+                              <AnimatedDonut end={83} delay={200} />
+                              <div>
+                                 <div className="score-info-lbl">Your ATS score</div>
+                                 <div className="score-info-val">Highly optimized</div>
+                                 <div className="score-delta-badge">▲ +49 after ResumeMile</div>
+                              </div>
+                           </div>
+                           <div className="ats-sep"></div>
+                           <div className="ats-row"><div className="ats-row-lbl">Keyword match</div><div className="ats-row-bar"><AnimatedProgress width={83} delay={400} /></div><div className="ats-row-pct"><AnimatedCounter end={83} suffix="%" duration={1200} /></div></div>
+                           <div className="ats-row"><div className="ats-row-lbl">JD alignment</div><div className="ats-row-bar"><AnimatedProgress width={91} delay={500} /></div><div className="ats-row-pct"><AnimatedCounter end={91} suffix="%" duration={1200} /></div></div>
+                           <div className="ats-row"><div className="ats-row-lbl">Skills section</div><div className="ats-row-bar"><AnimatedProgress width={78} delay={600} /></div><div className="ats-row-pct"><AnimatedCounter end={78} suffix="%" duration={1200} /></div></div>
+                           <div className="ats-row"><div className="ats-row-lbl">Format score</div><div className="ats-row-bar"><AnimatedProgress width={96} delay={700} /></div><div className="ats-row-pct"><AnimatedCounter end={96} suffix="%" duration={1200} /></div></div>
+                           <div className="ats-row"><div className="ats-row-lbl">Action verbs</div><div className="ats-row-bar"><AnimatedProgress width={88} delay={800} /></div><div className="ats-row-pct"><AnimatedCounter end={88} suffix="%" duration={1200} /></div></div>
                         </div>
                      </div>
                   </div>
                </div>
             </div>
          </div>
-         {/* how it works section ends here */}
 
-         {/* Resume Templates section start here */}
-         <div className="resume_templates_section px-4 pt-10 lg:pt-20 lg:pb-20">
-            <div className='max-w-6xl mx-auto'>
-               <div className="mb-10 px-2 lg:px-0">
-                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6 text-center">Access Free <span className="text-[#A536A2]">Resume Templates</span></h2>
-                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] lg:px-40 px-10 text-center">All the templates are ATS compliant and can be customized according to your style using our AI Resume Builder.</p>
-               </div>
-               <FreeResumeTemplates />
-            </div>
-         </div>
-         {/* Resume Templates section ends here */}
+         <WaveEdge bg="#FFFFFF" fill="#FBF5FB" />
 
-         {/* Key benefits section start here */}
-         <div className="key_benefits_section px-4 pt-10 lg:pt-20 lg:pb-20">
-            <div className='max-w-6xl mx-auto'>
-               <div className="mb-10">
-                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6 text-center">Explore <span className="text-[#A536A2]">AI Resume Builder Features</span></h2>
-                  <p className="text-[#2A2A2A] text-[18px] leading-[30px] lg:px-40 px-10 text-center">Dive into a powerful suite of career development tools and features designed to advance careers at all levels.</p>
-               </div>
-               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
-                     <div className="flex items-center mb-3">
-                        <Image src={Create_New_Resume_icon} alt='Create_New_Resume_icon' className='' />
-                        <h3 className="text-[#320731] text-xl leading-[30px] ml-2">Create New Resume</h3>
-                     </div>
-                     <p className="text-[#585858] text-base leading-[25px]">Create your resume for success build a standout resume in minutes.</p>
+         <div className="compare-bg">
+            <div className="sec">
+               <div className="sec-label r">Why not ChatGPT or any other LLM model?</div>
+               <h2 className="sec-h r">Text generation ≠ <span className="it">getting hired.</span></h2>
+               <div className="compare-table r">
+                  <div className="ct-head">
+                     <div className="ct-hcell label">Feature</div>
+                     <div className="ct-hcell gpt">ChatGPT</div>
+                     <div className="ct-hcell rm"><div className="rm-live-dot"></div> ResumeMile</div>
                   </div>
-                  <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
-                     <div className="flex items-center mb-3">
-                        <Image src={ResumeTemplates_icon} alt='ResumeTemplates_icon' className='' />
-                        <h3 className="text-[#320731] text-xl leading-[30px] ml-2">Resume Templates</h3>
-                     </div>
-                     <p className="text-[#585858] text-base leading-[25px]">Choose from professional, ATS-friendly designs</p>
-                  </div>
-                  <div className="bg-[#ffffff] shadow-lg rounded-[10px] px-5 py-5">
-                     <div className="flex items-center mb-3">
-                        <Image src={ResumeTemplates_icon} alt='ResumeTemplates_icon' className='' />
-                        <h3 className="text-[#320731] text-xl leading-[30px] ml-2">Customize Existing Resume</h3>
-                     </div>
-                     <p className="text-[#585858] text-base leading-[25px]">Personalize your resume layout and branding</p>
-                  </div>
+                  <div className="ct-row"><div className="ct-cell label">Drag-and-drop resume builder</div><div className="ct-cell gpt"><span className="icon-cross">✗</span></div><div className="ct-cell rm"><span className="icon-check">✓</span></div></div>
+                  <div className="ct-row"><div className="ct-cell label">ATS score for your resume</div><div className="ct-cell gpt"><span className="icon-cross">✗</span></div><div className="ct-cell rm"><span className="icon-check">✓</span></div></div>
+                  <div className="ct-row"><div className="ct-cell label">Match resume to job description</div><div className="ct-cell gpt"><span className="icon-cross">✗</span></div><div className="ct-cell rm"><span className="icon-check">✓</span></div></div>
+                  <div className="ct-row"><div className="ct-cell label">LinkedIn profile rewrite</div><div className="ct-cell gpt"><span className="icon-cross">✗</span></div><div className="ct-cell rm"><span className="icon-check">✓</span></div></div>
+                  <div className="ct-row"><div className="ct-cell label">Formatted PDF or Word download</div><div className="ct-cell gpt"><span className="icon-cross">✗</span></div><div className="ct-cell rm"><span className="icon-check">✓</span></div></div>
+                  <div className="ct-row"><div className="ct-cell label">MAANG recruiter-approved templates</div><div className="ct-cell gpt"><span className="icon-cross">✗</span></div><div className="ct-cell rm"><span className="icon-check">✓</span></div></div>
+                  <div className="ct-row"><div className="ct-cell label">Avoids ATS-flagged AI phrasing</div><div className="ct-cell gpt"><span className="icon-cross">✗ Flags your resume</span></div><div className="ct-cell rm"><span className="icon-check">✓ Human-like</span></div></div>
                </div>
             </div>
          </div>
-         {/* Key benefits section ends here */}
 
-         {/* Testimonials section start here */}
-         <div className="testimonials_section lg:pt-20 lg:pb-20 pt-10 pb-10 pb-5 px-4 lg:px-0">
-            <div className='max-w-6xl mx-auto'>
-               <div className="lg:flex gap-12">
-                  <div className="lg:w-4/12 mb-4 lg:mb-0">
-                     <p className="text-base leading-[27px] text-white uppercase mb-1">testimonials</p>
-                     <h2 className="text-2xl lg:text-[40px] lg:leading-[40px] text-white font-bold mb-2 lg:mb-4 pr-20">What people say</h2>
-                     <p className="text-sm leading-[24px] text-white">Real stories from real users who turned ordinary resumes into extraordinary opportunities. With ResumeMile, thousands have unlocked career growth and achieved the jobs they truly deserve.</p>
+         <TornEdge bg="#FBF5FB" fill="#FFFFFF" />
+
+         <div className="sec" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div className="sec-label r">Real results</div>
+            <h2 className="sec-h r">They applied. <span className="it">They got called.</span></h2>
+            <div className="testi-grid">
+               <div className="testi r">
+                  <div className="testi-chip">↑ ATS score: 34 → 83</div>
+                  <p className="testi-q">"40 applications. Zero callbacks. Used ResumeMile — 3 interview calls in 2 weeks. Turned out my ATS score was 34. I had no idea that was even a thing."</p>
+                  <div className="testi-person"><div className="testi-av">P</div><div><div className="testi-nm">Priya M.</div><div className="testi-role">Software Engineer · Bangalore</div></div></div>
+               </div>
+               <div className="testi r d1">
+                  <div className="testi-chip">↑ JD match: 28% → 91%</div>
+                  <p className="testi-q">"My resume looked fine to me. ResumeMile showed my JD match was 28% for the exact role I wanted. After the rewrite it hit 91%. Offer in 6 weeks."</p>
+                  <div className="testi-person"><div className="testi-av">R</div><div><div className="testi-nm">Rahul S.</div><div className="testi-role">Product Manager · Hyderabad</div></div></div>
+               </div>
+               <div className="testi r d2">
+                  <div className="testi-chip">↑ LinkedIn views +340%</div>
+                  <p className="testi-q">"I had a good profile but nobody was finding me. The LinkedIn rewrite changed everything — recruiters started reaching out within days. Worth every rupee."</p>
+                  <div className="testi-person"><div className="testi-av">A</div><div><div className="testi-nm">Anjali K.</div><div className="testi-role">Data Analyst · Pune</div></div></div>
+               </div>
+            </div>
+         </div>
+
+         <WaveEdge bg="#FFFFFF" fill="#FBF5FB" />
+
+         <div className="faq-bg">
+            <div className="sec" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+               <div className="sec-label r">Common questions</div>
+               <h2 className="sec-h r">Everything you need<br /><span className="it">to know.</span></h2>
+
+               <div className="faq-grid r">
+                  <div className="faq-item">
+                     <div className="faq-q" onClick={toggleFaq}>
+                        What exactly is an ATS score?
+                        <div className="faq-chevron">▾</div>
+                     </div>
+                     <div className="faq-a"><div className="faq-a-inner">ATS stands for Applicant Tracking System — software that companies use to automatically scan and filter resumes before any human sees them. We ensure your resume passes this scan.</div></div>
                   </div>
-                  <div className="lg:w-8/12">
-                     <Testimonial />
+                  <div className="faq-item">
+                     <div className="faq-q" onClick={toggleFaq}>
+                        What happens after I upload my resume?
+                        <div className="faq-chevron">▾</div>
+                     </div>
+                     <div className="faq-a"><div className="faq-a-inner">Sign up, then use our drag-and-drop builder to create your resume — add any section, place it anywhere, and reorder with a simple drag. Our AI will then optimize it.</div></div>
+                  </div>
+                  <div className="faq-item">
+                     <div className="faq-q" onClick={toggleFaq}>
+                        How is this different from just using ChatGPT?
+                        <div className="faq-chevron">▾</div>
+                     </div>
+                     <div className="faq-a"><div className="faq-a-inner">ChatGPT generates generic text. ResumeMile is purpose-built for getting hired — it scores your resume against ATS criteria, matches it to a job description, and provides a formatted PDF.</div></div>
+                  </div>
+                  <div className="faq-item">
+                     <div className="faq-q" onClick={toggleFaq}>
+                        How does the drag-and-drop builder work?
+                        <div className="faq-chevron">▾</div>
+                     </div>
+                     <div className="faq-a"><div className="faq-a-inner">After signing up, you get a live resume canvas. Every section — Summary, Experience, Education, Skills, Projects, Certifications — is a draggable block. Arrange them easily.</div></div>
+                  </div>
+                  <div className="faq-item">
+                     <div className="faq-q" onClick={toggleFaq}>
+                        Will my resume look professional, not AI-generated?
+                        <div className="faq-chevron">▾</div>
+                     </div>
+                     <div className="faq-a"><div className="faq-a-inner">Yes. Our AI is trained to avoid the generic phrasing that ATS systems and recruiters flag as AI-written. The output reads like a human wrote it.</div></div>
+                  </div>
+                  <div className="faq-item">
+                     <div className="faq-q" onClick={toggleFaq}>
+                        What formats can I download?
+                        <div className="faq-chevron">▾</div>
+                     </div>
+                     <div className="faq-a"><div className="faq-a-inner">PDF and Word (.docx) — both included in every paid plan. PDF for submitting online applications. Word for recruiters who ask for an editable version.</div></div>
                   </div>
                </div>
             </div>
          </div>
-         {/* Testimonials section ends here */}
 
-         {/* Purchase section start here */}
-         <div className="purchase_section py-8 lg:py-20 px-4 lg:px-0" id="pricing">
-            <div className='max-w-6xl mx-auto'>
-               <div className="text-center mb-10 lg:mb-10">
-                  <h2 className="text-2xl lg:text-[60px] lg:leading-[70px] text-black font-bold mb-2 lg:mb-6">Find Your <span>Perfect Plan</span></h2>
-                  <p className="text-[#4C4B4B] text-base lg:text-[18px] leading-[30px] lg:px-32">Discover the ideal plan to fuel your business growth. Our pricing options are carefully crafted to cater to businesses.</p>
-               </div>
-               <div className="subscription_tab_section">
+         <WaveEdge bg="#FBF5FB" fill="#FFFFFF" />
+
+         <div id="pricing">
+            <div className="sec" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+               <div className="sec-label r">Pricing</div>
+               <h2 className="sec-h r">Simple plans. <span className="it">Real results.</span></h2>
+               <p className="sec-body r" style={{ marginBottom: '32px' }}>Every plan includes PDF or Word download, 5 AI improvement rounds, and 3-month validity.</p>
+
+               <div className="subscription_tab_section" style={{ marginTop: '20px' }}>
                   <Tabs>
-                     <TabList>
-                        <Tab>Build</Tab>
-                        <Tab>Break Through </Tab>
-                        <Tab>Institution </Tab>
+                     <TabList style={{ display: 'flex', justifyContent: 'center', gap: '10px', border: 'none', marginBottom: '24px' }}>
+                        <Tab className="nav-tab" selectedClassName="active">Build</Tab>
+                        <Tab className="nav-tab" selectedClassName="active">Break Through </Tab>
+                        <Tab className="nav-tab" selectedClassName="active">Institution </Tab>
                      </TabList>
-                     <p className="text-sm text-[#a536a2] font-bold my-2 text-center">
+                     <p className="text-sm text-[#a536a2] font-bold my-2 text-center" style={{ marginBottom: '24px' }}>
                         Buy as many plans as you want. You can use each plan until its expiry date, and purchasing a new plan will not affect your existing plan.
                      </p>
+
                      <TabPanel>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
-                           <style>{`.plan-card-wrapper{position:relative;display:flex;flex-direction:column}.plan-card-wrapper:hover{z-index:2}`}</style>
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-transparent rounded-4xl mx-4 lg:mx-0" style={{ justifyItems: 'center' }}>
                            {plans?.data?.map((oneTime) => (
                               oneTime?.plan_frequency === 1 && (
-                                 <PlanCard key={oneTime?.id} oneTime={oneTime} popularId={3} onGetStarted={() => setOpenLoginModal(true)} />
+                                 <div key={oneTime?.id} style={{ width: '100%', maxWidth: '300px' }}>
+                                    <PlanCard oneTime={oneTime} popularId={3} onGetStarted={() => setOpenLoginModal(true)} />
+                                 </div>
                               )
                            ))}
                         </div>
                      </TabPanel>
 
                      <TabPanel>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-transparent rounded-4xl mx-4 lg:mx-0" style={{ justifyItems: 'center' }}>
                            {plans?.data?.map((oneTime) => (
                               oneTime?.plan_frequency === 3 && (
-                                 <PlanCard key={oneTime?.id} oneTime={oneTime} popularId={12} onGetStarted={() => setOpenLoginModal(true)} />
+                                 <div key={oneTime?.id} style={{ width: '100%', maxWidth: '300px' }}>
+                                    <PlanCard oneTime={oneTime} popularId={12} onGetStarted={() => setOpenLoginModal(true)} />
+                                 </div>
                               )
                            ))}
                         </div>
                      </TabPanel>
 
                      <TabPanel>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-white rounded-4xl p-5 mx-4 lg:mx-0" style={{ paddingTop: "24px" }}>
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 bg-transparent rounded-4xl mx-4 lg:mx-0" style={{ justifyItems: 'center' }}>
                            {plansHomeData?.data?.map((oneTime) => (
                               oneTime?.plan_frequency === 12 && (
-                                 <PlanCard key={oneTime?.id} oneTime={oneTime} popularId={7} onGetStarted={() => setOpenLoginModal(true)} />
+                                 <div key={oneTime?.id} style={{ width: '100%', maxWidth: '300px' }}>
+                                    <PlanCard oneTime={oneTime} popularId={7} onGetStarted={() => setOpenLoginModal(true)} />
+                                 </div>
                               )
                            ))}
                         </div>
                      </TabPanel>
-                     {/* <TabPanel>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           {
-                              plans?.data?.map((oneTime) => (
-                                 <>
-                                    {
-                                       oneTime?.plan_frequency === 1 && (
-                                          <div
-                                             className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 3 ? "border-[#800080]" : "border-[#e9edff]"
-                                                }`}
-                                          >
-                                             <div className="py-8 px-6 relative min-h-[700px]">
-                                                <div className="flex items-center justify-between mb-6">
-                                                   <Image src={sub01} alt='sub01' className='' />
-                                                   <div className={`${oneTime?.id === 3 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
-                                                      {oneTime?.id === 3 && "Most Popular"}
-                                                   </div>
-                                                </div>
-
-                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">{oneTime?.plan_name}</h3>
-                                                <p className="text-[#1B223C] pb-6">{oneTime?.placeholder}</p>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[25px] leading-[45px] font-medium">
-                                                      {oneTime?.planPrice?.currency}{" "}
-                                                      {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
-                                                   </p>
-
-                                                   {parseFloat(oneTime?.planPrice?.price || 0) > 0 && (
-                                                      <div className="flex flex-col items-start pt-1">
-                                                         <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                                                            {oneTime?.planPrice?.currency === "INR"
-                                                               ? `₹${(parseFloat(oneTime?.planPrice?.price) * 1.3).toFixed(2)}`
-                                                               : `$${(parseFloat(oneTime?.planPrice?.price) * 1.3).toFixed(2)}`}
-                                                         </p>
-
-                                                         <span className="text-[#30B980] text-[12px] font-medium mt-[2px]">
-                                                            30% OFF
-                                                         </span>
-                                                      </div>
-                                                   )}
-                                                </div>
-
-
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-
-
-                                                      {
-                                                         oneTime?.PlanAccess?.map((planAccessName) => (
-                                                            <>
-                                                               <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                                  <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                                                  {planAccessName?.plan_access_description}
-                                                               </div>
-                                                            </>
-                                                         ))
-                                                      }
-
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button onClick={() => setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       )
-                                    }
-
-
-                                 </>
-
-                              ))
-                           }
-                        </div>
-                     </TabPanel>
-                     <TabPanel>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           {
-                              plans?.data?.map((oneTime) => (
-                                 <>
-                                    {
-                                       oneTime?.plan_frequency === 3 && (
-                                          <div
-                                             className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 12 ? "border-[#800080]" : "border-[#e9edff]"
-                                                }`}
-                                          >
-                                             <div className="py-8 px-6 relative min-h-[700px]">
-
-                                                <div className="flex items-center justify-between mb-6">
-                                                   <Image src={sub01} alt='sub01' className='' />
-                                                   <div className={`${oneTime?.id === 12 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
-                                                      {oneTime?.id === 12 && "Most Popular"}
-                                                   </div>
-                                                </div>
-
-                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] font-medium">{oneTime?.plan_name}</h3>
-                                                <p className="text-[#1B223C] pb-6">{oneTime?.placeholder}</p>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
-                                                      {oneTime?.planPrice?.currency}{" "}
-                                                      {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
-                                                   </p>
-
-                                                   {parseFloat(oneTime?.planPrice?.price || 0) > 0 && (
-                                                      <div className="flex flex-col items-start pt-1">
-                                                         <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                                                            {oneTime?.planPrice?.currency === "INR"
-                                                               ? `₹${(parseFloat(oneTime?.planPrice?.price) * 1.3).toFixed(2)}`
-                                                               : `$${(parseFloat(oneTime?.planPrice?.price) * 1.3).toFixed(2)}`}
-                                                         </p>
-
-                                                         <span className="text-[#30B980] text-[12px] font-medium mt-[2px]">
-                                                            30% OFF
-                                                         </span>
-                                                      </div>
-                                                   )}
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-
-
-                                                      {
-                                                         oneTime?.PlanAccess?.map((planAccessName) => (
-                                                            <>
-                                                               <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                                  <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                                                  {planAccessName?.plan_access_description}
-                                                               </div>
-                                                            </>
-                                                         ))
-                                                      }
-
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button onClick={() => setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       )
-                                    }
-
-
-                                 </>
-
-                              ))
-                           }
-
-                        </div>
-                     </TabPanel>
-                     <TabPanel>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 bg-white rounded-4xl p-5 mx-4 lg:mx-0">
-                           {
-                              plansHomeData?.data?.map((oneTime) => (
-                                 <>
-                                    {
-                                       oneTime?.plan_frequency === 12 && (
-                                          <div
-                                             className={`pt-0 border rounded-[26px] bg-white ${oneTime?.id === 7 ? "border-[#800080]" : "border-[#e9edff]"
-                                                }`}
-                                          >
-                                             <div className="py-8 px-6 relative min-h-[680px]">
-                                                <div className="flex items-center justify-between mb-6">
-                                                   <Image src={sub01} alt='sub01' className='' />
-                                                   <div className={`${oneTime?.id === 7 && "bg-[#a536a2]"} {oneTime?.id===7&&"Popular"} px-3 py-2 rounded-[5px] text-xs text-white`}>
-                                                      {oneTime?.id === 7 && "Most Popular"}
-                                                   </div>
-                                                </div>
-                                                <h3 className="text-[20px] leading-[28px] text-[#1B223C] pb-6 font-medium">{oneTime?.plan_name}</h3>
-                                                <div className="flex items-center gap-2 mb-8">
-                                                   <p className="text-[#1D2127] text-[25px] leading-[35px] font-medium">
-                                                      {oneTime?.planPrice?.currency}{" "}
-                                                      {parseFloat(oneTime?.planPrice?.price || 0).toFixed(2)}
-                                                   </p>
-                                                   {parseFloat(oneTime?.planPrice?.price || 0) > 0 && (
-                                                      <div className="flex flex-col items-start pt-1">
-                                                         <p className="text-[#797878] text-[14px] leading-[20px] line-through">
-                                                            {oneTime?.planPrice?.currency === "INR"
-                                                               ? `₹${(parseFloat(oneTime?.planPrice?.price) * 1.3).toFixed(2)}`
-                                                               : `$${(parseFloat(oneTime?.planPrice?.price) * 1.3).toFixed(2)}`}
-                                                         </p>
-
-                                                         <span className="text-[#30B980] text-[12px] font-medium mt-[2px]">
-                                                            30% OFF
-                                                         </span>
-                                                      </div>
-                                                   )}
-                                                </div>
-                                                <div className="mb-14 border-t border-[#edf0ff] pt-8">
-                                                   <div>
-
-
-                                                      {
-                                                         oneTime?.PlanAccess?.map((planAccessName) => (
-                                                            <>
-                                                               <div className="flex gap-1 text-[#1B223C] text-[13px] mb-2">
-                                                                  <Image src={Check} alt='Check' className='w-[14px] h-[14px] mr-2' />
-                                                                  {planAccessName?.plan_access_description}
-                                                               </div>
-                                                            </>
-                                                         ))
-                                                      }
-
-                                                   </div>
-                                                </div>
-                                                <div className="absolute left-0 bottom-[20px] w-full px-6">
-                                                   <button onClick={() => setOpenLoginModal(true)} className="bg-[#ffffff] hover:bg-[#1B223C] text-[#1B223C] hover:text-[#ffffff] border border-[#1B223C] text-[14px] leading-[40px] rounded-md w-full block cursor-pointer">Get Started</button>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       )
-                                    }
-
-
-                                 </>
-
-                              ))
-                           }
-
-                        </div>
-                     </TabPanel> */}
                   </Tabs>
                </div>
             </div>
          </div>
-         {/* Purchase section ends here */}
 
-         {openLoginModal &&
+         <WaveEdge bg="#FFFFFF" fill="#FBF5FB" />
+
+         <section className="bottom-cta">
+            <div className="bottom-inner r">
+               <h2>Your next job starts<br /><span className="it">here.</span></h2>
+               <p>Sign up, build with our drag-and-drop editor, and apply with a resume that actually gets read.</p>
+               <button className="btn-hero-primary" style={{ margin: '0 auto' }} onClick={handleRippleClick(() => setOpenRegisterModal(true))}>
+                  Get my optimised resume
+                  <span className="btn-icon">→</span>
+               </button>
+               <div className="bottom-trust">
+                  <div className="bottom-trust-item">Sign up in 2 minutes</div>
+                  <div className="bottom-trust-item">No credit card</div>
+                  <div className="bottom-trust-item">8,400+ already shortlisted</div>
+               </div>
+            </div>
+         </section>
+
+         {openLoginModal && (
             <LoginModal
                openLoginModal={openLoginModal}
                setOpenLoginModal={setOpenLoginModal}
                setOpenRegisterModal={setOpenRegisterModal}
                setOpenChoiceModal={setOpenChoiceModal}
             />
-         }
+         )}
 
-         {openRegisterModal &&
+         {openRegisterModal && (
             <RegistrationModal
                openRegisterModal={openRegisterModal}
                setOpenRegisterModal={setOpenRegisterModal}
@@ -740,18 +1000,23 @@ export default function Home() {
                setOpenPriceModal={setOpenPriceModal}
                chooseResumeType={chooseResumeType}
             />
-         }
-         {
-            openChoiceModal && (
-               <ChoiceModal
-                  openChoiceModal={openChoiceModal}
-                  setOpenChoiceModal={setOpenChoiceModal}
-                  setChooseResumeType={setChooseResumeType}
-                  setOpenRegisterModal={setOpenRegisterModal}
-               />
-            )
-         }
-      </div>
+         )}
 
+         {openChoiceModal && (
+            <ChoiceModal
+               openChoiceModal={openChoiceModal}
+               setOpenChoiceModal={setOpenChoiceModal}
+               setChooseResumeType={setChooseResumeType}
+               setOpenRegisterModal={setOpenRegisterModal}
+            />
+         )}
+
+         {openPricModal && (
+            <PriceListModal
+               openPricModal={openPricModal}
+               setOpenPriceModal={setOpenPriceModal}
+            />
+         )}
+      </div>
    );
 }
