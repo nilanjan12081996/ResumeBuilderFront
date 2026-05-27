@@ -2365,7 +2365,7 @@ const Page = () => {
 
         <div className="fixed bottom-[20px] left-1/2 -translate-x-1/2 z-50">
           {savingStatus === 'saving' && (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg animate-pulse">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur text-white text-xs font-medium shadow-lg">
               <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               Saving changes...
             </div>

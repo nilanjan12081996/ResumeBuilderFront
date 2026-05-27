@@ -132,8 +132,8 @@ const Insideheader = () => {
             <Image
               src={headerLogo}
               alt="headerLogo"
-              width={180}
-              height={50}
+              width={140}
+              height={40}
               className='object-contain'
               priority
             />
