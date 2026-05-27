@@ -388,7 +388,7 @@ export default function Home() {
                </p>
 
                <div className="hero-ctas">
-                  <button className="btn-hero-primary" onClick={handleRippleClick(() => setOpenRegisterModal(true))}>
+                  <button className="btn-hero-primary" onClick={handleRippleClick(() => setOpenChoiceModal(true))}>
                      Sign up &amp; build my resume
                      <span className="btn-icon">→</span>
                   </button>
@@ -548,7 +548,7 @@ export default function Home() {
                            Drag-and-drop any section — add, remove, reorder freely
                         </div>
                      </div>
-                     <div onClick={() => setOpenRegisterModal(true)} className="srv-link">Build my resume →</div>
+                     <div onClick={() => setOpenChoiceModal(true)} className="srv-link">Build my resume →</div>
                   </div>
 
                   <div className="srv">
@@ -562,7 +562,7 @@ export default function Home() {
                         <div className="jd-row"><span className="jd-lbl">Skills aligned</span><div className="jd-bar"><AnimatedProgress width={88} delay={400} className="jd-fill" /></div><span className="jd-pct"><AnimatedCounter end={88} suffix="%" duration={1200} /></span></div>
                         <div className="jd-row"><span className="jd-lbl">Role language</span><div className="jd-bar"><AnimatedProgress width={94} delay={600} className="jd-fill" /></div><span className="jd-pct"><AnimatedCounter end={94} suffix="%" duration={1200} /></span></div>
                      </div>
-                     <div onClick={() => setOpenRegisterModal(true)} className="srv-link" style={{ color: '#92690A', borderColor: '#92690A' }}>Match to my dream job →</div>
+                     <div onClick={() => setOpenChoiceModal(true)} className="srv-link" style={{ color: '#92690A', borderColor: '#92690A' }}>Match to my dream job →</div>
                   </div>
 
                   <div className="srv">
@@ -582,7 +582,7 @@ export default function Home() {
                            <div className="li-stat"><div className="li-sn"><AnimatedCounter end={1} prefix="#" duration={2000} /></div><div className="li-sl">Search rank</div></div>
                         </div>
                      </div>
-                     <div onClick={() => setOpenRegisterModal(true)} className="srv-link" style={{ color: '#1D4ED8', borderColor: '#1D4ED8' }}>Rewrite my LinkedIn →</div>
+                     <div onClick={() => setOpenChoiceModal(true)} className="srv-link" style={{ color: '#1D4ED8', borderColor: '#1D4ED8' }}>Rewrite my LinkedIn →</div>
                   </div>
                </div>
             </div>
@@ -968,7 +968,7 @@ export default function Home() {
             <div className="bottom-inner r">
                <h2>Your next job starts<br /><span className="it">here.</span></h2>
                <p>Sign up, build with our drag-and-drop editor, and apply with a resume that actually gets read.</p>
-               <button className="btn-hero-primary" style={{ margin: '0 auto' }} onClick={handleRippleClick(() => setOpenRegisterModal(true))}>
+               <button className="btn-hero-primary" style={{ margin: '0 auto' }} onClick={handleRippleClick(() => setOpenChoiceModal(true))}>
                   Get my optimised resume
                   <span className="btn-icon">→</span>
                </button>

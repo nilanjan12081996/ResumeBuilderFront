@@ -35,7 +35,7 @@ const Header = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    const handleOpenSignup = () => setOpenRegisterModal(true);
+    const handleOpenSignup = () => setOpenChoiceModal(true);
 
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('open-signup-modal', handleOpenSignup);
