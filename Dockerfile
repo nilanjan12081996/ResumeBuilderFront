@@ -42,56 +42,47 @@
 
 
 FROM node:20-alpine AS base
- 
-# 1. Install dependencies stage
 
+# 1. Install dependencies stage (Optimized to prevent freezes)
 FROM base AS deps
-
 RUN apk add --no-cache libc6-compat
-
 WORKDIR /app
- 
+
 COPY package.json package-lock.json* ./
- 
+
 # Lower memory footprint optimizations for small VPS setups
-
 ENV NPM_CONFIG_MAX_SOCKETS=5
-
 RUN npm install --network-timeout=300000 --prefer-offline --no-audit --progress=false
- 
+
 # 2. Rebuild the source code stage
-
 FROM base AS builder
-
 WORKDIR /app
-
 COPY --from=deps /app/node_modules ./node_modules
-
 COPY . .
- 
-# Set this dynamically to 1.5GB so it comfortably fits a standard VPS limit without crashing
 
+# Fits your VPS safely without freezing during compilation
 ENV NODE_OPTIONS="--max-old-space-size=1536"
- 
 RUN npm run build
- 
-# 3. Production image runner stage
 
+# 3. Production image runner stage (Restored your working config)
 FROM base AS runner
-
 WORKDIR /app
- 
+
 ENV NODE_ENV=production
- 
-# Copy necessary production build layers
+ENV PORT=3989
+ENV HOSTNAME="0.0.0.0"
 
-COPY --from=builder /app/.next ./.next
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/node_modules ./node_modules
+# Copy layers exactly how your working configuration expected them
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-COPY --from=builder /app/package.json ./package.json
- 
-EXPOSE 3000
- 
-CMD ["npm", "start"]
+USER nextjs
+
+EXPOSE 3989
+
+CMD ["node", "server.js"]
  
