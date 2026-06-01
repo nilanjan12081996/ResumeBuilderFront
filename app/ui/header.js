@@ -75,7 +75,7 @@ const Header = () => {
             <Image src={headerLogo} alt='logo' className='h-[42px] w-auto' />
           </div>
           <div className="lg:hidden">
-            <Image src={logo} alt='logo' className='w-[70px] h-auto' />
+            <Image src={headerLogo} alt='logo' className='h-[34px] w-auto' />
           </div>
         </div>
 
