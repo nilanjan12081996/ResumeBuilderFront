@@ -202,7 +202,7 @@ const ImpDynamicFields = ({
                   <DraggableWrapper key={item.id} id={item.id} collapseOnDrag={true} width={`${itemWidth}%`}>
                     <div 
                       className={`px-2 transition-all duration-200 ${isDeleting ? "opacity-0 -translate-x-6" : ""}`}
-                      style={{ minWidth: '300px' }}
+                      style={{ minWidth: 'min(100%, 300px)' }}
                     >
                       <div className="flex items-center gap-3 mb-1 group">
                         <DragIcon />

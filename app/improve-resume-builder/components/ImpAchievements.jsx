@@ -79,7 +79,7 @@ const ImpAchievements = ({
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">
-                        <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
                             <Label className="!text-sm !font-medium !text-gray-500">Title</Label>
                             <input

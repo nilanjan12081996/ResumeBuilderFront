@@ -81,7 +81,7 @@ const ImpEducation = ({
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">
-                        <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
                             <Label className="!text-sm !font-medium !text-gray-500">School/College</Label>
                             <input
@@ -136,7 +136,7 @@ const ImpEducation = ({
                             </div>
                           </div>
 
-                          <div className="col-span-2">
+                          <div className="col-span-1 md:col-span-2">
                             <Label className="!text-sm !font-medium !text-gray-500">City</Label>
                             <input
                               value={edu.city}

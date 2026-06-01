@@ -82,7 +82,7 @@ const ImpActivities = ({
                                             </AccordionTitle>
 
                                             <AccordionContent className="pt-0">
-                                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                     <div>
                                                         <Label className="!text-sm !font-medium !text-gray-500">Function Title</Label>
                                                         <input
@@ -103,7 +103,7 @@ const ImpActivities = ({
                                                         />
                                                     </div>
 
-                                                    <div className="col-span-2">
+                                                    <div className="col-span-1 md:col-span-2">
                                                         <Label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Start & End Date</Label>
                                                         <div className="flex gap-2 mt-1">
                                                             <div className="flex-1">

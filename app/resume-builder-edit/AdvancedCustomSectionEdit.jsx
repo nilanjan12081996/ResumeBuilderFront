@@ -102,8 +102,8 @@ const AdvancedCustomSectionEdit = ({
                             </AccordionTitle>
 
                             <AccordionContent>
-                              <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div className="col-span-2">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div className="col-span-1 md:col-span-2">
                                   <label className="block text-xs font-semibold text-gray-500">Title</label>
                                   <input
                                     type="text"
@@ -113,7 +113,7 @@ const AdvancedCustomSectionEdit = ({
                                   />
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <label className="block text-xs font-semibold text-gray-500">Start & End Date</label>
                                   <div className="flex gap-2 mt-1">
                                     <div className="flex-1">
@@ -165,7 +165,7 @@ const AdvancedCustomSectionEdit = ({
                                   </div>
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <label className="block text-xs font-semibold text-gray-500">City</label>
                                   <input
                                     type="text"
@@ -176,7 +176,7 @@ const AdvancedCustomSectionEdit = ({
                                 </div>
 
                                 {/* Dynamic Fields (Core + Custom) */}
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <ImpDynamicFields
                                     coreFields={[{
                                       id: 'description',

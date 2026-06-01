@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 
 const templates = [
-  { id: 1, name: 'Professional', type: ['PDF', 'DOCX'], img: '/path/to/Professional.png' },
-  { id: 2, name: 'Prime ATS', type: ['PDF', 'DOCX'], img: '/path/to/Prime ATS.png' },
-  { id: 3, name: 'Clean', type: ['PDF', 'DOCX'], img: '/path/to/professional.png' },
-  { id: 4, name: 'Corporate', type: ['PDF', 'DOCX'], img: '/path/to/Corporate.png' },
-  { id: 5, name: 'Clear', type: ['PDF', 'DOCX'], img: '/path/to/Clear.png' },
-  { id: 6, name: 'Vivid', type: ['PDF', 'DOCX'], img: '/path/to/Vivid.png' },
+  { id: 1, name: 'Executive', type: ['PDF', 'DOCX'], img: '/path/to/Professional.png' },
+  { id: 2, name: 'Smart ATS', type: ['PDF', 'DOCX'], img: '/path/to/Prime ATS.png' },
+  { id: 3, name: 'Essential', type: ['PDF', 'DOCX'], img: '/path/to/professional.png' },
+  { id: 4, name: 'Industry Standard', type: ['PDF', 'DOCX'], img: '/path/to/Corporate.png' },
+  { id: 5, name: 'Clarity', type: ['PDF', 'DOCX'], img: '/path/to/Clear.png' },
+  { id: 6, name: 'Impact', type: ['PDF', 'DOCX'], img: '/path/to/Vivid.png' },
   // Add more templates as needed
 ];
 

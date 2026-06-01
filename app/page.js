@@ -495,8 +495,8 @@ export default function Home() {
          <div className="trust-strip">
             <div className="trust-inner">
                <div className="sec-label r" style={{ justifyContent: 'center' }}>Why trust us</div>
-               <h2 className="sec-h r" style={{ textAlign: 'center', marginBottom: '8px' }}>MAANG insider knowledge,<br /><span className="it">built into every resume.</span></h2>
-               <p style={{ textAlign: 'center', fontSize: '17px', color: 'var(--on-surface2)', fontWeight: 300, maxWidth: '540px', margin: '0 auto' }} className="r">Our founding team didn't just study recruitment — they lived it.</p>
+               <h2 className="sec-h trust-header r">MAANG insider knowledge,<br /><span className="it">built into every resume.</span></h2>
+               <p className="trust-subtitle r">Our founding team didn't just study recruitment — they lived it.</p>
 
                <div className="trust-grid r">
                   <div className="trust-card">

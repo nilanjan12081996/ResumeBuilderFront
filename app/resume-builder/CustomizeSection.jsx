@@ -15,30 +15,30 @@ const CustomizeSection = ({ selectedTemplate, onSelectTemplate }) => {
   const templates = [
     {
       id: "professional",
-      name: "Professional",
+      name: "Executive",
       image: professional,
       tags: ["ATS", "Free"],
     },
     {
       id: "clear",
-      name: "Clear",
+      name: "Clarity",
       image: clear,
       tags: ["With photo", "Two column"],
     },
     {
       id: "Clean",
-      name: "clean",
+      name: "Essential",
       image: clean,
       tags: ["Customized", "Two column"],
     },
-    { id: "ats", name: "Prime ATS", image: primeAts, tags: ["DOCX", "Free"] },
+    { id: "ats", name: "Smart ATS", image: primeAts, tags: ["DOCX", "Free"] },
     {
       id: "corporate",
-      name: "Corporate",
+      name: "Industry Standard",
       image: corporate,
       tags: ["DOCX", "Free"],
     },
-    { id: "vivid", name: "Vivid", image: vivid, tags: ["DOCX", "Free"] },
+    { id: "vivid", name: "Impact", image: vivid, tags: ["DOCX", "Free"] },
   ];
 
   const filters = [
@@ -117,7 +117,7 @@ const CustomizeSection = ({ selectedTemplate, onSelectTemplate }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {templates.map((template) => (
             <div key={template.id} className="flex flex-col items-center">
-              <h3 className="text-xl font-medium mb-4 text-slate-800">
+              <h3 className="text-[13px] md:text-[15px] font-medium mb-2 text-slate-800 text-center w-full min-h-[32px] md:min-h-[38px] flex items-center justify-center px-1">
                 {template.name}
               </h3>
               <div

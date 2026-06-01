@@ -19,7 +19,7 @@ const DraggableWrapper = ({ id, children, collapseOnDrag, width }) => {
     transition,
     opacity: isDragging ? 0.7 : 1,
     zIndex: isDragging ? 10 : 1,
-    width: width || '100%',
+    '--field-width': width || '100%',
     ...(collapseOnDrag && isDragging ? {
       maxHeight: '35px',
       overflow: 'hidden',
@@ -31,7 +31,7 @@ const DraggableWrapper = ({ id, children, collapseOnDrag, width }) => {
 
   return (
     <DragHandleContext.Provider value={{ attributes, listeners, isDragging }}>
-      <div ref={setNodeRef} style={style}>
+      <div ref={setNodeRef} style={style} className="w-full md:w-[var(--field-width)]">
         {children}
       </div>
     </DragHandleContext.Provider>

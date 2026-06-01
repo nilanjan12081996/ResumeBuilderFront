@@ -22,12 +22,12 @@ const TemplateAndColors = ({
     setThemeColor,
 }) => {
     const templates = [
-        { id: "professional", name: "Professional", image: professional },
-        { id: "clear", name: "Clear", image: clear },
-        { id: "clean", name: "Clean", image: clean },
-        { id: "ats", name: "Prime ATS", image: primeAts },
-        { id: "corporate", name: "Corporate", image: corporate },
-        { id: "vivid", name: "Vivid", image: vivid },
+        { id: "professional", name: "Executive", image: professional },
+        { id: "clear", name: "Clarity", image: clear },
+        { id: "clean", name: "Essential", image: clean },
+        { id: "ats", name: "Smart ATS", image: primeAts },
+        { id: "corporate", name: "Industry Standard", image: corporate },
+        { id: "vivid", name: "Impact", image: vivid },
         { id: "linkedin", name: "LinkedIn Prime", image: linkedin },
     ];
 
@@ -146,7 +146,7 @@ const TemplateAndColors = ({
                                     ${selectedTemplate === template.id ? "ring-2 ring-blue-500 border-blue-500" : "border-gray-200"}
                                 `}
                             >
-                                <h3 className="text-[18px] font-medium mb-2 text-slate-800 text-center w-full">
+                                <h3 className="text-[13px] md:text-[15px] font-medium mb-2 text-slate-800 text-center w-full min-h-[32px] md:min-h-[38px] flex items-center justify-center px-1">
                                     {template.name}
                                 </h3>
 

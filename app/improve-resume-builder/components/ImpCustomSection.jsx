@@ -76,8 +76,8 @@ const ImpCustomSection = ({
                                             </AccordionTitle>
 
                                             <AccordionContent>
-                                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                                    <div className="col-span-2">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                    <div className="col-span-1 md:col-span-2">
                                                         <Label className="!text-sm !font-medium !text-gray-500">Title</Label>
                                                         <input
                                                             className="w-full border p-2 rounded"

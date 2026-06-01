@@ -73,9 +73,9 @@ const LinkedInHonors = ({ section, sectionIndex, handleUpdate, handleAddItem }) 
                       </AccordionTitle>
 
                       <AccordionContent className="pt-0">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                          <div className="col-span-2">
+                          <div className="col-span-1 md:col-span-2">
                             <Label className="!text-sm !font-medium !text-gray-500">Award / Honor Title</Label>
                             <input
                               value={item.title || ''}
@@ -85,7 +85,7 @@ const LinkedInHonors = ({ section, sectionIndex, handleUpdate, handleAddItem }) 
                             />
                           </div>
 
-                          <div className="col-span-2">
+                          <div className="col-span-1 md:col-span-2">
                             <Label className="!text-sm !font-medium !text-gray-500">Issuer / Organization</Label>
                             <input
                               value={item.issuer || ''}
@@ -95,7 +95,7 @@ const LinkedInHonors = ({ section, sectionIndex, handleUpdate, handleAddItem }) 
                             />
                           </div>
 
-                          <div className="col-span-2">
+                          <div className="col-span-1 md:col-span-2">
                             <Label className="block text-xs font-semibold !text-gray-500 mb-1">Start & End Date</Label>
                             <div className="flex gap-2 mt-1">
                               <div className="flex-1">
@@ -113,7 +113,7 @@ const LinkedInHonors = ({ section, sectionIndex, handleUpdate, handleAddItem }) 
                             </div>
                           </div>
 
-                          <div className="col-span-2">
+                          <div className="col-span-1 md:col-span-2">
                             <Label className="!text-sm !font-medium !text-gray-500">Description</Label>
                             <TipTapEditor
                               value={item.description || ''}

@@ -101,10 +101,10 @@ const AdvancedCustomSection = ({
                             </AccordionTitle>
 
                             <AccordionContent>
-                              <div className="grid grid-cols-2 gap-4 mb-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
                                 {/* Title */}
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <label className="block text-xs font-semibold text-gray-500">Title</label>
                                   <input
                                     type="text"
@@ -115,7 +115,7 @@ const AdvancedCustomSection = ({
                                 </div>
 
                                 {/* Start & End Date */}
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <label className="block text-xs font-semibold text-gray-500">Start & End Date</label>
                                   <div className="flex gap-2 mt-1">
                                     <div className="flex-1">
@@ -168,7 +168,7 @@ const AdvancedCustomSection = ({
                                 </div>
 
                                 {/* Technologies */}
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <label className="block text-xs font-semibold text-gray-500">Technologies</label>
                                   <input
                                     type="text"
@@ -179,7 +179,7 @@ const AdvancedCustomSection = ({
                                 </div>
 
                                 {/* Dynamic Fields (Core + Custom) */}
-                                <div className="col-span-2">
+                                <div className="col-span-1 md:col-span-2">
                                   <ImpDynamicFields
                                     coreFields={[{
                                       id: 'description',

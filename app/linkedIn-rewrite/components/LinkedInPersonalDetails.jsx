@@ -229,23 +229,23 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
           <input type="text" placeholder="Frontend Developer || React Js || Next Js..." className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("job_target")} />
           <p className="text-xs text-gray-400 mt-1">Appears below your name like LinkedIn</p>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <div><label className="block text-sm font-medium text-gray-700 mb-1">First Name</label><input type="text" placeholder="First Name" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("first_name")} /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label><input type="text" placeholder="Last Name" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("last_name")} /></div>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Email ID</label><input type="email" placeholder="email@example.com" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("email")} /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label><input type="text" placeholder="+91 98765 43210" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("phone")} /></div>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Complete Address</label><input type="text" placeholder="Street address" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("address")} /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">City, State</label><input type="text" placeholder="Kolkata, West Bengal" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("city_state")} /></div>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Country</label><input type="text" placeholder="India" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("country")} /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label><input type="text" placeholder="700001" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("postal_code")} /></div>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
           <div><label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label><input type="text" placeholder="linkedin.com/in/yourprofile" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("linkedin")} /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">Website / Portfolio</label><input type="text" placeholder="yourportfolio.com" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("website")} /></div>
         </div>
@@ -254,7 +254,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
           {showAdditionalDetails ? <><ChevronUp size={20} /> Hide additional details</> : <><ChevronDown size={20} /> Add more details</>}
         </button>
         {showAdditionalDetails && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div><label className="block text-sm font-medium text-gray-700 mb-1">GitHub</label><input type="text" placeholder="github.com/username" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("github")} /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Stack Overflow</label><input type="text" placeholder="stackoverflow.com/users/..." className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("stackoverflow")} /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">LeetCode</label><input type="text" placeholder="leetcode.com/username" className="w-full rounded-lg border border-gray-300 p-2 text-sm" {...register("leetcode")} /></div>

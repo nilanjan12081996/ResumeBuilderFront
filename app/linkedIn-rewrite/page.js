@@ -1492,7 +1492,7 @@ const LinkedInResumeBuilder = () => {
       </div>
 
       {/* ── Template preview ── */}
-      <div className='lg:w-6/12 bg-white h-[calc(100vh-64px)] overflow-hidden px-0'>
+      <div className='hidden lg:block lg:w-6/12 bg-white h-[calc(100vh-64px)] overflow-hidden px-0'>
         {/* <div className='h-screen overflow-y-scroll hide-scrollbar'>
           <div ref={componentRef}>
             <ActiveResume
