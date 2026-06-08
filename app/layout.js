@@ -14,7 +14,7 @@ import Insideheader from "./ui/insideheader";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ThemeColorProvider } from './ui/ThemeColorProvider';
 
-
+import Script from 'next/script';
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'], // specify desired weights
@@ -39,6 +39,21 @@ export default function RootLayout({ children }) {
       <body
         className={`${inter.variable} antialiased`}
       >
+        {/* --- Google Analytics Tracking Code start --- */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-8X1244Q659"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            gtag('config', 'G-8X1244Q659');
+          `}
+        </Script>
+        {/* --- Google Analytics Tracking Code End --- */}
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
 
 
