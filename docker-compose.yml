@@ -1,11 +1,25 @@
-version: '3.8'
+# version: '3.8'
 
+# services:
+#   nextjs-app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: resumemileai
+#     ports:
+#       - "3989:3989" 
+#     restart: unless-stopped
+
+
+version: '3.8'
+ 
 services:
   nextjs-app:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host # <--- This bypasses Docker's internal DNS bridge to fix the ENOTFOUND error
     container_name: resumemileai
     ports:
-      - "3989:3989" 
+      - "3989:3989"
     restart: unless-stopped
