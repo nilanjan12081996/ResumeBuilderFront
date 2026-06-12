@@ -1043,29 +1043,59 @@ const buildVividDocxHtml = (params) => {
 
     } else if (sec.type === 'skills') {
       const showLevel = sec.hideExperienceLevel === false;
-      (sec.skills || []).forEach(sk => {
-        bodyHtml += '<div style="margin-bottom:4pt;font-family:' + fontStack(sf) + ';font-size:' + bp + 'pt;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:0.04em;">' + esc(sk.name) + '</div>';
-        if (showLevel) bodyHtml += skillBar(sk.level ?? 3, 5);
-      });
+      bodyHtml += '<table width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;"><colgroup><col width="33.33%"/><col width="33.33%"/><col width="33.33%"/></colgroup><tbody>';
+      const sks = sec.skills || [];
+      for (let i = 0; i < sks.length; i += 3) {
+        bodyHtml += '<tr>';
+        for (let j = 0; j < 3; j++) {
+          const sk = sks[i + j];
+          bodyHtml += '<td width="33.33%" style="width:33.33%;vertical-align:top;padding-right:12pt;padding-bottom:6pt;">';
+          if (sk) {
+            bodyHtml += '<div style="margin-bottom:2pt;font-family:' + fontStack(sf) + ';font-size:' + bp + 'pt;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:0.04em;">' + esc(sk.name);
+            if (showLevel) {
+               const lvlText = ['Novice', 'Beginner', 'Skillful', 'Experienced', 'Expert'][sk.level ?? 3];
+               bodyHtml += ' <span style="font-weight:400;color:#6b7280;font-size:' + (bp - 0.5) + 'pt;text-transform:none;">(' + lvlText + ')</span>';
+            }
+            bodyHtml += '</div>';
+          }
+          bodyHtml += '</td>';
+        }
+        bodyHtml += '</tr>';
+      }
+      bodyHtml += '</tbody></table>';
 
     } else if (sec.type === 'languages') {
-      bodyHtml += '<table width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;"><colgroup><col width="50%"/><col width="50%"/></colgroup><tbody>';
+      bodyHtml += '<table width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;"><colgroup><col width="33.33%"/><col width="33.33%"/><col width="33.33%"/></colgroup><tbody>';
       const langs = sec.languages || [];
-      for (let i = 0; i < langs.length; i += 2) {
-        const l1 = langs[i], l2 = langs[i + 1];
+      
+      const getLangLevelForVivid = (langLevel) => {
+        if (typeof langLevel === "number") return langLevel;
+        const map = {
+          "native speaker": 5, "native": 5, "highly proficient": 4, "fluent": 4, "advanced": 4,
+          "very good command": 3, "upper intermediate": 3, "good working knowledge": 2, "intermediate": 2,
+          "working knowledge": 1, "elementary": 1, "beginner": 1, "basic": 1,
+          "a1": 0, "a2": 1, "b1": 2, "b2": 3, "c1": 4, "c2": 5,
+        };
+        if (typeof langLevel === "string") return map[langLevel.toLowerCase()] ?? 2;
+        return 2;
+      };
+
+      for (let i = 0; i < langs.length; i += 3) {
         bodyHtml += '<tr>';
-        bodyHtml += '<td width="50%" style="width:50%;vertical-align:top;padding-right:12pt;padding-bottom:6pt;">';
-        if (l1) {
-          bodyHtml += '<p style="font-size:' + bp + 'pt;font-weight:500;color:#111;margin-bottom:1pt;">' + esc(l1.language) + '</p>';
-          if (!sec.hideProficiency) bodyHtml += skillBar(0, 6); // simplified bar
+        for (let j = 0; j < 3; j++) {
+          const lang = langs[i + j];
+          bodyHtml += '<td width="33.33%" style="width:33.33%;vertical-align:top;padding-right:12pt;padding-bottom:6pt;">';
+          if (lang) {
+            bodyHtml += '<div style="font-size:' + bp + 'pt;font-weight:500;color:#111;margin-bottom:2pt;">' + esc(lang.language);
+            if (!sec.hideProficiency) {
+               const langMap = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+               const lvlText = langMap[getLangLevelForVivid(lang.level)] || 'B1';
+               bodyHtml += ' <span style="font-weight:400;color:#6b7280;font-size:' + (bp - 0.5) + 'pt;text-transform:none;">(' + lvlText + ')</span>';
+            }
+            bodyHtml += '</div>';
+          }
+          bodyHtml += '</td>';
         }
-        bodyHtml += '</td>';
-        bodyHtml += '<td width="50%" style="width:50%;vertical-align:top;padding-bottom:6pt;">';
-        if (l2) {
-          bodyHtml += '<p style="font-size:' + bp + 'pt;font-weight:500;color:#111;margin-bottom:1pt;">' + esc(l2.language) + '</p>';
-          if (!sec.hideProficiency) bodyHtml += skillBar(0, 6);
-        }
-        bodyHtml += '</td>';
         bodyHtml += '</tr>';
       }
       bodyHtml += '</tbody></table>';
@@ -1173,17 +1203,19 @@ export const useDownload = ({ componentRef, formValues, resumeSettings, sections
 
   const handleDownloadPDF = async () => {
     try {
+      const resumeEl = componentRef.current;
+      if (!resumeEl) return;
+
       const decreaseResult = await dispatch(decreaseSubscriptionCount(resumeType));
       if (decreaseSubscriptionCount.rejected.match(decreaseResult)) {
         toast.error("Download limit reached. Please upgrade your plan.");
         return;
       }
-      const resumeEl = componentRef.current;
-      if (!resumeEl) return;
 
       const cloned = resumeEl.cloneNode(true);
       cloned.querySelectorAll('*').forEach(el => {
         const s = el.style;
+        if (!s) return;
         const cn = typeof el.className === 'string' ? el.className : '';
         if (
           s.overflow === 'auto' || s.overflow === 'scroll' ||
@@ -1323,19 +1355,21 @@ export const useDownload = ({ componentRef, formValues, resumeSettings, sections
 
   const handleDownloadDocx = async () => {
     try {
+      const resumeEl = componentRef.current;
+      if (!resumeEl) return;
+
       const decreaseResult = await dispatch(decreaseSubscriptionCount(resumeType));
       if (decreaseSubscriptionCount.rejected.match(decreaseResult)) {
         toast.error("Download limit reached. Please upgrade your plan.");
         return;
       }
-      const resumeEl = componentRef.current;
-      if (!resumeEl) return;
 
       const cloned = resumeEl.cloneNode(true);
       
       // 1. Clean up overflow issues
       cloned.querySelectorAll('*').forEach(el => {
         const s = el.style;
+        if (!s) return;
         const cn = typeof el.className === 'string' ? el.className : '';
         if (
           s.overflow === 'auto' || s.overflow === 'scroll' ||

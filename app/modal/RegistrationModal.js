@@ -10,8 +10,13 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { getIpData } from "../reducers/PlanSlice";
 import { createScratchFreeSubscription, createSubscriptionCount } from "../reducers/ResumeSlice";
 import Link from "next/link";
+import { IS_MAINTENANCE_MODE } from "../config/maintenance";
+import MaintenanceModal from "./MaintenanceModal";
 
 const RegistrationModal = ({ openRegisterModal, setOpenRegisterModal, setOpenVerifyOtpModal, setOpenLoginModal, openPricModal, setOpenPriceModal, chooseResumeType }) => {
+    if (IS_MAINTENANCE_MODE) {
+        return <MaintenanceModal show={openRegisterModal} onClose={() => setOpenRegisterModal(false)} />;
+    }
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading } = useSelector((state) => state?.auth);

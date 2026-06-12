@@ -9,8 +9,13 @@ import { useEffect, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { createScratchFreeSubscription, createSubscriptionCount } from "../reducers/ResumeSlice";
 import Link from "next/link";
+import { IS_MAINTENANCE_MODE } from "../config/maintenance";
+import MaintenanceModal from "./MaintenanceModal";
 
 const LoginModal = ({ openLoginModal, setOpenLoginModal, setOpenRegisterModal, setOpenChoiceModal }) => {
+    if (IS_MAINTENANCE_MODE) {
+        return <MaintenanceModal show={openLoginModal} onClose={() => setOpenLoginModal(false)} />;
+    }
     const dispatch = useDispatch();
     const router = useRouter();
     const { loading } = useSelector((state) => state?.auth);

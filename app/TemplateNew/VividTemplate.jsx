@@ -277,14 +277,15 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         <SectionHeading title={formData.skillSectionTitle || "Skills"} />
         <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
           <colgroup>
-            <col style={{ width: "50%" }} />
-            <col style={{ width: "50%" }} />
+            <col style={{ width: "33.33%" }} />
+            <col style={{ width: "33.33%" }} />
+            <col style={{ width: "33.33%" }} />
           </colgroup>
           <tbody>
-            {Array.from({ length: Math.ceil(formData.newSkillHistory.length / 2) }).map((_, rowIdx) => (
+            {Array.from({ length: Math.ceil(formData.newSkillHistory.length / 3) }).map((_, rowIdx) => (
               <tr key={rowIdx}>
-                {[0, 1].map(colIdx => {
-                  const item = formData.newSkillHistory[rowIdx * 2 + colIdx];
+                {[0, 1, 2].map(colIdx => {
+                  const item = formData.newSkillHistory[rowIdx * 3 + colIdx];
                   if (!item || !item.skill) return <td key={colIdx} />;
                   return (
                     <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
@@ -298,10 +299,12 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
                         marginBottom: "1pt",
                       }}>
                         {item.skill}
+                        {!formData.hideExperienceLevel && (
+                          <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt`, textTransform: "none" }}>
+                            ({skillLevels[item.level ?? 3]})
+                          </span>
+                        )}
                       </div>
-                      {!formData.hideExperienceLevel && (
-                        <SkillBar level={item.level ?? 3} total={5} />
-                      )}
                     </td>
                   );
                 })}
@@ -320,23 +323,28 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         <SectionHeading title={formData.languagesSectionTitle || "Languages"} />
         <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
           <colgroup>
-            <col style={{ width: "50%" }} />
-            <col style={{ width: "50%" }} />
+            <col style={{ width: "33.33%" }} />
+            <col style={{ width: "33.33%" }} />
+            <col style={{ width: "33.33%" }} />
           </colgroup>
           <tbody>
-            {Array.from({ length: Math.ceil(formData.languageHistory.length / 2) }).map((_, rowIdx) => (
+            {Array.from({ length: Math.ceil(formData.languageHistory.length / 3) }).map((_, rowIdx) => (
               <tr key={rowIdx}>
-                {[0, 1].map(colIdx => {
-                  const lang = formData.languageHistory[rowIdx * 2 + colIdx];
+                {[0, 1, 2].map(colIdx => {
+                  const lang = formData.languageHistory[rowIdx * 3 + colIdx];
                   if (!lang) return <td key={colIdx} />;
+                  const langMap = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+                  const lvlText = langMap[getLangLevel(lang.level)] || 'B1';
                   return (
                     <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
                       <div style={{ ...bodyStyle, fontWeight: "500", color: "#111", marginBottom: "1pt" }}>
                         {lang.language}
+                        {!formData.hideLanguageProficiency && (
+                          <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt` }}>
+                            ({lvlText})
+                          </span>
+                        )}
                       </div>
-                      {!formData.hideLanguageProficiency && (
-                        <SkillBar level={getLangLevel(lang.level)} total={6} />
-                      )}
                     </td>
                   );
                 })}
@@ -536,14 +544,15 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         <SectionHeading title={section.title} />
         <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
           <colgroup>
-            <col style={{ width: "50%" }} />
-            <col style={{ width: "50%" }} />
+            <col style={{ width: "33.33%" }} />
+            <col style={{ width: "33.33%" }} />
+            <col style={{ width: "33.33%" }} />
           </colgroup>
           <tbody>
-            {Array.from({ length: Math.ceil((section.skills?.length || 0) / 2) }).map((_, rowIdx) => (
+            {Array.from({ length: Math.ceil((section.skills?.length || 0) / 3) }).map((_, rowIdx) => (
               <tr key={rowIdx}>
-                {[0, 1].map(colIdx => {
-                  const skill = section.skills?.[rowIdx * 2 + colIdx];
+                {[0, 1, 2].map(colIdx => {
+                  const skill = section.skills?.[rowIdx * 3 + colIdx];
                   if (!skill || !skill.name) return <td key={colIdx} />;
                   return (
                     <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
@@ -557,8 +566,12 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
                         marginBottom: "1pt",
                       }}>
                         {skill.name}
+                        {showLevel && (
+                          <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt`, textTransform: "none" }}>
+                            ({skillLevels[skill.level ?? 3]})
+                          </span>
+                        )}
                       </div>
-                      {showLevel && <SkillBar level={skill.level ?? 3} total={5} />}
                     </td>
                   );
                 })}
@@ -575,23 +588,28 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
         <colgroup>
-          <col style={{ width: "50%" }} />
-          <col style={{ width: "50%" }} />
+          <col style={{ width: "33.33%" }} />
+          <col style={{ width: "33.33%" }} />
+          <col style={{ width: "33.33%" }} />
         </colgroup>
         <tbody>
-          {Array.from({ length: Math.ceil((section.languages?.length || 0) / 2) }).map((_, rowIdx) => (
+          {Array.from({ length: Math.ceil((section.languages?.length || 0) / 3) }).map((_, rowIdx) => (
             <tr key={rowIdx}>
-              {[0, 1].map(colIdx => {
-                const l = section.languages?.[rowIdx * 2 + colIdx];
+              {[0, 1, 2].map(colIdx => {
+                const l = section.languages?.[rowIdx * 3 + colIdx];
                 if (!l) return <td key={colIdx} />;
+                const langMap = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+                const lvlText = langMap[getLangLevel(l.level)] || 'B1';
                 return (
                   <td key={colIdx} style={{ verticalAlign: "top", paddingRight: "12pt", paddingBottom: "6pt" }}>
                     <div style={{ ...bodyStyle, fontWeight: "500", color: "#111", marginBottom: "1pt" }}>
                       {l.language}
+                      {!section.hideProficiency && (
+                        <span style={{ fontWeight: "400", color: "#6b7280", marginLeft: "6pt", fontSize: `${bodySize - 0.5}pt` }}>
+                          ({lvlText})
+                        </span>
+                      )}
                     </div>
-                    {!section.hideProficiency && (
-                      <SkillBar level={getLangLevel(l.level)} total={6} />
-                    )}
                   </td>
                 );
               })}

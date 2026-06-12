@@ -685,7 +685,6 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           left: 0,
           width: '35%',
           height: '100%',
-          minHeight: '297mm',
           backgroundColor: themeColor,
           zIndex: 0,
           pointerEvents: 'none',

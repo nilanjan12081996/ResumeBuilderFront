@@ -6,18 +6,18 @@ const A4_W = 794;
 const A4_H = 1123;
 
 const TEMPLATE_PAGE_BREAK_MAP = {
-  "prime ats": 1028,
-  "prime": 1040,
-  "primeats": 1040,
+  "prime ats": 1048,
+  "prime": 1048,
+  "primeats": 1048,
   "professional": 1064,
   "clear": 1065,
-  "clean": 1040,
+  "clean": 1048,
   "corporate": 1081,
-  "vivid": 1055,
-  "linkedin prime": 1010,
-  "linkedinprime": 1010,
+  "vivid": 1028,
+  "linkedin prime": 1048,
+  "linkedinprime": 1048,
 };
-const DEFAULT_PAGE_BREAK_H = 1028;
+const DEFAULT_PAGE_BREAK_H = 1048;
 
 /**
  * Use Range.getClientRects() to find individual text-line positions.
@@ -92,6 +92,12 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
     resumeSettings?.templateId ||
     ""
   ).toLowerCase();
+
+  const themeColor =
+    resumeSettings?.theme?.templateColors?.[templateName] ||
+    resumeSettings?.theme?.defaultColor ||
+    resumeSettings?.themeColor ||
+    "#800080";
 
   const pageBreakH = TEMPLATE_PAGE_BREAK_MAP[templateName] ?? DEFAULT_PAGE_BREAK_H;
 
@@ -184,15 +190,16 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
                       height: A4_H,
                       transform: `scale(${scale})`,
                       transformOrigin: "top left",
+                      paddingTop: idx > 0 ? `${(A4_H - pageBreakH) / 2}px` : "0px",
                     }}
-                    className="bg-white relative overflow-hidden"
+                    className="bg-white relative overflow-hidden flex flex-col items-center"
                   >
-                    <div style={{ overflow: "hidden", width: "100%" }}>
+                    <div style={{ overflow: "hidden", width: "100%", height: "100%" }}>
                       <div
                         className="w-full overflow-hidden resume-view-container pdf-parity-fix"
-                        style={{ maxHeight: pageH, overflow: "hidden", width: "100%" }}
+                        style={{ maxHeight: pageH, overflow: "hidden", width: "100%", position: 'relative' }}
                       >
-                        <div style={{ transform: `translateY(-${start}px)`, width: "100%" }}>
+                        <div style={{ transform: `translateY(-${start}px)`, width: "100%", position: 'relative' }}>
                           {children}
                         </div>
                       </div>
@@ -209,18 +216,18 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
       {/* Bottom toolbar */}
       <div className="h-16 bg-white flex items-center justify-between px-10 z-40 shadow-[0_-15px_40px_rgba(0,0,0,0.04)]">
         <div className="flex items-center gap-2 bg-gray-50/50 p-1.5 rounded-2xl">
-          <button onClick={handleZoomOut} className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-indigo-600 transition-all"><FiZoomOut size={18} /></button>
+          <button onClick={handleZoomOut} className="p-2 cursor-pointer hover:bg-white rounded-xl text-gray-400 hover:text-indigo-600 transition-all"><FiZoomOut size={18} /></button>
           <div className="px-2 min-w-[50px] text-center">
             <span className="text-[11px] font-black text-gray-700">{displayScale}%</span>
           </div>
-          <button onClick={handleZoomIn} className="p-2 hover:bg-white rounded-xl text-gray-400 hover:text-indigo-600 transition-all"><FiZoomIn size={18} /></button>
+          <button onClick={handleZoomIn} className="p-2 cursor-pointer hover:bg-white rounded-xl text-gray-400 hover:text-indigo-600 transition-all"><FiZoomIn size={18} /></button>
         </div>
 
         <div className="flex items-center gap-6">
           <button
             onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
             disabled={currentPage === 0}
-            className={`p-3 rounded-full transition-all border ${currentPage === 0 ? "text-gray-100 cursor-not-allowed" : "text-indigo-600 border-indigo-100 hover:bg-indigo-50 active:scale-95"}`}
+            className={`p-3 rounded-full transition-all border ${currentPage === 0 ? "text-gray-100 cursor-not-allowed" : "cursor-pointer text-indigo-600 border-indigo-100 hover:bg-indigo-50 active:scale-95"}`}
           ><FiChevronLeft size={22} /></button>
           <div className="flex flex-col items-center min-w-[60px]">
             <span className="text-sm font-black text-indigo-600">{currentPage + 1} / {totalPages}</span>
@@ -229,19 +236,34 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
             disabled={currentPage === totalPages - 1}
-            className={`p-3 rounded-full transition-all border ${currentPage === totalPages - 1 ? "text-gray-200 border-gray-100 cursor-not-allowed" : "text-indigo-600 border-indigo-100 hover:bg-indigo-50 active:scale-95"}`}
+            className={`p-3 rounded-full transition-all border ${currentPage === totalPages - 1 ? "text-gray-200 border-gray-100 cursor-not-allowed" : "cursor-pointer text-indigo-600 border-indigo-100 hover:bg-indigo-50 active:scale-95"}`}
           ><FiChevronRight size={22} /></button>
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsPanMode(!isPanMode)}
-            className={`p-3 rounded-2xl border transition-all ${isPanMode ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-gray-400 hover:bg-indigo-50 hover:text-indigo-600"}`}
-          ><FiMove size={20} /></button>
-          <button
-            onClick={() => { setIsAutoFit(true); recalculate(); }}
-            className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider border transition-all ${isAutoFit ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-gray-400 hover:bg-indigo-50 hover:text-indigo-600"}`}
-          >Auto Fit</button>
+          <div className="relative group">
+            <button
+              onClick={() => setIsPanMode(!isPanMode)}
+              className={`p-3 cursor-pointer rounded-2xl border transition-all ${isPanMode ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-gray-400 hover:bg-indigo-50 hover:text-indigo-600"}`}
+            ><FiMove size={20} /></button>
+            <div className="absolute bottom-[calc(100%+12px)] right-0 w-[200px] bg-slate-900 text-slate-200 text-[11px] font-medium p-3 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 pointer-events-none text-center leading-relaxed z-50">
+              <span className="font-bold text-indigo-400 block mb-1">Pan Tool</span>
+              Click and drag the document to move around freely while zoomed in.
+              <div className="absolute -bottom-1.5 right-4 w-3 h-3 bg-slate-900 rotate-45 rounded-sm"></div>
+            </div>
+          </div>
+          
+          <div className="relative group">
+            <button
+              onClick={() => { setIsAutoFit(true); recalculate(); }}
+              className={`px-6 py-2.5 cursor-pointer rounded-2xl text-[10px] font-black uppercase tracking-wider border transition-all ${isAutoFit ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-gray-400 hover:bg-indigo-50 hover:text-indigo-600"}`}
+            >Auto Fit</button>
+            <div className="absolute bottom-[calc(100%+12px)] right-0 w-[220px] bg-slate-900 text-slate-200 text-[11px] font-medium p-3 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 pointer-events-none text-center leading-relaxed z-50">
+              <span className="font-bold text-indigo-400 block mb-1">Auto Fit</span>
+              Restores the resume back to its perfectly fitted default size after zooming.
+              <div className="absolute -bottom-1.5 right-8 w-3 h-3 bg-slate-900 rotate-45 rounded-sm"></div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -104,7 +104,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
         <AccordionPanel>
           <AccordionTitle className='font-bold text-xl'>Personal Details</AccordionTitle>
           <AccordionContent className='pt-0'>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               {/* Job Title + Photo */}
               <div className="md:col-span-2 flex flex-col md:flex-row gap-6 items-center">
@@ -396,7 +396,7 @@ const ImpPersonalDetails = ({ register, watch, selectedTemplate, setValue }) => 
                   </div>
                 </>
               )}
-            </form>
+            </div>
           </AccordionContent>
         </AccordionPanel>
       </Accordion>

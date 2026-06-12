@@ -5,6 +5,8 @@ import { getSignupType } from "../reducers/AuthSlice";
 import InstittuionImg from '../assets/imagesource/Instittuion.png'
 import JobseekerImg from '../assets/imagesource/Jobseeker.png'
 import Image from "next/image";
+import { IS_MAINTENANCE_MODE } from "../config/maintenance";
+import MaintenanceModal from "./MaintenanceModal";
 
 const ChoiceModal = ({
   openChoiceModal,
@@ -12,6 +14,9 @@ const ChoiceModal = ({
   setChooseResumeType,
   setOpenRegisterModal,
 }) => {
+  if (IS_MAINTENANCE_MODE) {
+    return <MaintenanceModal show={openChoiceModal} onClose={() => setOpenChoiceModal(false)} />;
+  }
   const { signUpTypes } = useSelector((state) => state?.auth)
   const [selectedType, setSelectedType] = useState(null);
 

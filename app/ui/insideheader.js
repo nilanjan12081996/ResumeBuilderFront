@@ -240,6 +240,19 @@ const Insideheader = () => {
                         </label>
                       </div>
                       <div className="px-4 pb-3 pt-1">
+                        <div className="mb-3">
+                          <p style={{
+                            fontSize: "9px",
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.08em",
+                            color: "#a855f7",
+                            marginBottom: "6px",
+                          }}>
+                            Credits Remaining
+                          </p>
+                          <RemainingCountHeader />
+                        </div>
                         <button disabled={!confirmChecked} onClick={() => setShowConfirmModal(false)} className="w-full py-2 rounded-full text-sm font-semibold text-white transition-all duration-200 disabled:opacity-40" style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}>Proceed to Download</button>
                       </div>
                     </>

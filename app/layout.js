@@ -8,6 +8,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Providers from "./reducers/provider";
 import ClientLayoutWrapper from "./clientLayoutWrapper";
+import MaintenanceMode from "./ui/MaintenanceMode";
 
 import Sidebar from "./ui/sidebar";
 import Insideheader from "./ui/insideheader";
@@ -34,6 +35,21 @@ export const metadata = {
 };
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 export default function RootLayout({ children }) {
+  // 🛑 MAINTENANCE MODE TOGGLE 🛑
+  // Change `isMaintenance` to `false` to turn off maintenance mode and restore the site.
+  // Change to `true` to block the entire site with the Maintenance screen.
+  const isMaintenance = false;
+
+  if (isMaintenance) {
+    return (
+      <html lang="en">
+        <body className={`${inter.variable} antialiased`}>
+          <MaintenanceMode />
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en">
       <body
