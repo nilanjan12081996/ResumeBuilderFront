@@ -87,37 +87,33 @@
 # CMD ["node", "server.js"]
 
 
-FROM node:20-alpine AS base
+
+FROM node:20-slim AS base
  
-# 1. Install dependencies stage (Optimized to prevent freezes and network drops)
+# 2. Install dependencies stage
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
  
 COPY package.json package-lock.json* ./
  
-# Lower memory footprint & aggressive network retry optimizations
-ENV NPM_CONFIG_MAX_SOCKETS=5
+# Remove the fake Cloudflare registry and massive timeouts.
+# Using the default official registry ensures reliable downloads.
+RUN npm config set registry https://registry.npmjs.org/
  
-# Clear single lines - no backslashes, no warnings
-RUN npm config set registry https://registry.cloudflare-npm.com/
-RUN npm config set fetch-retries 5
-RUN npm config set fetch-retry-mintimeout 20000
-RUN npm config set fetch-retry-maxtimeout 120000
+# Standard install. It will fail fast if there's a real network issue.
+RUN npm install --prefer-offline --no-audit --progress=false
  
-RUN npm install --network-timeout=300000 --prefer-offline --no-audit --progress=false
- 
-# 2. Rebuild the source code stage
+# 3. Rebuild the source code stage
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
  
-# Fits your VPS safely without freezing during compilation
-ENV NODE_OPTIONS="--max-old-space-size=1536"
+# Prevent VPS memory freezing during compilation
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN npm run build
  
-# 3. Production image runner stage
+# 4. Production image runner stage
 FROM base AS runner
 WORKDIR /app
  

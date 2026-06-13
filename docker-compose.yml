@@ -18,7 +18,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      network: host # <--- This bypasses Docker's internal DNS bridge to fix the ENOTFOUND error
     container_name: resumemileai
     ports:
       - "3989:3989"
