@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -54,12 +55,17 @@ const getPlanMeta = (placeholder) => {
 
 const Page = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { plans, ipData } = useSelector((state) => state.planst || {});
+  const { getRemainingCountData } = useSelector((state) => state.resume || {});
+  const scratchCount = getRemainingCountData?.data?.totalScratch || 0;
 
   const usertypeId = localStorage.getItem("signup_type_id");
   const parsed = usertypeId ? JSON.parse(usertypeId) : null;
 
   const [openCouponModal, setOpenCouponModal] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(5);
   const [couponModalData, setCouponModalData] = useState({
     amount: 0,
     currency: "INR",
@@ -151,7 +157,8 @@ const Page = () => {
             dispatch(resetAiCount());
             dispatch(createSubscriptionCount());
             dispatch(getRemainingCount());
-            dispatch(scratchResumeCount())
+            dispatch(scratchResumeCount());
+            setPaymentSuccess(true);
           } catch (err) {
             toast.error("Payment verification failed.");
           }
@@ -184,6 +191,18 @@ const Page = () => {
     if (ipData?.ip) dispatch(currentSubscription(ipData.ip));
     // dispatch(createSubscriptionCount());
   }, [ipData]);
+
+  useEffect(() => {
+    if (!paymentSuccess) return;
+    if (countdown === 0) {
+      router.push("/resume-builder");
+      return;
+    }
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [paymentSuccess, countdown, router]);
 
   const renderPlanCard = (pln) => {
     const thisPrice = Number(pln?.planPrice?.price || 0);
@@ -320,7 +339,7 @@ const Page = () => {
             >
               Buy Now
             </button> */}
-            {!isFree && (
+            {!isFree ? (
               <button
                 onClick={(e) => handlePlanClick(e, pln)}
                 style={{
@@ -343,6 +362,39 @@ const Page = () => {
                 }}
               >
                 Buy Now
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (scratchCount > 0) {
+                    router.push("/resume-builder");
+                  }
+                }}
+                disabled={scratchCount === 0}
+                style={{
+                  width: "100%", padding: "12px", borderRadius: "10px", fontSize: "13px",
+                  fontWeight: 700, letterSpacing: "0.03em", border: "none",
+                  cursor: scratchCount > 0 ? "pointer" : "not-allowed",
+                  transition: "all 0.2s ease",
+                  background: scratchCount > 0 ? "#16a34a" : "#e5e7eb",
+                  color: scratchCount > 0 ? "#fff" : "#9ca3af",
+                  boxShadow: "none",
+                }}
+                onMouseEnter={e => {
+                  if (scratchCount > 0) {
+                    e.currentTarget.style.transform = "scale(1.02)";
+                    e.currentTarget.style.filter = "brightness(1.08)";
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (scratchCount > 0) {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.filter = "brightness(1)";
+                  }
+                }}
+              >
+                {scratchCount > 0 ? "Get Started with Free" : "Free Plan Exhausted"}
               </button>
             )}
           </div>
@@ -421,6 +473,55 @@ const Page = () => {
             ip={ipData?.ip}
             onPayment={handlePaymentModal}
           />
+        )}
+
+        {paymentSuccess && (
+          <div 
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+            style={{ animation: "fadeIn 0.2s ease-out" }}
+          >
+            <div 
+              className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center transform transition-all duration-300 ease-out scale-100"
+              style={{ animation: "scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+            >
+              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-50 mb-6 border border-green-100">
+                <svg className="h-12 w-12 text-green-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-[#1B223C] mb-2">Payment Successful!</h3>
+              <p className="text-gray-500 mb-6 text-sm leading-relaxed">
+                Thank you! Your account has been upgraded successfully. You now have full access to premium templates and resume building tools.
+              </p>
+              
+              <div className="bg-purple-50 rounded-xl p-4 mb-6 border border-purple-100">
+                <span className="text-sm text-[#800080] font-semibold block mb-1">Preparing your builder</span>
+                <span className="text-xs text-purple-600 font-medium">Redirecting you in <strong className="text-sm font-bold text-[#800080]">{countdown}</strong> seconds...</span>
+              </div>
+
+              <button
+                onClick={() => router.push("/resume-builder")}
+                className="w-full py-3 px-4 rounded-xl font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:brightness-[1.08] active:scale-[0.98] cursor-pointer"
+                style={{
+                  background: "linear-gradient(135deg, #800080, #b44db4)",
+                  boxShadow: "0 4px 14px rgba(128,0,128,0.3)",
+                }}
+              >
+                Go to Resume Builder Now
+              </button>
+            </div>
+            <style>{`
+              @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+              }
+              @keyframes scaleIn {
+                from { transform: scale(0.95); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+              }
+            `}</style>
+          </div>
         )}
       </div>
     </>

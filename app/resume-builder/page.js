@@ -211,6 +211,7 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
   
   const ActiveResume = templateMap[selectedTemplate] || Professional;
   const componentRef = useRef();
+  const rawContentRef = useRef();
 
   const dispatch = useDispatch()
   const router = useRouter();
@@ -530,7 +531,7 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
 
   const { activeTab } = useTabs();
 
-  useDownload({ componentRef, formValues, resumeSettings, themeColor, resumeType: "s"});
+  useDownload({ componentRef, rawContentRef, formValues, resumeSettings, themeColor, resumeType: "s"});
 
   return (
     <div>
@@ -566,6 +567,8 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
                 sections={[]}
                 formValues={formValues}
                 resumeSettings={resumeSettings}
+                templateName={selectedTemplate}
+                themeColor={themeColor}
               >
                 <ActiveResume
                   formData={formValues}
@@ -1284,11 +1287,14 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
             </div> */}
             <ResumePageViewer
               contentRef={componentRef}
+              rawContentRef={rawContentRef}
               sections={[]}
               formValues={formValues}
               resumeSettings={resumeSettings}
+              templateName={selectedTemplate}
+              themeColor={themeColor}
             >
-              <div ref={componentRef}>
+              <div>
                 <ActiveResume 
                   formData={formValues} 
                   empHistory={empHistory} 

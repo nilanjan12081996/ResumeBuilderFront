@@ -57,6 +57,7 @@ import ResumePreviewModal from '../modal/ResumePreviewModal';
 
 const Page = () => {
   const componentRef = useRef();
+  const rawContentRef = useRef();
   const templateTextSettings = useRef({});
   const hasInitialAtsCalled = useRef(false);
   const originalFormValuesRef = useRef(null);
@@ -2077,7 +2078,7 @@ const Page = () => {
   // Dummy handler for child components
   const handleDragEnd = () => { };
 
-  useDownload({ componentRef, formValues, resumeSettings, sections, themeColor, resumeType: "i" });
+  useDownload({ componentRef, rawContentRef, formValues, resumeSettings, sections, themeColor, resumeType: "i" });
 
 
   useEffect(() => {
@@ -2397,11 +2398,14 @@ const Page = () => {
       <div className='hidden lg:block lg:w-6/12 bg-white h-[calc(100vh-64px)] overflow-hidden px-0'>
         <ResumePageViewer
           contentRef={componentRef}
+          rawContentRef={rawContentRef}
           sections={sections}
           formValues={formValues}
           resumeSettings={resumeSettings}
+          templateName={selectedTemplate}
+          themeColor={themeColor}
         >
-          <div ref={componentRef}>
+          <div>
             <ActiveResume
               formData={formValues}
               sections={sections}

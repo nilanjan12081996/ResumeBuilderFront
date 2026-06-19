@@ -72,7 +72,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
   );
 
   const SkillItem = ({ name }) => (
-    <div style={{ textAlign: "center", marginBottom: "6pt" }}>
+    <div style={{ textAlign: "center", marginBottom: "6pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
       <div style={{ ...bodyStyle, color: "#333", marginBottom: "2pt" }}>{name}</div>
       <div style={{ width: "55%", borderBottom: "1.5pt solid #111", margin: "0 auto" }} />
     </div>
@@ -83,57 +83,53 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
   // ════════════════════════════════════════════════════════════
 
   const MainHeading = ({ title, Icon, iconSize}) => (
-    <div style={{ marginTop: `${betweenSections}pt`, marginBottom: "6pt" }}>
-      <table style={{ borderCollapse: "collapse" }}>
-        <tbody>
-          <tr>
-            {Icon && (
-              <td style={{ verticalAlign: "middle", paddingRight: "4pt", lineHeight: 1 }}>
-                <Icon style={{ fontSize: iconSize || ICON_SIZE, color: "#374151", display: "block" }} />
-              </td>
-            )}
-            <td style={{ verticalAlign: "middle" }}>
-              <span style={{
-                fontFamily: secondaryFont,
-                fontSize: `${sectionTitleSize}pt`,
-                fontWeight: sectionTitleWeight,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#111",
-              }}>
-                {title}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="section-heading" style={{ marginTop: `${betweenSections}pt`, marginBottom: "6pt" }}>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        {Icon && (
+          <div style={{ paddingRight: "4pt", lineHeight: 1 }}>
+            <Icon style={{ fontSize: iconSize || ICON_SIZE, color: "#374151", display: "block" }} />
+          </div>
+        )}
+        <div style={{
+          fontFamily: secondaryFont,
+          fontSize: `${sectionTitleSize}pt`,
+          fontWeight: sectionTitleWeight,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "#111",
+        }}>
+          {title}
+        </div>
+      </div>
       <div style={{ borderBottom: "0.75pt solid #e5e7eb", marginTop: "3pt" }} />
     </div>
   );
 
   const TimelineEntry = ({ heading, period, html, content }) => (
     <div style={{ marginBottom: "8pt" }}>
-      <div style={{
-        fontFamily: secondaryFont,
-        fontSize: `${bodySize + 1}pt`,
-        fontWeight: "600",
-        color: "#111",
-        lineHeight: 1.25,
-        marginBottom: "1pt",
-      }}>
-        {heading}
-      </div>
-      {period && (
+      <div className="section-heading" style={{ marginBottom: "4pt" }}>
         <div style={{
-          fontFamily: primaryFont,
-          fontSize: `${bodySize - 0.5}pt`,
-          color: "#9ca3af",
-          lineHeight: 1.3,
-          marginBottom: "2pt",
+          fontFamily: secondaryFont,
+          fontSize: `${bodySize + 1}pt`,
+          fontWeight: "600",
+          color: "#111",
+          lineHeight: 1.25,
+          marginBottom: "1pt",
         }}>
-          {period}
+          {heading}
         </div>
-      )}
+        {period && (
+          <div style={{
+            fontFamily: primaryFont,
+            fontSize: `${bodySize - 0.5}pt`,
+            color: "#9ca3af",
+            lineHeight: 1.3,
+            marginBottom: "2pt",
+          }}>
+            {period}
+          </div>
+        )}
+      </div>
       {content ? content : (html && (
         <div
           className="resume-content"
@@ -204,7 +200,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
 
   const renderHobbiesFromSection = (section) =>
     section.hobbies ? (
-      <div key={section.id}>
+      <div key={section.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
         <SidebarHeading title={section.title} />
         <div style={{ ...bodyStyle, color: "#374151", textAlign: "center" }}>
           {section.hobbies.split("\n").map((h, i) => <div key={i}>{h}</div>)}
@@ -259,7 +255,7 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
 
   const renderHobbiesScratch = () =>
     formData.hobbies ? (
-      <div key="hobbies">
+      <div key="hobbies" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
         <SidebarHeading title={formData.hobbiesSectionTitle || "Hobbies"} />
         <div style={{ ...bodyStyle, color: "#374151", textAlign: "center" }}>
           {formData.hobbies.split("\n").map((h, i) => <div key={i}>{h}</div>)}
@@ -735,25 +731,28 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
       <style>{`
         .resume-content ul { list-style-type: disc; padding-left: 12pt; margin: 1pt 0; }
         .resume-content ol { list-style-type: decimal; padding-left: 12pt; margin: 1pt 0; }
-        .resume-content li { margin-bottom: 1pt; }
+        .resume-content li { margin-bottom: 1pt; break-inside: avoid; page-break-inside: avoid; }
         .resume-content strong { font-weight: bold; }
         .resume-content em { font-style: italic; }
-        .resume-content p { margin-bottom: 1pt; }
+        .resume-content p { margin-bottom: 1pt; break-inside: avoid; page-break-inside: avoid; }
       `}</style>
 
-      <div style={{
-        minHeight: "297mm",
+      <div className="resume-document" style={{
         width: "100%",
-        backgroundColor: "#fff",
+        maxWidth: "210mm",
+        minHeight: "297mm",
+        backgroundColor: "#ffffff",
+        color: "#374151",
         fontFamily: primaryFont,
         fontSize: `${bodySize}pt`,
         lineHeight: lineHeight,
-        color: "#374151",
         boxSizing: "border-box",
+        margin: "0 auto",
       }}>
 
         {/* ══ HEADER ══ */}
         <div style={{
+          backgroundColor: "#ffffff",
           textAlign: "center",
           paddingTop: `${topBottom}pt`,
           paddingBottom: "12pt",
@@ -811,22 +810,25 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
         </div>
 
         {/* ══ BODY ══ */}
-        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-          <colgroup>
-            <col style={{ width: "30%" }} />
-            <col style={{ width: "70%" }} />
-          </colgroup>
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", border: "none", margin: 0, padding: 0 }}>
+          <thead>
+            <tr>
+              <th style={{ width: "30%", height: "20px", padding: 0, margin: 0, border: "none" }}></th>
+              <th style={{ width: "70%", height: "20px", padding: 0, margin: 0, border: "none" }}></th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
               {/* LEFT SIDEBAR */}
               <td style={{
+                width: "30%",
                 verticalAlign: "top",
                 paddingTop: "4pt",
                 paddingRight: "12pt",
                 paddingBottom: `${topBottom}pt`,
                 paddingLeft: `${leftRight}pt`,
-                borderRight: "1pt solid #f3f4f6",
-                backgroundColor: "#fafafa",
+                boxSizing: "border-box",
+                borderRight: "1pt solid #e5e7eb",
               }}>
                 {renderDetailsSidebar()}
                 {renderLinksSidebar()}
@@ -835,16 +837,24 @@ const CorporateTemplate = ({ formData, sections, sectionOrder, themeColor, resum
 
               {/* RIGHT MAIN */}
               <td style={{
+                width: "70%",
                 verticalAlign: "top",
                 paddingTop: "2pt",
                 paddingRight: `${leftRight}pt`,
                 paddingBottom: `${topBottom}pt`,
                 paddingLeft: "14pt",
+                boxSizing: "border-box",
               }}>
                 {renderMainContent()}
               </td>
             </tr>
           </tbody>
+          <tfoot>
+            <tr>
+              <th style={{ width: "30%", height: "20px", padding: 0, margin: 0, border: "none" }}></th>
+              <th style={{ width: "70%", height: "20px", padding: 0, margin: 0, border: "none" }}></th>
+            </tr>
+          </tfoot>
         </table>
 
       </div>

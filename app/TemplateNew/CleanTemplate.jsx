@@ -218,7 +218,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <div key="skills" style={{ marginBottom: `${betweenSections}pt` }}>
         <SectionHeading title={formData.skillSectionTitle || "Skills"} />
         {formData.newSkillHistory.map((skill, i) => (
-          <div key={i}>
+          <div key={i} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
             <span style={{ ...bodyStyle, display: "block", marginBottom: "1pt" }}>{skill.skill}</span>
             {!formData.hideExperienceLevel
               ? <SkillBar level={skill.level ?? 0} total={5} />
@@ -236,7 +236,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <div key="languages" style={{ marginBottom: `${betweenSections}pt` }}>
         <SectionHeading title={formData.languagesSectionTitle || "Languages"} />
         {formData.languageHistory.map((lang, i) => (
-          <div key={i}>
+          <div key={i} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
             <span style={{ ...bodyStyle, display: "block", marginBottom: "1pt" }}>{lang.language}</span>
             {!formData.hideLanguageProficiency
               ? <SkillBar level={getLangLevel(lang.level)} total={6} />
@@ -251,7 +251,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
   const renderHobbiesSidebar = () => {
     if (!formData.hobbies) return null;
     return (
-      <div key="hobbies" style={{ marginBottom: `${betweenSections}pt` }}>
+      <div key="hobbies" style={{ marginBottom: `${betweenSections}pt`, breakInside: "avoid", pageBreakInside: "avoid" }}>
         <SectionHeading title={formData.hobbiesSectionTitle || "Hobbies"} />
         <span style={{ ...bodyStyle, display: "block", whiteSpace: "pre-wrap" }}>{formData.hobbies}</span>
       </div>
@@ -355,11 +355,13 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
         <SectionHeading title={formData.activitiesSectionTitle || "Activities"} />
         {formData.activityHistory.map((act, i) => (
           <div key={i} style={{ marginBottom: "10pt" }}>
+            <div className="section-heading" style={{ }}>
             <span style={titleStyle}>
               {act.functionTitle}{act.employer ? ` - ${act.employer}` : ""}
               {act.city ? ` — ${act.city}` : ""}
             </span>
             {dateRange(act.startDate, act.endDate) && <span style={dateStyle}>{dateRange(act.startDate, act.endDate)}</span>}
+          </div>
             {renderDynamicFields(act, { ...bodyStyle })}
           </div>
         ))}
@@ -398,11 +400,13 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <SectionHeading title={section.title} />
       {section.experiences?.map((exp, i) => (
         <div key={exp.id || i} style={{ marginBottom: "12pt" }}>
-          <span style={titleStyle}>
-            {exp.jobTitle}{exp.company ? `, ${exp.company}` : ""}
-            {exp.city ? ` — ${exp.city}` : ""}
-          </span>
-          {dateRange(exp.startDate, exp.endDate) && <span style={dateStyle}>{dateRange(exp.startDate, exp.endDate)}</span>}
+          <div className="section-heading" style={{ }}>
+            <span style={titleStyle}>
+              {exp.jobTitle}{exp.company ? `, ${exp.company}` : ""}
+              {exp.city ? ` — ${exp.city}` : ""}
+            </span>
+            {dateRange(exp.startDate, exp.endDate) && <span style={dateStyle}>{dateRange(exp.startDate, exp.endDate)}</span>}
+          </div>
           {renderDynamicFields(exp, { ...bodyStyle })}
         </div>
       ))}
@@ -414,11 +418,13 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <SectionHeading title={section.title} />
       {section.educations?.map((edu, i) => (
         <div key={edu.id || i} style={{ marginBottom: "10pt" }}>
-          <span style={titleStyle}>
-            {edu.degree}{edu.institute ? `, ${edu.institute}` : ""}
-            {edu.city ? ` — ${edu.city}` : ""}
-          </span>
-          {dateRange(edu.startDate, edu.endDate) && <span style={dateStyle}>{dateRange(edu.startDate, edu.endDate)}</span>}
+          <div className="section-heading" style={{ }}>
+            <span style={titleStyle}>
+              {edu.degree}{edu.institute ? `, ${edu.institute}` : ""}
+              {edu.city ? ` — ${edu.city}` : ""}
+            </span>
+            {dateRange(edu.startDate, edu.endDate) && <span style={dateStyle}>{dateRange(edu.startDate, edu.endDate)}</span>}
+          </div>
           {renderDynamicFields(edu, { ...bodyStyle })}
         </div>
       ))}
@@ -430,12 +436,14 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <SectionHeading title={section.title} />
       {section.certifications?.map((cert, i) => (
         <div key={cert.id || i} style={{ marginBottom: "8pt" }}>
-          <span style={titleStyle}>
-            {cert.name}{cert.organization ? `, ${cert.organization}` : ""}
-          </span>
-          {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear) && (
-            <span style={dateStyle}>{dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}</span>
-          )}
+          <div className="section-heading" style={{ }}>
+            <span style={titleStyle}>
+              {cert.name}{cert.organization ? `, ${cert.organization}` : ""}
+            </span>
+            {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear) && (
+              <span style={dateStyle}>{dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}</span>
+            )}
+          </div>
           {renderDynamicFields(cert, { ...bodyStyle, marginTop: "2pt" })}
         </div>
       ))}
@@ -447,8 +455,10 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <SectionHeading title={section.title} />
       {section.courses?.map((c, i) => (
         <div key={c.id || i} style={{ marginBottom: "6pt" }}>
-          <span style={titleStyle}>{c.course}{c.institution ? ` - ${c.institution}` : ""}</span>
-          {dateRange(c.startDate, c.endDate) && <span style={dateStyle}>{dateRange(c.startDate, c.endDate)}</span>}
+          <div className="section-heading" style={{ }}>
+            <span style={titleStyle}>{c.course}{c.institution ? ` - ${c.institution}` : ""}</span>
+            {dateRange(c.startDate, c.endDate) && <span style={dateStyle}>{dateRange(c.startDate, c.endDate)}</span>}
+          </div>
         </div>
       ))}
     </div>
@@ -459,11 +469,13 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <SectionHeading title={section.title} />
       {section.internships?.map((intern, i) => (
         <div key={intern.id || i} style={{ marginBottom: "10pt" }}>
-          <span style={titleStyle}>
-            {intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ""}
-            {intern.city ? ` — ${intern.city}` : ""}
-          </span>
-          {dateRange(intern.startDate, intern.endDate) && <span style={dateStyle}>{dateRange(intern.startDate, intern.endDate)}</span>}
+          <div className="section-heading" style={{ }}>
+            <span style={titleStyle}>
+              {intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ""}
+              {intern.city ? ` — ${intern.city}` : ""}
+            </span>
+            {dateRange(intern.startDate, intern.endDate) && <span style={dateStyle}>{dateRange(intern.startDate, intern.endDate)}</span>}
+          </div>
           {renderDynamicFields(intern, { ...bodyStyle })}
         </div>
       ))}
@@ -491,7 +503,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
     <div key={section.id} style={{ marginBottom: `${betweenSections}pt` }}>
       <SectionHeading title={section.title} />
       {section.skills?.map((skill, i) => (
-        <div key={skill.id || i}>
+        <div key={skill.id || i} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <span style={{ ...bodyStyle, display: "block", marginBottom: "1pt" }}>{skill.name}</span>
           {section.hideExperienceLevel === false
             ? <SkillBar level={skill.level ?? 0} total={5} />
@@ -507,7 +519,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
     <div key={section.id} style={{ marginBottom: `${betweenSections}pt` }}>
       <SectionHeading title={section.title} />
       {section.languages?.map((l, i) => (
-        <div key={i}>
+        <div key={i} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <span style={{ ...bodyStyle, fontWeight: "600", display: "block", marginBottom: "1pt" }}>{l.language}</span>
           {!section.hideProficiency
             ? <SkillBar level={getLangLevel(l.level)} total={6} />
@@ -521,7 +533,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
   const renderHobbiesFromSection = (section) => {
     if (!section.hobbies) return null;
     return (
-      <div key={section.id} style={{ marginBottom: `${betweenSections}pt` }}>
+      <div key={section.id} style={{ marginBottom: `${betweenSections}pt`, breakInside: "avoid", pageBreakInside: "avoid" }}>
         <SectionHeading title={section.title} />
         <span style={{ ...bodyStyle, display: "block", whiteSpace: "pre-wrap" }}>{section.hobbies}</span>
       </div>
@@ -538,7 +550,7 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
           const name = typeof item === "object" ? (item.name || item.title) : item;
           const level = typeof item === "object" ? (item.level ?? 0) : 0;
           return (
-            <div key={i}>
+            <div key={i} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <span style={{ ...bodyStyle, display: "block", marginBottom: "1pt" }}>{name}</span>
               {showLevel ? <SkillBar level={level} total={5} /> : <div style={{ marginBottom: "5pt" }} />}
             </div>
@@ -554,8 +566,10 @@ const CleanTemplate = ({ formData, sections, sectionOrder, resumeSettings }) => 
       <SectionHeading title={section.title} />
       {section.items?.map((item, i) => (
         <div key={item.id || i} style={{ marginBottom: "10pt" }}>
-          <span style={titleStyle}>{item.title}{item.city ? `, ${item.city}` : ""}</span>
-          {dateRange(item.startDate, item.endDate) && <span style={dateStyle}>{dateRange(item.startDate, item.endDate)}</span>}
+          <div className="section-heading" style={{ }}>
+            <span style={titleStyle}>{item.title}{item.city ? `, ${item.city}` : ""}</span>
+            {dateRange(item.startDate, item.endDate) && <span style={dateStyle}>{dateRange(item.startDate, item.endDate)}</span>}
+          </div>
           {renderDynamicFields(item, { ...bodyStyle, marginTop: "2pt" })}
         </div>
       ))}

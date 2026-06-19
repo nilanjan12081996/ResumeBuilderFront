@@ -72,7 +72,7 @@ export const renderDynamicFields = (item, containerStyle) => {
         const links = field.value.split(/[, \s]+/).filter(l => l.trim().length > 0);
         
         return (
-          <div key={field.id} style={{ marginTop: "2pt", marginBottom: "2pt" }}>
+          <div key={field.id} style={{ marginTop: "2pt", marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
             <span style={{ ...containerStyle, fontWeight: "bold" }}>{field.name}: </span>
             {links.map((link, idx) => {
               const href = link.startsWith('http') ? link : `https://${link}`;
@@ -95,7 +95,7 @@ export const renderDynamicFields = (item, containerStyle) => {
       }
 
       return (
-         <div key={field.id} style={{ marginTop: "2pt", marginBottom: "2pt" }}>
+         <div key={field.id} style={{ marginTop: "2pt", marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
             <span style={{ ...containerStyle, fontWeight: "bold" }}>{field.name}: </span>
             <span style={containerStyle}>{field.value}</span>
          </div>

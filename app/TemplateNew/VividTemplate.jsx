@@ -57,7 +57,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
 
   // ── Section heading — black badge label ──────────────────────────────────
   const SectionHeading = ({ title }) => (
-    <div style={{
+    <div className="section-heading" style={{
       display: "inline-block",
       backgroundColor: "#111",
       color: "#fff",
@@ -68,6 +68,8 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       textTransform: "uppercase",
       padding: "2pt 8pt",
       marginBottom: `${betweenTitlesContent}pt`,
+      breakInside: "avoid",
+      pageBreakInside: "avoid",
     }}>
       {title}
     </div>
@@ -75,7 +77,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
 
   // ── Entry title row ───────────────────────────────────────────────────────
   const EntryTitle = ({ title, sub }) => (
-    <div style={{ marginBottom: "2pt" }}>
+    <div style={{ marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
       <span style={{
         fontFamily: secondaryFont,
         fontSize: `${bodySize + 1}pt`,
@@ -107,10 +109,19 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         letterSpacing: "0.06em",
         textTransform: "uppercase",
         marginBottom: "4pt",
+        breakInside: "avoid",
+        pageBreakInside: "avoid",
       }}>
         {range}
       </div>
     ) : null;
+
+  const EntryHeader = ({ title, sub, range }) => (
+    <div className="section-heading" style={{ }}>
+      <EntryTitle title={title} sub={sub} />
+      <DateLine range={range} />
+    </div>
+  );
 
   // ── Skill bar — table-based, PDF-safe ────────────────────────────────────
   const SkillBar = ({ level, total = 5 }) => {
@@ -383,7 +394,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
           <div key={sectionId} style={sectionGap}>
             <SectionHeading title={title} />
             {history.map((item, i) => (
-              <div key={i} style={{ marginBottom: "4pt" }}>
+              <div key={i} style={{ marginBottom: "4pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
                 <div style={{
                   fontFamily: secondaryFont,
                   fontSize: `${bodySize}pt`,
@@ -416,13 +427,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         return (
           <div key={sectionId} style={sectionGap}>
             <SectionHeading title={title} />
-            {history.map((item, i) => (
-              <div key={i} style={{ marginBottom: "8pt" }}>
-                <EntryTitle
+            {history.map((item, idx) => (
+              <div key={idx} style={{ marginBottom: "8pt" }}>
+                <EntryHeader
                   title={item.title}
                   sub={item.city ? `, ${item.city}` : ""}
+                  range={dateRange(item.startDate, item.endDate)}
                 />
-                <DateLine range={dateRange(item.startDate, item.endDate)} />
                 {renderDynamicFields(item, bodyStyle)}
               </div>
             ))}
@@ -447,11 +458,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       {section.experiences?.map((exp, i) => (
         <div key={exp.id || i} style={{ marginBottom: "10pt" }}>
-          <EntryTitle
-            title={exp.jobTitle}
-            sub={`${exp.company ? `, ${exp.company}` : ""}${exp.city ? `, ${exp.city}` : ""}`}
-          />
-          <DateLine range={dateRange(exp.startDate, exp.endDate)} />
+          <div className="section-heading">
+            <EntryTitle
+              title={exp.jobTitle}
+              sub={`${exp.company ? `, ${exp.company}` : ""}${exp.city ? `, ${exp.city}` : ""}`}
+            />
+            <DateLine range={dateRange(exp.startDate, exp.endDate)} />
+          </div>
           {renderDynamicFields(exp, bodyStyle)}
         </div>
       ))}
@@ -463,11 +476,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       {section.educations?.map((edu, i) => (
         <div key={edu.id || i} style={{ marginBottom: "8pt" }}>
-          <EntryTitle
-            title={edu.degree}
-            sub={`${edu.institute ? `, ${edu.institute}` : ""}${edu.city ? `, ${edu.city}` : ""}`}
-          />
-          <DateLine range={dateRange(edu.startDate, edu.endDate)} />
+          <div className="section-heading">
+            <EntryTitle
+              title={edu.degree}
+              sub={`${edu.institute ? `, ${edu.institute}` : ""}${edu.city ? `, ${edu.city}` : ""}`}
+            />
+            <DateLine range={dateRange(edu.startDate, edu.endDate)} />
+          </div>
           {renderDynamicFields(edu, bodyStyle)}
         </div>
       ))}
@@ -479,11 +494,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       {section.certifications?.map((cert, i) => (
         <div key={cert.id || i} style={{ marginBottom: "8pt" }}>
-          <EntryTitle
-            title={cert.name}
-            sub={cert.organization ? `, ${cert.organization}` : ""}
-          />
-          <DateLine range={dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)} />
+          <div className="section-heading">
+            <EntryTitle
+              title={cert.name}
+              sub={cert.organization ? `, ${cert.organization}` : ""}
+            />
+            <DateLine range={dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)} />
+          </div>
           {renderDynamicFields(cert, bodyStyle)}
         </div>
       ))}
@@ -495,11 +512,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       {section.courses?.map((c, i) => (
         <div key={c.id || i} style={{ marginBottom: "6pt" }}>
-          <EntryTitle
-            title={c.course}
-            sub={c.institution ? ` - ${c.institution}` : ""}
-          />
-          <DateLine range={dateRange(c.startDate, c.endDate)} />
+          <div className="section-heading">
+            <EntryTitle
+              title={c.course}
+              sub={c.institution ? ` - ${c.institution}` : ""}
+            />
+            <DateLine range={dateRange(c.startDate, c.endDate)} />
+          </div>
         </div>
       ))}
     </div>
@@ -510,11 +529,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       {section.internships?.map((intern, i) => (
         <div key={intern.id || i} style={{ marginBottom: "8pt" }}>
-          <EntryTitle
-            title={intern.jobTitle}
-            sub={`${intern.employer ? `, ${intern.employer}` : ""}${intern.city ? `, ${intern.city}` : ""}`}
-          />
-          <DateLine range={dateRange(intern.startDate, intern.endDate)} />
+          <div className="section-heading">
+            <EntryTitle
+              title={intern.jobTitle}
+              sub={`${intern.employer ? `, ${intern.employer}` : ""}${intern.city ? `, ${intern.city}` : ""}`}
+            />
+            <DateLine range={dateRange(intern.startDate, intern.endDate)} />
+          </div>
           {renderDynamicFields(intern, bodyStyle)}
         </div>
       ))}
@@ -526,11 +547,13 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <SectionHeading title={section.title} />
       {section.activities?.map((a, i) => (
         <div key={a.id || i} style={{ marginBottom: "8pt" }}>
-          <EntryTitle
-            title={a.functionTitle}
-            sub={`${a.employer ? ` - ${a.employer}` : ""}${a.city ? `, ${a.city}` : ""}`}
-          />
-          <DateLine range={dateRange(a.startDate, a.endDate)} />
+          <div className="section-heading">
+            <EntryTitle
+              title={a.functionTitle}
+              sub={`${a.employer ? ` - ${a.employer}` : ""}${a.city ? `, ${a.city}` : ""}`}
+            />
+            <DateLine range={dateRange(a.startDate, a.endDate)} />
+          </div>
           {renderDynamicFields(a, bodyStyle)}
         </div>
       ))}
@@ -550,7 +573,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
           </colgroup>
           <tbody>
             {Array.from({ length: Math.ceil((section.skills?.length || 0) / 3) }).map((_, rowIdx) => (
-              <tr key={rowIdx}>
+              <tr key={rowIdx} style={{ }}>
                 {[0, 1, 2].map(colIdx => {
                   const skill = section.skills?.[rowIdx * 3 + colIdx];
                   if (!skill || !skill.name) return <td key={colIdx} />;
@@ -594,7 +617,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         </colgroup>
         <tbody>
           {Array.from({ length: Math.ceil((section.languages?.length || 0) / 3) }).map((_, rowIdx) => (
-            <tr key={rowIdx}>
+            <tr key={rowIdx} style={{ }}>
               {[0, 1, 2].map(colIdx => {
                 const l = section.languages?.[rowIdx * 3 + colIdx];
                 if (!l) return <td key={colIdx} />;
@@ -641,7 +664,7 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
           const name = typeof item === "object" ? (item.name || item.title) : item;
           const level = typeof item === "object" ? (item.level ?? 2) : 2;
           return (
-            <div key={i} style={{ marginBottom: "4pt" }}>
+            <div key={i} style={{ marginBottom: "4pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
               <div style={{
                 fontFamily: secondaryFont,
                 fontSize: `${bodySize}pt`,
@@ -668,12 +691,12 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
     <div key={section.id} style={sectionGap}>
       <SectionHeading title={section.title} />
       {section.items?.map((item, i) => (
-        <div key={item.id || i} style={{ marginBottom: "8pt" }}>
-          <EntryTitle
+        <div key={item.id || i} style={{ marginBottom: "8pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
+          <EntryHeader
             title={item.title}
             sub={item.city ? `, ${item.city}` : ""}
+            range={dateRange(item.startDate, item.endDate)}
           />
-          <DateLine range={dateRange(item.startDate, item.endDate)} />
           {renderDynamicFields(item, bodyStyle)}
         </div>
       ))}
@@ -818,10 +841,10 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
       <style>{`
         .resume-content ul  { list-style-type: disc;    padding-left: 14pt; margin: 2pt 0; }
         .resume-content ol  { list-style-type: decimal; padding-left: 14pt; margin: 2pt 0; }
-        .resume-content li  { margin-bottom: 2pt; }
+        .resume-content li  { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
         .resume-content strong { font-weight: bold; }
         .resume-content em     { font-style: italic; }
-        .resume-content p      { margin-bottom: 2pt; }
+        .resume-content p      { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
       `}</style>
 
       <div style={{
@@ -944,11 +967,16 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
         )}
 
         {/* ══ BODY ══ */}
-        <div style={{
-          paddingTop: `${topBottom}pt`,
-          paddingLeft: `${leftRight}pt`,
-          paddingRight: `${leftRight}pt`,
-        }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+          <thead><tr><th style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></th></tr></thead>
+          <tbody>
+            <tr>
+              <td style={{
+                paddingTop: `${topBottom}pt`,
+                paddingLeft: `${leftRight}pt`,
+                paddingRight: `${leftRight}pt`,
+                verticalAlign: "top",
+              }}>
 
           {/* Details + Links section
               - photo নেই: শুধু personal details (dob, nationality, licence) + links
@@ -1052,7 +1080,11 @@ const VividTemplate = ({ formData, sections, sectionOrder, resumeSettings, theme
           {/* All sections */}
           {renderAllSections()}
 
-        </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot><tr><td style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></td></tr></tfoot>
+        </table>
       </div>
     </div>
   );

@@ -24,7 +24,8 @@ const TemplateLayout = ({ layoutSettings, setLayoutSettings, selectedTemplate })
           onChange={(e) =>
             setLayoutSettings({ ...layoutSettings, pageFormat: e.target.value })
           }
-          className="w-full rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 text-sm outline-[#800080]"
+          disabled
+          className="w-full rounded-xl border border-gray-300 bg-gray-200 px-3 py-2 text-sm text-gray-500 cursor-not-allowed outline-none"
         >
           <option value="A4">A4 (8.27" x 11.69")</option>
           <option value="Letter">Letter (8.5" x 11")</option>

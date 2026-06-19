@@ -886,6 +886,8 @@ const page = () => {
                 sections={[]}
                 formValues={formValues}
                 resumeSettings={resumeSettings}
+                templateName={selectedTemplate}
+                themeColor={themeColor}
               >
                 <ActiveResume
                   formData={formValues}
@@ -1446,6 +1448,8 @@ const page = () => {
             sections={[]}
             formValues={formValues}
             resumeSettings={resumeSettings}
+            templateName={selectedTemplate}
+            themeColor={themeColor}
           >
             <div ref={componentRef}>
               <ActiveResume formData={formValues} empHistory={empHistory} themeColor={themeColor} sectionOrder={sectionOrder} resumeSettings={resumeSettings} />

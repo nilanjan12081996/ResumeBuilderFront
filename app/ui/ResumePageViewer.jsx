@@ -6,72 +6,128 @@ const A4_W = 794;
 const A4_H = 1123;
 
 const TEMPLATE_PAGE_BREAK_MAP = {
-  "prime ats": 1048,
-  "prime": 1048,
-  "primeats": 1048,
-  "professional": 1064,
-  "clear": 1065,
-  "clean": 1048,
-  "corporate": 1081,
-  "vivid": 1028,
-  "linkedin prime": 1048,
-  "linkedinprime": 1048,
+  "prime ats": 1123,
+  "prime": 1123,
+  "primeats": 1123,
+  "professional": 1123,
+  "executive": 1123,
+  "clear": 1123,
+  "minimalist": 1123,
+  "clean": 1123,
+  "essential": 1123,
+  "corporate": 1123,
+  "industry standard": 1123,
+  "vivid": 1123,
+  "linkedin prime": 1123,
+  "linkedinprime": 1123,
 };
-const DEFAULT_PAGE_BREAK_H = 1048;
+const DEFAULT_PAGE_BREAK_H = 1123;
 
 /**
- * Use Range.getClientRects() to find individual text-line positions.
- * This is the only browser API that exposes per-line geometry.
- * We find the last complete text line before each pageBreakH boundary.
+ * Simulate PDF page-break-inside:avoid behaviour in the browser preview.
+ *
+ * For every page boundary at (prevCut + pageBreakH) we check whether any
+ * avoid-break element (li, p, skill-row div etc.) would be split by that cut.
+ * If yes we move the cut to just before that element's top — exactly what the
+ * PDF engine does.  This makes each preview page end at the same content line
+ * as the corresponding PDF page.
  */
-function computeSafeBreaks(container, pageBreakH) {
-  const totalH = container.scrollHeight;
-  if (totalH <= pageBreakH) return [];
-
+function computePagination(container, pageBreakH, templateName) {
   const containerTop = container.getBoundingClientRect().top;
+  const isSidebarTemplate = templateName && ["corporate", "industry standard", "professional", "executive", "clean", "essential", "clear", "minimalist"].includes(templateName.toLowerCase());
+  const hasTfoot = isSidebarTemplate && !["corporate", "industry standard"].includes(templateName.toLowerCase());
+  const theadH = isSidebarTemplate ? 20 : 0;
+  const tfootH = hasTfoot ? 20 : 0;
 
-  // Collect bottom-Y of every rendered text line
-  const lineBottoms = new Set();
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-  let node;
-  while ((node = walker.nextNode())) {
-    if (!node.textContent.trim()) continue;
-    try {
-      const range = document.createRange();
-      range.selectNodeContents(node);
-      const rects = range.getClientRects();
-      for (const r of rects) {
-        if (r.height > 1) {
-          // Round to avoid sub-pixel jitter
-          lineBottoms.add(Math.round(r.bottom - containerTop));
-        }
+  const avoidElsArray = Array.from(container.querySelectorAll('.section-heading, .resume-content li, .resume-content p, [style*="avoid"]'));
+  const avoidEls = [];
+  
+  avoidElsArray.forEach((el, index) => {
+    const rect = el.getBoundingClientRect();
+    const x = Math.round(rect.left - container.getBoundingClientRect().left);
+    const top = Math.round(rect.top - containerTop);
+    const height = Math.round(rect.height);
+    if (height > 0 && top < container.scrollHeight) {
+      avoidEls.push({ el, index, x, top, height, bottom: top + height });
+    }
+  });
+
+  avoidEls.sort((a, b) => a.top - b.top);
+
+  const columnShifts = {};
+  const mutations = [];
+
+  const getNextBoundary = (y) => {
+    let boundary = 0;
+    let pageIdx = 0;
+    while (boundary <= y) {
+      let capacity = pageBreakH;
+      if (isSidebarTemplate) {
+        if (pageIdx === 0) capacity = pageBreakH - tfootH;
+        else capacity = pageBreakH - tfootH - theadH;
       }
-    } catch (_) { /* skip inaccessible nodes */ }
-  }
+      boundary += capacity;
+      pageIdx++;
+    }
+    return boundary;
+  };
 
-  const sorted = Array.from(lineBottoms).sort((a, b) => a - b);
+  avoidEls.forEach(item => {
+    let colKey = Object.keys(columnShifts).find(k => Math.abs(parseInt(k) - item.x) < 50);
+    if (!colKey) {
+      colKey = item.x.toString();
+      columnShifts[colKey] = 0;
+    }
+
+    const shift = columnShifts[colKey];
+    const topWithShift = item.top + shift;
+    const bottomWithShift = topWithShift + item.height;
+
+    const nextBoundary = getNextBoundary(topWithShift);
+
+    const BOTTOM_MARGIN = 15; // User requested ~10px gap
+    const TOP_MARGIN = 20;    // Reduced top margin to align with a small gap
+
+    if (bottomWithShift > nextBoundary - BOTTOM_MARGIN && item.height < pageBreakH * 0.8) {
+      let targetItem = item;
+      let targetTopWithShift = topWithShift;
+
+      let currentItem = item;
+
+      // Only attach to the immediate heading, don't climb multiple levels
+      // Actually, to maximize page filling as requested by the user, we should NOT drag headings
+      // that are far away. We just push the exact element that crossed the boundary.
+      // Removed the while(true) loop to prevent entire sections from being pushed to the next page.
+
+      const pushAmount = (nextBoundary + TOP_MARGIN) - targetTopWithShift;
+      columnShifts[colKey] += pushAmount;
+      mutations.push({ index: targetItem.index, marginTop: pushAmount });
+    }
+  });
+
+  const totalH = container.scrollHeight;
+  const maxShift = Math.max(0, ...Object.values(columnShifts), 0);
+  const newTotalH = totalH + maxShift;
 
   const breaks = [];
-  let pageStart = 0;
-
+  let boundary = 0;
+  let pageIdx = 0;
   while (true) {
-    const targetBreak = pageStart + pageBreakH;
-    if (targetBreak >= totalH) break;
-
-    // Last text line that fully fits within this page
-    const fitting = sorted.filter(b => b > pageStart && b <= targetBreak);
-    const safeCut = fitting.length > 0
-      ? fitting[fitting.length - 1]   // last complete line
-      : targetBreak;                   // fallback: hard cut
-
-    breaks.push(safeCut);
-    pageStart = safeCut;
+    let capacity = pageBreakH;
+    if (isSidebarTemplate) {
+      if (pageIdx === 0) capacity = pageBreakH - tfootH;
+      else capacity = pageBreakH - tfootH - theadH;
+    }
+    boundary += capacity;
+    if (boundary >= newTotalH) break;
+    breaks.push(boundary);
+    pageIdx++;
   }
 
-  return breaks;
+  return { breaks, mutations };
 }
 
-const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) => {
+const ResumePageViewer = ({ children, sections, formValues, resumeSettings, contentRef, rawContentRef }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
   const [scale, setScale] = useState(1);
@@ -79,9 +135,11 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
   const [isAutoFit, setIsAutoFit] = useState(true);
   const [isPanMode, setIsPanMode] = useState(false);
   const [safeBreaks, setSafeBreaks] = useState([]);
+  const [mutations, setMutations] = useState([]);
 
   const containerRef = useRef(null);
-  const measurementRef = useRef(null);
+  const internalMeasurementRef = useRef(null);
+  const measurementRef = rawContentRef || internalMeasurementRef;
   const scrollContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [coords, setCoords] = useState({ startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 });
@@ -105,9 +163,10 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
     const el = measurementRef.current;
     if (!el) return;
 
-    const breaks = computeSafeBreaks(el, pageBreakH);
-    setSafeBreaks(breaks);
-    setTotalPages(breaks.length + 1);
+    const result = computePagination(el, pageBreakH, templateName);
+    setSafeBreaks(result.breaks);
+    setMutations(result.mutations);
+    setTotalPages(result.breaks.length + 1);
 
     if (containerRef.current) {
       const fitScale = containerRef.current.clientWidth / A4_W;
@@ -130,6 +189,65 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
     return () => { obs.disconnect(); window.removeEventListener("resize", recalculate); };
   }, [recalculate]);
 
+  // Ref array for visible page containers
+  const visiblePagesRef = useRef([]);
+
+  useEffect(() => {
+    const insertedSpacers = [];
+
+    const containersToProcess = [...visiblePagesRef.current];
+    if (contentRef && contentRef.current) {
+      Array.from(contentRef.current.children).forEach(child => {
+        containersToProcess.push(child);
+      });
+    }
+
+    containersToProcess.forEach((container) => {
+      if (!container) return;
+      const avoidEls = Array.from(container.querySelectorAll('.section-heading, .resume-content li, .resume-content p, [style*="avoid"]'));
+      
+      mutations.forEach(({ index, marginTop }) => {
+        if (avoidEls[index] && marginTop > 0) {
+          const el = avoidEls[index];
+          const tagName = el.tagName.toLowerCase();
+          const isLi = tagName === 'li';
+          const isTr = tagName === 'tr';
+          
+          let spacer;
+          if (isTr) {
+            spacer = document.createElement('tr');
+            spacer.className = 'pdf-parity-spacer';
+            const td = document.createElement('td');
+            td.colSpan = 100;
+            td.style.height = `${marginTop}px`;
+            td.style.padding = '0';
+            td.style.border = 'none';
+            spacer.appendChild(td);
+          } else {
+            spacer = document.createElement(isLi ? 'li' : 'div');
+            spacer.className = 'pdf-parity-spacer';
+            spacer.style.height = `${marginTop}px`;
+            spacer.style.width = '100%';
+            spacer.style.flexShrink = '0';
+            if (isLi) {
+              spacer.style.listStyle = 'none';
+              spacer.style.margin = '0';
+              spacer.style.padding = '0';
+            }
+          }
+          el.parentNode.insertBefore(spacer, el);
+          insertedSpacers.push(spacer);
+        }
+      });
+    });
+
+    return () => {
+      insertedSpacers.forEach(spacer => {
+        if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
+      });
+    };
+  }, [mutations, safeBreaks, children]);
+
   const handleZoomIn = () => { setScale(p => Math.min(2, p + 0.1)); setIsAutoFit(false); };
   const handleZoomOut = () => { setScale(p => Math.max(0.2, p - 0.1)); setIsAutoFit(false); };
 
@@ -148,19 +266,59 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
   };
 
   // start and height of each page's content slice
+  // Each page shows content between its break points, matching the PDF engine.
   const getPageSlice = (idx) => {
     const start = idx === 0 ? 0 : (safeBreaks[idx - 1] ?? idx * pageBreakH);
-    const end = safeBreaks[idx] ?? (start + pageBreakH);
-    return { start, pageH: end - start };
+    const end = safeBreaks[idx] ?? ((idx + 1) * pageBreakH);
+    const sliceH = end - start;
+    return { start, sliceH, pageH: pageBreakH };
   };
 
   const displayScale = Math.round((scale / baseScale) * 100);
 
+  const pdfResetStyles = `
+    .resume-document table { border-collapse: collapse; }
+    .resume-document td { vertical-align: top; }
+    .resume-document a { color: inherit; text-decoration: none; }
+    .resume-document ul { list-style-type: disc; padding-left: 1.2rem; margin: 0.25rem 0; }
+    .resume-document ol { list-style-type: decimal; padding-left: 1.2rem; margin: 0.25rem 0; }
+    .resume-document li { margin-bottom: 0.15rem; }
+    .resume-document p { margin: 0.1rem 0; }
+  `;
+
   return (
     <div className="flex flex-col h-full bg-[#f8fafc] overflow-hidden select-none relative" ref={containerRef}>
+      <style>{pdfResetStyles}</style>
+      
       {/* Off-screen measurement container */}
-      <div className="fixed -left-[9999px] top-0 w-[794px] pdf-measurement-box" ref={measurementRef}>
+      <div className="fixed -left-[9999px] top-0 w-[794px] pdf-measurement-box resume-document" ref={measurementRef}>
         {children}
+      </div>
+
+      {/* Hidden export wrapper: This is what gets sent to the PDF generator. 
+          It contains the EXACT same slices as the visible UI, ensuring 100% parity. */}
+      <div ref={contentRef} style={{ display: 'none' }}>
+        {Array.from({ length: totalPages }).map((_, idx) => {
+          const { start, sliceH } = getPageSlice(idx);
+          return (
+            <div key={`export-${idx}`} style={{ 
+              width: `${A4_W}px`, 
+              height: `${A4_H}px`, 
+              backgroundColor: "#fff",
+              position: "relative",
+              overflow: "hidden",
+              pageBreakAfter: "always",
+              paddingTop: "0px",
+              boxSizing: "border-box"
+            }}>
+              <div style={{ height: `${sliceH}px`, overflow: "hidden", width: "100%", position: 'relative' }}>
+                <div style={{ transform: `translateY(-${start}px)`, width: "100%", position: 'relative' }}>
+                  {children}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div
@@ -181,7 +339,7 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
             style={{ transform: `translateX(-${currentPage * 100}%)`, width: `${totalPages * 100}%`, display: "flex" }}
           >
             {Array.from({ length: totalPages }).map((_, idx) => {
-              const { start, pageH } = getPageSlice(idx);
+              const { start, sliceH, pageH } = getPageSlice(idx);
               return (
                 <div key={idx} className="w-full h-full flex justify-start flex-shrink-0">
                   <div
@@ -190,16 +348,32 @@ const ResumePageViewer = ({ children, sections, formValues, resumeSettings }) =>
                       height: A4_H,
                       transform: `scale(${scale})`,
                       transformOrigin: "top left",
-                      paddingTop: idx > 0 ? `${(A4_H - pageBreakH) / 2}px` : "0px",
+                      paddingTop: ["corporate", "industry standard", "professional", "executive", "clean", "essential", "clear", "minimalist"].includes(templateName?.toLowerCase()) && idx > 0 ? "20px" : "0px",
+                      background: (() => {
+                        const tn = templateName?.toLowerCase() || '';
+                        if (tn === 'corporate' || tn === 'industry standard') {
+                          return "#ffffff";
+                        }
+                        if (tn === 'professional' || tn === 'executive') {
+                          return `linear-gradient(to right, ${themeColor} 0%, ${themeColor} 35%, #fff 35%, #fff 100%)`;
+                        }
+                        if (tn === 'clear' || tn === 'clarity' || tn === 'minimalist' || tn === 'linkedin prime' || tn === 'linkedinprime') {
+                          return "#ffffff";
+                        }
+                        return "#ffffff";
+                      })()
                     }}
-                    className="bg-white relative overflow-hidden flex flex-col items-center"
+                    className="relative overflow-hidden flex flex-col items-center"
                   >
                     <div style={{ overflow: "hidden", width: "100%", height: "100%" }}>
                       <div
-                        className="w-full overflow-hidden resume-view-container pdf-parity-fix"
-                        style={{ maxHeight: pageH, overflow: "hidden", width: "100%", position: 'relative' }}
+                        className="w-full overflow-hidden resume-view-container pdf-parity-fix resume-document"
+                        style={{ height: sliceH, overflow: "hidden", width: "100%", position: 'relative' }}
                       >
-                        <div style={{ transform: `translateY(-${start}px)`, width: "100%", position: 'relative' }}>
+                        <div 
+                          ref={el => visiblePagesRef.current[idx] = el}
+                          style={{ transform: `translateY(-${start}px)`, width: "100%", position: 'relative' }}
+                        >
                           {children}
                         </div>
                       </div>

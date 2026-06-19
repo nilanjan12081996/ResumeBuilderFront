@@ -58,11 +58,11 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
   };
 
   const SectionHeading = ({ title }) => (
-    <div style={sectionHeadingStyle}>{title}</div>
+    <div className="section-heading" style={sectionHeadingStyle}>{title}</div>
   );
 
   const SidebarHeading = ({ title }) => (
-    <div style={{
+    <div className="section-heading" style={{
       ...sectionHeadingStyle,
       fontSize: `${(text.sectionTitle || 10) - 1}pt`,
       marginTop: `${Math.max((layout.betweenSections || 10) - 2, 4)}pt`,
@@ -74,7 +74,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
 
   // Two-col row (title left, date right) — table only
   const TwoColRow = ({ left, right }) => (
-    <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+    <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", breakInside: "avoid", pageBreakInside: "avoid" }}>
       <colgroup>
         <col style={{ width: "70%" }} />
         <col style={{ width: "30%" }} />
@@ -98,7 +98,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
       <div key="skills">
         <SidebarHeading title={formData.skillSectionTitle || "Skills"} />
         {formData.newSkillHistory.map((s, i) => (
-          <div key={i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt" }}>
+          <div key={i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
             {s.skill}
             {!formData.hideExperienceLevel && s.level !== undefined
               ? ` (${capitalize(skillLevels[s.level ?? 0])})`
@@ -115,7 +115,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
       <div key="languages">
         <SidebarHeading title={formData.languagesSectionTitle || "Languages"} />
         {formData.languageHistory.map((lang, i) => (
-          <div key={i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt" }}>
+          <div key={i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
             {lang.language}
             {!formData.hideLanguageProficiency && lang.level ? ` (${lang.level})` : ""}
           </div>
@@ -127,7 +127,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
   const renderHobbiesSidebar = () => {
     if (!formData.hobbies) return null;
     return (
-      <div key="hobbies">
+      <div key="hobbies" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
         <SidebarHeading title={formData.hobbiesSectionTitle || "Hobbies"} />
         <div style={{ ...bodyStyle, color: "#444" }}>{formData.hobbies}</div>
       </div>
@@ -460,7 +460,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
       <div key={section.id}>
         <SidebarHeading title={section.title} />
         {section.skills?.map((skill, i) => (
-          <div key={skill.id || i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt" }}>
+          <div key={skill.id || i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
             {skill.name}
             {showLevel && skill.level !== undefined
               ? ` (${capitalize(skillLevels[skill.level ?? 0])})`
@@ -473,10 +473,10 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
 
   // Languages sidebar from sections prop
   const renderLanguagesFromSection = (section) => (
-    <div key={section.id}>
+    <div key={section.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
       <SidebarHeading title={section.title} />
       {section.languages?.map((l, i) => (
-        <div key={i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt" }}>
+        <div key={i} style={{ ...bodyStyle, color: "#333", marginBottom: "2pt", breakInside: "avoid", pageBreakInside: "avoid" }}>
           {l.language}
           {!section.hideProficiency && l.level ? ` (${l.level})` : ""}
         </div>
@@ -487,7 +487,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
   const renderHobbiesFromSection = (section) => {
     if (!section.hobbies) return null;
     return (
-      <div key={section.id}>
+      <div key={section.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
         <SidebarHeading title={section.title} />
         <div style={{ ...bodyStyle, color: "#444" }}>{section.hobbies}</div>
       </div>
@@ -857,7 +857,7 @@ const ClearTemplate = ({ formData, sections, sectionOrder, themeColor, resumeSet
                       {formData.driving_licence && (
                         <div style={{ marginBottom: "4pt" }}>
                           <div style={{ fontSize: "7.5pt", fontWeight: "700", color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                            Driving License
+                            Driving Licence
                           </div>
                           <div style={{ ...bodyStyle, color: "#333" }}>{formData.driving_licence}</div>
                         </div>

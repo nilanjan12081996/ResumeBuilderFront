@@ -43,11 +43,11 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
   };
 
   const SectionHeading = ({ title }) => (
-    <div style={sectionHeadingStyle}>{title}</div>
+    <div className="section-heading" style={sectionHeadingStyle}>{title}</div>
   );
 
   const TwoColRow = ({ left, right }) => (
-    <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+    <table className="section-heading" style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", breakInside: "avoid", pageBreakInside: "avoid" }}>
       <colgroup>
         <col style={{ width: "70%" }} />
         <col style={{ width: "30%" }} />
@@ -131,7 +131,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               const s1 = formData.newSkillHistory[rowIdx * 2];
               const s2 = formData.newSkillHistory[rowIdx * 2 + 1];
               return (
-                <tr key={rowIdx}>
+                <tr key={rowIdx} style={{ }}>
                   <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", color: "#1f2937", verticalAlign: "middle" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <tbody><tr>
@@ -242,7 +242,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
               const s1 = skills[rowIdx * 2];
               const s2 = skills[rowIdx * 2 + 1];
               return (
-                <tr key={rowIdx}>
+                <tr key={rowIdx} style={{ }}>
                   <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", color: "#1f2937", verticalAlign: "middle" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <tbody><tr>
@@ -416,7 +416,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             {items.map((item, idx) => {
               const name = typeof item === "object" ? item?.name || item?.title : item;
               return (
-                <tr key={idx}>
+                <tr key={idx} style={{ }}>
                   <td style={{ width: showLevel ? "80%" : "100%", padding: "2pt 0", color: "#1f2937" }}>
                     {name}
                   </td>
@@ -502,7 +502,7 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
                   const it1 = items[rowIdx * 2];
                   const it2 = items[rowIdx * 2 + 1];
                   return (
-                    <tr key={rowIdx}>
+                    <tr key={rowIdx} style={{ }}>
                       <td style={{ width: "50%", padding: "2pt 8pt 2pt 0", color: "#1f2937" }}>
                         {it1?.name}
                         {!hideLevel && <span style={{ float: "right", color: "#9ca3af", fontSize: `${text.body - 1}pt`, textTransform: "uppercase" }}>{skillLevels[it1?.level ?? 2]}</span>}
@@ -552,24 +552,28 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
       <style>{`
         .resume-content ul { list-style-type: disc; padding-left: 16pt; margin: 2pt 0; }
         .resume-content ol { list-style-type: decimal; padding-left: 16pt; margin: 2pt 0; }
-        .resume-content li { margin-bottom: 2pt; }
+        .resume-content li { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
         .resume-content strong { font-weight: bold; }
         .resume-content em { font-style: italic; }
-        .resume-content p { margin-bottom: 2pt; }
+        .resume-content p { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
       `}</style>
-      <div
+      <table
         style={{
-          minHeight: "297mm",
           width: "100%",
+          borderCollapse: "collapse",
+          minHeight: "297mm",
           backgroundColor: "#fff",
           fontFamily: text.primaryFont || "Arial",
           lineHeight: text.lineHeight || 1.5,
           fontSize: `${text.body}pt`,
-          padding: `${layout.topBottom}pt ${layout.leftRight}pt`,
           boxSizing: "border-box",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8pt" }}>
+        <thead><tr><th style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></th></tr></thead>
+        <tbody>
+          <tr>
+            <td style={{ padding: `${layout.topBottom}pt ${layout.leftRight}pt`, verticalAlign: "top" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8pt" }}>
           <tbody>
             <tr>
               <td style={{ verticalAlign: "top", textAlign: headerTextAlign }}>
@@ -638,8 +642,12 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
           </tbody>
         </table>
 
-        {renderDynamicSections()}
-      </div>
+              {renderDynamicSections()}
+            </td>
+          </tr>
+        </tbody>
+        <tfoot><tr><td style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></td></tr></tfoot>
+      </table>
     </div>
   );
 };

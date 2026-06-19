@@ -1509,8 +1509,10 @@ const LinkedInResumeBuilder = () => {
           sections={sections}
           formValues={formValues}
           resumeSettings={resumeSettings}
+          templateName={selectedTemplate}
+          themeColor={themeColor}
         >
-          <div ref={componentRef}>
+          <div>
             <ActiveResume
               formData={formValues}
               sections={sections}

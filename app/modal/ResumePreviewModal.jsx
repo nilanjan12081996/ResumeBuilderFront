@@ -80,6 +80,8 @@ const ResumePreviewModal = ({
                                 sections={sections}
                                 formValues={formData}
                                 resumeSettings={resumeSettings}
+                                templateName={selectedTemplate}
+                                themeColor={themeColor}
                             >
                                 <ActiveTemplate
                                     formData={formData}

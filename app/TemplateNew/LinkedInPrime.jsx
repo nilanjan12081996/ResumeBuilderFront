@@ -86,6 +86,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
   // ── Section Heading ───────────────────────────────────────────
   const SectionHeading = ({ title }) => (
     <div
+      className="section-heading"
       style={{
         color: "#000000",
         fontFamily: text.secondaryFont,
@@ -142,6 +143,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
         const dur = calcDuration(exp.startDate, exp.endDate);
         return (
           <div key={exp.id || i} style={{ marginBottom: "10pt" }}>
+    <div className="section-heading" style={{ }}>
             <div style={{
               fontFamily: text.secondaryFont || text.primaryFont,
               fontSize: `${text.body + 1}pt`,
@@ -166,7 +168,8 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
                 {exp.city}
               </div>
             )}
-            {renderDynamicFields(exp, { ...bodyStyle, marginTop: "4pt" })}
+                </div>
+    {renderDynamicFields(exp, { ...bodyStyle, marginTop: "4pt" })}
           </div>
         );
       })}
@@ -181,6 +184,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
         const dr = dateRange(edu.startDate, edu.endDate);
         return (
           <div key={edu.id || i} style={{ marginBottom: "10pt" }}>
+    <div className="section-heading" style={{ }}>
             <div style={{
               fontFamily: text.secondaryFont || text.primaryFont,
               fontSize: `${text.body + 1}pt`,
@@ -210,7 +214,8 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
                 CGPA: {edu.cgpa}
               </div>
             )}
-            {renderDynamicFields(edu, { ...bodyStyle, marginTop: "4pt" })}
+                </div>
+    {renderDynamicFields(edu, { ...bodyStyle, marginTop: "4pt" })}
           </div>
         );
       })}
@@ -234,6 +239,8 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
             fontFamily: text.primaryFont,
             marginRight: "4pt",
             marginBottom: "4pt",
+            breakInside: "avoid",
+            pageBreakInside: "avoid",
           }}>
             {skill.name}
           </span>
@@ -249,7 +256,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
       <table style={{ borderCollapse: "collapse" }}>
         <tbody>
           {Array.from({ length: Math.ceil((section.languages?.length || 0) / 3) }).map((_, rowIdx) => (
-            <tr key={rowIdx}>
+            <tr key={rowIdx} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               {[0, 1, 2].map(colIdx => {
                 const l = section.languages?.[rowIdx * 3 + colIdx];
                 if (!l) return <td key={colIdx} style={{ paddingRight: "16pt", paddingBottom: "4pt" }} />;
@@ -279,6 +286,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
       <SectionHeading title={section.title} />
       {section.courses?.map((course, i) => (
         <div key={course.id || i} style={{ marginBottom: "8pt" }}>
+    <div className="section-heading" style={{ }}>
           <div style={{
             fontFamily: text.secondaryFont || text.primaryFont,
             fontSize: `${text.body}pt`,
@@ -298,7 +306,8 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
               {dateRange(course.startDate, course.endDate)}
             </div>
           )}
-          {renderDynamicFields(course, { ...bodyStyle, marginTop: "2pt" })}
+              </div>
+    {renderDynamicFields(course, { ...bodyStyle, marginTop: "2pt" })}
         </div>
       ))}
       <Divider />
@@ -312,6 +321,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
         const dr = dateRange(item.startDate, item.endDate);
         return (
           <div key={item.id || i} style={{ marginBottom: "10pt" }}>
+    <div className="section-heading" style={{ }}>
             <div style={{
               fontFamily: text.secondaryFont || text.primaryFont,
               fontSize: `${text.body + 1}pt`,
@@ -331,7 +341,8 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
                 {dr}
               </div>
             )}
-            {renderDynamicFields(item, { ...bodyStyle, marginTop: "4pt" })}
+                </div>
+    {renderDynamicFields(item, { ...bodyStyle, marginTop: "4pt" })}
           </div>
         );
       })}
@@ -353,7 +364,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
           return (
             <table key={i} style={{ borderCollapse: "collapse" }}>
               <tbody>
-                <tr>
+                <tr style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
                   <td style={{ verticalAlign: "top" }}>
                     <span style={{ ...bodyStyle, color: "#374151" }}>
                       {name}
@@ -381,6 +392,7 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
         const dr = dateRange(item.startDate, item.endDate);
         return (
           <div key={item.id || i} style={{ marginBottom: "10pt" }}>
+    <div className="section-heading" style={{ }}>
             <div style={{
               fontFamily: text.secondaryFont || text.primaryFont,
               fontSize: `${text.body + 1}pt`,
@@ -402,7 +414,8 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
                 </a>
               </div>
             )}
-            {renderDynamicFields(item, { ...bodyStyle, marginTop: "4pt" })}
+                </div>
+    {renderDynamicFields(item, { ...bodyStyle, marginTop: "4pt" })}
           </div>
         );
       })}
@@ -430,10 +443,10 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
       <style>{`
         .resume-content ul { list-style-type: disc; padding-left: 14pt; margin: 2pt 0; }
         .resume-content ol { list-style-type: decimal; padding-left: 14pt; margin: 2pt 0; }
-        .resume-content li { margin-bottom: 2pt; }
+        .resume-content li { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
         .resume-content strong { font-weight: bold; }
         .resume-content em { font-style: italic; }
-        .resume-content p { margin-bottom: 2pt; }
+        .resume-content p { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
 
         /* ── PDF-safe profile photo circle ── */
         .linkedin-profile-photo {
@@ -530,7 +543,14 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
           </div>
         </div>
 
-        {/* Spacer for profile photo overlap */}
+        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+          <thead>
+            <tr><th style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ verticalAlign: "top" }}>
+                {/* Spacer for profile photo overlap */}
         <div style={{
           paddingTop: "38pt",
           paddingLeft: `${layout.leftRight || 20}pt`,
@@ -676,8 +696,14 @@ const LinkedInPrime = ({ formData, sections, themeColor, resumeSettings }) => {
 
           {/* ══ 15. CUSTOM ADVANCED ══════════════════════════════════ */}
           {customAdvSections.map((s) => renderCustomAdvanced(s))}
-
-        </div>
+          </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr><td style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></td></tr>
+          </tfoot>
+        </table>
       </div>
     </div>
   );

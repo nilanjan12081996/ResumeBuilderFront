@@ -15,6 +15,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
 
   const [coverCropSrc, setCoverCropSrc] = useState(null);
   const [coverLoading, setCoverLoading] = useState(false);
+  const [coverError, setCoverError] = useState("");
 
   const dispatch = useDispatch();
   const { uploadImageLinkedInLoading } = useSelector((state) => state.resume);
@@ -69,8 +70,18 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
   };
 
   const handleCoverChange = (e) => {
+    setCoverError("");
     const file = e.target.files[0];
     if (!file) return;
+    const allowed = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowed.includes(file.type)) {
+      setCoverError("Only JPG, JPEG, PNG formats are supported.");
+      return;
+    }
+    if (file.size > 1 * 1024 * 1024) {
+      setCoverError("File size must be under 1MB.");
+      return;
+    }
     const reader = new FileReader();
     reader.onloadend = () => setCoverCropSrc(reader.result);
     reader.readAsDataURL(file);
@@ -103,6 +114,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
   // ✅ Same for cover image
   const handleCoverCropSave = async (base64) => {
     setCoverCropSrc(null);
+    setCoverError("");
     setCoverLoading(true);
     // base64 টা এখনই save করি DOCX এর জন্য
     setValue("coverImageBase64", base64);
@@ -115,6 +127,7 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
       }
     } catch (err) {
       console.error("Cover upload error:", err);
+      setCoverError("Something went wrong during upload.");
       setValue("coverImageBase64", null);
     } finally {
       setCoverLoading(false);
@@ -165,8 +178,14 @@ const LinkedInPersonalDetails = ({ register, watch, setValue }) => {
                 className="w-full flex items-center justify-center rounded-t-xl text-white text-sm font-medium gap-2"
                 style={{ height: "90px", background: "linear-gradient(135deg, #0a66c2 0%, #7c3aed 100%)" }}
               >
-                <FaCamera size={14} />
-                <span>Upload cover photo</span>
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center gap-2">
+                    <FaCamera size={14} />
+                    <span>Upload cover photo</span>
+                  </div>
+                  <span className="text-[10px] text-white/80 mt-1">JPG, JPEG, PNG (Up to 1MB)</span>
+                  {coverError && <span className="text-[10px] text-red-200 mt-1 font-semibold">{coverError}</span>}
+                </div>
               </div>
             )}
           </label>

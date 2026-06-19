@@ -203,7 +203,7 @@ const TemplateText = ({ textSettings, setTextSettings, isPrimeAtsTemp, selectedT
                 }
                 disabled={value === defaultSettings[item.key]}
               >
-                Set as Default
+                Reset to Original
               </button>
             </div>
           );

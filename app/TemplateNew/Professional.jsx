@@ -99,7 +99,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         {formData.newSkillHistory.map((item, i) => {
           const pct = ((item.level ?? 3) + 1) * 20;
           return (
-            <div key={i} style={{ marginBottom: '8pt' }}>
+            <div key={item.id || i} style={{ marginBottom: '8pt', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ ...bodyStyle, color: '#ffffff', fontSize: `${text.body}pt` }}>{item.skill}</div>
               {!hideLevel && (
                 <div style={skillBarBg}>
@@ -113,9 +113,22 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     );
   };
 
+  const EntryHeader = ({ title, date }) => (
+    <div className="section-heading" style={{ }}>
+      <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
+        {title}
+      </div>
+      {date && (
+        <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
+          {date}
+        </div>
+      )}
+    </div>
+  );
+
   const renderHobbiesScratch = () =>
     formData.hobbies ? (
-      <div key="hobbies">
+      <div key="hobbies" style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
         <span style={sideHeadingStyle}>{formData.hobbiesSectionTitle || 'Hobbies'}</span>
         <p style={{ ...bodyStyle, color: '#d1d5db', margin: 0 }}>{formData.hobbies}</p>
       </div>
@@ -128,7 +141,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <div key="languages">
         <span style={sideHeadingStyle}>{formData.languagesSectionTitle || 'Languages'}</span>
         {formData.languageHistory.map((item, i) => (
-          <div key={i} style={{ marginBottom: '8pt' }}>
+          <div key={i} style={{ marginBottom: '8pt', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <div style={{ ...bodyStyle, color: '#ffffff' }}>
               {item.language}{!formData.hideLanguageProficiency && item.level ? ` (${item.level})` : ''}
             </div>
@@ -151,7 +164,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         {section.skills?.map((skill, i) => {
           const pct = ((skill.level ?? 3) + 1) * 20;
           return (
-            <div key={skill.id || i} style={{ marginBottom: '8pt' }}>
+            <div key={skill.id || i} style={{ marginBottom: '8pt', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
               <div style={{ ...bodyStyle, color: '#ffffff' }}>{skill.name}</div>
               {showLevel && (
                 <div style={skillBarBg}>
@@ -172,7 +185,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <div key={section.id}>
         <span style={sideHeadingStyle}>{section.title}</span>
         {section.languages.map((l, i) => (
-          <div key={i} style={{ marginBottom: '8pt' }}>
+          <div key={l.id || i} style={{ marginBottom: '8pt', breakInside: 'avoid', pageBreakInside: 'avoid' }}>
             <div style={{ ...bodyStyle, color: '#ffffff' }}>
               {l.language}{!section.hideProficiency && l.level ? ` (${l.level})` : ''}
             </div>
@@ -189,7 +202,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
 
   const renderHobbiesFromSectionSidebar = (section) =>
     section.hobbies ? (
-      <div key={section.id}>
+      <div key={section.id} style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}>
         <span style={sideHeadingStyle}>{section.title}</span>
         <p style={{ ...bodyStyle, color: '#d1d5db', margin: 0 }}>{section.hobbies}</p>
       </div>
@@ -202,7 +215,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
   const renderSummaryScratch = () =>
     formData.summary ? (
       <section key="summary">
-        <span style={mainHeadingStyle}>{formData.summarySectionTitle || 'Profile'}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{formData.summarySectionTitle || 'Profile'}</span>
         <div
           className="resume-content"
           style={{ ...bodyStyle, color: '#374151', lineHeight: text.lineHeight, textAlign: 'justify' }}
@@ -216,17 +229,13 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     if (!hasEmp) return null;
     return (
       <section key="employment">
-        <span style={mainHeadingStyle}>{formData.employmentSectionTitle || 'Employment History'}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{formData.employmentSectionTitle || 'Employment History'}</span>
         {formData.employmentHistory.map((job, i) => (
           <div key={i} style={{ marginBottom: '8pt' }}>
-            <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-              {job.job_title}{job.employer ? `, ${job.employer}` : ''}{job.city_state ? `, ${job.city_state}` : ''}
-            </div>
-            {dateRange(job.startDate, job.endDate) && (
-              <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
-                {dateRange(job.startDate, job.endDate)}
-              </div>
-            )}
+            <EntryHeader 
+              title={<>{job.job_title}{job.employer ? `, ${job.employer}` : ''}{job.city_state ? `, ${job.city_state}` : ''}</>}
+              date={dateRange(job.startDate, job.endDate)} 
+            />
             {renderDynamicFields(job, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
           </div>
         ))}
@@ -239,18 +248,14 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     if (!hasEdu) return null;
     return (
       <section key="education">
-        <span style={mainHeadingStyle}>{formData.educationSectionTitle || 'Education'}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{formData.educationSectionTitle || 'Education'}</span>
         {formData.educationHistory.map((edu, i) => (
           <div key={i} style={{ marginBottom: '8pt' }}>
-            <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-              {edu.degree}{edu.school ? `, ${edu.school}` : ''}{edu.city_state ? `, ${edu.city_state}` : ''}
-            </div>
-            {dateRange(edu.startDate, edu.endDate) && (
-              <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
-                {dateRange(edu.startDate, edu.endDate)}
-              </div>
-            )}
-            {renderDynamicFields(edu, { ...bodyStyle, color: '#374151' })}
+            <EntryHeader 
+              title={<>{edu.degree}{edu.school ? `, ${edu.school}` : ''}{edu.city_state ? `, ${edu.city_state}` : ''}</>}
+              date={dateRange(edu.startDate, edu.endDate)} 
+            />
+            {renderDynamicFields(edu, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
           </div>
         ))}
       </section>
@@ -261,17 +266,13 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     if (!formData.coursesHistory?.some(c => c.course || c.institution)) return null;
     return (
       <section key="courses">
-        <span style={mainHeadingStyle}>{formData.coursesSectionTitle || 'Courses'}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{formData.coursesSectionTitle || 'Courses'}</span>
         {formData.coursesHistory.map((course, i) => (
           <div key={i} style={{ marginBottom: '6pt' }}>
-            <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-              {course.course}{course.institution ? `, ${course.institution}` : ''}
-            </div>
-            {dateRange(course.startDate, course.endDate) && (
-              <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-                {dateRange(course.startDate, course.endDate)}
-              </div>
-            )}
+            <EntryHeader 
+              title={<>{course.course}{course.institution ? `, ${course.institution}` : ''}</>}
+              date={dateRange(course.startDate, course.endDate)} 
+            />
           </div>
         ))}
       </section>
@@ -282,17 +283,13 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     if (!formData.activityHistory?.some(a => a.functionTitle || a.employer)) return null;
     return (
       <section key="activities">
-        <span style={mainHeadingStyle}>{formData.activitiesSectionTitle || 'Extra-curricular Activities'}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{formData.activitiesSectionTitle || 'Extra-curricular Activities'}</span>
         {formData.activityHistory.map((a, i) => (
           <div key={i} style={{ marginBottom: '8pt' }}>
-            <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-              {a.functionTitle}{a.employer ? `, ${a.employer}` : ''}{a.city ? `, ${a.city}` : ''}
-            </div>
-            {dateRange(a.startDate, a.endDate) && (
-              <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-                {dateRange(a.startDate, a.endDate)}
-              </div>
-            )}
+            <EntryHeader 
+              title={<>{a.functionTitle}{a.employer ? `, ${a.employer}` : ''}{a.city ? `, ${a.city}` : ''}</>}
+              date={dateRange(a.startDate, a.endDate)} 
+            />
             {a.description && <p style={{ ...bodyStyle, color: '#374151', margin: '2pt 0' }}>{a.description}</p>}
           </div>
         ))}
@@ -304,18 +301,14 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     if (!formData.internshipHistory?.some(i => i.jobTitle || i.employer)) return null;
     return (
       <section key="internships">
-        <span style={mainHeadingStyle}>{formData.internshipsSectionTitle || 'Internships'}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{formData.internshipsSectionTitle || 'Internships'}</span>
         {formData.internshipHistory.map((intern, i) => (
           <div key={i} style={{ marginBottom: '8pt' }}>
-            <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-              {intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ''}{intern.city ? `, ${intern.city}` : ''}
-            </div>
-            {dateRange(intern.startDate, intern.endDate) && (
-              <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-                {dateRange(intern.startDate, intern.endDate)}
-              </div>
-            )}
-            {intern.description && <p style={{ ...bodyStyle, color: '#374151', margin: '2pt 0' }}>{intern.description}</p>}
+            <EntryHeader 
+              title={<>{intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ''}{intern.city ? `, ${intern.city}` : ''}</>}
+              date={dateRange(intern.startDate, intern.endDate)} 
+            />
+            {renderDynamicFields(intern, { ...bodyStyle, color: '#374151' })}
           </div>
         ))}
       </section>
@@ -333,7 +326,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         if (!history?.some(i => i.name)) return null;
         return (
           <section key={sectionId}>
-            <span style={mainHeadingStyle}>{title}</span>
+            <span className="section-heading" style={mainHeadingStyle}>{title}</span>
             <div style={{ width: '100%' }}>
               {history.map((item, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', padding: '2pt 0', ...bodyStyle, color: '#1f2937' }}>
@@ -346,7 +339,6 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         );
       });
 
-  // ── FIX 2: Custom Advanced — vertical list, niche niche ──────────────────
   const renderScratchAdvancedCustomSections = () =>
     Object.keys(formData)
       .filter(key => key.startsWith('customAdvancedHistory_custom_advanced_'))
@@ -357,17 +349,13 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
         if (!history?.some(i => i.title || i.city)) return null;
         return (
           <section key={sectionId}>
-            <span style={mainHeadingStyle}>{title}</span>
+            <span className="section-heading" style={mainHeadingStyle}>{title}</span>
             {history.map((item, idx) => (
               <div key={idx} style={{ marginBottom: '8pt' }}>
-                <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-                  {item.title}{item.city ? `, ${item.city}` : ''}
-                </div>
-                {dateRange(item.startDate, item.endDate) && (
-                  <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-                    {dateRange(item.startDate, item.endDate)}
-                  </div>
-                )}
+                <EntryHeader 
+                  title={<>{item.title}{item.city ? `, ${item.city}` : ''}</>}
+                  date={dateRange(item.startDate, item.endDate)} 
+                />
                 {renderDynamicFields(item, { ...bodyStyle, color: '#374151' })}
               </div>
             ))}
@@ -395,14 +383,10 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.experiences?.map((exp, i) => (
         <div key={exp.id || i} style={{ marginBottom: '8pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {exp.jobTitle}{exp.company ? `, ${exp.company}` : ''}{exp.city ? `, ${exp.city}` : ''}
-          </div>
-          {dateRange(exp.startDate, exp.endDate) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
-              {dateRange(exp.startDate, exp.endDate)}
-            </div>
-          )}
+          <EntryHeader 
+            title={<>{exp.jobTitle}{exp.company ? `, ${exp.company}` : ''}{exp.city ? `, ${exp.city}` : ''}</>}
+            date={dateRange(exp.startDate, exp.endDate)} 
+          />
           {renderDynamicFields(exp, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
         </div>
       ))}
@@ -414,14 +398,10 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.educations?.map((edu, i) => (
         <div key={edu.id || i} style={{ marginBottom: '8pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {edu.degree}{edu.institute ? `, ${edu.institute}` : ''}{edu.city ? `, ${edu.city}` : ''}
-          </div>
-          {dateRange(edu.startDate, edu.endDate) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
-              {dateRange(edu.startDate, edu.endDate)}
-            </div>
-          )}
+          <EntryHeader 
+            title={<>{edu.degree}{edu.institute ? `, ${edu.institute}` : ''}{edu.city ? `, ${edu.city}` : ''}</>}
+            date={dateRange(edu.startDate, edu.endDate)} 
+          />
           {renderDynamicFields(edu, { ...bodyStyle, color: '#374151' })}
         </div>
       ))}
@@ -433,14 +413,10 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.certifications?.map((cert, i) => (
         <div key={cert.id || i} style={{ marginBottom: '8pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {cert.name}{cert.organization ? `, ${cert.organization}` : ''}
-          </div>
-          {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2pt' }}>
-              {dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)}
-            </div>
-          )}
+          <EntryHeader 
+            title={<>{cert.name}{cert.organization ? `, ${cert.organization}` : ''}</>}
+            date={dateRange(cert.startDate || cert.startYear, cert.endDate || cert.endYear)} 
+          />
           {renderDynamicFields(cert, { ...bodyStyle, color: '#374151', lineHeight: text.lineHeight })}
         </div>
       ))}
@@ -451,15 +427,11 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     <section key={section.id}>
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.courses?.map((course, i) => (
-        <div key={course.id || i} style={{ marginBottom: '6pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {course.course}{course.institution ? `, ${course.institution}` : ''}
-          </div>
-          {dateRange(course.startDate, course.endDate) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-              {dateRange(course.startDate, course.endDate)}
-            </div>
-          )}
+        <div key={course.id || i} style={{ marginBottom: '8pt' }}>
+          <EntryHeader 
+            title={<>{course.course}{course.institution ? `, ${course.institution}` : ''}</>}
+            date={dateRange(course.startDate, course.endDate)} 
+          />
         </div>
       ))}
     </section>
@@ -470,15 +442,11 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.internships?.map((intern, i) => (
         <div key={intern.id || i} style={{ marginBottom: '8pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ''}{intern.city ? `, ${intern.city}` : ''}
-          </div>
-          {dateRange(intern.startDate, intern.endDate) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-              {dateRange(intern.startDate, intern.endDate)}
-            </div>
-          )}
-          {intern.description && <p style={{ ...bodyStyle, color: '#374151', margin: '2pt 0' }}>{intern.description}</p>}
+          <EntryHeader 
+            title={<>{intern.jobTitle}{intern.employer ? `, ${intern.employer}` : ''}{intern.city ? `, ${intern.city}` : ''}</>}
+            date={dateRange(intern.startDate, intern.endDate)} 
+          />
+          {renderDynamicFields(intern, { ...bodyStyle, color: '#374151' })}
         </div>
       ))}
     </section>
@@ -489,15 +457,11 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.activities?.map((a, i) => (
         <div key={a.id || i} style={{ marginBottom: '8pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {a.functionTitle}{a.employer ? `, ${a.employer}` : ''}{a.city ? `, ${a.city}` : ''}
-          </div>
-          {dateRange(a.startDate, a.endDate) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-              {dateRange(a.startDate, a.endDate)}
-            </div>
-          )}
-          {a.description && <p style={{ ...bodyStyle, color: '#374151', margin: '2pt 0' }}>{a.description}</p>}
+          <EntryHeader 
+            title={<>{a.functionTitle}{a.employer ? `, ${a.employer}` : ''}{a.city ? `, ${a.city}` : ''}</>}
+            date={dateRange(a.startDate, a.endDate)} 
+          />
+          {renderDynamicFields(a, { ...bodyStyle, color: '#374151' })}
         </div>
       ))}
     </section>
@@ -505,8 +469,8 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
 
   const renderHobbiesFromSection = (section) =>
     section.hobbies ? (
-      <section key={section.id}>
-        <span style={mainHeadingStyle}>{section.title}</span>
+      <section key={section.id} style={{ }}>
+        <span className="section-heading" style={mainHeadingStyle}>{section.title}</span>
         <p style={{ ...bodyStyle, color: '#374151', margin: 0 }}>{section.hobbies}</p>
       </section>
     ) : null;
@@ -516,7 +480,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     const items = section.items || [];
     return (
       <section key={section.id}>
-        <span style={mainHeadingStyle}>{section.title}</span>
+        <span className="section-heading" style={mainHeadingStyle}>{section.title}</span>
         <div style={{ width: '100%' }}>
           {items.map((item, i) => {
             const name = typeof item === 'object' ? (item?.name || item?.title) : item;
@@ -532,20 +496,15 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
     );
   };
 
-  // ── FIX 2: renderCustomAdvancedFromSection — vertical list ───────────────
   const renderCustomAdvancedFromSection = (section) => (
     <section key={section.id}>
       <span style={mainHeadingStyle}>{section.title}</span>
       {section.items?.map((item, i) => (
         <div key={item.id || i} style={{ marginBottom: '8pt' }}>
-          <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>
-            {item.title}{item.city ? `, ${item.city}` : ''}
-          </div>
-          {dateRange(item.startDate, item.endDate) && (
-            <div style={{ fontSize: `${text.body - 1}pt`, color: '#9ca3af', textTransform: 'uppercase', marginBottom: '2pt' }}>
-              {dateRange(item.startDate, item.endDate)}
-            </div>
-          )}
+          <EntryHeader 
+            title={<>{item.title}{item.city ? `, ${item.city}` : ''}</>}
+            date={dateRange(item.startDate, item.endDate)} 
+          />
           {renderDynamicFields(item, { ...bodyStyle, color: '#374151' })}
         </div>
       ))}
@@ -616,7 +575,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           if (!history?.some(i => i.name)) return null;
           return (
             <section key={id}>
-              <span style={mainHeadingStyle}>{title}</span>
+              <span className="section-heading" style={mainHeadingStyle}>{title}</span>
               <div style={{ width: '100%' }}>
                 {history.map((item, idx) => (
                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6', padding: '2pt 0', ...bodyStyle, color: '#1f2937' }}>
@@ -635,7 +594,7 @@ const Professional = ({ formData, sections, sectionOrder, themeColor, resumeSett
           if (!history?.some(i => i.title || i.city)) return null;
           return (
             <section key={id}>
-              <span style={mainHeadingStyle}>{title}</span>
+              <span className="section-heading" style={mainHeadingStyle}>{title}</span>
               {history.map((item, idx) => (
                 <div key={idx} style={{ marginBottom: '8pt' }}>
                   <div style={{ ...bodyStyle, fontWeight: 'bold', color: '#000' }}>{item.title}{item.city ? `, ${item.city}` : ''}</div>

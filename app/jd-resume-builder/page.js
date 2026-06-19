@@ -2404,6 +2404,8 @@ const Page = () => {
           sections={sections}
           formValues={formValues}
           resumeSettings={resumeSettings}
+          templateName={selectedTemplate}
+          themeColor={themeColor}
         >
           <div ref={componentRef}>
             <ActiveResume
