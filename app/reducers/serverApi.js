@@ -2,14 +2,19 @@
 
 import axios from 'axios';
 import { toast } from 'react-toastify';
-const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_BASE_URL });
-const serverApi=axios.create({baseURL: process.env.NEXT_PUBLIC_API_SERVER_BASE_URL})
-const formDataURL = ['user/user-profile/change-avatar','/api/usercsv/upload', '/api/usercsv/upload-excel'];
+const api = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://resumebuilderbackend.hiringeye.ai'
+});
+
+const serverApi = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_SERVER_BASE_URL || 'https://resumebuildermicroservice.hiringeye.ai'
+});
+const formDataURL = ['user/user-profile/change-avatar', '/api/usercsv/upload', '/api/usercsv/upload-excel'];
 serverApi.interceptors.request.use((req) => {
     let userTokenData;
     try {
         // userTokenData = JSON.parse(sessionStorage.getItem('resumeToken'));c
-         userTokenData = JSON.parse(localStorage.getItem('resumeToken'));
+        userTokenData = JSON.parse(localStorage.getItem('resumeToken'));
     } catch (error) {
         userTokenData = null;
     }
