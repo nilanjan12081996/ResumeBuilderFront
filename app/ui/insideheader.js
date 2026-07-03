@@ -227,7 +227,7 @@ const Insideheader = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                             </svg>
                             <p className="text-[11px] text-amber-800 leading-relaxed">
-                              One resume credit will be deducted upon download. Please prepare your resume carefully. You can either download in <strong>PDF</strong> or <strong>Word</strong> format.
+                              After downloading, you will not be able to edit or make any changes to your resume. Please review it carefully before downloading. One credit will be used per download. You can either download in <strong>PDF</strong> or <strong>Word</strong> format.
                             </p>
                           </div>
                         </div>
@@ -322,78 +322,78 @@ const Insideheader = () => {
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
                 <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-100"
-                  style={{ background: "linear-gradient(135deg, #faf5ff, #f5f3ff)" }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
-                      {profileData?.data?.avatar ? (
-                        <img src={profileData.data.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
-                      ) : (
-                        <FaUser className="text-purple-400 text-sm" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-gray-800 truncate leading-tight">
-                        {profileData?.data?.fullname}
-                      </p>
-                      <p className="text-[11px] text-gray-400 truncate">
-                        {profileData?.data?.email}
-                      </p>
+                  <div className="px-4 py-3 border-b border-gray-100"
+                    style={{ background: "linear-gradient(135deg, #faf5ff, #f5f3ff)" }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
+                        {profileData?.data?.avatar ? (
+                          <img src={profileData.data.avatar} alt="avatar" className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          <FaUser className="text-purple-400 text-sm" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-gray-800 truncate leading-tight">
+                          {profileData?.data?.fullname}
+                        </p>
+                        <p className="text-[11px] text-gray-400 truncate">
+                          {profileData?.data?.email}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p style={{
-                    fontSize: "9px",
-                    fontWeight: 800,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    color: "#a855f7",
-                    marginBottom: "8px",
-                  }}>
-                    Credits Remaining
-                  </p>
-                  <RemainingCountHeader />
-                </div>
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p style={{
+                      fontSize: "9px",
+                      fontWeight: 800,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      color: "#a855f7",
+                      marginBottom: "8px",
+                    }}>
+                      Credits Remaining
+                    </p>
+                    <RemainingCountHeader />
+                  </div>
 
-                <ul className="flex flex-col py-1.5">
-                  <li className="px-0">
-                    <Link
-                      href="/profile"
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                  <ul className="flex flex-col py-1.5">
+                    <li className="px-0">
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <FaUser className="text-gray-500 text-xs" />
+                        </div>
+                        <span className="font-medium">My Profile</span>
+                      </Link>
+                    </li>
+                    <li className="px-0">
+                      <Link
+                        href="/support"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-blue-50 transition-colors group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
+                          <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <span className="font-medium group-hover:text-blue-500 transition-colors">Help & Support</span>
+                      </Link>
+                    </li>
+                    <li
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-red-50 transition-colors group"
+                      onClick={handleLogout}
                     >
-                      <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <FaUser className="text-gray-500 text-xs" />
+                      <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0 group-hover:bg-red-100 transition-colors">
+                        <MdOutlineLogout className="text-red-400 text-sm" />
                       </div>
-                      <span className="font-medium">My Profile</span>
-                    </Link>
-                  </li>
-                  <li className="px-0">
-                    <Link
-                      href="/support"
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-blue-50 transition-colors group"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
-                        <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <span className="font-medium group-hover:text-blue-500 transition-colors">Help & Support</span>
-                    </Link>
-                  </li>
-                  <li
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-gray-600 text-sm cursor-pointer hover:bg-red-50 transition-colors group"
-                    onClick={handleLogout}
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0 group-hover:bg-red-100 transition-colors">
-                      <MdOutlineLogout className="text-red-400 text-sm" />
-                    </div>
-                    <span className="font-medium group-hover:text-red-500 transition-colors">Log Out</span>
-                  </li>
-                </ul>
-              </div>
+                      <span className="font-medium group-hover:text-red-500 transition-colors">Log Out</span>
+                    </li>
+                  </ul>
+                </div>
               </>
             )}
           </div>

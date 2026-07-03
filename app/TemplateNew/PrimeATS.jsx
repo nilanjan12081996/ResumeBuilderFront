@@ -552,16 +552,15 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
       <style>{`
         .resume-content ul { list-style-type: disc; padding-left: 16pt; margin: 2pt 0; }
         .resume-content ol { list-style-type: decimal; padding-left: 16pt; margin: 2pt 0; }
-        .resume-content li { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
+        .resume-content li { margin-bottom: 2pt; }
         .resume-content strong { font-weight: bold; }
         .resume-content em { font-style: italic; }
-        .resume-content p { margin-bottom: 2pt; break-inside: avoid; page-break-inside: avoid; }
+        .resume-content p { margin-bottom: 2pt; }
       `}</style>
       <table
         style={{
           width: "100%",
           borderCollapse: "collapse",
-          minHeight: "297mm",
           backgroundColor: "#fff",
           fontFamily: text.primaryFont || "Arial",
           lineHeight: text.lineHeight || 1.5,
@@ -569,10 +568,10 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
           boxSizing: "border-box",
         }}
       >
-        <thead><tr><th style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></th></tr></thead>
+        <thead><tr><th style={{ height: `${layout.topBottom}pt`, padding: 0, margin: 0, border: "none" }}></th></tr></thead>
         <tbody>
           <tr>
-            <td style={{ padding: `${layout.topBottom}pt ${layout.leftRight}pt`, verticalAlign: "top" }}>
+            <td style={{ paddingLeft: `${layout.leftRight}pt`, paddingRight: `${layout.leftRight}pt`, verticalAlign: "top" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8pt" }}>
           <tbody>
             <tr>
@@ -641,12 +640,21 @@ const PrimeATS = ({ formData, sections, sectionOrder, themeColor, resumeSettings
             </tr>
           </tbody>
         </table>
-
-              {renderDynamicSections()}
             </td>
           </tr>
+
+          {/* Map each section into its own table row to prevent Chromium's massive single-cell multi-page gap bug */}
+          {renderDynamicSections()?.map((sectionNode, idx) => 
+            sectionNode ? (
+              <tr key={idx}>
+                <td style={{ paddingLeft: `${layout.leftRight}pt`, paddingRight: `${layout.leftRight}pt`, verticalAlign: "top" }}>
+                  {sectionNode}
+                </td>
+              </tr>
+            ) : null
+          )}
         </tbody>
-        <tfoot><tr><td style={{ height: "20px", padding: 0, margin: 0, border: "none" }}></td></tr></tfoot>
+        <tfoot><tr><td style={{ height: `${layout.topBottom}pt`, padding: 0, margin: 0, border: "none" }}></td></tr></tfoot>
       </table>
     </div>
   );

@@ -86,7 +86,18 @@ export const useDownload = ({ componentRef, formValues, resumeSettings, sections
         s.height = 'auto';
         s.maxHeight = 'none';
       }
+      
+      // html-docx-js sets DOCX fonts directly from inline styles. 
+      // MS Word for Mac panics and falls back to Symbol/Wingdings if it doesn't recognize a web font (like 'Inter').
+      // We must map all inline fonts to safe system fonts for DOCX.
+      if (processImages && s.fontFamily) {
+        s.fontFamily = fontStack(s.fontFamily.replace(/['"]/g, '').split(',')[0].trim());
+      }
     });
+
+    if (processImages && cloned.style.fontFamily) {
+      cloned.style.fontFamily = fontStack(cloned.style.fontFamily.replace(/['"]/g, '').split(',')[0].trim());
+    }
 
     if (processImages) {
       await processImagesForDocx(cloned);
