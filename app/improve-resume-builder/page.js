@@ -254,6 +254,8 @@ const Page = () => {
     const normalized = JSON.parse(JSON.stringify(currentData));
 
     if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
+      // If user reverts changes before the debounce finishes, we must clear the "saving" status!
+      setSavingStatus(prev => prev === "saving" ? "saved" : prev);
       return;
     }
 

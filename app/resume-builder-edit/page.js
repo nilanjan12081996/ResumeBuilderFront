@@ -582,6 +582,7 @@ const page = () => {
     }));
 
     if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
+      setSavingStatus(prev => prev === "saving" ? "saved" : prev);
       return;
     }
 

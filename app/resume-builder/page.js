@@ -407,12 +407,13 @@ const {uploadImageScratchLoading} = useSelector((state) => state.resume);
   // Auto-Save Effect
   useEffect(() => {
     if (resumeIds.mongo_id && resumeIds.mysql_id) {
-      const currentDataNormalized = JSON.parse(JSON.stringify({
+      const normalized = JSON.parse(JSON.stringify({
         ...formValues,
         resumeSettings,
       }));
 
-      if (lastSavedData.current && isEqual(currentDataNormalized, lastSavedData.current)) {
+      if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
+        setSavingStatus(prev => prev === "saving" ? "saved" : prev);
         return;
       }
 

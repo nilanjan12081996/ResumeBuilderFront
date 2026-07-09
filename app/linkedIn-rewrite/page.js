@@ -232,7 +232,10 @@ const LinkedInResumeBuilder = () => {
     const currentData = { ...formValues, sections, resumeSettings };
     const normalized = JSON.parse(JSON.stringify(currentData));
 
-    if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) return;
+    if (lastSavedData.current && isEqual(normalized, lastSavedData.current)) {
+      setSavingStatus(prev => prev === "saving" ? "saved" : prev);
+      return;
+    }
 
     setSavingStatus("saving");
 
